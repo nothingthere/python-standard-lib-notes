@@ -1,0 +1,58 @@
+#+TITLE: python3.5标准库
+
+* 内置函数
+
+- *abs* (x)
+  返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
+
+- *all* (/iterable/)
+  如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
+  true。相当于：
+
+  #+BEGIN_SRC python
+    def all(iterable):
+        for element in iterable:
+            if not element:
+                return False
+        return True
+  #+END_SRC
+
+- *any* (iterable)
+  如果iterable中任何一个元素为true则返回True，如果为空则返回False。
+
+  #+BEGIN_SRC python
+    def any(iterable):
+        for element in iterable:
+            if element:
+                return True
+        return false
+  #+END_SRC
+
+- *ansii* (object)
+  同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
+  ascii码：
+
+  #+BEGIN_EXAMPLE
+    >>> repr("我")
+    "'我'"
+    >>> ascii("我")
+    "'\\u6211'"
+  #+END_EXAMPLE
+
+- *bin* (x)
+  返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
+  法__index__()：
+
+  #+BEGIN_SRC python
+    class Test:
+        def __init__(self, num):
+            self.num = num
+
+        def __index__(self):
+            return self.num
+
+    t = Test(1024)
+    print(bin(t))
+  #+END_SRC
+
+- class *bool* ([x])
