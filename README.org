@@ -1,4 +1,4 @@
-#+TITLE: python3.5标准库
+#+TITLE: python3.5标准库学习笔记
 
 * 内置函数
 
@@ -32,7 +32,7 @@
   同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
   ascii码：
 
-  #+BEGIN_EXAMPLE
+  #+BEGIN_EXAMPLE python
     >>> repr("我")
     "'我'"
     >>> ascii("我")
@@ -52,7 +52,150 @@
             return self.num
 
     t = Test(1024)
-    print(bin(t))
+    print(bin(t)) # 0b10000000000
   #+END_SRC
 
 - class *bool* ([x])
+  如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
+  [[真假判断]]。
+
+- class *bytearray* ([source[,encoding[,errors]]])
+
+- class *bytes* ([source,[encoding[,errors]]])
+
+- *callable* (object)
+
+  如果object可被调用，则返回True
+
+  #+BEGIN_EXAMPLE
+    >>> def foo():
+    ...     return
+    ...
+    >>> callable(foo)
+    True
+    >>> a = 1
+    >>> callable(a)
+    False
+  #+END_EXAMPLE
+
+- *chr* (i)
+  返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
+  范围为(0-1,114,111)。
+
+  #+BEGIN_EXAMPLE python
+    >>> chr(97)
+    'a'
+    >>> ord('a')
+    97
+    >>> chr(8364)
+    '€'
+  #+END_EXAMPLE
+
+- *classmethod*  (function)
+
+- *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)
+
+- class *complex* [real[,img]]
+
+- *delattr* (object,name)
+  与setattr()相反。参数分别为对象和字符串。'delattr(x, 'foobar')'相当
+  于'del x.foobar'。
+
+- class *dict* (**kwarg)
+- class *dict* (mapping, **kwarg)
+- class *dict* (iterable, **kwarg)
+  创建“字典”。
+
+- *dir* ([object])
+
+  #+BEGIN_EXAMPLE python
+    >>> dir()
+    ['__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__']
+    >>> import struct
+    >>> dir()
+    ['__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__', 'struct']
+    >>> dir(struct)
+    ['Struct', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_clearcache', 'calcsize', 'error', 'iter_unpack', 'pack', 'pack_into', 'unpack', 'unpack_from']
+    >>> class Shape:
+    ...     def __dir__(self):
+    ...             return ['1', '2']
+    ...
+    >>> s = Shape()
+    >>> dir(s)
+    ['1', '2']
+  #+END_EXAMPLE
+
+* 内置常量
+
+* 内置类型
+
+** <<真假判断>>
+   除下面情况外都为True：
+  - None
+  - False
+  - 任何形式的数值0，如0、0.0、0j。
+  - 空的sequence，如''、()、[]。
+  - 空的map，如{}。
+  - 自定义类中有__bool__和__len()__方法，且实例的此方法返回0或布尔值
+    False。
+
+** 布尔值操作-and、or、not
+
+** 比较
+
+** 数值类型-int、float、complex
+
+** Iterator类型
+
+** Sequence类型-list、tuple、range
+
+** 文本Sequence类型-str
+
+** 二进制Sequence类型-bytes、bytearray、menoryview
+
+*** Bytes
+
+** Set类型-set、frozenset
+
+** Mapping类型-dict
+
+** Context Manager 类型
+
+** 其他内置类型
+
+** 特殊属性
+* 文本处理函数
+
+* 二进制数据函数
+
+* 数据类型
+
+* 数字和数学计算模块
+
+* 函数式编程模块
+
+* 文件和文件夹操作
+
+* 数据保持
+
+* 数据压缩和打包
+
+* 文件格式
+
+* 加密函数
+
+* 基本系统操作
+
+* 并发执行
+
+* 进程通话和网络
+
+* 网络数据处理
+
+* 标记语言处理工具
+
+* 网络协议和支持
+
+* 多媒体服务
+
+* 国际化
