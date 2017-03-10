@@ -1,4 +1,4 @@
-#+TITLE: python3.5标准库学习笔记
+#+TITLE: python（3.5）标准库学习笔记
 
 * 内置函数
 
@@ -117,8 +117,6 @@
   - 如果object是类实例，则返回其本身的属性名，及递归到的父类属性名。
   - 否则，为该object的熟悉名，加所属类的属性名，加递归到的父类属性名。
 
-- *divmode* (a,b)
-
 #+BEGIN_EXAMPLE python
     >>> dir()
     ['__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__']
@@ -135,6 +133,123 @@
     >>> dir(s)
     ['1', '2']
 #+END_EXAMPLE
+
+- *divmode* (a,b)
+  接受2个数值（非复数），返回除值和余数组成的tuple。如果都为都为整数结
+  果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通畅
+  为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
+  都非常难接近a。
+
+- *enumerate* (iterable, start=0)
+  返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
+  持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
+  为索引（从0开始），第二个元素为原来对象的元素。
+  #+BEGIN_EXAMPLE python
+    >>> seasons = ['spring', 'summer', 'fall', 'winter']
+    >>> list(enumerate(seasons))
+    [(0, 'spring'), (1, 'summer'), (2, 'fall'), (3, 'winter')]
+    >>> list(enumerate(seasons, start=1))
+    [(1, 'spring'), (2, 'summer'), (3, 'fall'), (4, 'winter')]
+  #+END_EXAMPLE
+
+  相当于：
+
+  #+BEGIN_SRC python
+    def enumarate(sequence, start=0):
+        n = start
+        for elem in sequence:
+            yield n, elem
+            n += 1
+  #+END_SRC
+
+- *eval* (expression,globals=None,locals=None)
+
+- *exec* (object[,globals[,locals]])
+
+- *filter* (function,iterable)
+  返回按照function判断后iterable中元素为True的所有元素组成的iterator对
+  象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
+
+  如果function不为None，则相当于(item for item in iterable if
+  function(item))；如果function为None则相当于(item for item in
+  iterable if item)。
+
+- class *float* ([x])
+  返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
+
+  如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
+  的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
+  且可不区分呢大小写。
+
+  #+BEGIN_EXAMPLE python
+    >>> float('+1.23')
+    1.23
+    >>> float('    -12345\n')
+    -12345.0
+    >>> float('1e-003')
+    0.001
+    >>> float('-Infinity')
+    -inf
+  #+END_EXAMPLE
+
+- *format* (value[,format_spec])
+  按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
+  则相当于str(value)：
+
+  #+BEGIN_EXAMPLE python
+    >>> format('me', '>30')
+    '                            me'
+    >>> format('me', '<30')
+    'me                            '
+    >>> format('me', '30')
+    'me                            '
+    >>> format('me', '')
+    'me'
+  #+END_EXAMPLE
+
+  调用format(value, format_spec)时，实际上是转换为了
+  type(value).__format__(value, format_spec)。即搜索value对应类型
+  的__format__()方法。如果递归搜索父类有__format__()方法，且无
+  format_spec参数，则使用该方法；如果有使用了format_spec参数，则返回
+  TypeError错误。如果format_spec或方法返回值不是字符串，也会返回
+  TypeError错误。
+
+- class *frozenset* ([iterable])
+
+- *getattr* (object,name[,default])
+  返回对象object属性name对应值。name必须为字符串。如果name是object的属
+  性，则返回对应属性值，即getattr(x, 'foobar')相当于x.foobar；如果不存
+  在name属性，且有default参数，则返回default参数，否则返回
+  AttributeError错误。
+
+- *globals* ()
+  返回一个表示当前全局symbol table的dict，总是当前module的全局symbol
+  table。
+
+  如果在函数或方法中，module为其定义时的module，而非调用时的module。
+
+- *hasattr* (object, name)
+  参数分别为对象和字符串。如果name是object的属性则返回True，否则返回
+  False。（实现方法为，调用getattr(object, name)函数，看是否返回
+  AttributeError错误。）
+
+- *hash* (object)
+  返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
+  较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
+
+- *hex* (x)
+  将整数转换为小写的16进制字符串。
+
+  #+BEGIN_EXAMPLE python
+    >>> hex(255)
+    '0xff'
+    >>> hex(-42)
+    '-0x2a'
+  #+END_EXAMPLE
+
+  如需使用16进制字符串表示浮点数，使用float.hex()方法。
+
+- *id* (object)
 
 * 内置常量
 
