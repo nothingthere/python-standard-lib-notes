@@ -233,6 +233,11 @@
   False。（实现方法为，调用getattr(object, name)函数，看是否返回
   AttributeError错误。）
 
+- *help* ([object])
+  在命令行查看帮助文档。如果不带参数，则进入帮助文档交互模式。如果为字
+  符串，则显示对应的module、函数、类、方法、关键字或相关文档。如果参数
+  为对象，则显示对应文档，如help(1)显示整型对应的帮助文档。
+
 - *hash* (object)
   返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
   较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
@@ -250,6 +255,179 @@
   如需使用16进制字符串表示浮点数，使用float.hex()方法。
 
 - *id* (object)
+  返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
+  如果两个对象的生命周期没有交集，可能相同。
+
+  *CPython实现中：*  此值为该对象的内存地址。
+
+- *input* ([prompt])
+  如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
+  输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
+  错误。
+
+  #+BEGIN_EXAMPLE python
+    >>> s = input('---> ')
+    ---> hello world
+    >>> s
+    'hello world'
+  #+END_EXAMPLE
+
+- class *int* (x=0)
+- class *int* (x, base=10)
+  返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
+  字，返回x.__int__()；如果为浮点数，返回值为去除小数点后面的内容。
+
+  如果x不是数字或有base参数，x须为字符串、bytes或bytearray实例。前面可
+  有正负号，首位可有空格。base的取值范围内为2-35，默认为10。
+
+- *isinstance* (object,classinfo)
+  如果object是，或间接是（递归父类）classinfo的实例则返回True。
+  classinfo可为类型名，也可为多个类型名组成的tuple。当为tuple时，
+  object直接或间接为其中某个元素的实例即返回True。如果classinfo不为类
+  型名或类型名组成的tuple则返回TypeError错误。
+
+- *issubclass* (class, classinfo)
+  如果class直接或间接为classinfo的子类，返回True。一个类总是自己的子类。
+  classinfo可为单个类名，也可为多个类型名组成的tuple。为tuple时，其中
+  的每个类名都会检查。其他任何情况都会返回TypeError错误。
+
+- *iter* (object[,sentinel])
+  返回一个iterator对象。第二个参数决定第一个参数的解释方式：
+
+  - 如果无第二个参数：object须为一个支持迭代协议（__iter__()方法）的
+    collection对象；或者须支持sequence协议（__getitem__()，整数参数以0
+    开始）。如果两种协议都不支持，则返回TypeError错误。
+
+  - 如果有第二个参数sentinel：object须为可调用对象（即函数）。所返回的
+    iterator的生成过程为不带参数调用object的__next__()方法。如果返回值
+    等于sentinel则返回StopIteration错误，否则返回__next__()方法的返回
+    值。
+
+	第二种形式适合于读取文本，直到指定行。如下例直到readline()方法返回
+    空字符串：
+
+	#+BEGIN_SRC python
+      with open('mydate.txt') as fp:
+          for line in iter(fp.readline, ''):
+              process_line(line)
+	#+END_SRC
+
+- *len* (s)
+  返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
+  range），也可为collection（如dictionary、set或frozen set）。
+
+- class *list* ([iterable])
+  list实际上是一个mutable sequence类型。
+
+- *locals* ()
+  在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
+  数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
+  方法中有区别。
+
+- *map* (function, iterable,...)
+  对iterable中的元素每个调用function函数，返回map类型，可使用list函数
+  转换为list类型。如果有多个iterable参数，则function也需有对应个数的参
+  数，结果长度与长度最小的iterable参数相同。
+
+- *max* (iterable, *[,key,default])
+- *max* (arg1,arg2,*args[,key])
+  返回iterable中，或者是2个或以上参数中最大的一个。
+
+  - 如果只有一个普通参数，则须为iterable类型。可使default关键字参数，
+    指定该iterable中无参数时的返回值。如果ietrable参数为空，且无
+    default参数，则返回ValueError错误。
+  - 如果有多普通参数，不能使用default关键字参数。
+
+  两种情况都能使用key关键字参数（与list.sort()函数的用法相同）。[[http://www.oschina.net/code/snippet_111708_16478][@优雅先
+  生]]：
+
+  #+BEGIN_SRC python
+  # 最简单的形似：
+  max(1,2)
+  max('a','b')
+
+  # 也可对list和tuple使用：
+  max([1,2])
+  max((1,2))
+
+  # 还可指定比较函数
+  max('ah', 'bf', key=lambda x: x[1])
+
+  def comparotor(x):
+  return x[1]
+
+  max('ah', 'bf', key=comparotor)
+  #+END_SRC
+
+- *momeryview* (obj)
+
+- *max* (iterable, *[,key,default])
+- *max* (arg1,arg2,*args[,key])
+  与max函数用法相同
+
+- *next* (iterator[,default])
+  通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
+  且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
+  值。
+
+- class *object*
+  返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
+  不接受任何参数。
+
+  *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
+
+- oct(x)
+  返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
+  返回一个整数。
+
+- *open* (file,
+  mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
+
+- *ord* (c)
+
+- *pow* (x,y[,z])
+
+- *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
+
+- class *property* (fget=None,fset=None,fdel=None,doc=None)
+
+- *range* (stop)
+- *range* (start,stop,[,step])
+
+- *repr* (object)
+
+- *reversed* (seq)
+
+- *round* (number[,ndigits])
+
+- class *set* ([iterable])
+
+- *setattr* (object,name,value)
+
+- class *slice* (stop)
+- class *slice* (start,stop,[,step])
+
+- *sorted* (iterable[,key][,reversed])
+
+- *staticmethod* (function)
+
+- class *str* (object='')
+- class *str* (object=b'',encoding='utf-8',errors='strict')
+
+- *sum* (iterable[,start])
+
+- *super* ([type[,object-or-type]])
+
+- *tuple* ([iterable])
+
+- class *type* (object)
+- class *type* (name,bases,dict)
+
+- *vars* ([object])
+
+- *zip* (*iterables)
+
+- *__import__* (name,globals=None,locals=None,formlist=(),level=0)
 
 * 内置常量
 
