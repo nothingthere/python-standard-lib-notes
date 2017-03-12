@@ -638,6 +638,32 @@
    *注意* ：如importlib.import_module一样，日常写Python完全不需要。
 
 * 内置常量
+** *False*
+   bool类型的假值。
+** *True*
+   bool类型的真值。
+** *None*
+   NoneType类型唯一的值。常用语表示“无值”，或作为函数的默认参数。
+** *NotImplemented* ？？？
+** *Ellipsis*
+   与"..."相同。常见于在用户自定义数据中表示“切片语法”。
+** *__debug__* ？？？
+
+   *注意*: 上面的常量中，除Ellipsis外，都不能重新赋值，或作为属性名，否则返回
+   SystaxError错误。
+
+** *site* 模块添加的（常量？？？）函数
+   site模块（启动时自动加载，除非在命令行中使用-S参数），添加了下面常
+   量：
+
+   - *quit* (code=None)
+   - *exit* (code=None)
+	 退出时与系统交互返回exit码。
+   - *copyright*
+   - *licence*
+   - *credits*
+	 显示相应信息。
+
 * 内置类型
 
 ** <<真假判断>>
@@ -650,14 +676,29 @@
   - 自定义类中有__bool__和__len()__方法，且实例的此方法返回0或布尔值
     False。
 
+	操作符（Operations）和内置函数如果返回布尔型，要么返回1或True作为
+    “真”，要么返回0或False作为“假”。
+
+	*注意* ：or和and操作符总是将其一个operands作为返回值。
+
 ** 布尔值操作-and、or、not
+   下表按有限级排序：
+
+   | Operation | 结果                                    | 注意 |
+   |-----------+-----------------------------------------+------|
+   | x or y    | 如果x为false，则返回y，否则返回x        | (1)  |
+   | x an y    | 如果x为false，则返回x，否则返回y        | (2)  |
+   | not x     | 如果x为false，则返回True，否则返回False | (3)  |
+
+   注意点：
+
+   1.
 
 ** 比较
 
 ** 数值类型-int、float、complex
 
 ** Iterator类型
-
 ** Sequence类型-list、tuple、range
 
 ** 文本Sequence类型-str
@@ -678,7 +719,6 @@
 * 文本处理函数
 
 * 二进制数据函数
-
 * 数据类型
 
 * 数字和数学计算模块
