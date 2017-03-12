@@ -1,0 +1,69 @@
+#+TITLE: 内置类型
+* 内置类型
+
+** 真假判断
+   除下面情况外都为True：
+  - None
+  - False
+  - 任何形式的数值0，如0、0.0、0j。
+  - 空的sequence，如''、()、[]。
+  - 空的map，如{}。
+  - 自定义类中有__bool__和__len()__方法，且实例的此方法返回0或布尔值
+    False。
+
+	操作符（Operations）和内置函数如果返回布尔型，要么返回1或True作为
+    “真”，要么返回0或False作为“假”。
+
+	*注意* ：or和and操作符总是将其一个operands作为返回值。
+
+** 布尔值操作-and、or、not
+   下表按有限级排序：
+
+   | Operation | 结果                                    | 注意 |
+   |-----------+-----------------------------------------+------|
+   | x or y    | 如果x为false，则返回y，否则返回x        | (1)  |
+   | x an y    | 如果x为false，则返回x，否则返回y        | (2)  |
+   | not x     | 如果x为false，则返回True，否则返回False | (3)  |
+
+   注意点：
+
+   1. 只有x为假，才计算y。
+   2. 只有x为真，才计算y。
+   3. 三者中not的优先级最低，所以not a == b相当于not (a == b)，而a ==
+      not b为语法错误。
+
+** 比较
+   Python有8个比较操作符，优先级相同，不过都比布尔值操作符高。比较操作
+   可任意组合，如x < y <= z等价于x < y and y <= z（与C不同），不过y只
+   计算一次，且如果x < y 为加，不计算z，直接返回False。
+
+   | 操作符 | 含义         |
+   |--------+--------------|
+   | <      | 小于         |
+   | <=     | 小于等于     |
+   | >      | 大于         |
+   | >=     | 大于等于     |
+   | ==     | 等于         |
+   | !=     | 不等于       |
+   | is     | 对象完全相同 |
+   | is not | 不为相同对象 |
+
+** 数值类型-int、float、complex
+** Iterator类型
+** Sequence类型-list、tuple、range
+
+** 文本Sequence类型-str
+
+** 二进制Sequence类型-bytes、bytearray、menoryview
+
+*** Bytes
+
+** Set类型-set、frozenset
+
+** Mapping类型-dict
+
+** Context Manager 类型
+
+** 其他内置类型
+
+** 特殊属性

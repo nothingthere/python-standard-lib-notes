@@ -1,0 +1,27 @@
+#+TITLE: 内置常量
+* 内置常量
+** *False*
+   bool类型的假值。
+** *True*
+   bool类型的真值。
+** *None*
+   NoneType类型唯一的值。常用语表示“无值”，或作为函数的默认参数。
+** *NotImplemented* ？？？
+** *Ellipsis*
+   与"..."相同。常见于在用户自定义数据中表示“切片语法”。
+** *__debug__* ？？？
+
+   *注意*: 上面的常量中，除Ellipsis外，都不能重新赋值，或作为属性名，否则返回
+   SystaxError错误。
+
+** *site* 模块添加的（常量？？？）函数
+   site模块（启动时自动加载，除非在命令行中使用-S参数），添加了下面常
+   量：
+
+   - *quit* (code=None)
+   - *exit* (code=None)
+	 退出时与系统交互返回exit码。
+   - *copyright*
+   - *licence*
+   - *credits*
+	 显示相应信息。
