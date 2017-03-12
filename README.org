@@ -92,8 +92,7 @@
 
 ** *classmethod*  (function)
 
-** *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)
-
+** *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
 ** class *complex* [real[,img]]
 
 ** *delattr* (object,name)
@@ -161,10 +160,8 @@
             n += 1
    #+END_SRC
 
-** *eval* (expression,globals=None,locals=None)
-
-** *exec* (object[,globals[,locals]])
-
+** *eval* (expression,globals=None,locals=None)？？？
+** *exec* (object[,globals[,locals]])？？？
 ** *filter* (function,iterable)
    返回按照function判断后iterable中元素为True的所有元素组成的iterator对
    象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
@@ -374,7 +371,7 @@
 
    *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
 
-** *oct*(x)
+** *oct* (x)
    返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
    返回一个整数。
 
@@ -442,44 +439,203 @@
    返回x的y次方，相当于x**y；如果有第三个参数z，则相当于pow(x, y) % z，
    不过效率更高。
 ** *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
+   将objects打印到文本流file中，以sep隔开，最后输出end。如果无参数，则
+   只打印end。
+
+   所有非关键字参数都先转换为字符串，如str()函数。
+
+   file参数须为有write(string)方法的对象；如果无此方法，或为None，则使
+   用sys.stdout对象。由于所有需打印的参数都先转换为字符串，所以不能用
+   于二进制模式的文件对象，此情况使用file.write(...)替换。
+
+   输出内容是否被buffer由file参数决定，如果flush参数为true，则强制flush。
 ** class *property* (fget=None,fset=None,fdel=None,doc=None)
+   fget为获取属性值的函数，fset为设置属性值的函数，fdel为删除属性值的
+   函数，doc为该属性的文档字符串。
+
+   如下：
+
+   #+BEGIN_SRC python
+     class C:
+         def __init__(self):
+             self._x = None
+
+         def getx(self):
+             return self._x
+
+         def setx(self, value):
+             self._x = value
+
+         def delx(self):
+             del self._x
+
+         x = property(getx, setx, delx, "I'm the 'x' property.")
+
+     c1 = C()
+     c2 = C()
+
+     c1.x = 'c1'
+     c2.x = 'c2'
+     print(c1.x)
+     print(c2.x)
+   #+END_SRC
+
+   如果c为C的实例，则c.x调用getter函数，c.x=value调用setter函数，del
+   c.x调用delete函数。
+
+   如果有doc参数，则为该属性的文档，否则属性文档为fgets的文档字符串
+   （如果有）。将property作为”装饰器“（decorator）可方便创建自读属性：
+
+   #+BEGIN_SRC python
+     class Parrot:
+         def __init__(self):
+             self._voltage = 10000
+
+         @property
+         def valtage(self):
+             '''获取当权voltage值'''
+             return self._voltage
+
+     p = Parrot()
+     print(p.valtage)
+   #+END_SRC
+
+   此例使用@property装饰器将voltage()方法转换为了'getter'函数，来获取
+   相同名字的自读属性，且将voltage属性的文档字符串转换为了"获取当权
+   voltage值"。
+
+   使用装饰器改写第一个例子的结果为：
+
+   #+BEGIN_SRC python
+     class C:
+         def __init__(self):
+             self._x = None
+
+         @property
+         def x(self):
+             """I'am the 'x' property."""
+             return self._x
+
+         @x.setter
+         def x(self, value):
+             self._x = value
+
+         @x.deleter
+         def x(self):
+             del self._x
+
+     c1 = C()
+     c2 = C()
+
+     c1.x = 'c1'
+     c2.x = 'c2'
+     print(c1.x)
+     print(c2.x)
+
+     # del c1.x
+     # print(c1.x)
+   #+END_SRC
+
 ** *range* (stop)
 ** *range* (start,stop,[,step])
-
+   与其说range是一个函数，不如说是一个immutable sequence类型。
 ** *repr* (object)
+   返回打印前用字符串表示的object。
+
+   对大多数对象而言，此函数返回的值与使用eval()函数返回的值相同，否则
+   用尖括号表示其类型名及其名称和地址。
+
+   在声明类时，可定义__repr__()方法指定此函数的返回值。
 
 ** *reversed* (seq)
+   返回一个将seq逆序后的iterator。seq需有__reversed__()方法，或支持
+   sequence协议（__len__()方法和__getitem()__整数参数以0开始）。
 
 ** *round* (number[,ndigits])
+   返回小数点后有ndigits个数的浮点数。如果无ndigits参数或为None，则返
+   回最近的整数。
 
 ** class *set* ([iterable])
-
+   返回一个新的set对象，可使用iterable中的元素初始化。
 ** *setattr* (object,name,value)
-
-** class *slice* (stop)
+   与getattr()相反。参数分别为object、字符串和任意值。string可以是
+   object已有的属性名，也可是新属性名。setattr(x, 'foobar', '123')相当
+   于x.foobar = 123。
+** class *slice* (stop)？？？
 ** class *slice* (start,stop,[,step])
-
 ** *sorted* (iterable[,key][,reversed])
+   返回排序后的iterable对象。
 
+   key和reversed参数都需使用关键字参数。
+
+   key为排序时对每个元素的操作，比如key=str.lower()。默认值为None。
+
+   reverse参数如果为True，则排序时默认原来元素都已逆序。
 ** *staticmethod* (function)
+   将函数作为静态方法。
 
+   静态方法不接受"self"参数，如：
+
+   #+BEGIN_SRC python
+     class C:
+         @staticmethod
+         def f(arg1,arg2,...)...
+   #+END_SRC
+
+   可在实例中调用（C().f()），也可在类上调用（C.f()）。
 ** class *str* (object='')
 ** class *str* (object=b'',encoding='utf-8',errors='strict')
-
+   返回object用字符串表示的形式。
 ** *sum* (iterable[,start])
+   将start与iterable中的每个元素从左到右相加，返回总和。iterable中的元
+   素通畅为数字，start的值不允许为字符串。
+
+   其他几个函数对特定情况效率更高：
+
+   - ''.join(sequence)：拼接字符串。
+   - math.fsum()：求浮点数和，且保留精度。
+   - itertools.chain()：拼接多个iterable。
 
 ** *super* ([type[,object-or-type]])
 
-** *tuple* ([iterable])
+   #+BEGIN_SRC python
+     class C(B):
+         def method(self, arg):
+             super().method(arg)     # 相当于super(C, self).method(arg)
+   #+END_SRC
 
+** *tuple* ([iterable])
+   实际上是tuple类。
 ** class *type* (object)
 ** class *type* (name,bases,dict)
+   如果只有一个参数object，返回其类型。返回值为type对象，通畅与
+   object.__class__属性值相同。
 
-** *vars* ([object])
+   *注意* ：测试对象类型时，最好使用isinstance()函数，因为其将子类型考
+   虑其中。
 
+   如果有哦3个参数，则返回一个新的type对象。相当于动态的class声明。字
+   符串name参数变为__name__属性，tuple类型bases转变为新类型的基础类，
+   并变为__bases__属性，dict字典转换为__dict__属性。如下2个语句实际上
+   生成的为相同类：
+
+   #+BEGIN_EXAMPLE python
+     >>> class X:
+     ...     a = 1
+     ...
+     >>> X = type('X', (object,), dict(a=1))
+   #+END_EXAMPLE
+
+** *vars* ([object]) ？？？
 ** *zip* (*iterables)
+   将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
+   那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
+   中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
 
 ** *__import__* (name,globals=None,locals=None,formlist=(),level=0)
+   代码中调用import时，相当于调用了此函数。
+
+   *注意* ：如importlib.import_module一样，日常写Python完全不需要。
 
 * 内置常量
 * 内置类型
