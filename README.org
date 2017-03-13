@@ -843,9 +843,206 @@
 **** classmethod float. *fromhex* (s)
 *** numeric类型哈希计算（Hashing）
 ** Iterator类型
-*** Generator类型
-** Sequence类型-list、tuple、range
+   Python支持在容器（container）外面嵌套一个迭代层。此实现使用了2个不
+   同的方法，帮助用户自定义类主持迭代。后面讨论的Sequence总是支持下面
+   的迭代方法。
 
+   容器对象需支持container. *__iter__* ()方法提供迭代支持，此方法： 返
+   回一个迭代对象。
+
+   迭代对象本身需支持iterator. *__iter__* ()和iterator. *__next__* ()
+   方法。
+
+*** Generator类型
+	如果容器对象有__iter__()方法，且为generator实现，则自动返回迭代对
+	象，且支持__iter__()和__next__()方法。
+
+** Sequence类型-list、tuple、range
+   3个基本的Sequence类型为：链表、元组和范围。另外两个专门用于处理二进
+   制数据（binary date）和文本字符串（text string）Sequence类型在专门
+   章节讨论。
+*** 常用的Sequence操作
+	下表的操作对mutable和immutable都有效。其中s和t都是类型相同的
+	Sequence，n、i和j都是整数索引，x？
+
+	整个表中的优先级递增。in和not in具有相同的优先级，+和*的优先级同用
+	于数字运算一样。
+
+    | 操作符               | 结果                               | 注意点 |
+    |----------------------+------------------------------------+--------|
+    | x in s               | 如果x与s中某个元素equal，返回True  | (1)    |
+    | x not in s           | 如果x与s中某个元素equal，返回False | (1)    |
+    | s + t                | 将s和t连接                         | (6)(7) |
+    | s * n 或 n * s       | 将s复制n次                         | (2)(7) |
+    | s[i]                 | s中的第i个元素，第一个元素为s[0]   | (3)    |
+    | s[i:j]               | 截取s中第i到j的元素                | (3)(4) |
+    | s[i:j:k]             | 截取s中第i到j的元素，跨度为k       | (3)(5) |
+    | len(s)               | s的元素个数                        |        |
+    | min(s)               | s中最下的元素                      |        |
+    | max(s)               | s中最大的元素                      |        |
+    | s.index[x[, i[, j]]] | s中第一个x的索引（索引i后，j前）   | (8)    |
+    | s.count(x)           | s中x的个数                         |        |
+
+	同类型的sequence可做比较。比如链表和元组，为逐个比较其中的元素。即
+	两个Sequence相等，则需对应位置的元素相等，且类型相同，长度相等。
+
+	注意点：
+
+	1. in和not in通常用来判断是否包含某元素，不过一些特殊的Sequence，
+       如str、bytes和bytearray也可同样使用：
+
+	   #+BEGIN_EXAMPLE python
+         >>> 'gg' in 'egge'
+         True
+	   #+END_EXAMPLE
+
+	2. n如果小于0，则作为0对待，返回相同类型的Sequence，单其中无元素。
+       注意，复制s本身并不是正真复制，而是多次引用原来的元素：
+
+	   #+BEGIN_EXAMPLE python
+         >>> lists = [[]] * 3
+         >>> lists
+         [[], [], []]
+         >>> lists[0].append(3)
+         >>> lists
+         [[3], [3], [3]]
+	   #+END_EXAMPLE
+
+	3. 如果i或j为负数，则相当于les(s)+i和len(s)+j。
+
+	4. 截取s时，如果没有i，则i相当于0；如果没有j，则j相当于len(s)。如
+       果i或j大于len(s)，则默认为len(s)；如果i >= j，则结果中没有任何
+       元素。
+
+	5. 使用步数k参数：相当于截取元素i、i+k、i+2k...，直到大于或等于
+       j（不包含j）。k值不能为0，如果为None则默认为1。
+
+	6. 拼接immutable类型的Sequence时，会生成新对象。意味着复制自身拼接
+       时耗时按次方增加，如需使耗时线性等价可：
+
+	   1. 如果是拼接str对象，可先链表再使用str.join()函数合成字符串；
+          或者将其写入一个io.StringIO实例，最后再获取。
+
+	   2. 如歌拼接bytes对象，可同字符串一样使用bytes.join()函数或
+          io.BytesIO；或者使用bytearray，bytearray对象为mutable类型，
+          效率更高。
+
+	   3. 如果拼接元组，可转换为链表再操作。
+
+	   4. 对于其他类型，参考相应文档。
+
+	7. 如range这样的对象，不支持拼接和复制。
+
+	8. 如果s中无元素x，则返回Valueerror错误。如果有i和j参数，则相当于
+       s[i:j].index(x)，只是没有数据复制，且返回索引值相对于sequence的
+       起始位置，而非截断的起始位置。
+
+*** Immutable Sequence类型
+	immutable类型中有，而mutable类型中没有实现的唯一操作是hash()。
+
+	此特性可使immutable类型，如元组，可作为字典(dict)的key值，或另存为
+	set或frozenset。
+
+	如果尝试hash含unhashable元素的immutable类型，则返回Typeerror错误。
+	如：
+
+	#+BEGIN_EXAMPLE python
+      >>> hash((1,2,[2]))
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        TypeError: unhashable type: 'list'
+	#+END_EXAMPLE
+
+*** Mutable Sequence类型
+	下表为只有mutable类型才有的操作。其中s为mutable类型的实例，t为任何
+	可迭代的对象，x?
+
+    | 操作              | 结果                                                 | 注意点 |
+    |-------------------+------------------------------------------------------+--------|
+    | s[i]=x            | 使用x替换s中索引为i的元素                            |        |
+    | s[i:j]=t          | 将s中i->j截断替换为可迭代对象t中的内容               |        |
+    | del s[i:j]        | 与s[i:j]=[]同                                        |        |
+    | s[i:j:k]=t        | 将截断对应位置上的元素逐个替换为t中的元素            | (1)    |
+    | del s[i:j:k]      | 将截断s[i:j:k]从s中删除                              |        |
+    | s.append(x)       | 将x添加到s末尾，相当于s[len(s):len(s)]=[x]           |        |
+    | s.clear()         | 清除s中所有元素，相当于del s[:]                      | (5)    |
+    | s.copy            | 复制s，相当于s[:]                                    | (5)    |
+    | s.extend(t)或s+=t | 将t中的元素拼接到s后，基本上等价于s[len(s):len(s)]=t |        |
+    | s *= n            | s自身复制n次                                         | (6)    |
+    | s.insert(i, x)    | 将s中第i个元素变为x，等价于s[i:i]=x                  |        |
+    | s.pop([i])        | 返回s中第i个元素，并将其删除                         | (2)    |
+    | s.remove(x)       | 将s中出现的第一个x删除                               | (3)    |
+    | s.reverse()       | 将s自身逆序。                                        | (4)    |
+
+	注意点：
+
+	1. t需与截断的长度相等。
+	2. 可选参数i默认值为-1，即默认删除最后一个元素。
+	3. 如果s中不存在元素x，则返回Valueerror错误。
+	4. 为逆序大型sequence时的效率考虑，reverse()方法直接将该sequence逆
+       序。为提醒使用者，故意不反悔逆序后的sequence。
+	5. clear()和copy()方法是为了兼容不支持截断的mutable序列类型接口，
+       如set和dict。
+	6. n为整数，或有__index__()方法的对象。当n<=0时，清空。同上，复制
+       自身并不是真正复制，而是复制reference：
+
+	   #+BEGIN_EXAMPLE python
+         >>> t = [[1],[2]]
+         >>> t *= 2
+         >>> t
+         [[1], [2], [1], [2]]
+         >>> t[0].append(1000)
+         >>> t
+         [[1, 1000], [2], [1, 1000], [2]]
+	   #+END_EXAMPLE
+
+*** 链表（List）
+	链表为mutable类型的sequence，一般用来存储相同类型的元素。
+
+**** class *list* ([iterable])
+	 构建链表有下面方法：
+	 - 使用方括号构建空链表。
+	 - 使用方括号，指定其中元素4用逗号隔开。如[a]、[a,b,c]。
+	 - 或者为[x for x in iterable]的形式。
+	 - 或者使用类型构造器：list()或list(iterable)。
+
+	 使用最后一种方法，list构造链表时，新生成的链表中元素顺序同原来的
+	 iterable相同。iterable可以是sequence、支持迭代的容器、或者是
+	 iterator对象。 如果iterable本身就是链表，则是复制其reference。如
+	 果没有参数，则返回空链表：
+
+	 #+BEGIN_EXAMPLE python
+       >>> a = [[1],[2]]
+       >>> b = list(a)
+       >>> b
+       [[1], [2]]
+       >>> b[0].append(100)
+       >>> b
+       [[1, 100], [2]]
+       >>> a
+       [[1, 100], [2]]
+	 #+END_EXAMPLE
+
+	 有许多其他操作符可生成链表，如sorted()。
+
+	 除上面所有Sequence和mutable类型支持的操作符外，链表还支持sort方法：
+***** *sort* (*, key=None,reverse=None)
+	  元素见比较时，仅能使用“<”比较。如果比较过程中出现语义错误，如“1
+	  < 'a'”，则整个排序过程终止（可能将原链表部分排序）。
+
+	  key和reverse参数仅能以关键字参数的形式出现。
+
+	  key参数为接受一个参数的函数，用来指定各元素比较内容，如
+	  "key=str.lower"。此函数只在每个元素调用一次。默认值为None，表示
+	  不计算每个元素中的key值。
+
+	  如果reverse参数为True，则逆序排序。
+
+	  同reverse函数一样，为保证操作大型sequence时的效率，排序直接改变
+	  原来链表，也不反悔排序后的链表。（可使用sorted()函数创建一个排序
+	  后的新链表实例。）
+*** 元组（Tuple）
+*** 范围（Range）
 ** 文本Sequence类型-str
 
 ** 二进制Sequence类型-bytes、bytearray、menoryview
