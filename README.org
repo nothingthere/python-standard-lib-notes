@@ -861,7 +861,7 @@
    3个基本的Sequence类型为：链表、元组和范围。另外两个专门用于处理二进
    制数据（binary date）和文本字符串（text string）Sequence类型在专门
    章节讨论。
-*** 常用的Sequence操作
+*** 常用的Sequence操作符
 	下表的操作对mutable和immutable都有效。其中s和t都是类型相同的
 	Sequence，n、i和j都是整数索引，x？
 
@@ -1001,6 +1001,7 @@
 
 **** class *list* ([iterable])
 	 构建链表有下面方法：
+
 	 - 使用方括号构建空链表。
 	 - 使用方括号，指定其中元素4用逗号隔开。如[a]、[a,b,c]。
 	 - 或者为[x for x in iterable]的形式。
@@ -1025,7 +1026,7 @@
 
 	 有许多其他操作符可生成链表，如sorted()。
 
-	 除上面所有Sequence和mutable类型支持的操作符外，链表还支持sort方法：
+	 除上面第一节Sequence和第二节mutable类型支持的操作符外，链表还支持sort方法：
 ***** *sort* (*, key=None,reverse=None)
 	  元素见比较时，仅能使用“<”比较。如果比较过程中出现语义错误，如“1
 	  < 'a'”，则整个排序过程终止（可能将原链表部分排序）。
@@ -1039,12 +1040,63 @@
 	  如果reverse参数为True，则逆序排序。
 
 	  同reverse函数一样，为保证操作大型sequence时的效率，排序直接改变
-	  原来链表，也不反悔排序后的链表。（可使用sorted()函数创建一个排序
+	  原来链表，也不返回排序后的链表。（可使用sorted()函数创建一个排序
 	  后的新链表实例。）
 *** 元组（Tuple）
+	元组是immutable类型的Sequence；常用来将类型不同的数据存储在一起，
+	如内置函数enumarate()的返回的2元素元组；有时也用于存储immutable类
+	型的Sequence，如作为set或dict的元素。？
+
+**** class *tuple* ([iterable])
+	 构造元组有下面方法：
+
+	 - 一对小括号表示空元组：()。
+	 - 在原始后面加逗号表示一元素元组，可无小括号：a,或(a,)。
+	 - 多个元素间用逗号隔开，可无小括号：a,b,c或(a,b,c)。
+	 - 使用内置tuple构造器函数：tuple或tuple(iterable)。
+
+	 最后一种方法构造的元组，其元素的顺序与参数iterable中的顺序相同。
+	 iterable可为Sequence、支持迭代的容器或iterator对象。如果iterable
+	 本来就是元组，则同链表一样，也是复制其reference，如果无参数则生成
+	 空元组：
+
+	 #+BEGIN_EXAMPLE python
+       >>> t = ([1],[2],[3])
+       >>> t
+       ([1], [2], [3])
+       >>> s = tuple(t)
+       >>> s
+       ([1], [2], [3])
+       >>> t[0].append(1)
+       >>> t
+       ([1, 1], [2], [3])
+       >>> s
+       ([1, 1], [2], [3])
+
+       # 元组与链表转换时也只是复制其reference
+       >>> t
+       ([1], [2], [3])
+       >>> t = [[1],[2],[3]]
+       >>> s = tuple(t)
+       >>> s
+       ([1], [2], [3])
+       >>> s[0].append(1000)
+       >>> s
+       ([1, 1000], [2], [3])
+       >>> t
+       [[1, 1000], [2], [3]]
+	 #+END_EXAMPLE
+
+	 *注意* ：实际上是逗号，而非小括号构成的元组。小括号基本可省略，单
+	 在造成语义混淆的地方不可少，如f(a,b,c)为函数调用3个参数，二
+	 f((a,b,c))则是调用了一个3元素元组参数。
+
+	 元组支持前面第一节中，所有Sequence通用操作符。
+
+	 对于内涵不同类型元素的元组，可使用collections.namedtuple()类型实
+	 现通过字符串名称获取索引，比纯数字索引更合适。
 *** 范围（Range）
 ** 文本Sequence类型-str
-
 ** 二进制Sequence类型-bytes、bytearray、menoryview
 
 *** Bytes
