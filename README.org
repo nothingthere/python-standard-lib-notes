@@ -59,9 +59,7 @@
    [[真假判断]]。
 
 ** class *bytearray* ([source[,encoding[,errors]]])
-
 ** class *bytes* ([source,[encoding[,errors]]])
-
 ** *callable* (object)
 
    如果object可被调用，则返回True
@@ -91,7 +89,6 @@
    #+END_EXAMPLE
 
 ** *classmethod*  (function)
-
 ** *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
 ** class *complex* [real[,img]]
 
@@ -614,7 +611,7 @@
    *注意* ：测试对象类型时，最好使用isinstance()函数，因为其将子类型考
    虑其中。
 
-   如果有哦3个参数，则返回一个新的type对象。相当于动态的class声明。字
+   如果有3个参数，则返回一个新的type对象。相当于动态的class声明。字
    符串name参数变为__name__属性，tuple类型bases转变为新类型的基础类，
    并变为__bases__属性，dict字典转换为__dict__属性。如下2个语句实际上
    生成的为相同类：
@@ -896,7 +893,7 @@
          True
 	   #+END_EXAMPLE
 
-	2. n如果小于0，则作为0对待，返回相同类型的Sequence，单其中无元素。
+	2. n如果小于0，则作为0对待，返回相同类型的Sequence，但其中无元素。
        注意，复制s本身并不是正真复制，而是多次引用原来的元素：
 
 	   #+BEGIN_EXAMPLE python
@@ -1096,6 +1093,7 @@
 	 对于内涵不同类型元素的元组，可使用collections.namedtuple()类型实
 	 现通过字符串名称获取索引，比纯数字索引更合适。
 *** 范围（Range）
+
 ** 文本Sequence类型-str
 ** 二进制Sequence类型-bytes、bytearray、menoryview
 
