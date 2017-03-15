@@ -1590,6 +1590,7 @@
 	 [[http://www.runoob.com/python/att-string-translate.html][@runoob]]：
 
 	 #+BEGIN_EXAMPLE python
+       >>> str = 'a a'
        >>> intab = 'aeiou'
        >>> outtab = '12345'
        >>> tantab = str.maketrans(intab, outtab) #创建翻译字典
