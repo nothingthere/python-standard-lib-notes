@@ -1093,8 +1093,534 @@
 	 对于内涵不同类型元素的元组，可使用collections.namedtuple()类型实
 	 现通过字符串名称获取索引，比纯数字索引更合适。
 *** 范围（Range）
+	range类型为immutable的数字Sequence，常与for语句搭配表示循环次数。
+**** class *range* (stop)
+**** class *range* (start,stop[,step])
+	 所有参数都须为整数（内置int类型或有__index__方法的对象）。如果
+	 无step参数，默认为1；如果无start参数，默认为0；如果step参数为0，
+	 则返回ValueError错误。下面为range的用法举例：
+
+	 #+BEGIN_EXAMPLE python
+       >>> list(range(10))
+       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+       >>> list(range(1, 11))
+       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+       >>> list(range(0, 30, 5))
+       [0, 5, 10, 15, 20, 25]
+       >>> list(range(0, 10, 3))
+       [0, 3, 6, 9]
+       >>> list(range(0, -10, -1))
+       [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+       >>> list(range(0, -10, 1))
+       []
+       >>> list(range(0))
+       []
+       >>> list(range(1, 0))
+       []
+	 #+END_EXAMPLE
+
+	 除拼接和复制外，range支持上面第一小节中所有Sequence支持的操作。原
+	 因为range对象只能表示严格模式的Sequence，拼接和复制会损坏此模式。
+
+	 range对象有start、stop和step3属性，分别对应创建时的三个值：
+
+	 #+BEGIN_EXAMPLE python
+       >>> r = range(1, 20, 5)
+       >>> r.start
+       1
+       >>> r.stop
+       20
+       >>> r.step
+       5
+	 #+END_EXAMPLE
+
+	 较之链表和元组，range占用内存更小。无论表示序列个数多少，所占内存
+	 固定：只存储start、stop和step3个值，各元素需要时才计算。
+
+	 range实现了collections.abc.Sequence ABC，支持元素包含测试，索引查
+	 找，截断和负截断：
+
+	 #+BEGIN_EXAMPLE python
+       >>> r = range(0, 20, 2)
+       >>> r
+       range(0, 20, 2)
+       >>> 11 in r
+       False
+       >>> 10 in r
+       True
+       >>> r.index(10)
+       5
+       >>> r[5]
+       10
+       >>> r[:5]
+       range(0, 10, 2)
+       >>> r[-1]
+       18
+	 #+END_EXAMPLE
+
+	 使用==和!=判断range是否相等时，同一般Sequence一样，即两者中元素是
+	 否逐个相等。两个相等的range可有不同的start、stop和step值，如
+	 range(0) == range(2, 1, 3)。
 
 ** 文本Sequence类型-str
+   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
+   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
+   可用下面方式表示：
+
+   - 单引号：'里面可用"双引号"'。
+   - 双引号："里面可有'单引号'"。
+   - 三引号：'''可以是三个单引号'''，"""也可以是三个双引号"""。
+
+   三引号表示的字符串可跨行书写，且保留换行符。
+
+   在同一个表达式中，如果字符串间只有空格，则字典拼接：("spam"
+   "eggs") == "spam eggs"。
+
+   由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
+   值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
+
+   由于字符串本身为immutable，为保证效率，可拼接字符串时可使用
+   str.join()和io.StringIO方法。
+
+   - class *str* (object='')
+   - class *str* (object='', encoding='utf-8',errors='strict')
+	 返回object的字符串形式。如果无object参数，返回空字符串；否则，返
+     回值由下面规则决定：
+
+	 如果encoding和errors参数都没有，返回值实际上是object.__str__()方
+     法的返回值。对于字符串对象，则是返回该字符串本身；如果
+     object无__str__()方法，则是返回调用repr(object)函数的返回值。
+
+	 如果encoding和errors中只要出现任意一个，object就须为类bytes对象
+     （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
+     bytes.decode(encoding, errors)。
+
+	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
+     正式"字符串：
+
+	 #+BEGIN_EXAMPLE python
+       >>> str(b'Zoot')
+       "b'Zoot'"
+	 #+END_EXAMPLE
+
+*** 字符串方法
+	字符串类型支持第一节中所有Sequence常用的操作，此外还支持下面列举的
+	操作。
+
+	字符串支持两种格式化方法：str.format()方法，和与C中printf类似的方
+	法。
+**** str. *capitalize* ()
+	 返回复制后的字符串，第一个字母大写，其余字母小写。
+**** str. *casefold* ()
+	 相当于str.lower()方法。[[http://www.cnblogs.com/zhanmeiliang/p/5988207.html][@爱尔兰时空]]：
+
+	 lower()只对'A-Z'有效，不能处理其他语言中小写的问题，如德语中'ß'的
+	 小写为'ss'：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'ß'
+       >>> s.lower()
+       'ß'
+       >>> s.casefold()
+       'ss'
+	 #+END_EXAMPLE
+**** str. *center* (width[,fillchar])
+	 将字符串扩展为长度width，原字符串至于中间，空白处使用fillchar字符
+	 填充（默认为ASCII空格字符），如果width小于或等于len(s)，则返回原
+	 来字符串：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'claudio'
+       >>> s.center(10)
+       ' claudio  '
+       >>> s.center(10, '|')
+       '|claudio||'
+       >>> s.center(1)
+       'claudio'
+	 #+END_EXAMPLE
+
+**** str. *count* (sub[,start[,end]])
+	 返回字符串sub出现的次数，可指定在截断[start:end]间计算：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.count('an')
+       2
+       >>> s.count('an', -3)
+       1
+       >>> s.count('an', 3)
+       1
+	 #+END_EXAMPLE
+**** str. *encode* (encoding='utf-8',errors='strict')
+	 以bytes对象的形式返回字符串编码后的结果。默认编码为utf-8；默认
+	 errors值为strict，即当出现编码错误时返回UnicodeError错误，其他可
+	 取值为ignore、replace、xmlcharrefreplace和backslashreplace，以及
+	 其他通过codecs.register_error()方法寄存的名称。
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'claudio'.encode()
+       b'claudio'
+       >>> '学习'.encode()
+       b'\xe5\xad\xa6\xe4\xb9\xa0';
+	 #+END_EXAMPLE
+**** str. *endswith* (suffix,[,start[,end]])
+	 如果字符串以suffix结尾返回True，否则返回False。可指定在截断
+	 [start:end]中计算：
+
+	 #+BEGIN_EXAMPLE
+       >>> 'banana'.endswith('na')
+       True
+       >>> 'banana'.endswith('na', 5)
+       False
+       >>> '香蕉'.endswith('蕉')
+       True
+	 #+END_EXAMPLE
+**** str. *expandtabs* (tabsize=8)
+	 返回复制后的字符串，其中tab字符使用一个或多个空格替代，可指定一个
+	 tab字符所占列数：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '01\t012\t0123\t01234'.expandtabs()
+       '01      012     0123    01234'
+       >>> '01\t012\t0123\t01234'.expandtabs(4)
+       '01  012 0123    01234'
+	 #+END_EXAMPLE
+**** str. *find* (sub[,start[,end]])
+	 返回从左到右起，sub出现在字符串中的索引，可指定在截断[start:end]
+	 中计算，如果无sub字符串出现，则返回-1。
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'banana'.find('a')
+       1
+       >>> 'banana'.find('a', 4)
+       5
+       >>> 'banana'.find('a', 19)
+       -1
+	 #+END_EXAMPLE
+
+	 为效率考虑，只有需知道sub在字符串中的索引时才使用find()方法，如果
+	 只是判断是否出现sub，使用in操作符即可：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'Py' in 'Python'
+       True
+       >>> 'py' in 'Python'
+       False
+	 #+END_EXAMPLE
+
+**** str. *format* (*args,**kwargs)
+	 对字符串进行格式化。字符串中可含普通字符，也可含需被替换的place
+	 holder，用{}表示。{}中可为数字或关键字参数，分别对应format中的
+	 args和kwargs：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'The sum of 1 + 2 is {0}'.format(1+2)
+       'The sum of 1 + 2 is 3'
+       >>> 'The sum of {a} + {b} is {0}'.format(1+2, a=1, b=2)
+       'The sum of 1 + 2 is 3'
+	 #+END_EXAMPLE
+
+	 如需打印大括号本身，使用双层大括号：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'format 中使用{{}}表示placeholder'.format()
+       'format 中使用{}表示placeholder'
+	 #+END_EXAMPLE
+
+**** str. *format_map* (mapping)
+	 与str.format(***mapping)类型，不过是直接使用mapping，而不是复制到
+	 dict中。如果mapping本身就是dict的一个子类，则非常方便。？？？：
+
+	 #+BEGIN_EXAMPLE
+       >>> d = {'name': 'Guido'}
+       >>> '{name} was born in ?'.format(**d)
+       'Guido was born in ?'
+
+       >>> class Default(dict):
+       ...     def __missing__(self, key):
+       ...             return key
+       ...
+       >>> '{name} was born in {country}'.format_map(Default(name='Guido'))
+       'Guido was born in country'
+	 #+END_EXAMPLE
+
+**** str. *index* (sub[,start[,end]])
+	 同find()方法类似，不过当不能在字符串中找到sub时返回ValueError错误，
+	 而非-1：
+
+	 #+BEGIN_EXAMPLE
+       >>> 'banana'.index('a')
+       1
+       >>> 'banana'.index('aD')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         ValueError: substring not found
+	 #+END_EXAMPLE
+
+**** str. *isalnum* ()
+	 如果字符串不为空，且其中所有字符非数字即"字母"，则返回True：
+
+	 #+BEGIN_EXAMPLE
+       >>> '111'.isalnum()
+       True
+       >>> ''.isalnum()
+       False
+       >>> '11#'.isalnum()
+       False
+	 #+END_EXAMPLE
+
+	 只要c.isalpha()、c.isdecimal()、c.isdigit()或c.isnumeric()中一个
+	 返回True，则c.isalnum()就返回True。
+
+**** str. *isalpha* ()
+	 如果字符串中不为空，且所有字符窦唯“字母”则返回True。只要Unicode字
+	 符数据库中认为是"字母"都可。
+
+	 *注意* ：不同于Unicode Standard中定义的"Alphabetic"。
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'a'.isalpha()
+       True
+       >>> '一'.isalpha()
+       True
+	 #+END_EXAMPLE
+**** str. *isdecimal* ()
+	 字符串不为空，且所有字符都是十进制数字符，即所有能用于表示十进制
+	 数的字符。
+**** str. *isdigit* ()
+	 除isdecimal字符外，还包含“compatibility superscript digits”。？？？
+**** str. *isidentifier* ()
+	 如果是Python中合法的identifier（变量名、函数名和类名），则返回
+	 True：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'is_identifer'.isidentifier()
+       True
+       >>> 'is-identifer'.isidentifier()
+       False
+       >>> 'is2identifer'.isidentifier()
+       True
+       >>> '_is_identifer'.isidentifier()
+       True
+       >>> '_is_identifer#'.isidentifier()
+       False
+	 #+END_EXAMPLE
+
+	 如需判断是否是“保留字”，使用keuword.iskeyword()方法：
+
+	 #+BEGIN_EXAMPLE python
+       >>> import keyword
+       >>> keyword.iskeyword('def')
+       True
+       >>> keyword.iskeyword('class')
+       True
+       >>> keyword.iskeyword('name')
+       False
+       >>> keyword.iskeyword('__init__')
+       False
+	 #+END_EXAMPLE
+**** str. *islower* ()
+	 含至少一个有大小写区分的字符，且所有有大小写区别的字符都为小写：
+
+	 #+BEGIN_EXAMPLE
+       >>> 'abc'.islower()
+       True
+       >>> ''.islower()
+       False
+       >>> 'ab三'.islower()
+       True
+       >>> 'ab3'.islower()
+       True
+       >>> '一'.islower()
+       False
+	 #+END_EXAMPLE
+
+**** str. *isnumeric* ()？？？
+	 字符串不为空，且所有字符都为数字字符：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '012'.isnumeric()
+       True
+       >>> '0X12'.isnumeric()
+       False
+       >>> '0x12'.isnumeric()
+       False
+	 #+END_EXAMPLE
+
+	 *？* ：和isdigit的区别。
+
+**** str. *isprintable* ()
+	 只含所有可见字符+空格字符，以及空字符串返回True：
+
+	 #+BEGIN_EXAMPLE python
+       >>> ' '.isprintable()
+       True
+       >>> '\n '.isprintable()
+       False
+       >>> ''.isprintable()
+       True
+	 #+END_EXAMPLE
+**** str. *isspace* ()
+	 所有空白字符。
+	 #+BEGIN_EXAMPLE python
+       >>> ''.isspace()
+       False
+       >>> ' '.isspace()
+       True
+       >>> '\n\t'.isspace()
+       True
+	 #+END_EXAMPLE
+**** str. *istitle* ()
+	 含至少一个字符，为标题形式的字符串返回True。
+
+	 #+BEGIN_EXAMPLE
+       >>> 'I Have A Dream'.istitle()
+       True
+       >>> 'I Have a Dream'.istitle()
+       False
+       >>> 'I HAVE A Dream'.istitle()
+       False
+       >>> 'I HavE A Dream'.istitle()
+       False
+       >>> '我是标题'.istitle()
+       False
+       >>> 'The Way to Go'.istitle()
+       False
+	 #+END_EXAMPLE
+**** str. *isupper* ()
+	 含至少一个有大小写区分的字符，且所有区分大小写的字符都为大写。
+**** str. *join* (iterable)
+	 使用字符串将iterable中的所有元素拼接，如果任何一个元素不为字符串
+	 （含bytes类型），则返回Valueerror错误。
+
+	 #+BEGIN_EXAMPLE python
+       >>> '|'.join(['a','b','c'])
+       'a|b|c'
+
+       >>> '|'.join(['a','b',3])
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         TypeError: sequence item 2: expected str instance, int found
+       >>> '|'.join(['a','b',b'c'])
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         TypeError: sequence item 2: expected str instance, bytes found
+
+       >>> '|'.join([])
+       ''
+	 #+END_EXAMPLE
+**** str. *ljust* (width[,fillchar])
+	 返回指定宽带为width，左对齐后的字符串，使用fillchar填充空白字符。
+	 如果width<=len(s)则返回原来字符串。
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'claudio'.ljust(10)
+       'claudio   '
+       >>> 'claudio'.ljust(10, '|')
+       'claudio|||'
+       >>> 'claudio'.ljust(1, '|')
+       'claudio'
+	 #+END_EXAMPLE
+**** str. *lower* ()
+	 返回复制后的字符串，并将所有有大小写区别的字符转换为小写。
+**** str. *lstrip* ([chars])
+	 返回复制后的字符串，将左边的含chars中字符的所有字符删除，如果参数
+	 为None，则char默认为' '。
+
+	 *注意* ：chars不是前缀，而是单个字符的组合：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '   i have a dream    '.lstrip()
+       'i have a dream    '
+       >>> 'www.bing.com'.lstrip('w.com')
+       'bing.com'
+	 #+END_EXAMPLE
+**** static str. *maketrans* (x[,y[,z]])
+	 此方法为静态方法。作用是返回一个用于str.translate()方法翻译字符串
+	 的字典类型。
+
+	 如果只有一个参数，则须为字典型，key值可为单个字符字符串或Unocide
+	 值，value值可为单个字符字符串、Unicode值，任意长度字符串或None。
+
+	 如果是两个参数，则须为长度相等的字符串，对应位置的字符分别成为生
+	 成字典的key值和value值。
+
+	 如果是三个参数，最后一个参数需为字符串，其中的字符为会成为生成字
+	 典的key值，对应的value值则为None，即使用str.translate()方法时将删
+	 除的字符：
+
+	 #+BEGIN_EXAMPLE python
+       >>> str.maketrans({'a': '98'})
+       {97: '98'}
+       >>> str.maketrans({'a': 98})
+       {97: 98}
+       >>> str.maketrans({'a': None})
+       {97: None}
+       >>> str.maketrans({97: 'qw' })
+       {97: 'qw'}
+
+       >>> str.maketrans('aeiou', '123')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         ValueError: the first two maketrans arguments must have equal length
+       >>> str.maketrans('aeiou', '12345')
+       {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
+       >>> str.maketrans('aeiou', '12345', 'XZ')
+       {97: 49, 117: 53, 88: None, 105: 51, 90: None, 101: 50, 111: 52}
+
+	 #+END_EXAMPLE
+**** str. *partition* (sep)
+**** str. *replace* (old,new[,count])
+**** str. *rfind* (sub[,start[,end]])
+**** str. *rindex* (sub[,start[,end]])
+**** str. *rjust* (width[,fillchar])
+**** str. *rpartition* (sep)
+**** str. *rsplit* (sep=None,maxsplit=-1)
+**** str. *rstrip* ([chars])
+**** str. *split* (sep=None,maxsplit=-1)
+**** str. *splitlines* ([keepends])
+**** str. *startswith* (prefix[,start[,end]])
+**** str. *strip* ([chars])
+**** str. *swapcase* ()
+**** str. *title* ()
+**** str. *translate* (table)
+	 将字符串中的字符逐个与参数table中的元素对应，如果相同，则转换，返
+	 回转换后的结果。可使用静态方法str.maketrans(in, out)创建字典：
+
+	 [[http://www.runoob.com/python/att-string-translate.html][@runoob]]：
+
+	 #+BEGIN_EXAMPLE python
+       >>> intab = 'aeiou'
+       >>> outtab = '12345'
+       >>> tantab = str.maketrans(intab, outtab) #创建翻译字典
+       >>> tantab
+       {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
+       >>> str = 'this is a string example...wow!!!'
+       >>> str.translate(tantab)       #翻译
+       'th3s 3s 1 str3ng 2x1mpl2...w4w!!!'
+	 #+END_EXAMPLE
+
+	 table参数须为通过__getitem__()方法实现索引的对象，即mapping或
+	 sequence对象。当字典key值为整数时，可翻译为：单个字符、Unicode值；
+	 如果为None则删除原来字符。
+
+	 #+BEGIN_EXAMPLE python
+       >>> str = 'a a'
+       >>> str.translate({97:'A'})
+       'A A'
+       >>> str.translate({97:'ABC'})
+       'ABC ABC'
+       >>> str.translate({97: None})
+       ' '
+       >>> str.translate({97: 'A'})
+       'A A'
+       >>> str.translate({97: 1234})
+       'Ӓ Ӓ'
+	 #+END_EXAMPLE
+
+**** str. *upper* ()
+**** str. *zfill* (width)
+*** 格式化输出
 ** 二进制Sequence类型-bytes、bytearray、menoryview
 
 *** Bytes
