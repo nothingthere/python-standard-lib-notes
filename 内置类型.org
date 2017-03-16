@@ -1270,12 +1270,12 @@
 	*注意* ：最好使用str.format()接口格式化字符串。
 
 * 二进制Sequence类型-bytes、bytearray、menoryview
-   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryvie类
-   支持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他
-   对象的内存地址。？
+  bytes和bytearray是Python核心内置处理二进制数据的类。由memoryvie类
+  支持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他
+  对象的内存地址。？
 
-   array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
-   数。
+  array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
+  数。
 
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
@@ -1438,8 +1438,26 @@
 	#+END_EXAMPLE
 
 ** Bytes和bytearray操作符
+
+   bytes和bytearray对象都具备上面提到的Sequence通用的操作符。此外，二
+   者使用上面的通用操作符号时，可混合使用，还可同“类bytes对
+   象”（bytes-like object，bytes、bytearray和许多常见的memoryview对象）
+   一起使用，返回结果由出现顺序而定（为先出现类型）：
+
+   #+BEGIN_EXAMPLE python
+     >>> b = byte
+     bytearray(  bytes(
+     >>> b = bytes(b'abc')
+     >>> ba = bytearray(b'123')
+     >>> ba + b
+     bytearray(b'123abc')
+     >>> b + ba
+     b'abc123'
+   #+END_EXAMPLE
+
 *** bytes. *count* (sub[,start[,end]])
 *** bytearray. *count* (sub[,start[,end]])
+
 *** bytes. *decode* (encoding='utf-8',errors='strict')
 *** bytearray. *decode* (encoding='utf-8',errors='strict')
 *** bytes. *endswith* (suffix[,stat[,end]])
