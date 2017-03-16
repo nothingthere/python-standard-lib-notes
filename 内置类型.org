@@ -1,7 +1,6 @@
 #+TITLE: 内置类型
 
-* 内置类型
-** <<真假判断>>
+* 真假判断
    除下面情况外都为True：
   - None
   - False
@@ -16,7 +15,7 @@
 
 	*注意* ：or和and操作符总是将其一个operands作为返回值。
 
-** 布尔值操作-and、or、not
+* 布尔值操作-and、or、not
    下表按有限级排序：
 
    | Operation | 结果                                    | 注意 |
@@ -32,7 +31,7 @@
    3. 三者中not的优先级最低，所以not a == b相当于not (a == b)，而a ==
       not b为语法错误。
 
-** 比较
+* 比较
    Python有8个比较操作符，优先级相同，不过都比布尔值操作符高。比较操作
    可任意组合，如x < y <= z等价于x < y and y <= z（与C不同），不过y只
    计算一次，且如果x < y 为加，不计算z，直接返回False。
@@ -61,7 +60,7 @@
    in 和 not in两个操作符具有比较操作符的相同优先级，仅支持sequence类
    型。
 
-** 数字类型-int、float、complex
+* 数字类型-int、float、complex
    一共有3种数字类型：整型、浮点型和复数。此外，布尔型是整型的子类型。
    整型精度无限，浮点型通常与C中的double型精度相同（可使用
    sys.float_info变量查看）。复数分实部和虚部（都为浮点型），如果z为复
@@ -127,7 +126,7 @@
    | math.floor(x) | <=x 的最大整数                                        |
    | math.ceil(x)  | >=x 的最小整数                                        |
 
-*** 整数位运算
+** 整数位运算
 	位运算只适用于整数。负数进行位运算时取反补码（以保证足够的bit防止
 	计算时溢出）。
 
@@ -149,8 +148,8 @@
 	2. 位左移相当于没有溢出检查的乘以pow(2,n)
 	3. 位右移相当于没有溢出检查的除以pow(2,n)
 
-*** 整型的额外方法
-**** int. *bit_length* ()
+** 整型的额外方法
+*** int. *bit_length* ()
 	 返回以二进制表示整数的位数：
 
 	 #+BEGIN_EXAMPLE python
@@ -170,15 +169,15 @@
            return len(s)
 	 #+END_SRC
 
-**** int. *to_bytes* (length,byteorder,*,signed=False)？？？
-**** clasmethod int *from_bytes* (bytes,byteorder,*,signed=False)？？？
-*** 浮点型的额外方法
-**** float. *as_integer_ratio* ()
-**** float. *is_integer* ()
-**** float. *hex* ()
-**** classmethod float. *fromhex* (s)
-*** numeric类型哈希计算（Hashing）
-** Iterator类型
+*** int. *to_bytes* (length,byteorder,*,signed=False)？？？
+*** clasmethod int *from_bytes* (bytes,byteorder,*,signed=False)？？？
+** 浮点型的额外方法
+*** float. *as_integer_ratio* ()
+*** float. *is_integer* ()
+*** float. *hex* ()
+*** classmethod float. *fromhex* (s)
+** numeric类型哈希计算（Hashing）
+* Iterator类型
    Python支持在容器（container）外面嵌套一个迭代层。此实现使用了2个不
    同的方法，帮助用户自定义类主持迭代。后面讨论的Sequence总是支持下面
    的迭代方法。
@@ -189,15 +188,15 @@
    迭代对象本身需支持iterator. *__iter__* ()和iterator. *__next__* ()
    方法。
 
-*** Generator类型
+** Generator类型
 	如果容器对象有__iter__()方法，且为generator实现，则自动返回迭代对
 	象，且支持__iter__()和__next__()方法。
 
-** Sequence类型-list、tuple、range
+* Sequence类型-list、tuple、range
    3个基本的Sequence类型为：链表、元组和范围。另外两个专门用于处理二进
    制数据（binary date）和文本字符串（text string）Sequence类型在专门
    章节讨论。
-*** 常用的Sequence操作符
+** 常用的Sequence操作符
 	下表的操作对mutable和immutable都有效。其中s和t都是类型相同的
 	Sequence，n、i和j都是整数索引，x？
 
@@ -273,7 +272,7 @@
        s[i:j].index(x)，只是没有数据复制，且返回索引值相对于sequence的
        起始位置，而非截断的起始位置。
 
-*** Immutable Sequence类型
+** Immutable Sequence类型
 	immutable类型中有，而mutable类型中没有实现的唯一操作是hash()。
 
 	此特性可使immutable类型，如元组，可作为字典(dict)的key值，或另存为
@@ -289,7 +288,7 @@
         TypeError: unhashable type: 'list'
 	#+END_EXAMPLE
 
-*** Mutable Sequence类型
+** Mutable Sequence类型
 	下表为只有mutable类型才有的操作。其中s为mutable类型的实例，t为任何
 	可迭代的对象，x?
 
@@ -332,10 +331,10 @@
          [[1, 1000], [2], [1, 1000], [2]]
 	   #+END_EXAMPLE
 
-*** 链表（List）
+** 链表（List）
 	链表为mutable类型的sequence，一般用来存储相同类型的元素。
 
-**** class *list* ([iterable])
+*** class *list* ([iterable])
 	 构建链表有下面方法：
 
 	 - 使用方括号构建空链表。
@@ -363,7 +362,7 @@
 	 有许多其他操作符可生成链表，如sorted()。
 
 	 除上面第一节Sequence和第二节mutable类型支持的操作符外，链表还支持sort方法：
-***** *sort* (*, key=None,reverse=None)
+**** *sort* (*, key=None,reverse=None)
 	  元素见比较时，仅能使用“<”比较。如果比较过程中出现语义错误，如“1
 	  < 'a'”，则整个排序过程终止（可能将原链表部分排序）。
 
@@ -378,12 +377,12 @@
 	  同reverse函数一样，为保证操作大型sequence时的效率，排序直接改变
 	  原来链表，也不返回排序后的链表。（可使用sorted()函数创建一个排序
 	  后的新链表实例。）
-*** 元组（Tuple）
+** 元组（Tuple）
 	元组是immutable类型的Sequence；常用来将类型不同的数据存储在一起，
 	如内置函数enumarate()的返回的2元素元组；有时也用于存储immutable类
 	型的Sequence，如作为set或dict的元素。？
 
-**** class *tuple* ([iterable])
+*** class *tuple* ([iterable])
 	 构造元组有下面方法：
 
 	 - 一对小括号表示空元组：()。
@@ -431,10 +430,10 @@
 
 	 对于内涵不同类型元素的元组，可使用collections.namedtuple()类型实
 	 现通过字符串名称获取索引，比纯数字索引更合适。
-*** 范围（Range）
+** 范围（Range）
 	range类型为immutable的数字Sequence，常与for语句搭配表示循环次数。
-**** class *range* (stop)
-**** class *range* (start,stop[,step])
+*** class *range* (stop)
+*** class *range* (start,stop[,step])
 	 所有参数都须为整数（内置int类型或有__index__方法的对象）。如果
 	 无step参数，默认为1；如果无start参数，默认为0；如果step参数为0，
 	 则返回ValueError错误。下面为range的用法举例：
@@ -501,7 +500,7 @@
 	 否逐个相等。两个相等的range可有不同的start、stop和step值，如
 	 range(0) == range(2, 1, 3)。
 
-** 文本Sequence类型-str
+* 文本Sequence类型-str
    Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
    immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
    可用下面方式表示：
@@ -542,15 +541,15 @@
        "b'Zoot'"
 	 #+END_EXAMPLE
 
-*** 字符串方法
+** 字符串方法
 	字符串类型支持第一节中所有Sequence常用的操作，此外还支持下面列举的
 	操作。
 
 	字符串支持两种格式化方法：str.format()方法，和与C中printf类似的方
 	法。
-**** str. *capitalize* ()
+*** str. *capitalize* ()
 	 返回复制后的字符串，第一个字母大写，其余字母小写。
-**** str. *casefold* ()
+*** str. *casefold* ()
 	 相当于str.lower()方法。[[http://www.cnblogs.com/zhanmeiliang/p/5988207.html][@爱尔兰时空]]：
 
 	 lower()只对'A-Z'有效，不能处理其他语言中小写的问题，如德语中'ß'的
@@ -563,7 +562,7 @@
        >>> s.casefold()
        'ss'
 	 #+END_EXAMPLE
-**** str. *center* (width[,fillchar])
+*** str. *center* (width[,fillchar])
 	 将字符串扩展为长度width，原字符串至于中间，空白处使用fillchar字符
 	 填充（默认为ASCII空格字符），如果width小于或等于len(s)，则返回原
 	 来字符串：
@@ -578,7 +577,7 @@
        'claudio'
 	 #+END_EXAMPLE
 
-**** str. *count* (sub[,start[,end]])
+*** str. *count* (sub[,start[,end]])
 	 返回字符串sub出现的次数，可指定在截断[start:end]间计算：
 
 	 #+BEGIN_EXAMPLE python
@@ -591,7 +590,7 @@
        1
 	 #+END_EXAMPLE
 
-**** str. *encode* (encoding='utf-8',errors='strict')
+*** str. *encode* (encoding='utf-8',errors='strict')
 	 以bytes对象的形式返回字符串编码后的结果。默认编码为utf-8；默认
 	 errors值为strict，即当出现编码错误时返回UnicodeError错误，其他可
 	 取值为ignore、replace、xmlcharrefreplace和backslashreplace，以及
@@ -604,7 +603,7 @@
        b'\xe5\xad\xa6\xe4\xb9\xa0';
 	 #+END_EXAMPLE
 
-**** str. *endswith* (suffix,[,start[,end]])
+*** str. *endswith* (suffix,[,start[,end]])
 	 如果字符串以suffix结尾返回True，否则返回False。可指定在截断
 	 [start:end]中计算：
 
@@ -616,7 +615,7 @@
        >>> '香蕉'.endswith('蕉')
        True
 	 #+END_EXAMPLE
-**** str. *expandtabs* (tabsize=8)
+*** str. *expandtabs* (tabsize=8)
 	 返回复制后的字符串，其中tab字符使用一个或多个空格替代，可指定一个
 	 tab字符所占列数：
 
@@ -626,7 +625,7 @@
        >>> '01\t012\t0123\t01234'.expandtabs(4)
        '01  012 0123    01234'
 	 #+END_EXAMPLE
-**** str. *find* (sub[,start[,end]])
+*** str. *find* (sub[,start[,end]])
 	 返回从左到右起，sub出现在字符串中的索引，可指定在截断[start:end]
 	 中计算，如果无sub字符串出现，则返回-1。
 
@@ -649,7 +648,7 @@
        False
 	 #+END_EXAMPLE
 
-**** str. *format* (*args,**kwargs)
+*** str. *format* (*args,**kwargs)
 	 对字符串进行格式化。字符串中可含普通字符，也可含需被替换的place
 	 holder，用{}表示。{}中可为数字或关键字参数，分别对应format中的
 	 args和kwargs：
@@ -668,7 +667,7 @@
        'format 中使用{}表示placeholder'
 	 #+END_EXAMPLE
 
-**** str. *format_map* (mapping)
+*** str. *format_map* (mapping)
 	 与str.format(***mapping)类型，不过是直接使用mapping，而不是复制到
 	 dict中。如果mapping本身就是dict的一个子类，则非常方便。？？？：
 
@@ -685,7 +684,7 @@
        'Guido was born in country'
 	 #+END_EXAMPLE
 
-**** str. *index* (sub[,start[,end]])
+*** str. *index* (sub[,start[,end]])
 	 同find()方法类似，不过当不能在字符串中找到sub时返回ValueError错误，
 	 而非-1：
 
@@ -698,7 +697,7 @@
          ValueError: substring not found
 	 #+END_EXAMPLE
 
-**** str. *isalnum* ()
+*** str. *isalnum* ()
 	 如果字符串不为空，且其中所有字符非数字即"字母"，则返回True：
 
 	 #+BEGIN_EXAMPLE
@@ -713,7 +712,7 @@
 	 只要c.isalpha()、c.isdecimal()、c.isdigit()或c.isnumeric()中一个
 	 返回True，则c.isalnum()就返回True。
 
-**** str. *isalpha* ()
+*** str. *isalpha* ()
 	 如果字符串中不为空，且所有字符窦唯“字母”则返回True。只要Unicode字
 	 符数据库中认为是"字母"都可。
 
@@ -725,12 +724,12 @@
        >>> '一'.isalpha()
        True
 	 #+END_EXAMPLE
-**** str. *isdecimal* ()
+*** str. *isdecimal* ()
 	 字符串不为空，且所有字符都是十进制数字符，即所有能用于表示十进制
 	 数的字符。
-**** str. *isdigit* ()
+*** str. *isdigit* ()
 	 除isdecimal字符外，还包含“compatibility superscript digits”。？？？
-**** str. *isidentifier* ()
+*** str. *isidentifier* ()
 	 如果是Python中合法的identifier（变量名、函数名和类名），则返回
 	 True：
 
@@ -760,7 +759,7 @@
        >>> keyword.iskeyword('__init__')
        False
 	 #+END_EXAMPLE
-**** str. *islower* ()
+*** str. *islower* ()
 	 含至少一个有大小写区分的字符，且所有有大小写区别的字符都为小写：
 
 	 #+BEGIN_EXAMPLE
@@ -776,7 +775,7 @@
        False
 	 #+END_EXAMPLE
 
-**** str. *isnumeric* ()？？？
+*** str. *isnumeric* ()？？？
 	 字符串不为空，且所有字符都为数字字符：
 
 	 #+BEGIN_EXAMPLE python
@@ -790,7 +789,7 @@
 
 	 *？* ：和isdigit的区别。
 
-**** str. *isprintable* ()
+*** str. *isprintable* ()
 	 只含所有可见字符+空格字符，以及空字符串返回True：
 
 	 #+BEGIN_EXAMPLE python
@@ -801,7 +800,7 @@
        >>> ''.isprintable()
        True
 	 #+END_EXAMPLE
-**** str. *isspace* ()
+*** str. *isspace* ()
 	 所有空白字符。
 	 #+BEGIN_EXAMPLE python
        >>> ''.isspace()
@@ -811,7 +810,7 @@
        >>> '\n\t'.isspace()
        True
 	 #+END_EXAMPLE
-**** str. *istitle* ()
+*** str. *istitle* ()
 	 含至少一个字符，为标题形式的字符串返回True。
 
 	 #+BEGIN_EXAMPLE
@@ -828,9 +827,9 @@
        >>> 'The Way to Go'.istitle()
        False
 	 #+END_EXAMPLE
-**** str. *isupper* ()
+*** str. *isupper* ()
 	 含至少一个有大小写区分的字符，且所有区分大小写的字符都为大写。
-**** str. *join* (iterable)
+*** str. *join* (iterable)
 	 使用字符串将iterable中的所有元素拼接，如果任何一个元素不为字符串
 	 （含bytes类型），则返回Valueerror错误。
 
@@ -850,7 +849,7 @@
        >>> '|'.join([])
        ''
 	 #+END_EXAMPLE
-**** str. *ljust* (width[,fillchar])
+*** str. *ljust* (width[,fillchar])
 	 返回指定宽带为width，左对齐后的字符串，使用fillchar填充空白字符。
 	 如果width<=len(s)则返回原来字符串。
 
@@ -862,9 +861,9 @@
        >>> 'claudio'.ljust(1, '|')
        'claudio'
 	 #+END_EXAMPLE
-**** str. *lower* ()
+*** str. *lower* ()
 	 返回复制后的字符串，并将所有有大小写区别的字符转换为小写。
-**** str. *lstrip* ([chars])
+*** str. *lstrip* ([chars])
 	 返回复制后的字符串，将左边的含chars中字符的所有字符删除，如果参数
 	 为None，则char默认为' '。
 
@@ -876,7 +875,7 @@
        >>> 'www.bing.com'.lstrip('w.com')
        'bing.com'
 	 #+END_EXAMPLE
-**** static str. *maketrans* (x[,y[,z]])
+*** static str. *maketrans* (x[,y[,z]])
 	 此方法为静态方法。作用是返回一个用于str.translate()方法翻译字符串
 	 的字典类型。
 
@@ -910,7 +909,7 @@
        {97: 49, 117: 53, 88: None, 105: 51, 90: None, 101: 50, 111: 52}
 
 	 #+END_EXAMPLE
-**** str. *partition* (sep)
+*** str. *partition* (sep)
 	 将字符串在第一次出现sep时分割，返回一个3元素元组，其中第一个元素
 	 为sep前面的字符串，第二个元素为sep本身，第三个元素为后面的字符串。
 	 如果字符串中不含sep，则第一个元素为字符串本身，后面两个元素为空字
@@ -929,7 +928,7 @@
          File "<stdin>", line 1, in <module>
          ValueError: empty separator
 	 #+END_EXAMPLE
-**** str. *replace* (old,new[,count])
+*** str. *replace* (old,new[,count])
 	 将字符串中所有的old都替换为new。如果有count参数，则只替换左起
 	 count个：
 
@@ -948,7 +947,7 @@
        >>> s.replace('an', 'AN', -2)
        'bANANa'
 	 #+END_EXAMPLE
-**** str. *rfind* (sub[,start[,end]])
+*** str. *rfind* (sub[,start[,end]])
 	 返回从右其字符串中第一次出现sub的索引，可指定在截断[start:end]中
 	 计算。如果无sub字符串出现，则返回-1：
 
@@ -961,7 +960,7 @@
        >>> s.rfind('a', -4, -2)
        3
 	 #+END_EXAMPLE
-**** str. *rindex* (sub[,start[,end]])
+*** str. *rindex* (sub[,start[,end]])
 	 同rfind，不过如果无sub字符串出现返回ValueError错误：
 
 	 #+BEGIN_EXAMPLE python
@@ -974,7 +973,7 @@
          ValueError: substring not found
 	 #+END_EXAMPLE
 
-**** str. *rjust* (width[,fillchar])
+*** str. *rjust* (width[,fillchar])
 	 返回右对齐后的字符串，使用fillchar填充空白字符，默认为空格字符。
 	 如果width小于或等于len(s)，则返回字符串本身：
 
@@ -986,7 +985,7 @@
        >>> 'claudio'.rjust(1, '|')
        'claudio'
 	 #+END_EXAMPLE
-**** str. *rpartition* (sep)
+*** str. *rpartition* (sep)
 	 同str.partition，不过是从右起分割；且如果sep不出现在字符串中，返
 	 回的3元素元组前两个元素为空字符串，最后一个为字符串本身：
 
@@ -999,12 +998,12 @@
        >>> s.rpartition('X')
        ('', '', 'banana')
 	 #+END_EXAMPLE
-**** str. *rsplit* (sep=None,maxsplit=-1)
+*** str. *rsplit* (sep=None,maxsplit=-1)
 	 与split函数相同，只是从右边分割。
 
 	 *？* ：既然有split函数，此函数还有啥子卵用？
 
-**** str. *rstrip* ([chars])
+*** str. *rstrip* ([chars])
 	 返回字符串的副本，末尾中的字符只要出现在chars则被移除。如果无
 	 chars参数，或为None，则默认移除末尾的空白字符。
 
@@ -1015,7 +1014,7 @@
        'www.bing'
 	 #+END_EXAMPLE
 
-**** str. *split* (sep=None,maxsplit=-1)
+*** str. *split* (sep=None,maxsplit=-1)
 	 返回字符串中所有“单词”组成的链表，使用sep作为单词间的分隔符。如果
 	 指定maxsplit参数，则进行maxsplit次分割（即结果最多可有maxsplit+1
 	 个元素）；如果未指定maxsplit参数，或其值为-1，则最大限度分割。
@@ -1068,7 +1067,7 @@
        ['1', '2', '3']
 	 #+END_EXAMPLE
 
-**** str. *splitlines* ([keepends])
+*** str. *splitlines* ([keepends])
 	 在字符串中换行符处分割，返回链表。下表中的字符都会被当做换行符：
 
      | 字符     | 含义 |
@@ -1120,7 +1119,7 @@
        ['One line', '']
 	 #+END_EXAMPLE
 
-**** str. *startswith* (prefix[,start[,end]])
+*** str. *startswith* (prefix[,start[,end]])
 	 如果字符串有前缀prefix，则返回True，可指定在截断[start:end]中计算：
 
 	 #+BEGIN_EXAMPLE python
@@ -1133,7 +1132,7 @@
        >>> 'banana'.startswith('n', 2)
        True
 	 #+END_EXAMPLE
-**** str. *strip* ([chars])
+*** str. *strip* ([chars])
 	 返回原字符串副本，移除收尾中在chars中出现的字符。如果无chars参数，
 	 或为None，则默认删除首尾的空白字符。
 
@@ -1144,7 +1143,7 @@
        'bing'
 	 #+END_EXAMPLE
 
-**** str. *swapcase* ()
+*** str. *swapcase* ()
 
 	 返回大小写交换后的字符串副本。
 
@@ -1169,7 +1168,7 @@
        >>> s.swapcase().swapcase()
        'ss'
 	 #+END_EXAMPLE
-**** str. *title* ()
+*** str. *title* ()
 	 将原字符串中每个单词首字母大写，其他字母小写作为返回值：
 
 	 #+BEGIN_EXAMPLE python
@@ -1203,7 +1202,7 @@
        # They're Bill's Friends From Uk
 	 #+END_SRC
 
-**** str. *translate* (table)
+*** str. *translate* (table)
 	 将字符串中的字符逐个与参数table中的元素对应，如果相同，则转换，返
 	 回转换后的结果。可使用静态方法str.maketrans(in, out)创建字典：
 
@@ -1239,7 +1238,7 @@
        'Ӓ Ӓ'
 	 #+END_EXAMPLE
 
-**** str. *upper* ()
+*** str. *upper* ()
 	 返回字符串副本，将有大小写区别的字符转换为大写。
 
 	 *注意* ：如果str中只含无大小写区分字符，str.upper().isupper()可能
@@ -1254,7 +1253,7 @@
        False
 	 #+END_EXAMPLE
 
-**** str. *zfill* (width)
+*** str. *zfill* (width)
 	 返回字符串副本，使用ASCII'0'填充扩张到width长度后的左边的空白。如果有正
 	 负号，则先添加。如果width小于或等于len(s)则返回字符串本身：
 
@@ -1267,10 +1266,10 @@
        '-qwdqw'
 	 #+END_EXAMPLE
 
-*** printf风格的格式化输出
+** printf风格的格式化输出
 	*注意* ：最好使用str.format()接口格式化字符串。
 
-** 二进制Sequence类型-bytes、bytearray、menoryview
+* 二进制Sequence类型-bytes、bytearray、menoryview
    bytes和bytearray是Python核心内置处理二进制数据的类。由memoryvie类
    支持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他
    对象的内存地址。？
@@ -1278,12 +1277,12 @@
    array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
    数。
 
-*** 写在前面
-**** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
+** 写在前面
+*** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
 	 比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
 	 只含ASCII字符，直接遍历就可；单如果有非ASCII字符，这些字符可能占
 	 多个字节，就不能通过遍历每个字符来实现遍历每个字节。
-**** 进一步说明 [[https://segmentfault.com/a/1190000004450876][@xu_zhoufeng]]
+*** 进一步说明 [[https://segmentfault.com/a/1190000004450876][@xu_zhoufeng]]
 	 Bytes类似字符串，不过是由单个字节（8位，取值范围为0-255）作为基本
 	 元素的Sequence类型，也为Immutable。
 
@@ -1338,7 +1337,7 @@
          b'1a'
 	 #+END_EXAMPLE
 
-*** Bytes对象
+** Bytes对象
 	bytes对象是由单个bytes元素组成的immutable类型的Sequence。由于主要
 	的二进制协议都基于ASCII文本编码，bytes对象中有几个方法只在处理
 	ASCII兼容数据时有效，且与字符串的一些方法用法相似。
@@ -1409,7 +1408,7 @@
 	b'...'形式表示比bytes([46, 46, 46])更有用，不过还是可使用list函数
 	将bytes对象转换为整数链表。
 
-*** Bytearray对象
+** Bytearray对象
 	bytearray对象相当于immutable形式的bytes对象。不过没有相应的字面量
 	表示方法，只可用构造器函数构造：
 
@@ -1438,89 +1437,87 @@
       [46, 46, 46]
 	#+END_EXAMPLE
 
-*** Bytes和bytearray操作符
-**** bytes. *count* (sub[,start[,end]])
-**** bytearray. *count* (sub[,start[,end]])
-**** bytes. *decode* (encoding='utf-8',errors='strict')
-**** bytearray. *decode* (encoding='utf-8',errors='strict')
-**** bytes. *endswith* (suffix[,stat[,end]])
-**** bytearray. *endswith* (suffix[,stat[,end]])
-**** bytes. *find* (sub[,start[,end]])
-**** bytearray. *find* (sub[,start[,end]])
-**** bytes. *index* (sub[,start[,end]])
-**** bytearray. *index* (sub[,start[,end]])
-**** bytes. *join* (iterable)
-**** bytearray. *join* (iterable)
-**** static bytes.maketrans(from, to)
-**** static bytearray.maketrans(from, to)
-**** bytes. *partition* (sep)
-**** bytearray. *partition* (sep)
-**** bytes. *replace* (old, new, [count])
-**** bytearray. *replace* (old, new, [count])
-**** bytes. *rfind* (subp[,start[,end]])
-**** bytearray. *rfind* (subp[,start[,end]])
-**** bytes. *rindex* (sub[,start[,end]])
-**** bytearray. *rindex* (sub[,start[,end]])
-**** bytes. *rpartition* (sep)
-**** bytearray. *rpartition* (sep)
-**** bytes. *startswith* (prefix,[start[,end]])
-**** bytearray. *startswith* (prefix,[start[,end]])
-**** bytes. *translate* (table[,delete])
-**** bytearray. *translate* (table[,delete])
-**** bytes. *center* (width[,fillchar])
-**** bytearray. *center* (width[,fillchar])
-**** bytes. *ljust* (width[,fillchar])
-**** bytearray. *ljust* (width[,fillchar])
-**** bytes. *lstrip* ([chars])
-**** bytearray. *lstrip* ([chars])
-**** bytes. *rjust* (width[,fillchar])
-**** bytearray. *rjust* (width[,fillchar])
-**** bytes. *rsplit* (sep=None,maxsplit=-1)
-**** bytearray. *rsplit* (sep=None,maxsplit=-1)
-**** bytes. *rstrip* ([chars])
-**** bytearray. *rstrip* ([chars])
-**** bytes. *split* (sep=None,maxsplit=-1)
-**** bytearray. *split* (sep=None,maxsplit=-1)
-**** bytes. *strip* ([chars])
-**** bytearray. *strip* ([chars])
-**** bytes. *capitalize* ()
-**** bytearray. *capitalize* ()
-**** bytes. *expandtabs* (tabsize=8)
-**** bytearray. *expandtabs* (tabsize=8)
-**** bytes. *isalnum* ()
-**** bytearray. *isalnum* ()
-**** bytes. *isalpha* ()
-**** bytearray. *isalpha* ()
-**** bytes. *isdigit* ()
-**** bytearray. *isdigit* ()
-**** bytes. *islower* ()
-**** bytearray. *islower* ()
-**** bytes. *isspace* ()
-**** bytearray. *isspace* ()
-**** bytes. *istitle* ()
-**** bytearray. *istitle* ()
-**** bytes. *isupper* ()
-**** bytearray. *isupper* ()
-**** bytes. *lower* ()
-**** bytearray. *lower* ()
-**** bytes. *splitlines* (keepends=False)
-**** bytearray. *splitlines* (keepends=False)
-**** bytes. *swapcase* ()
-**** bytearray. *swapcase* ()
-**** bytes. *title* ()
-**** bytearray. *title* ()
-**** bytes. *upper* ()
-**** bytearray. *upper* ()
-**** bytes. *zfill* ()
-**** bytearray. *zfill* ()
-*** 使用printf风格格式化Byes
-*** Memory Views
-** Set类型-set、frozenset
+** Bytes和bytearray操作符
+*** bytes. *count* (sub[,start[,end]])
+*** bytearray. *count* (sub[,start[,end]])
+*** bytes. *decode* (encoding='utf-8',errors='strict')
+*** bytearray. *decode* (encoding='utf-8',errors='strict')
+*** bytes. *endswith* (suffix[,stat[,end]])
+*** bytearray. *endswith* (suffix[,stat[,end]])
+*** bytes. *find* (sub[,start[,end]])
+*** bytearray. *find* (sub[,start[,end]])
+*** bytes. *index* (sub[,start[,end]])
+*** bytearray. *index* (sub[,start[,end]])
+*** bytes. *join* (iterable)
+*** bytearray. *join* (iterable)
+*** static bytes.maketrans(from, to)
+*** static bytearray.maketrans(from, to)
+*** bytes. *partition* (sep)
+*** bytearray. *partition* (sep)
+*** bytes. *replace* (old, new, [count])
+*** bytearray. *replace* (old, new, [count])
+*** bytes. *rfind* (subp[,start[,end]])
+*** bytearray. *rfind* (subp[,start[,end]])
+*** bytes. *rindex* (sub[,start[,end]])
+*** bytearray. *rindex* (sub[,start[,end]])
+*** bytes. *rpartition* (sep)
+*** bytearray. *rpartition* (sep)
+*** bytes. *startswith* (prefix,[start[,end]])
+*** bytearray. *startswith* (prefix,[start[,end]])
+*** bytes. *translate* (table[,delete])
+*** bytearray. *translate* (table[,delete])
+*** bytes. *center* (width[,fillchar])
+*** bytearray. *center* (width[,fillchar])
+*** bytes. *ljust* (width[,fillchar])
+*** bytearray. *ljust* (width[,fillchar])
+*** bytes. *lstrip* ([chars])
+*** bytearray. *lstrip* ([chars])
+*** bytes. *rjust* (width[,fillchar])
+*** bytearray. *rjust* (width[,fillchar])
+*** bytes. *rsplit* (sep=None,maxsplit=-1)
+*** bytearray. *rsplit* (sep=None,maxsplit=-1)
+*** bytes. *rstrip* ([chars])
+*** bytearray. *rstrip* ([chars])
+*** bytes. *split* (sep=None,maxsplit=-1)
+*** bytearray. *split* (sep=None,maxsplit=-1)
+*** bytes. *strip* ([chars])
+*** bytearray. *strip* ([chars])
+*** bytes. *capitalize* ()
+*** bytearray. *capitalize* ()
+*** bytes. *expandtabs* (tabsize=8)
+*** bytearray. *expandtabs* (tabsize=8)
+*** bytes. *isalnum* ()
+*** bytearray. *isalnum* ()
+*** bytes. *isalpha* ()
+*** bytearray. *isalpha* ()
+*** bytes. *isdigit* ()
+*** bytearray. *isdigit* ()
+*** bytes. *islower* ()
+*** bytearray. *islower* ()
+*** bytes. *isspace* ()
+*** bytearray. *isspace* ()
+*** bytes. *istitle* ()
+*** bytearray. *istitle* ()
+*** bytes. *isupper* ()
+*** bytearray. *isupper* ()
+*** bytes. *lower* ()
+*** bytearray. *lower* ()
+*** bytes. *splitlines* (keepends=False)
+*** bytearray. *splitlines* (keepends=False)
+*** bytes. *swapcase* ()
+*** bytearray. *swapcase* ()
+*** bytes. *title* ()
+*** bytearray. *title* ()
+*** bytes. *upper* ()
+*** bytearray. *upper* ()
+*** bytes. *zfill* ()
+*** bytearray. *zfill* ()
+** 使用printf风格格式化Byes
+** Memory Views
+* Set类型-set、frozenset
+* Mapping类型-dict
+* Context Manager 类型
 
-** Mapping类型-dict
+* 其他内置类型
 
-** Context Manager 类型
-
-** 其他内置类型
-
-** 特殊属性
+* 特殊属性

@@ -1,10 +1,9 @@
 #+TITLE: 内置函数
 
-* 内置函数
-** *abs* (x)
+* *abs* (x)
    返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
 
-** *all* (/iterable/)
+* *all* (/iterable/)
    如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
    true。相当于：
 
@@ -16,7 +15,7 @@
         return True
    #+END_SRC
 
-** *any* (iterable)
+* *any* (iterable)
    如果iterable中任何一个元素为true则返回True，如果为空则返回False。
 
    #+BEGIN_SRC python
@@ -27,7 +26,7 @@
         return false
    #+END_SRC
 
-** *ansii* (object)
+* *ansii* (object)
    同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
    ascii码：
 
@@ -38,7 +37,7 @@
     "'\\u6211'"
    #+END_EXAMPLE
 
-** *bin* (x)
+* *bin* (x)
    返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
    法__index__()：
 
@@ -54,11 +53,11 @@
     print(bin(t)) # 0b10000000000
    #+END_SRC
 
-** class *bool* ([x])
+* class *bool* ([x])
    如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
    [[真假判断]]。
 
-** class *bytearray* ([source[,encoding[,errors]]])
+* class *bytearray* ([source[,encoding[,errors]]])
    返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
    bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，
    以及绝大多数bytes具有的方法。
@@ -71,13 +70,13 @@
    - 如果是buffer接口返回的对象，则使用buffer内容初始化。
    - 如果为iterable，其中元素须为0<=x<256的整数，用这些元素初始化。
 
-** class *bytes* ([source,[encoding[,errors]]])
+* class *bytes* ([source,[encoding[,errors]]])
    返回一个全新的byes对象，元素为取值范围为0<=x<256的immutable序列。
    bytes是immutable版本的bytearray，具备非mutable类型序列相同的方法，
    以及索引查找和截断操作。
 
    参数传递方式同bytearray函数。
-** *callable* (object)
+* *callable* (object)
 
    如果object可被调用，则返回True
 
@@ -92,7 +91,7 @@
     False
    #+END_EXAMPLE
 
-** *chr* (i)
+* *chr* (i)
    返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
    范围为(0-1,114,111)。
 
@@ -105,20 +104,20 @@
     '€'
    #+END_EXAMPLE
 
-** *classmethod*  (function)
-** *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
-** class *complex* [real[,img]]
+* *classmethod*  (function)
+* *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
+* class *complex* [real[,img]]
 
-** *delattr* (object,name)
+* *delattr* (object,name)
    与setattr()相反。参数分别为对象和字符串。'delattr(x, 'foobar')'相当
    于'del x.foobar'。
 
-** class *dict* (**kwarg)
-** class *dict* (mapping, **kwarg)
-** class *dict* (iterable, **kwarg)
+* class *dict* (**kwarg)
+* class *dict* (mapping, **kwarg)
+* class *dict* (iterable, **kwarg)
    创建“字典”。
 
-** *dir* ([object])
+* *dir* ([object])
    如果无参数，返回当前local scope中的name链表。如果有参数，则返回该对
    象的有效属性链表。
 
@@ -146,13 +145,13 @@
     ['1', '2']
   #+END_EXAMPLE
 
-** *divmode* (a,b)
+* *divmode* (a,b)
    接受2个数值（非复数），返回除值和余数组成的tuple。如果都为都为整数结
    果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通畅
    为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
    都非常难接近a。
 
-** *enumerate* (iterable, start=0)
+* *enumerate* (iterable, start=0)
    返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
    持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
    为索引（从0开始），第二个元素为原来对象的元素。
@@ -174,9 +173,9 @@
             n += 1
    #+END_SRC
 
-** *eval* (expression,globals=None,locals=None)？？？
-** *exec* (object[,globals[,locals]])？？？
-** *filter* (function,iterable)
+* *eval* (expression,globals=None,locals=None)？？？
+* *exec* (object[,globals[,locals]])？？？
+* *filter* (function,iterable)
    返回按照function判断后iterable中元素为True的所有元素组成的iterator对
    象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
 
@@ -184,7 +183,7 @@
    function(item))；如果function为None则相当于(item for item in
    iterable if item)。
 
-** class *float* ([x])
+* class *float* ([x])
    返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
 
    如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
@@ -202,7 +201,7 @@
     -inf
    #+END_EXAMPLE
 
-** *format* (value[,format_spec])
+* *format* (value[,format_spec])
    按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
    则相当于str(value)：
 
@@ -224,34 +223,34 @@
    TypeError错误。如果format_spec或方法返回值不是字符串，也会返回
    TypeError错误。
 
-** class *frozenset* ([iterable])
-** *getattr* (object,name[,default])
+* class *frozenset* ([iterable])
+* *getattr* (object,name[,default])
    返回对象object属性name对应值。name必须为字符串。如果name是object的属
    性，则返回对应属性值，即getattr(x, 'foobar')相当于x.foobar；如果不存
    在name属性，且有default参数，则返回default参数，否则返回
    AttributeError错误。
 
-** *globals* ()
+* *globals* ()
    返回一个表示当前全局symbol table的dict，总是当前module的全局symbol
    table。
 
    如果在函数或方法中，module为其定义时的module，而非调用时的module。
 
-** *hasattr* (object, name)
+* *hasattr* (object, name)
    参数分别为对象和字符串。如果name是object的属性则返回True，否则返回
    False。（实现方法为，调用getattr(object, name)函数，看是否返回
    AttributeError错误。）
 
-** *help* ([object])
+* *help* ([object])
    在命令行查看帮助文档。如果不带参数，则进入帮助文档交互模式。如果为字
    符串，则显示对应的module、函数、类、方法、关键字或相关文档。如果参数
    为对象，则显示对应文档，如help(1)显示整型对应的帮助文档。
 
-** *hash* (object)
+* *hash* (object)
    返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
    较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
 
-** *hex* (x)
+* *hex* (x)
    将整数转换为小写的16进制字符串。
 
    #+BEGIN_EXAMPLE python
@@ -263,13 +262,13 @@
 
    如需使用16进制字符串表示浮点数，使用float.hex()方法。
 
-** *id* (object)
+* *id* (object)
    返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
    如果两个对象的生命周期没有交集，可能相同。
 
    *CPython实现中：*  此值为该对象的内存地址。
 
-** *input* ([prompt])
+* *input* ([prompt])
    如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
    输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
    错误。
@@ -281,26 +280,26 @@
     'hello world'
    #+END_EXAMPLE
 
-** class *int* (x=0)
-** class *int* (x, base=10)
+* class *int* (x=0)
+* class *int* (x, base=10)
    返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
    字，返回x.__int__()；如果为浮点数，返回值为去除小数点后面的内容。
 
    如果x不是数字或有base参数，x须为字符串、bytes或bytearray实例。前面可
    有正负号，首位可有空格。base的取值范围内为2-35，默认为10。
 
-** *isinstance* (object,classinfo)
+* *isinstance* (object,classinfo)
    如果object是，或间接是（递归父类）classinfo的实例则返回True。
    classinfo可为类型名，也可为多个类型名组成的tuple。当为tuple时，
    object直接或间接为其中某个元素的实例即返回True。如果classinfo不为类
    型名或类型名组成的tuple则返回TypeError错误。
 
-** *issubclass* (class, classinfo)
+* *issubclass* (class, classinfo)
    如果class直接或间接为classinfo的子类，返回True。一个类总是自己的子类。
    classinfo可为单个类名，也可为多个类型名组成的tuple。为tuple时，其中
    的每个类名都会检查。其他任何情况都会返回TypeError错误。
 
-** *iter* (object[,sentinel])
+* *iter* (object[,sentinel])
    返回一个iterator对象。第二个参数决定第一个参数的解释方式：
 
   - 如果无第二个参数：object须为一个支持迭代协议（__iter__()方法）的
@@ -321,25 +320,25 @@
               process_line(line)
 	#+END_SRC
 
-** *len* (s)
+* *len* (s)
    返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
    range），也可为collection（如dictionary、set或frozen set）。
 
-** class *list* ([iterable])
+* class *list* ([iterable])
    list实际上是一个mutable sequence类型。
 
-** *locals* ()
+* *locals* ()
    在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
    数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
    方法中有区别。
 
-** *map* (function, iterable,...)
+* *map* (function, iterable,...)
    对iterable中的元素每个调用function函数，返回map类型，可使用list函数
    转换为list类型。如果有多个iterable参数，则function也需有对应个数的参
    数，结果长度与长度最小的iterable参数相同。
 
-** *max* (iterable, *[,key,default])
-** *max* (arg1,arg2,*args[,key])
+* *max* (iterable, *[,key,default])
+* *max* (arg1,arg2,*args[,key])
    返回iterable中，或者是2个或以上参数中最大的一个。
 
   - 如果只有一个普通参数，则须为iterable类型。可使default关键字参数，
@@ -368,28 +367,28 @@
   max('ah', 'bf', key=comparotor)
   #+END_SRC
 
-** *momeryview* (obj)
+* *momeryview* (obj)
 
-** *min* (iterable, *[,key,default])
-** *min* (arg1,arg2,*args[,key])
+* *min* (iterable, *[,key,default])
+* *min* (arg1,arg2,*args[,key])
    与max函数用法相同
 
-** *next* (iterator[,default])
+* *next* (iterator[,default])
    通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
    且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
    值。
 
-** class *object*
+* class *object*
    返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
    不接受任何参数。
 
    *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
 
-** *oct* (x)
+* *oct* (x)
    返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
    返回一个整数。
 
-** *open* (file,
+* *open* (file,
    mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
    打开文件file，返回file对象。
 
@@ -446,13 +445,13 @@
 
    第八个参数opener：
 
-** *ord* (c)
+* *ord* (c)
    接受单个Unicode字符组成的字符串，返回对应的Unicode值。比如ord('a')
    返回97。对应的函数为chr()。
-** *pow* (x,y[,z])
+* *pow* (x,y[,z])
    返回x的y次方，相当于x**y；如果有第三个参数z，则相当于pow(x, y) % z，
    不过效率更高。
-** *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
+* *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
    将objects打印到文本流file中，以sep隔开，最后输出end。如果无参数，则
    只打印end。
 
@@ -463,7 +462,7 @@
    于二进制模式的文件对象，此情况使用file.write(...)替换。
 
    输出内容是否被buffer由file参数决定，如果flush参数为true，则强制flush。
-** class *property* (fget=None,fset=None,fdel=None,doc=None)
+* class *property* (fget=None,fset=None,fdel=None,doc=None)
    fget为获取属性值的函数，fset为设置属性值的函数，fdel为删除属性值的
    函数，doc为该属性的文档字符串。
 
@@ -550,10 +549,10 @@
      # print(c1.x)
    #+END_SRC
 
-** *range* (stop)
-** *range* (start,stop,[,step])
+* *range* (stop)
+* *range* (start,stop,[,step])
    与其说range是一个函数，不如说是一个immutable sequence类型。
-** *repr* (object)
+* *repr* (object)
    返回打印前用字符串表示的object。
 
    对大多数对象而言，此函数返回的值与使用eval()函数返回的值相同，否则
@@ -561,23 +560,23 @@
 
    在声明类时，可定义__repr__()方法指定此函数的返回值。
 
-** *reversed* (seq)
+* *reversed* (seq)
    返回一个将seq逆序后的iterator。seq需有__reversed__()方法，或支持
    sequence协议（__len__()方法和__getitem()__整数参数以0开始）。
 
-** *round* (number[,ndigits])
+* *round* (number[,ndigits])
    返回小数点后有ndigits个数的浮点数。如果无ndigits参数或为None，则返
    回最近的整数。
 
-** class *set* ([iterable])
+* class *set* ([iterable])
    返回一个新的set对象，可使用iterable中的元素初始化。
-** *setattr* (object,name,value)
+* *setattr* (object,name,value)
    与getattr()相反。参数分别为object、字符串和任意值。string可以是
    object已有的属性名，也可是新属性名。setattr(x, 'foobar', '123')相当
    于x.foobar = 123。
-** class *slice* (stop)？？？
-** class *slice* (start,stop,[,step])
-** *sorted* (iterable[,key][,reversed])
+* class *slice* (stop)？？？
+* class *slice* (start,stop,[,step])
+* *sorted* (iterable[,key][,reversed])
    返回排序后的iterable对象。
 
    key和reversed参数都需使用关键字参数。
@@ -585,7 +584,7 @@
    key为排序时对每个元素的操作，比如key=str.lower()。默认值为None。
 
    reverse参数如果为True，则排序时默认原来元素都已逆序。
-** *staticmethod* (function)
+* *staticmethod* (function)
    将函数作为静态方法。
 
    静态方法不接受"self"参数，如：
@@ -597,10 +596,10 @@
    #+END_SRC
 
    可在实例中调用（C().f()），也可在类上调用（C.f()）。
-** class *str* (object='')
-** class *str* (object=b'',encoding='utf-8',errors='strict')
+* class *str* (object='')
+* class *str* (object=b'',encoding='utf-8',errors='strict')
    返回object用字符串表示的形式。
-** *sum* (iterable[,start])
+* *sum* (iterable[,start])
    将start与iterable中的每个元素从左到右相加，返回总和。iterable中的元
    素通畅为数字，start的值不允许为字符串。
 
@@ -610,7 +609,7 @@
    - math.fsum()：求浮点数和，且保留精度。
    - itertools.chain()：拼接多个iterable。
 
-** *super* ([type[,object-or-type]])
+* *super* ([type[,object-or-type]])
 
    #+BEGIN_SRC python
      class C(B):
@@ -618,10 +617,10 @@
              super().method(arg)     # 相当于super(C, self).method(arg)
    #+END_SRC
 
-** *tuple* ([iterable])
+* *tuple* ([iterable])
    实际上是tuple类。
-** class *type* (object)
-** class *type* (name,bases,dict)
+* class *type* (object)
+* class *type* (name,bases,dict)
    如果只有一个参数object，返回其类型。返回值为type对象，通畅与
    object.__class__属性值相同。
 
@@ -640,8 +639,8 @@
      >>> X = type('X', (object,), dict(a=1))
    #+END_EXAMPLE
 
-** *vars* ([object]) ？？？
-** *zip* (*iterables)
+* *vars* ([object]) ？？？
+* *zip* (*iterables)
    将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
    那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
    中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
@@ -662,7 +661,7 @@
      >>>
    #+END_EXAMPLE
 
-** *__import__* (name,globals=None,locals=None,formlist=(),level=0)
+* *__import__* (name,globals=None,locals=None,formlist=(),level=0)
    代码中调用import时，相当于调用了此函数。
 
    *注意* ：如importlib.import_module一样，日常写Python完全不需要。
