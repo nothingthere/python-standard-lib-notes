@@ -1,4 +1,4 @@
-#+TITLE: python（3.5）标准库学习笔记
+#+TITLE: python（3.5.3）标准库学习笔记
 
 * 内置函数
 ** *abs* (x)
@@ -628,6 +628,22 @@
    将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
    那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
    中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
+
+   #+BEGIN_EXAMPLE python
+     >>> l = [1,2,3]
+     >>> t = ('a','b','c')
+     >>> z = zip(l, t)
+     >>> z
+     <zip object at 0x7f4868f80c08>
+     >>> next(z, None)
+     (1, 'a')
+     >>> next(z, None)
+     (2, 'b')
+     >>> next(z, None)
+     (3, 'c')
+     >>> next(z, None)
+     >>>
+   #+END_EXAMPLE
 
 ** *__import__* (name,globals=None,locals=None,formlist=(),level=0)
    代码中调用import时，相当于调用了此函数。
@@ -1570,19 +1586,298 @@
 
 	 #+END_EXAMPLE
 **** str. *partition* (sep)
+	 将字符串在第一次出现sep时分割，返回一个3元素元组，其中第一个元素
+	 为sep前面的字符串，第二个元素为sep本身，第三个元素为后面的字符串。
+	 如果字符串中不含sep，则第一个元素为字符串本身，后面两个元素为空字
+	 符串：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.partition('a')
+       ('b', 'a', 'nana')
+       >>> s.partition('an')
+       ('b', 'an', 'ana')
+       >>> s.partition('X')
+       ('banana', '', '')
+       >>> s.partition('')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         ValueError: empty separator
+	 #+END_EXAMPLE
 **** str. *replace* (old,new[,count])
+	 将字符串中所有的old都替换为new。如果有count参数，则只替换左起
+	 count个：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.replace('an', 'AN')
+       'bANANa'
+       >>> s.replace('an', 'AN', 1)
+       'bANana'
+       >>> s.replace('an', 'AN', 100)
+       'bANANa'
+       >>> s.replace('an', 'AN', 0)
+       'banana'
+       >>> s.replace('an', 'AN', -1)
+       'bANANa'
+       >>> s.replace('an', 'AN', -2)
+       'bANANa'
+	 #+END_EXAMPLE
 **** str. *rfind* (sub[,start[,end]])
+	 返回从右其字符串中第一次出现sub的索引，可指定在截断[start:end]中
+	 计算。如果无sub字符串出现，则返回-1：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.rfind('a')
+       5
+       >>> s.rfind('A')
+       -1
+       >>> s.rfind('a', -4, -2)
+       3
+	 #+END_EXAMPLE
 **** str. *rindex* (sub[,start[,end]])
+	 同rfind，不过如果无sub字符串出现返回ValueError错误：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.rindex('a')
+       5
+       >>> s.rindex('A')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         ValueError: substring not found
+	 #+END_EXAMPLE
+
 **** str. *rjust* (width[,fillchar])
+	 返回右对齐后的字符串，使用fillchar填充空白字符，默认为空格字符。
+	 如果width小于或等于len(s)，则返回字符串本身：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'claudio'.rjust(10)
+       '   claudio'
+       >>> 'claudio'.rjust(10, '|')
+       '|||claudio'
+       >>> 'claudio'.rjust(1, '|')
+       'claudio'
+	 #+END_EXAMPLE
 **** str. *rpartition* (sep)
+	 同str.partition，不过是从右起分割；且如果sep不出现在字符串中，返
+	 回的3元素元组前两个元素为空字符串，最后一个为字符串本身：
+
+	 #+BEGIN_EXAMPLE python
+       >>> s = 'banana'
+       >>> s.rpartition('a')
+       ('banan', 'a', '')
+       >>> s.rpartition('n')
+       ('bana', 'n', 'a')
+       >>> s.rpartition('X')
+       ('', '', 'banana')
+	 #+END_EXAMPLE
 **** str. *rsplit* (sep=None,maxsplit=-1)
+	 与split函数相同，只是从右边分割。
+
+	 *？* ：既然有split函数，此函数还有啥子卵用？
+
 **** str. *rstrip* ([chars])
+	 返回字符串的副本，末尾中的字符只要出现在chars则被移除。如果无
+	 chars参数，或为None，则默认移除末尾的空白字符。
+
+	 *注意* ：chars不是后缀，而是所有需移除字符的集合。
+
+	 #+BEGIN_EXAMPLE
+       >>> 'www.bing.com'.rstrip('w.com')
+       'www.bing'
+	 #+END_EXAMPLE
+
 **** str. *split* (sep=None,maxsplit=-1)
+	 返回字符串中所有“单词”组成的链表，使用sep作为单词间的分隔符。如果
+	 指定maxsplit参数，则进行maxsplit次分割（即结果最多可有maxsplit+1
+	 个元素）；如果未指定maxsplit参数，或其值为-1，则最大限度分割。
+
+	 #+BEGIN_EXAMPLE
+       >>> s = 'banana'
+       >>> s.split('a')
+       ['b', 'n', 'n', '']
+       >>> s.split('a', 1)
+       ['b', 'nana']
+	 #+END_EXAMPLE
+
+	 如果有sep参数，连续的分割字符串间会生成空白字符：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '1,,2'.split(',')
+       ['1', '', '2']
+	 #+END_EXAMPLE
+
+	 分割字符串可为多个字符：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '1<>2<>3'.split('<>')
+       ['1', '2', '3']
+	 #+END_EXAMPLE
+
+	 如果指定sep参数，且字符串为空，则生成的链表只含一个空字符串；如果
+	 不指定sep参数，且原字符串为空，或只含空白字符，则返回控链表：
+
+	 #+BEGIN_EXAMPLE python
+       >>> ''.split()
+       []
+       >>> ''.split(',')
+       ['']
+
+       >>> '   '.split()
+       []
+	 #+END_EXAMPLE
+
+	 如果无sep参数，或为None，则使用不同的算法：使用空白字符作为分割字
+	 符，且删除相邻的空字符，即使首位有空格，返回的链表中也不会含空字
+	 符串：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '1 2 3'.split()
+       ['1', '2', '3']
+       >>> '1 2 3'.split(maxsplit=1)
+       ['1', '2 3']
+       >>> '1     2  3'.split()
+       ['1', '2', '3']
+	 #+END_EXAMPLE
+
 **** str. *splitlines* ([keepends])
+	 在字符串中换行符处分割，返回链表。下表中的字符都会被当做换行符：
+
+     | 字符     | 含义 |
+     |----------+------|
+     | \n       |      |
+     | \r       |      |
+     | \r\n     |      |
+     | \v或\x0b |      |
+     | \f或\x0c |      |
+     | \x1c     |      |
+     | \x1d     |      |
+     | \x1e     |      |
+     | \x85     |      |
+     | \u2028   |      |
+     | \u2029   |      |
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines()
+       ['ab c', '', 'de fd', 'kl']
+	 #+END_EXAMPLE
+
+	 结果中如需包含各种换行符，可指定keppends：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines(keepends=True)
+       ['ab c\n', '\r', 'de fd\r', 'kl\r\n']
+       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines(keepends='\n')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         TypeError: an integer is required (got type str)
+	 #+END_EXAMPLE
+
+	 不同于split()函数，如果指定sep参数，且原字符串为空，此函数返回空
+	 链表，末尾的换行符后并不生成一个空字符串：
+
+	 #+BEGIN_EXAMPLE python
+       >>> ''.splitlines()
+       []
+       >>> 'One line\n'.splitlines()
+       ['One line']
+	 #+END_EXAMPLE
+
+	 而split('\n')的对应结果为：
+
+	 #+BEGIN_EXAMPLE
+       >>> ''.split('\n')
+       ['']
+       >>> 'One line\n'.split('\n')
+       ['One line', '']
+	 #+END_EXAMPLE
+
 **** str. *startswith* (prefix[,start[,end]])
+	 如果字符串有前缀prefix，则返回True，可指定在截断[start:end]中计算：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'banana'.startswith('b')
+       True
+       >>> 'banana'.startswith('a')
+       False
+       >>> 'banana'.startswith('')
+       True
+       >>> 'banana'.startswith('n', 2)
+       True
+	 #+END_EXAMPLE
 **** str. *strip* ([chars])
+	 返回原字符串副本，移除收尾中在chars中出现的字符。如果无chars参数，
+	 或为None，则默认删除首尾的空白字符。
+
+	 *注意* ：chars不是前缀或后缀，而是所有需移除字符的集合。
+
+	 #+BEGIN_EXAMPLE
+       >>> 'www.bing.com'.strip('w.com')
+       'bing'
+	 #+END_EXAMPLE
+
 **** str. *swapcase* ()
+
+	 返回大小写交换后的字符串副本。
+
+	 *注意* ：s.swapcase().swapcase() 可能并不等于s。
+
+	 #+BEGIN_EXAMPLE
+       >>> s = 'Banana'
+       >>> s.swapcase()
+       'bANANA'
+       >>> s.swapcase().swapcase()
+       'Banana'
+
+       >>> s = '一二三'
+       >>> s.swapcase()
+       '一二三'
+       >>> s.swapcase().swapcase()
+       '一二三'
+
+       >>> s = 'ß'
+       >>> s.swapcase()
+       'SS'
+       >>> s.swapcase().swapcase()
+       'ss'
+	 #+END_EXAMPLE
 **** str. *title* ()
+	 将原字符串中每个单词首字母大写，其他字母小写作为返回值：
+
+	 #+BEGIN_EXAMPLE python
+       >>> 'i have a dream'.title()
+       'I Have A Dream'
+       >>> 'I Have a Dream'.title()
+       'I Have A Dream'
+       >>> '我有一个梦想'.title()
+       '我有一个梦想'
+	 #+END_EXAMPLE
+
+	 *注意* ：此函数只将连续字母看做"单词"，所以可能结果不能如愿：
+
+	 #+BEGIN_EXAMPLE
+       >>> "they'are bill's friends from the UK".title()
+       "They'Are Bill'S Friends From The Uk"
+	 #+END_EXAMPLE
+
+	 可使用正则勉强解决：
+
+	 #+BEGIN_SRC python
+       #!/usr/bin/python3.5
+       import re
+
+       def titlecase(s):
+           return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
+                         lambda mo: mo.group(0)[0].upper() + mo.group(0)[1:].lower(),
+                         s)
+
+       print(titlecase("they're bill's friends from UK"))
+       # They're Bill's Friends From Uk
+	 #+END_SRC
+
 **** str. *translate* (table)
 	 将字符串中的字符逐个与参数table中的元素对应，如果相同，则转换，返
 	 回转换后的结果。可使用静态方法str.maketrans(in, out)创建字典：
@@ -1620,8 +1915,36 @@
 	 #+END_EXAMPLE
 
 **** str. *upper* ()
+	 返回字符串副本，将有大小写区别的字符转换为大写。
+
+	 *注意* ：如果str中只含无大小写区分字符，str.upper().isupper()可能
+	 返回False：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '测试'.isupper()
+       False
+       >>> 'abc测试'.upper().isupper()
+       True
+       >>> '测试'.upper().isupper()
+       False
+	 #+END_EXAMPLE
+
 **** str. *zfill* (width)
-*** 格式化输出
+	 返回字符串副本，使用ASCII'0'填充扩张到width长度后的左边的空白。如果有正
+	 负号，则先添加。如果width小于或等于len(s)则返回字符串本身：
+
+	 #+BEGIN_EXAMPLE python
+       >>> '42'.zfill(5)
+       '00042'
+       >>> '-42'.zfill(5)
+       '-0042'
+       >>> '-qwdqw'.zfill(5)
+       '-qwdqw'
+	 #+END_EXAMPLE
+
+*** printf风格的格式化输出
+	*注意* ：最好使用str.format()接口格式化字符串。
+
 ** 二进制Sequence类型-bytes、bytearray、menoryview
 
 *** Bytes
