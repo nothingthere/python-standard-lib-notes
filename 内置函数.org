@@ -1,0 +1,668 @@
+#+TITLE: 内置函数
+
+* 内置函数
+** *abs* (x)
+   返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
+
+** *all* (/iterable/)
+   如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
+   true。相当于：
+
+   #+BEGIN_SRC python
+    def all(iterable):
+        for element in iterable:
+            if not element:
+                return False
+        return True
+   #+END_SRC
+
+** *any* (iterable)
+   如果iterable中任何一个元素为true则返回True，如果为空则返回False。
+
+   #+BEGIN_SRC python
+    def any(iterable):
+        for element in iterable:
+            if element:
+                return True
+        return false
+   #+END_SRC
+
+** *ansii* (object)
+   同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
+   ascii码：
+
+   #+BEGIN_EXAMPLE python
+    >>> repr("我")
+    "'我'"
+    >>> ascii("我")
+    "'\\u6211'"
+   #+END_EXAMPLE
+
+** *bin* (x)
+   返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
+   法__index__()：
+
+   #+BEGIN_SRC python
+    class Test:
+        def __init__(self, num):
+            self.num = num
+
+        def __index__(self):
+            return self.num
+
+    t = Test(1024)
+    print(bin(t)) # 0b10000000000
+   #+END_SRC
+
+** class *bool* ([x])
+   如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
+   [[真假判断]]。
+
+** class *bytearray* ([source[,encoding[,errors]]])
+   返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
+   bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，
+   以及绝大多数bytes具有的方法。
+
+   参数传递方式为：
+
+   - 如果为字符串，必须添加encoding参数（errors参数可选）；然后使用
+     str.encoding()函数将字符串转换为bytes对象。
+   - 如果为整数，表示元素个数，且每个元素初始值为空byte。
+   - 如果是buffer接口返回的对象，则使用buffer内容初始化。
+   - 如果为iterable，其中元素须为0<=x<256的整数，用这些元素初始化。
+
+** class *bytes* ([source,[encoding[,errors]]])
+   返回一个全新的byes对象，元素为取值范围为0<=x<256的immutable序列。
+   bytes是immutable版本的bytearray，具备非mutable类型序列相同的方法，
+   以及索引查找和截断操作。
+
+   参数传递方式同bytearray函数。
+** *callable* (object)
+
+   如果object可被调用，则返回True
+
+   #+BEGIN_EXAMPLE
+    >>> def foo():
+    ...     return
+    ...
+    >>> callable(foo)
+    True
+    >>> a = 1
+    >>> callable(a)
+    False
+   #+END_EXAMPLE
+
+** *chr* (i)
+   返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
+   范围为(0-1,114,111)。
+
+   #+BEGIN_EXAMPLE python
+    >>> chr(97)
+    'a'
+    >>> ord('a')
+    97
+    >>> chr(8364)
+    '€'
+   #+END_EXAMPLE
+
+** *classmethod*  (function)
+** *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
+** class *complex* [real[,img]]
+
+** *delattr* (object,name)
+   与setattr()相反。参数分别为对象和字符串。'delattr(x, 'foobar')'相当
+   于'del x.foobar'。
+
+** class *dict* (**kwarg)
+** class *dict* (mapping, **kwarg)
+** class *dict* (iterable, **kwarg)
+   创建“字典”。
+
+** *dir* ([object])
+   如果无参数，返回当前local scope中的name链表。如果有参数，则返回该对
+   象的有效属性链表。
+
+   如果object有__dir__()方法，则返回该方法（必须以链表作为返回值）的返
+   回链表值。可使用__getattr__()或__getattribute__()修饰dir()。
+
+  - 如果object是一个module对象，则返回该module的熟悉名链表。
+  - 如果object是类实例，则返回其本身的属性名，及递归到的父类属性名。
+  - 否则，为该object的熟悉名，加所属类的属性名，加递归到的父类属性名。
+
+  #+BEGIN_EXAMPLE python
+    >>> dir()
+    ['__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__']
+    >>> import struct
+    >>> dir()
+    ['__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__', 'struct']
+    >>> dir(struct)
+    ['Struct', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_clearcache', 'calcsize', 'error', 'iter_unpack', 'pack', 'pack_into', 'unpack', 'unpack_from']
+    >>> class Shape:
+    ...     def __dir__(self):
+    ...             return ['1', '2']
+    ...
+    >>> s = Shape()
+    >>> dir(s)
+    ['1', '2']
+  #+END_EXAMPLE
+
+** *divmode* (a,b)
+   接受2个数值（非复数），返回除值和余数组成的tuple。如果都为都为整数结
+   果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通畅
+   为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
+   都非常难接近a。
+
+** *enumerate* (iterable, start=0)
+   返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
+   持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
+   为索引（从0开始），第二个元素为原来对象的元素。
+   #+BEGIN_EXAMPLE python
+    >>> seasons = ['spring', 'summer', 'fall', 'winter']
+    >>> list(enumerate(seasons))
+    [(0, 'spring'), (1, 'summer'), (2, 'fall'), (3, 'winter')]
+    >>> list(enumerate(seasons, start=1))
+    [(1, 'spring'), (2, 'summer'), (3, 'fall'), (4, 'winter')]
+   #+END_EXAMPLE
+
+   相当于：
+
+   #+BEGIN_SRC python
+    def enumarate(sequence, start=0):
+        n = start
+        for elem in sequence:
+            yield n, elem
+            n += 1
+   #+END_SRC
+
+** *eval* (expression,globals=None,locals=None)？？？
+** *exec* (object[,globals[,locals]])？？？
+** *filter* (function,iterable)
+   返回按照function判断后iterable中元素为True的所有元素组成的iterator对
+   象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
+
+   如果function不为None，则相当于(item for item in iterable if
+   function(item))；如果function为None则相当于(item for item in
+   iterable if item)。
+
+** class *float* ([x])
+   返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
+
+   如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
+   的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
+   且可不区分呢大小写。
+
+   #+BEGIN_EXAMPLE python
+    >>> float('+1.23')
+    1.23
+    >>> float('    -12345\n')
+    -12345.0
+    >>> float('1e-003')
+    0.001
+    >>> float('-Infinity')
+    -inf
+   #+END_EXAMPLE
+
+** *format* (value[,format_spec])
+   按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
+   则相当于str(value)：
+
+   #+BEGIN_EXAMPLE python
+    >>> format('me', '>30')
+    '                            me'
+    >>> format('me', '<30')
+    'me                            '
+    >>> format('me', '30')
+    'me                            '
+    >>> format('me', '')
+    'me'
+   #+END_EXAMPLE
+
+   调用format(value, format_spec)时，实际上是转换为了
+   type(value).__format__(value, format_spec)。即搜索value对应类型
+   的__format__()方法。如果递归搜索父类有__format__()方法，且无
+   format_spec参数，则使用该方法；如果有使用了format_spec参数，则返回
+   TypeError错误。如果format_spec或方法返回值不是字符串，也会返回
+   TypeError错误。
+
+** class *frozenset* ([iterable])
+** *getattr* (object,name[,default])
+   返回对象object属性name对应值。name必须为字符串。如果name是object的属
+   性，则返回对应属性值，即getattr(x, 'foobar')相当于x.foobar；如果不存
+   在name属性，且有default参数，则返回default参数，否则返回
+   AttributeError错误。
+
+** *globals* ()
+   返回一个表示当前全局symbol table的dict，总是当前module的全局symbol
+   table。
+
+   如果在函数或方法中，module为其定义时的module，而非调用时的module。
+
+** *hasattr* (object, name)
+   参数分别为对象和字符串。如果name是object的属性则返回True，否则返回
+   False。（实现方法为，调用getattr(object, name)函数，看是否返回
+   AttributeError错误。）
+
+** *help* ([object])
+   在命令行查看帮助文档。如果不带参数，则进入帮助文档交互模式。如果为字
+   符串，则显示对应的module、函数、类、方法、关键字或相关文档。如果参数
+   为对象，则显示对应文档，如help(1)显示整型对应的帮助文档。
+
+** *hash* (object)
+   返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
+   较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
+
+** *hex* (x)
+   将整数转换为小写的16进制字符串。
+
+   #+BEGIN_EXAMPLE python
+    >>> hex(255)
+    '0xff'
+    >>> hex(-42)
+    '-0x2a'
+   #+END_EXAMPLE
+
+   如需使用16进制字符串表示浮点数，使用float.hex()方法。
+
+** *id* (object)
+   返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
+   如果两个对象的生命周期没有交集，可能相同。
+
+   *CPython实现中：*  此值为该对象的内存地址。
+
+** *input* ([prompt])
+   如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
+   输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
+   错误。
+
+   #+BEGIN_EXAMPLE python
+    >>> s = input('---> ')
+    ---> hello world
+    >>> s
+    'hello world'
+   #+END_EXAMPLE
+
+** class *int* (x=0)
+** class *int* (x, base=10)
+   返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
+   字，返回x.__int__()；如果为浮点数，返回值为去除小数点后面的内容。
+
+   如果x不是数字或有base参数，x须为字符串、bytes或bytearray实例。前面可
+   有正负号，首位可有空格。base的取值范围内为2-35，默认为10。
+
+** *isinstance* (object,classinfo)
+   如果object是，或间接是（递归父类）classinfo的实例则返回True。
+   classinfo可为类型名，也可为多个类型名组成的tuple。当为tuple时，
+   object直接或间接为其中某个元素的实例即返回True。如果classinfo不为类
+   型名或类型名组成的tuple则返回TypeError错误。
+
+** *issubclass* (class, classinfo)
+   如果class直接或间接为classinfo的子类，返回True。一个类总是自己的子类。
+   classinfo可为单个类名，也可为多个类型名组成的tuple。为tuple时，其中
+   的每个类名都会检查。其他任何情况都会返回TypeError错误。
+
+** *iter* (object[,sentinel])
+   返回一个iterator对象。第二个参数决定第一个参数的解释方式：
+
+  - 如果无第二个参数：object须为一个支持迭代协议（__iter__()方法）的
+    collection对象；或者须支持sequence协议（__getitem__()，整数参数以0
+    开始）。如果两种协议都不支持，则返回TypeError错误。
+
+  - 如果有第二个参数sentinel：object须为可调用对象（即函数）。所返回的
+    iterator的生成过程为不带参数调用object的__next__()方法。如果返回值
+    等于sentinel则返回StopIteration错误，否则返回__next__()方法的返回
+    值。
+
+	第二种形式适合于读取文本，直到指定行。如下例直到readline()方法返回
+    空字符串：
+
+	#+BEGIN_SRC python
+      with open('mydate.txt') as fp:
+          for line in iter(fp.readline, ''):
+              process_line(line)
+	#+END_SRC
+
+** *len* (s)
+   返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
+   range），也可为collection（如dictionary、set或frozen set）。
+
+** class *list* ([iterable])
+   list实际上是一个mutable sequence类型。
+
+** *locals* ()
+   在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
+   数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
+   方法中有区别。
+
+** *map* (function, iterable,...)
+   对iterable中的元素每个调用function函数，返回map类型，可使用list函数
+   转换为list类型。如果有多个iterable参数，则function也需有对应个数的参
+   数，结果长度与长度最小的iterable参数相同。
+
+** *max* (iterable, *[,key,default])
+** *max* (arg1,arg2,*args[,key])
+   返回iterable中，或者是2个或以上参数中最大的一个。
+
+  - 如果只有一个普通参数，则须为iterable类型。可使default关键字参数，
+    指定该iterable中无参数时的返回值。如果ietrable参数为空，且无
+    default参数，则返回ValueError错误。
+  - 如果有多普通参数，不能使用default关键字参数。
+
+  两种情况都能使用key关键字参数（与list.sort()函数的用法相同）。[[http://www.oschina.net/code/snippet_111708_16478][@优雅先
+  生]]：
+
+  #+BEGIN_SRC python
+  # 最简单的形似：
+  max(1,2)
+  max('a','b')
+
+  # 也可对list和tuple使用：
+  max([1,2])
+  max((1,2))
+
+  # 还可指定比较函数
+  max('ah', 'bf', key=lambda x: x[1])
+
+  def comparotor(x):
+  return x[1]
+
+  max('ah', 'bf', key=comparotor)
+  #+END_SRC
+
+** *momeryview* (obj)
+
+** *min* (iterable, *[,key,default])
+** *min* (arg1,arg2,*args[,key])
+   与max函数用法相同
+
+** *next* (iterator[,default])
+   通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
+   且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
+   值。
+
+** class *object*
+   返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
+   不接受任何参数。
+
+   *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
+
+** *oct* (x)
+   返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
+   返回一个整数。
+
+** *open* (file,
+   mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
+   打开文件file，返回file对象。
+
+   第一个参数file：
+
+   可为指定绝对路径或相对路径的字符串或bytes对象，或者是该文件
+   "file descriptor"对应的整数。（如果指定了file descriptor，当其返回
+   的I/O对象关闭后，该文件也随之关闭，除非closefd参数值为False。）
+
+   第二个参数mode：
+
+   指定打开文件后的操作，取值可为：
+
+   | 字符 | 含义                                   |
+   |------+----------------------------------------|
+   | 'r'  | 只读（默认）                           |
+   | 'w'  | 写入，打开时就将文件内容清空           |
+   | 'x'  | 专用于创建文件，如果文件已存在，则失败 |
+   | 'a'  | 写入，向文件末尾追加内容               |
+   | 'b'  | 二进制模式                             |
+   | 't'  | 文本文件模式（默认）                   |
+   | '+'  | 可读可写                               |
+   | 'U'  | (deprecated)                           |
+
+   默认模式为'r'（即'rt'），'w+b'为以二进制模式读写，'r+b'为以二进制模
+   式读写，但不先清空文件。
+
+   第三个参数buffering：？？？
+
+   指定buffering policy。0为关闭buffering（只能用于二进制模式）;1为选
+   择line buffering（只能用于文本模式）,>1表示“ the size in bytes of a
+   fixed-size chunk buffer”。如果无此参数，则：？？？
+
+   第四个参数encoding：
+
+   当以文本文件模式打开时，如果不指定此参
+   数，encoding值由系统决定，使用local.getpreferredencoding(False)?可
+   获取当前值。
+
+   对以二进制模式（'b'）和文本模式（'t'）打开的文件指针，Python会区别
+   对待。以二进制模式打开时，返回的bytes内容不经过任何decoding返回；以
+   文本模式打开时，则需根据本地系统（或指定的encoding参数）进行解码。
+
+   *注意* ：Python不依靠本地系统对文本文件的描述解码；全依靠Python本身，
+   所以platform-independent。
+
+   第五个参数errors：
+
+   指定当encoding和decoding发生错误时的处理方法（不能用于二进制模式）。
+
+   第六个参数newline：
+
+   第七个参数closefd：
+
+   第八个参数opener：
+
+** *ord* (c)
+   接受单个Unicode字符组成的字符串，返回对应的Unicode值。比如ord('a')
+   返回97。对应的函数为chr()。
+** *pow* (x,y[,z])
+   返回x的y次方，相当于x**y；如果有第三个参数z，则相当于pow(x, y) % z，
+   不过效率更高。
+** *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
+   将objects打印到文本流file中，以sep隔开，最后输出end。如果无参数，则
+   只打印end。
+
+   所有非关键字参数都先转换为字符串，如str()函数。
+
+   file参数须为有write(string)方法的对象；如果无此方法，或为None，则使
+   用sys.stdout对象。由于所有需打印的参数都先转换为字符串，所以不能用
+   于二进制模式的文件对象，此情况使用file.write(...)替换。
+
+   输出内容是否被buffer由file参数决定，如果flush参数为true，则强制flush。
+** class *property* (fget=None,fset=None,fdel=None,doc=None)
+   fget为获取属性值的函数，fset为设置属性值的函数，fdel为删除属性值的
+   函数，doc为该属性的文档字符串。
+
+   如下：
+
+   #+BEGIN_SRC python
+     class C:
+         def __init__(self):
+             self._x = None
+
+         def getx(self):
+             return self._x
+
+         def setx(self, value):
+             self._x = value
+
+         def delx(self):
+             del self._x
+
+         x = property(getx, setx, delx, "I'm the 'x' property.")
+
+     c1 = C()
+     c2 = C()
+
+     c1.x = 'c1'
+     c2.x = 'c2'
+     print(c1.x)
+     print(c2.x)
+   #+END_SRC
+
+   如果c为C的实例，则c.x调用getter函数，c.x=value调用setter函数，del
+   c.x调用delete函数。
+
+   如果有doc参数，则为该属性的文档，否则属性文档为fgets的文档字符串
+   （如果有）。将property作为”装饰器“（decorator）可方便创建自读属性：
+
+   #+BEGIN_SRC python
+     class Parrot:
+         def __init__(self):
+             self._voltage = 10000
+
+         @property
+         def valtage(self):
+             '''获取当权voltage值'''
+             return self._voltage
+
+     p = Parrot()
+     print(p.valtage)
+   #+END_SRC
+
+   此例使用@property装饰器将voltage()方法转换为了'getter'函数，来获取
+   相同名字的自读属性，且将voltage属性的文档字符串转换为了"获取当权
+   voltage值"。
+
+   使用装饰器改写第一个例子的结果为：
+
+   #+BEGIN_SRC python
+     class C:
+         def __init__(self):
+             self._x = None
+
+         @property
+         def x(self):
+             """I'am the 'x' property."""
+             return self._x
+
+         @x.setter
+         def x(self, value):
+             self._x = value
+
+         @x.deleter
+         def x(self):
+             del self._x
+
+     c1 = C()
+     c2 = C()
+
+     c1.x = 'c1'
+     c2.x = 'c2'
+     print(c1.x)
+     print(c2.x)
+
+     # del c1.x
+     # print(c1.x)
+   #+END_SRC
+
+** *range* (stop)
+** *range* (start,stop,[,step])
+   与其说range是一个函数，不如说是一个immutable sequence类型。
+** *repr* (object)
+   返回打印前用字符串表示的object。
+
+   对大多数对象而言，此函数返回的值与使用eval()函数返回的值相同，否则
+   用尖括号表示其类型名及其名称和地址。
+
+   在声明类时，可定义__repr__()方法指定此函数的返回值。
+
+** *reversed* (seq)
+   返回一个将seq逆序后的iterator。seq需有__reversed__()方法，或支持
+   sequence协议（__len__()方法和__getitem()__整数参数以0开始）。
+
+** *round* (number[,ndigits])
+   返回小数点后有ndigits个数的浮点数。如果无ndigits参数或为None，则返
+   回最近的整数。
+
+** class *set* ([iterable])
+   返回一个新的set对象，可使用iterable中的元素初始化。
+** *setattr* (object,name,value)
+   与getattr()相反。参数分别为object、字符串和任意值。string可以是
+   object已有的属性名，也可是新属性名。setattr(x, 'foobar', '123')相当
+   于x.foobar = 123。
+** class *slice* (stop)？？？
+** class *slice* (start,stop,[,step])
+** *sorted* (iterable[,key][,reversed])
+   返回排序后的iterable对象。
+
+   key和reversed参数都需使用关键字参数。
+
+   key为排序时对每个元素的操作，比如key=str.lower()。默认值为None。
+
+   reverse参数如果为True，则排序时默认原来元素都已逆序。
+** *staticmethod* (function)
+   将函数作为静态方法。
+
+   静态方法不接受"self"参数，如：
+
+   #+BEGIN_SRC python
+     class C:
+         @staticmethod
+         def f(arg1,arg2,...)...
+   #+END_SRC
+
+   可在实例中调用（C().f()），也可在类上调用（C.f()）。
+** class *str* (object='')
+** class *str* (object=b'',encoding='utf-8',errors='strict')
+   返回object用字符串表示的形式。
+** *sum* (iterable[,start])
+   将start与iterable中的每个元素从左到右相加，返回总和。iterable中的元
+   素通畅为数字，start的值不允许为字符串。
+
+   其他几个函数对特定情况效率更高：
+
+   - ''.join(sequence)：拼接字符串。
+   - math.fsum()：求浮点数和，且保留精度。
+   - itertools.chain()：拼接多个iterable。
+
+** *super* ([type[,object-or-type]])
+
+   #+BEGIN_SRC python
+     class C(B):
+         def method(self, arg):
+             super().method(arg)     # 相当于super(C, self).method(arg)
+   #+END_SRC
+
+** *tuple* ([iterable])
+   实际上是tuple类。
+** class *type* (object)
+** class *type* (name,bases,dict)
+   如果只有一个参数object，返回其类型。返回值为type对象，通畅与
+   object.__class__属性值相同。
+
+   *注意* ：测试对象类型时，最好使用isinstance()函数，因为其将子类型考
+   虑其中。
+
+   如果有3个参数，则返回一个新的type对象。相当于动态的class声明。字
+   符串name参数变为__name__属性，tuple类型bases转变为新类型的基础类，
+   并变为__bases__属性，dict字典转换为__dict__属性。如下2个语句实际上
+   生成的为相同类：
+
+   #+BEGIN_EXAMPLE python
+     >>> class X:
+     ...     a = 1
+     ...
+     >>> X = type('X', (object,), dict(a=1))
+   #+END_EXAMPLE
+
+** *vars* ([object]) ？？？
+** *zip* (*iterables)
+   将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
+   那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
+   中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
+
+   #+BEGIN_EXAMPLE python
+     >>> l = [1,2,3]
+     >>> t = ('a','b','c')
+     >>> z = zip(l, t)
+     >>> z
+     <zip object at 0x7f4868f80c08>
+     >>> next(z, None)
+     (1, 'a')
+     >>> next(z, None)
+     (2, 'b')
+     >>> next(z, None)
+     (3, 'c')
+     >>> next(z, None)
+     >>>
+   #+END_EXAMPLE
+
+** *__import__* (name,globals=None,locals=None,formlist=(),level=0)
+   代码中调用import时，相当于调用了此函数。
+
+   *注意* ：如importlib.import_module一样，日常写Python完全不需要。
