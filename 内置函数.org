@@ -4,10 +4,10 @@
   返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
 
   #+BEGIN_SRC python
-    print(abs(1))
-    print(abs(-1))
+    abs(1)
+    abs(-1)
     c = complex(1, 2)
-    print(abs(c))
+    abs(c)
   #+END_SRC
 
   #+RESULTS:
@@ -42,40 +42,33 @@
 * *any* (iterable)
   如果iterable中任何一个元素为true则返回True，如果为空则返回False。
 
-  #+BEGIN_SRC python
+  #+BEGIN_SRC python :output both
     def any(iterable):
         for element in iterable:
             if element:
                 return True
-        return false
+        return False
   #+END_SRC
 
   #+BEGIN_SRC python
     s = [1, 2, 3]
-    print(any(s))
+    any(s)
     s = [0, 1, 2]
-    print(any(s))
+    any(s)
     s = [0, '', (), [], False]
-    print(any(s))
-
+    any(s)
   #+END_SRC
 
-  #+RESULTS:
-  :
-  : True
-  : >>> True
-  : >>> False
-
 * *ansii* (object)
-   同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
-   ascii码：
+  同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
+  ascii码：
 
-   #+BEGIN_EXAMPLE python
+  #+BEGIN_EXAMPLE python
     >>> repr("我")
     "'我'"
     >>> ascii("我")
     "'\\u6211'"
-   #+END_EXAMPLE
+  #+END_EXAMPLE
 
 * *bin* (x)
   返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
