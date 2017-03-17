@@ -27,7 +27,7 @@
         return True
   #+END_SRC
 
-  #+BEGIN_SRC python
+  #+BEGIN_SRC python :output both
     s = [1, 2, 3]
     all(s)
     s = [0, 1, 2]
