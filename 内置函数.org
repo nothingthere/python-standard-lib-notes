@@ -3,7 +3,7 @@
 * *abs* (x)
   返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
 
-  #+BEGIN_SRC python :results output
+  #+BEGIN_SRC python :results output :exports both :session
     print(abs(1))
     print(abs(-1))
     c = complex(1, 2)
@@ -13,7 +13,7 @@
   #+RESULTS:
   : 1
   : 1
-  : 2.23606797749979
+  : >>> 2.23606797749979
 
 * *all* (/iterable/)
   如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
