@@ -1,7 +1,7 @@
 #+TITLE: 内置类型
 
 * 真假判断
-   除下面情况外都为True：
+  除下面情况外都为True：
   - None
   - False
   - 任何形式的数值0，如0、0.0、0j。
@@ -10,10 +10,10 @@
   - 自定义类中有__bool__和__len()__方法，且实例的此方法返回0或布尔值
     False。
 
-	操作符（Operations）和内置函数如果返回布尔型，要么返回1或True作为
-    “真”，要么返回0或False作为“假”。
+  操作符（Operations）和内置函数如果返回布尔型，要么返回1或True作为
+  “真”，要么返回0或False作为“假”。
 
-	*注意* ：or和and操作符总是将其一个operands作为返回值。
+  *注意* ：or和and操作符总是将其一个operands作为返回值。
 
 * 布尔值操作-and、or、not
    下表按有限级排序：
@@ -1323,7 +1323,7 @@
 ** printf风格的格式化输出
    *注意* ：最好使用str.format()接口格式化字符串。
 
-* 二进制Sequence类型-bytes、bytearray、menoryview
+* 二进制Sequence类型-bytes、bytearray、menoryviewb
   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryview类支
   持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他对象
   的内存地址。？

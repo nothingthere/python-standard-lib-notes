@@ -27,7 +27,7 @@
         return True
   #+END_SRC
 
-  #+BEGIN_SRC python :output both
+  #+BEGIN_SRC python
     s = [1, 2, 3]
     all(s)
     s = [0, 1, 2]
@@ -63,12 +63,14 @@
   同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
   ascii码：
 
-  #+BEGIN_EXAMPLE python
-    >>> repr("我")
-    "'我'"
-    >>> ascii("我")
-    "'\\u6211'"
-  #+END_EXAMPLE
+  #+BEGIN_SRC python :output both
+    repr("我")
+    ascii("我")
+  #+END_SRC
+
+  #+RESULTS:
+  : "'我'"
+  : "'\\u6211'"
 
 * *bin* (x)
   返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
@@ -84,7 +86,6 @@
 
     t = Test(2**10)
     bin(t.num)
-
   #+END_SRC
 
   #+RESULTS:
@@ -94,15 +95,15 @@
 
 * class *bool* ([x])
   如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
-  [[真假判断]]。
+  “真假判断”。
 
   #+BEGIN_SRC python
-     bool()
-     bool(0)
-     bool('')
-     bool([])
-     bool({})
-     bool(())
+    bool()
+    bool(0)
+    bool('')
+    bool([])
+    bool({})
+    bool(())
   #+END_SRC
 
   #+RESULTS:
@@ -172,7 +173,7 @@
 
   #+RESULTS:
   :
-  : ... >>> >>> True
+  : ... >>> True
   : >>> False
 
 * *chr* (i)
@@ -193,7 +194,6 @@
 * *classmethod*  (function)
 * *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
 * class *complex* [real[,img]]
-
 * *delattr* (object,name)
    与setattr()相反。参数分别为对象和字符串。'delattr(x, 'foobar')'相当
    于'del x.foobar'。
@@ -232,82 +232,122 @@
   #+END_EXAMPLE
 
 * *divmode* (a,b)
-   接受2个数值（非复数），返回除值和余数组成的tuple。如果都为都为整数结
-   果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通畅
-   为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
-   都非常难接近a。
+  接受2个数值（非复数），返回除值和余数组成的tuple。如果都为都为整数结
+  果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通常
+  为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
+  都非常难接近a。
+
+  #+BEGIN_SRC python :output both
+    10 // 3
+    10 % 3
+    divmod(10, 3)
+    divmod(10.4, 3)
+  #+END_SRC
+
+  #+RESULTS:
+  : 3
+  : 1
+  : (3, 1)
+  : (3.0, 1.4000000000000004)
 
 * *enumerate* (iterable, start=0)
-   返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
-   持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
-   为索引（从0开始），第二个元素为原来对象的元素。
-   #+BEGIN_EXAMPLE python
-    >>> seasons = ['spring', 'summer', 'fall', 'winter']
-    >>> list(enumerate(seasons))
-    [(0, 'spring'), (1, 'summer'), (2, 'fall'), (3, 'winter')]
-    >>> list(enumerate(seasons, start=1))
-    [(1, 'spring'), (2, 'summer'), (3, 'fall'), (4, 'winter')]
-   #+END_EXAMPLE
+  返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
+  持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
+  为索引（从0开始），第二个元素为原来对象的元素。
 
-   相当于：
+  #+BEGIN_SRC python
+     sessons = ['spring', 'summer', 'fall', 'wintwer']
+     list(enumerate(sessons))
+     list(enumerate(sessons, start=10))
+  #+END_SRC
 
-   #+BEGIN_SRC python
+  #+RESULTS:
+  :
+  : [(0, 'spring'), (1, 'summer'), (2, 'fall'), (3, 'wintwer')]
+  : [(10, 'spring'), (11, 'summer'), (12, 'fall'), (13, 'wintwer')]
+
+  其实现相当于：
+
+  #+BEGIN_SRC python
     def enumarate(sequence, start=0):
         n = start
         for elem in sequence:
             yield n, elem
             n += 1
-   #+END_SRC
+  #+END_SRC
 
 * *eval* (expression,globals=None,locals=None)？？？
 * *exec* (object[,globals[,locals]])？？？
 * *filter* (function,iterable)
-   返回按照function判断后iterable中元素为True的所有元素组成的iterator对
-   象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
+  返回按照function判断后iterable中元素为True的所有元素组成的iterator对
+  象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
 
-   如果function不为None，则相当于(item for item in iterable if
-   function(item))；如果function为None则相当于(item for item in
-   iterable if item)。
+  如果function不为None，则相当于(item for item in iterable if
+  function(item))；如果function为None则相当于(item for item in
+  iterable if item)。
+
+  #+BEGIN_SRC python
+    nums = range(0, 10)
+    list(filter(lambda x: x % 2 == 0, nums))
+    def even(x):
+        return x % 2 == 0
+
+    list((i for i in nums if even(i)))
+
+    list(filter(None, nums))
+    list((i for i in nums if i))
+  #+END_SRC
+
+  #+RESULTS:
+  :
+  : [0, 2, 4, 6, 8]
+  : ... ... >>> [0, 2, 4, 6, 8]
+  : >>> [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  : [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 * class *float* ([x])
-   返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
+  返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
 
-   如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
-   的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
-   且可不区分呢大小写。
+  如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
+  的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
+  且可不区分呢大小写。
 
-   #+BEGIN_EXAMPLE python
-    >>> float('+1.23')
-    1.23
-    >>> float('    -12345\n')
-    -12345.0
-    >>> float('1e-003')
-    0.001
-    >>> float('-Infinity')
-    -inf
-   #+END_EXAMPLE
+  #+BEGIN_SRC python
+    float('+1.23')
+    float('   -12345\n')
+    float('1e-003')
+    float('-infinity')
+  #+END_SRC
+
+  #+RESULTS:
+  : 1.23
+  : -12345.0
+  : 0.001
+  : -inf
 
 * *format* (value[,format_spec])
-   按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
-   则相当于str(value)：
+  按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
+  则相当于str(value)：
 
-   #+BEGIN_EXAMPLE python
-    >>> format('me', '>30')
-    '                            me'
-    >>> format('me', '<30')
-    'me                            '
-    >>> format('me', '30')
-    'me                            '
-    >>> format('me', '')
-    'me'
-   #+END_EXAMPLE
+  #+BEGIN_SRC python
+    format('me', '<30')
+    format('me', '>30')
+    format('me', '30')
+    format('me', '')
+  #+END_SRC
 
-   调用format(value, format_spec)时，实际上是转换为了
-   type(value).__format__(value, format_spec)。即搜索value对应类型
-   的__format__()方法。如果递归搜索父类有__format__()方法，且无
-   format_spec参数，则使用该方法；如果有使用了format_spec参数，则返回
-   TypeError错误。如果format_spec或方法返回值不是字符串，也会返回
-   TypeError错误。
+  #+RESULTS:
+  : 'me                            '
+  : '                            me'
+  : 'me                            '
+  : 'me'
+
+  调用format(value, format_spec)时，实际上是转换为了
+  type(value).__format__(value, format_spec)。即搜索value对应类型
+  的__format__()方法。如果递归搜索父类有__format__()方法，且无
+  format_spec参数，则使用该方法；如果有使用了format_spec参数，则返回
+  TypeError错误。如果format_spec或方法返回值不是字符串，也会返回
+  TypeError错误。
 
 * class *frozenset* ([iterable])
 * *getattr* (object,name[,default])
@@ -337,22 +377,46 @@
    较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
 
 * *hex* (x)
-   将整数转换为小写的16进制字符串。
+  将整数转换为小写的16进制字符串。
 
-   #+BEGIN_EXAMPLE python
-    >>> hex(255)
-    '0xff'
-    >>> hex(-42)
-    '-0x2a'
-   #+END_EXAMPLE
+  #+BEGIN_SRC python
+     hex(255)
+     hex(-24)
+  #+END_SRC
 
-   如需使用16进制字符串表示浮点数，使用float.hex()方法。
+  #+RESULTS:
+   : '0xff'
+   : '-0x18'
+
+  如需使用16进制字符串表示浮点数，使用float.hex()方法。
+
+  #+BEGIN_SRC python
+    float.hex(1.2)
+    hex(1.2)
+  #+END_SRC
+
+  #+RESULTS:
+  : '0x1.3333333333333p+0'
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : TypeError: 'float' object cannot be interpreted as an integer
 
 * *id* (object)
    返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
    如果两个对象的生命周期没有交集，可能相同。
 
    *CPython实现中：*  此值为该对象的内存地址。
+
+   #+BEGIN_SRC python
+     id(1)
+     id(1)
+     id('me')
+   #+END_SRC
+
+   #+RESULTS:
+   : 93927338204800
+   : 93927338204800
+   : 140012133581072
 
 * *input* ([prompt])
    如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
@@ -368,29 +432,66 @@
 
 * class *int* (x=0)
 * class *int* (x, base=10)
-   返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
-   字，返回x.__int__()；如果为浮点数，返回值为去除小数点后面的内容。
+  返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
+  字，返回x.__int__()；如果为浮点数，返回值为去除小数点后面的内容。
 
-   如果x不是数字或有base参数，x须为字符串、bytes或bytearray实例。前面可
-   有正负号，首位可有空格。base的取值范围内为2-35，默认为10。
+  如果x不是数字或有base参数，x须为字符串、bytes或bytearray实例。前面可
+  有正负号，首位可有空格。base的取值范围内为2-35，默认为10。
+
+  #+BEGIN_SRC python
+    int()                           # 没有参数
+    int(10)
+    int(1.2)
+
+    int('10', base=2)
+    int('ff', base=16)
+    int('10', base=10)
+
+  #+END_SRC
+
+  #+RESULTS:
+  : 0
+  : 10
+  : 1
+  : >>> 2
+  : 255
+  : 10
 
 * *isinstance* (object,classinfo)
-   如果object是，或间接是（递归父类）classinfo的实例则返回True。
-   classinfo可为类型名，也可为多个类型名组成的tuple。当为tuple时，
-   object直接或间接为其中某个元素的实例即返回True。如果classinfo不为类
-   型名或类型名组成的tuple则返回TypeError错误。
+  如果object是，或间接是（递归父类）classinfo的实例则返回True。
+  classinfo可为类型名，也可为多个类型名组成的tuple。当为tuple时，
+  object直接或间接为其中某个元素的实例即返回True。如果classinfo不为类
+  型名或类型名组成的tuple则返回TypeError错误。
 
 * *issubclass* (class, classinfo)
-   如果class直接或间接为classinfo的子类，返回True。一个类总是自己的子类。
-   classinfo可为单个类名，也可为多个类型名组成的tuple。为tuple时，其中
-   的每个类名都会检查。其他任何情况都会返回TypeError错误。
+  如果class直接或间接为classinfo的子类，返回True。一个类总是自己的子类。
+  classinfo可为单个类名，也可为多个类型名组成的tuple。为tuple时，其中
+  的每个类名都会检查。其他任何情况都会返回TypeError错误。
+
+  #+BEGIN_SRC python
+    issubclass(int, int)
+    issubclass(int, (float, int))
+    issubclass(int, float)
+  #+END_SRC
+
+  #+RESULTS:
+  : True
+  : True
+  : False
 
 * *iter* (object[,sentinel])
-   返回一个iterator对象。第二个参数决定第一个参数的解释方式：
+  返回一个iterator对象。第二个参数决定第一个参数的解释方式：
 
   - 如果无第二个参数：object须为一个支持迭代协议（__iter__()方法）的
     collection对象；或者须支持sequence协议（__getitem__()，整数参数以0
     开始）。如果两种协议都不支持，则返回TypeError错误。
+
+    #+BEGIN_SRC python
+      iter((1,2,3))
+    #+END_SRC
+
+    #+RESULTS:
+    : <tuple_iterator object at 0x7f571cf51518>
 
   - 如果有第二个参数sentinel：object须为可调用对象（即函数）。所返回的
     iterator的生成过程为不带参数调用object的__next__()方法。如果返回值
@@ -407,25 +508,56 @@
 	#+END_SRC
 
 * *len* (s)
-   返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
-   range），也可为collection（如dictionary、set或frozen set）。
+  返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
+  range），也可为collection（如dictionary、set或frozen set）。
+
+  #+BEGIN_SRC python
+    len('abc')
+    len(b'abc')
+    len((1, 2, 3))
+    len([1, 2, 3])
+    len(range(3))
+    len({'a': 1, 'b': 2, 'c': 3})
+    len({1, 2, 3})
+  #+END_SRC
+
+  #+RESULTS:
+  : 3
+  : 3
+  : 3
+  : 3
+  : 3
+  : 3
+  : 3
 
 * class *list* ([iterable])
-   list实际上是一个mutable sequence类型。
+  list实际上是一个mutable sequence类型。
 
 * *locals* ()
-   在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
-   数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
-   方法中有区别。
+  在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
+  数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
+  方法中有区别。
 
 * *map* (function, iterable,...)
-   对iterable中的元素每个调用function函数，返回map类型，可使用list函数
-   转换为list类型。如果有多个iterable参数，则function也需有对应个数的参
-   数，结果长度与长度最小的iterable参数相同。
+  对iterable中的元素每个调用function函数，返回map类型，可使用list函数
+  转换为list类型。如果有多个iterable参数，则function也需有对应个数的参
+  数，结果长度与长度最小的iterable参数相同。
+
+  #+BEGIN_SRC python
+     s = [1, 2, 3, 4]
+     t = (100, 200, 300)
+     list(map(lambda x: x * 100, s))
+     list(map(lambda x, y: x + y, s, t))
+  #+END_SRC
+
+  #+RESULTS:
+  :
+  : >>> [100, 200, 300, 400]
+  : [101, 202, 303]
 
 * *max* (iterable, *[,key,default])
 * *max* (arg1,arg2,*args[,key])
-   返回iterable中，或者是2个或以上参数中最大的一个。
+  返回iterable中，或者是2个或以上参数中最大的一个。
 
   - 如果只有一个普通参数，则须为iterable类型。可使default关键字参数，
     指定该iterable中无参数时的返回值。如果ietrable参数为空，且无
@@ -436,43 +568,97 @@
   生]]：
 
   #+BEGIN_SRC python
-  # 最简单的形似：
-  max(1,2)
-  max('a','b')
+    # 最简单的形似：
+    max(1, 2)
+    max('a', 'b')
 
-  # 也可对list和tuple使用：
-  max([1,2])
-  max((1,2))
+    # 也可对list和tuple使用：
+    max([1, 2])
+    max((1, 2))
 
-  # 还可指定比较函数
-  max('ah', 'bf', key=lambda x: x[1])
+    # 还可指定比较函数
+    max('ah', 'bf', key=lambda x: x[1])
 
-  def comparotor(x):
-  return x[1]
+    def cmp(x):
+        return x[0]
 
-  max('ah', 'bf', key=comparotor)
+    max('ah', 'bf', key=cmp)
+
   #+END_SRC
 
-* *momeryview* (obj)
+  #+RESULTS:
+  :
+  : 2
+  : 'b'
+  : >>> ... 2
+  : 2
+  : >>> ... 'ah'
+  : >>> ... ... >>> 'bf'
 
+* *momeryview* (obj)
 * *min* (iterable, *[,key,default])
 * *min* (arg1,arg2,*args[,key])
    与max函数用法相同
 
 * *next* (iterator[,default])
-   通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
-   且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
-   值。
+  通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
+  且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
+  值。
+
+  #+BEGIN_SRC python
+    a = iter([1, 2])
+    next(a, 'empty')
+    next(a, 'empty')
+    next(a, 'empty')
+    next(a, 'empty')
+
+  #+END_SRC
+
+  #+RESULTS:
+  :
+  : 1
+  : 2
+  : 'empty'
+  : 'empty'
 
 * class *object*
-   返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
-   不接受任何参数。
+  返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
+  不接受任何参数。
 
-   *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
+  *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
+
+  #+BEGIN_SRC python
+    o = object()
+    print(o)
+  #+END_SRC
+
+  #+RESULTS:
+  :
+  : <object object at 0x7f571d7e50a0>
 
 * *oct* (x)
-   返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
-   返回一个整数。
+  返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
+  返回一个整数。
+
+  #+BEGIN_SRC python
+     oct(10)
+
+     class Foo:
+         def __index__(self):
+             return 100
+
+     f = Foo()
+     oct(f)
+
+     oct(10.0)
+  #+END_SRC
+
+  #+RESULTS:
+  : '0o12'
+  : >>> ... ... ... >>> >>> '0o144'
+  : >>> Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : TypeError: 'float' object cannot be interpreted as an integer
 
 * *open* (file,
    mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
@@ -532,60 +718,91 @@
    第八个参数opener：
 
 * *ord* (c)
-   接受单个Unicode字符组成的字符串，返回对应的Unicode值。比如ord('a')
-   返回97。对应的函数为chr()。
+  接受单个Unicode字符组成的字符串，返回对应的Unicode值。比如ord('a')
+  返回97。对应的函数为chr()。
+
+  #+BEGIN_SRC python
+     ord('a')
+     chr(97)
+  #+END_SRC
+
+  #+RESULTS:
+   : 97
+   : 'a'
+
 * *pow* (x,y[,z])
-   返回x的y次方，相当于x**y；如果有第三个参数z，则相当于pow(x, y) % z，
-   不过效率更高。
+  返回x的y次方，相当于x**y；如果有第三个参数z，则相当于pow(x, y) % z，
+  不过效率更高。
+
+  #+BEGIN_SRC python
+     10 ** 2
+     pow(10, 2)
+     pow(10, 2, 3)
+  #+END_SRC
+
+  #+RESULTS:
+  : 100
+  : 100
+  : 1
+
 * *print* (*object,sep='',end='\n',file=sys.stdout,flush=False)
-   将objects打印到文本流file中，以sep隔开，最后输出end。如果无参数，则
-   只打印end。
+  将objects打印到文本流file中，以sep隔开，最后输出end。如果无参数，则
+  只打印end。
 
-   所有非关键字参数都先转换为字符串，如str()函数。
+  #+BEGIN_SRC python
+    print(1, 2, 3, sep='|', end='\n\n')
+    print(1, 2, sep='\t')
+  #+END_SRC
 
-   file参数须为有write(string)方法的对象；如果无此方法，或为None，则使
-   用sys.stdout对象。由于所有需打印的参数都先转换为字符串，所以不能用
-   于二进制模式的文件对象，此情况使用file.write(...)替换。
+  #+RESULTS:
+  : 1|2|3
+  : 1	2
 
-   输出内容是否被buffer由file参数决定，如果flush参数为true，则强制flush。
+  所有非关键字参数都先转换为字符串，如str()函数。
+
+  file参数须为有write(string)方法的对象；如果无此方法，或为None，则使
+  用sys.stdout对象。由于所有需打印的参数都先转换为字符串，所以不能用
+  于二进制模式的文件对象，此情况使用file.write(...)替换。
+
+  输出内容是否被buffer由file参数决定，如果flush参数为true，则强制flush。
 * class *property* (fget=None,fset=None,fdel=None,doc=None)
-   fget为获取属性值的函数，fset为设置属性值的函数，fdel为删除属性值的
-   函数，doc为该属性的文档字符串。
+  fget为获取属性值的函数，fset为设置属性值的函数，fdel为删除属性值的
+  函数，doc为该属性的文档字符串。
 
-   如下：
+  如下：
 
-   #+BEGIN_SRC python
-     class C:
-         def __init__(self):
-             self._x = None
+  #+BEGIN_SRC python
+    class C:
+        def __init__(self):
+            self._x = None
 
-         def getx(self):
-             return self._x
+        def getx(self):
+            return self._x
 
-         def setx(self, value):
-             self._x = value
+        def setx(self, value):
+            self._x = value
 
-         def delx(self):
-             del self._x
+        def delx(self):
+            del self._x
 
-         x = property(getx, setx, delx, "I'm the 'x' property.")
+        x = property(getx, setx, delx, "I'm the 'x' property.")
 
-     c1 = C()
-     c2 = C()
+    c1 = C()
+    c2 = C()
 
-     c1.x = 'c1'
-     c2.x = 'c2'
-     print(c1.x)
-     print(c2.x)
-   #+END_SRC
+    c1.x = 'c1'
+    c2.x = 'c2'
+    print(c1.x)                     # c1
+    print(c2.x)                     # c2
+  #+END_SRC
 
-   如果c为C的实例，则c.x调用getter函数，c.x=value调用setter函数，del
-   c.x调用delete函数。
+  如果c为C的实例，则c.x调用getter函数，c.x=value调用setter函数，del
+  c.x调用delete函数。
 
-   如果有doc参数，则为该属性的文档，否则属性文档为fgets的文档字符串
-   （如果有）。将property作为”装饰器“（decorator）可方便创建自读属性：
+  如果有doc参数，则为该属性的文档，否则属性文档为fgets的文档字符串
+  （如果有）。将property作为”装饰器“（decorator）可方便创建自读属性：
 
-   #+BEGIN_SRC python
+  #+BEGIN_SRC python
      class Parrot:
          def __init__(self):
              self._voltage = 10000
@@ -597,15 +814,15 @@
 
      p = Parrot()
      print(p.valtage)
-   #+END_SRC
+  #+END_SRC
 
-   此例使用@property装饰器将voltage()方法转换为了'getter'函数，来获取
-   相同名字的自读属性，且将voltage属性的文档字符串转换为了"获取当权
-   voltage值"。
+  此例使用@property装饰器将voltage()方法转换为了'getter'函数，来获取
+  相同名字的自读属性，且将voltage属性的文档字符串转换为了"获取当权
+  voltage值"。
 
-   使用装饰器改写第一个例子的结果为：
+  使用装饰器改写第一个例子的结果为：
 
-   #+BEGIN_SRC python
+  #+BEGIN_SRC python
      class C:
          def __init__(self):
              self._x = None
@@ -633,11 +850,19 @@
 
      # del c1.x
      # print(c1.x)
-   #+END_SRC
+  #+END_SRC
 
 * *range* (stop)
 * *range* (start,stop,[,step])
-   与其说range是一个函数，不如说是一个immutable sequence类型。
+  与其说range是一个函数，不如说是一个immutable sequence类型。
+
+  #+BEGIN_SRC python
+     list(range(1, 10, 2))
+  #+END_SRC
+
+  #+RESULTS:
+  : [1, 3, 5, 7, 9]
+
 * *repr* (object)
    返回打印前用字符串表示的object。
 
