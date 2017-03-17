@@ -3,7 +3,7 @@
 * *abs* (x)
   返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
 
-  #+BEGIN_SRC python :results output :exports both :session
+  #+BEGIN_SRC python
     print(abs(1))
     print(abs(-1))
     c = complex(1, 2)
@@ -27,16 +27,17 @@
         return True
   #+END_SRC
 
-  #+BEGIN_SRC python :results output
-    s = [1,2,3]
-    print(all(s))
-    s=[0,1,2]
-    print(all(s))
+  #+BEGIN_SRC python
+    s = [1, 2, 3]
+    all(s)
+    s = [0, 1, 2]
+    all(s)
   #+END_SRC
 
   #+RESULTS:
+  :
   : True
-  : False
+  : >>> False
 
 * *any* (iterable)
   如果iterable中任何一个元素为true则返回True，如果为空则返回False。
@@ -49,7 +50,7 @@
         return false
   #+END_SRC
 
-  #+BEGIN_SRC python :results output
+  #+BEGIN_SRC python
     s = [1, 2, 3]
     print(any(s))
     s = [0, 1, 2]
@@ -60,9 +61,10 @@
   #+END_SRC
 
   #+RESULTS:
+  :
   : True
-  : True
-  : False
+  : >>> True
+  : >>> False
 
 * *ansii* (object)
    同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
@@ -79,7 +81,7 @@
   返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
   法__index__()：
 
-  #+BEGIN_SRC python :results output :session
+  #+BEGIN_SRC python
     class Test:
         def __init__(self, num):
             self.num = num
@@ -101,7 +103,7 @@
   如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
   [[真假判断]]。
 
-  #+BEGIN_SRC python :results output :session
+  #+BEGIN_SRC python
      bool()
      bool(0)
      bool('')
@@ -119,17 +121,41 @@
   : False
 
 * class *bytearray* ([source[,encoding[,errors]]])
-   返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
-   bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，
-   以及绝大多数bytes具有的方法。
+  返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
+  bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，
+  以及绝大多数bytes具有的方法。
 
-   参数传递方式为：
+  参数传递方式为：
 
    - 如果为字符串，必须添加encoding参数（errors参数可选）；然后使用
      str.encoding()函数将字符串转换为bytes对象。
+
+	 #+BEGIN_SRC python
+       bytearray('i have a dream!哈哈！', encoding='utf-8')
+	 #+END_SRC
+
    - 如果为整数，表示元素个数，且每个元素初始值为空byte。
+
+	 #+BEGIN_SRC python
+       bytearray(10)
+	 #+END_SRC
+
+   #+RESULTS:
+  : bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+
    - 如果是buffer接口返回的对象，则使用buffer内容初始化。
    - 如果为iterable，其中元素须为0<=x<256的整数，用这些元素初始化。
+
+	 #+BEGIN_SRC python
+       bytearray([1, 2, 3, 3])
+       bytearray([256])
+	 #+END_SRC
+
+   #+RESULTS:
+  : bytearray(b'\x01\x02\x03\x03')
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : ValueError: byte must be in range(0, 256)
 
 * class *bytes* ([source,[encoding[,errors]]])
    返回一个全新的byes对象，元素为取值范围为0<=x<256的immutable序列。
@@ -139,31 +165,37 @@
    参数传递方式同bytearray函数。
 * *callable* (object)
 
-   如果object可被调用，则返回True
+  如果object可被调用，则返回True
 
-   #+BEGIN_EXAMPLE
-    >>> def foo():
-    ...     return
-    ...
-    >>> callable(foo)
-    True
-    >>> a = 1
-    >>> callable(a)
-    False
-   #+END_EXAMPLE
+  #+BEGIN_SRC python
+     def foo():
+         return
+
+     callable(foo)
+     a = 1
+     callable(a)
+
+  #+END_SRC
+
+  #+RESULTS:
+  :
+  : ... >>> >>> True
+  : >>> False
 
 * *chr* (i)
-   返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
-   范围为(0-1,114,111)。
+  返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
+  范围为(0-1,114,111)。
 
-   #+BEGIN_EXAMPLE python
-    >>> chr(97)
-    'a'
-    >>> ord('a')
-    97
-    >>> chr(8364)
-    '€'
-   #+END_EXAMPLE
+  #+BEGIN_SRC python
+    chr(97)
+    ord('a')
+    chr(8364)
+  #+END_SRC
+
+  #+RESULTS:
+  : 'a'
+  : 97
+  : '€'
 
 * *classmethod*  (function)
 * *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
