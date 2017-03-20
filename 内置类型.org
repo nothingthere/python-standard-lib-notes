@@ -585,10 +585,14 @@
 	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
      正式"字符串：
 
-	 #+BEGIN_EXAMPLE python
-       >>> str(b'Zoot')
-       "b'Zoot'"
-	 #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     str(b'Zoot')
+     str(b'Zoot', encoding='utf-8')
+   #+END_SRC
+
+   #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
+   : "b'Zoot'"
+   : 'Zoot'
 
 ** 字符串方法
    字符串类型支持所有Sequence通用的操作，此外还支持下面列举的操作。
