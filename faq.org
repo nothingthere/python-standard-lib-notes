@@ -1,0 +1,8 @@
+#+TITLE: 常见问题
+
+* 类bytes对象（bytes-like object）包含哪些？
+  
+  - bytes
+  - bytearray
+  - array.array
+  - memoryview

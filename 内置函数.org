@@ -6,15 +6,15 @@
   #+BEGIN_SRC python :session
     abs(1)
     abs(-1)
-    c = complex(1, 2)
-    abs(c)
+    abs(complex(1, 2))
+    abs(100)
   #+END_SRC
 
-  #+RESULTS[fb7aa44698f587ce882d41d04dac73d2d46f61fc]:
-  :
+  #+RESULTS[078ae593c13bae192d6eb3dc53b0dde37465227f]:
   : 1
   : 1
-  : >>> 2.23606797749979
+  : 2.23606797749979
+  : 100
 
 * *all* (/iterable/)
   如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
@@ -29,16 +29,16 @@
   #+END_SRC
 
   #+BEGIN_SRC python :session
-    s = [1, 2, 3]
-    all(s)
-    s = [0, 1, 2]
-    all(s)
+    all([1, 2, 3])
+    all([0, 1, 2, 3])
+    all([])
   #+END_SRC
 
-  #+RESULTS[d9714479413c158f3af3c3add196f027a087b189]:
+  #+RESULTS[1752cf656953765867d6103361f70fdeee613d98]:
   :
   : True
-  : >>> False
+  : False
+  : True
 
 * *any* (iterable)
   如果iterable中任何一个元素为true则返回True，如果为空则返回False。
@@ -52,19 +52,17 @@
   #+END_SRC
 
   #+BEGIN_SRC python :session
-    s = [1, 2, 3]
-    any(s)
-    s = [0, 1, 2]
-    any(s)
-    s = [0, '', (), [], False]
-    any(s)
+    any([1, 2, 3])
+    any([0, 1, 2, 3])
+    any([])
+    any([0, '', (), [], False])
   #+END_SRC
 
-  #+RESULTS[3ff2f936b0b4d9f8b0f3981dfac0e068ed10d5c0]:
-  :
+  #+RESULTS[10aabdb11b9f55ce7224db714fcbf5190d9cb726]:
   : True
-  : >>> True
-  : >>> False
+  : True
+  : False
+  : False
 
 * *ansii* (object)
   同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
@@ -87,33 +85,35 @@
     class Test:
         def __init__(self, num):
             self.num = num
-
         def __index__(self):
             return self.num
 
     t = Test(2**10)
     bin(t.num)
+    bin(-1024)
   #+END_SRC
 
-  #+RESULTS[fe087b3b2957a033542d5927bb4152aea54c615a]:
-  #+begin_example
-  >>> >>> '0b10000000000'
-  #+end_example
+  #+RESULTS[80c2c0951ac7490de33c293a4c1e8584250590a0]:
+  :
+  : ... ... ... ... >>> >>> >>> '0b10000000000'
+  : '-0b10000000000'
 
 * class *bool* ([x])
-  如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，使用
-  “真假判断”。
+  如果x为false或省略，则返回False，否则返回True。如果x不为布尔型，下例
+  所有情况都为False：
 
   #+BEGIN_SRC python :session
     bool()
     bool(0)
     bool('')
+    bool(b'')
     bool([])
     bool({})
     bool(())
   #+END_SRC
 
-  #+RESULTS[8128f7e98e76f868ce3d3633e162f1aa9f4be2f1]:
+  #+RESULTS[8e8b067dc176e346ddca2b7ea81a3c30504a6503]:
+  : False
   : False
   : False
   : False
@@ -152,11 +152,13 @@
 
 	 #+BEGIN_SRC python :session
        bytearray([1, 2, 3, 3])
+       bytearray([255])
        bytearray([256])
 	 #+END_SRC
 
-   #+RESULTS[ce4ee8994447910d7204d5cf0414a9cd1d482dd8]:
+   #+RESULTS[38bf58a5ee10ad654785a83db1a7652e1e0d8a65]:
   : bytearray(b'\x01\x02\x03\x03')
+  : bytearray(b'\xff')
   : Traceback (most recent call last):
   :   File "<stdin>", line 1, in <module>
   : ValueError: byte must be in range(0, 256)
@@ -188,18 +190,24 @@
 
 * *chr* (i)
   返回Unicode值为i的字符（以字符串表示）。相反的函数为ord(i)。i的取值
-  范围为(0-1,114,111)。
+  范围为(0 - 1,114,111)。
 
   #+BEGIN_SRC python :session
     chr(97)
     ord('a')
     chr(8364)
+    chr(1114111)
+    chr(1114112)
   #+END_SRC
 
-  #+RESULTS[66be7f9523538dcc605be927e7776cc3f3de46cc]:
+  #+RESULTS[4fcceee023843eeb4742beacf0c6851f914fb56e]:
   : 'a'
   : 97
   : '€'
+  : '\U0010ffff'
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : ValueError: chr() arg not in range(0x110000)
 
 * *classmethod*  (function)
 * *compile* (source, filename, mode, flag=0, dont_inherit=False, optimize=1)？？？
@@ -236,6 +244,27 @@
   - 如果object是一个module对象，则返回该module的属性名链表。
   - 如果object是类实例，则返回其本身的属性名，及递归到的父类属性名。
   - 否则，为该object的属性名，加所属类的属性名，加递归到的父类属性名。
+
+  #+BEGIN_SRC python :session
+    import struct
+    dir(struct)
+
+    class Foo:
+        def __init__(self, num):
+            self.num = num
+        def __dir__(self):
+            return [self.num]
+
+    dir(Foo)
+    foo = Foo(1)
+    dir(foo)
+  #+END_SRC
+
+  #+RESULTS[395bb2564deb6a2db6712b05f5513b81a1c07e7b]:
+  :
+  : ['Struct', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_clearcache', 'calcsize', 'error', 'iter_unpack', 'pack', 'pack_into', 'unpack', 'unpack_from']
+  : >>> >>> ... ... ... ... ... >>> >>> ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']
+  : [1]
 
   #+BEGIN_EXAMPLE python
     >>> dir()
@@ -276,24 +305,25 @@
 * *enumerate* (iterable, start=0)
   返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
   持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
-  为索引（从0开始），第二个元素为原来对象的元素。
+  为索引（默认从0开始），第二个元素为原来对象的元素。
 
   #+BEGIN_SRC python
-    sessons = ['spring', 'summer', 'fall', 'wintwer']
+    sessons = ['Spring', 'Summer', 'Fall', 'Wintwer']
     print(list(enumerate(sessons)))
     print(list(enumerate(sessons, start=10)))
     e = iter(enumerate(sessons, start=100))
-    for i in range(5):
+    for i in range(6):
         print(next(e, 'nothing'))
   #+END_SRC
 
-  #+RESULTS[fe6aaef2be1b22cc8050ee6c028fa3e87c14b872]:
-  : [(0, 'spring'), (1, 'summer'), (2, 'fall'), (3, 'wintwer')]
-  : [(10, 'spring'), (11, 'summer'), (12, 'fall'), (13, 'wintwer')]
-  : (100, 'spring')
-  : (101, 'summer')
-  : (102, 'fall')
-  : (103, 'wintwer')
+  #+RESULTS[1a5d100ebc67e86bbb239b5cc62441835a7b31be]:
+  : [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Wintwer')]
+  : [(10, 'Spring'), (11, 'Summer'), (12, 'Fall'), (13, 'Wintwer')]
+  : (100, 'Spring')
+  : (101, 'Summer')
+  : (102, 'Fall')
+  : (103, 'Wintwer')
+  : nothing
   : nothing
 
   其实现相当于：
@@ -318,23 +348,21 @@
 
   #+BEGIN_SRC python :session
     nums = range(0, 10)
-    list(filter(lambda x: x % 2 == 0, nums))
+    list(filter(lambda x: x % 2 != 0, nums))
 
     def even(x):
         return x % 2 == 0
 
     list((i for i in nums if even(i)))
-
     list(filter(None, nums))
     list((i for i in nums if i))
-
   #+END_SRC
 
-  #+RESULTS[04be63b5ebce184ec063360132f2b9303bd8ca1b]:
+  #+RESULTS[2cccfb97b9392936c087bbd9485d5b34711343e2]:
   :
-  : [0, 2, 4, 6, 8]
+  : [1, 3, 5, 7, 9]
   : >>> ... ... >>> [0, 2, 4, 6, 8]
-  : >>> [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  : [1, 2, 3, 4, 5, 6, 7, 8, 9]
   : [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 * class *float* ([x])
@@ -342,20 +370,26 @@
 
   如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
   的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
-  且可不区分呢大小写。
+  且可不区分大小写。
 
   #+BEGIN_SRC python :session
+    float()
     float('+1.23')
     float('   -12345\n')
     float('1e-003')
     float('-infinity')
+    float('12三')
   #+END_SRC
 
-  #+RESULTS[7ec9c57f3e0dcfdf03627dbb5fce157fc21cd45e]:
+  #+RESULTS[287662aad028fad578fd4cb6a022eee608a78a66]:
+  : 0.0
   : 1.23
   : -12345.0
   : 0.001
   : -inf
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : ValueError: could not convert string to float: '12三'
 
 * *format* (value[,format_spec])
   按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
@@ -389,10 +423,10 @@
    AttributeError错误。
 
 * *globals* ()
-   返回一个表示当前全局symbol table的dict，总是当前module的全局symbol
-   table。
+  返回一个表示当前全局symbol table的dict，总是当前module的全局symbol
+  table。
 
-   如果在函数或方法中，module为其定义时的module，而非调用时的module。
+  如果在函数或方法中，module为其定义时的module，而非调用时的module。
 
 * *hasattr* (object, name)
    参数分别为对象和字符串。如果name是object的属性则返回True，否则返回
@@ -409,7 +443,7 @@
   #+END_SRC
 
   #+RESULTS[03660dd42543bc8ef9a78feadea965279d7ead6b]:
-  #+begin_example
+  #+begin_example python
   Help on NoneType object:
 
   class NoneType(object)
@@ -432,23 +466,25 @@
   object只能为immutable类型。
 
   #+BEGIN_SRC python :session
-     hash(1)
-     hash(1.0)
-     hash('a')
-     hash(b'a')
-     hash(('a'))
-     hash(['a'])
+    hash(1)
+    hash(1.0)
+    hash('a')
+    hash(b'a')
+    hash(('a'))
+    hash(('a', 'b'))
+    hash(['a'])
   #+END_SRC
 
-  #+RESULTS[24d9be0f669653d69a52773dde844e4789f59c57]:
-   : 1
-   : 1
-   : -1886684903820781317
-   : -1886684903820781317
-   : -1886684903820781317
-   : Traceback (most recent call last):
-   :   File "<stdin>", line 1, in <module>
-   : TypeError: unhashable type: 'list'
+  #+RESULTS[6807fe7f1728ede1ce8089f99b270ada6c1760f8]:
+  : 1
+  : 1
+  : 244014917210466474
+  : 244014917210466474
+  : 244014917210466474
+  : 8532064262518639778
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  : TypeError: unhashable type: 'list'
 
 * *hex* (x)
   将整数转换为小写的16进制字符串。
@@ -486,27 +522,32 @@
   *CPython实现中：*  此值为该对象的内存地址。
 
   #+BEGIN_SRC python :session
-     id(1)
-     id(1)
-     hex(id('me'))
+    id(1)
+    id(1)
+    id(2)
+    hex(id('me'))
+    a = 1
+    id(a)
   #+END_SRC
 
-  #+RESULTS[0edaca6ceccc858b999c7c58ebe51a729ba28c74]:
-   : 94229332889216
-   : 94229332889216
-   : '0x7f99db0f4110'
+  #+RESULTS[41942b13a487f866d820bb2b080cdbf025f18660]:
+  : 94640587853440
+  : 94640587853440
+  : 94640587853472
+  : '0x7f398c2b2110'
+  : >>> 94640587853440
 
 * *input* ([prompt])
-   如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
-   输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
-   错误。
+  如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
+  输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
+  错误。
 
-   #+BEGIN_EXAMPLE python
+  #+BEGIN_EXAMPLE python
     >>> s = input('---> ')
     ---> hello world
     >>> s
     'hello world'
-   #+END_EXAMPLE
+  #+END_EXAMPLE
 
 * class *int* (x=0)
 * class *int* (x, base=10)
@@ -522,13 +563,13 @@
     int(1.2)
 
     int('10', base=2)
-    int('ff', base=16)
+    int(b'ff', base=16)
     int('10', base=10)
 
     int('10', base=37)
   #+END_SRC
 
-  #+RESULTS[75397b7da7f0ce1a7c4acf588fc523369a2374e7]:
+  #+RESULTS[0afc1713da6abc0ba5e5af53aa4d509c4f4332f3]:
   : 0
   : 10
   : 1
@@ -556,9 +597,9 @@
     isinstance(f, tuple)
   #+END_SRC
 
-  #+RESULTS[25b3ba6b22c7df04bea1efb30850c346024f3971]:
+  #+RESULTS[a3029c3c441ad87eb4a23dcedaf64d6ba2375560]:
   :
-  : ... ... >>> >>> True
+  : ... ... >>> >>> >>> True
   : True
   : False
 
@@ -671,10 +712,9 @@
     type(sm)
     list(sm)
     list(tm)
-
   #+END_SRC
 
-  #+RESULTS[5252c3d5b662ebbf7783e78d3443a06df14b894e]:
+  #+RESULTS[355e863c49f8fb5373cf9fa210fd4971a5145d8c]:
   :
   : >>> >>> >>> <class 'map'>
   : [10, 20, 30, 40]
@@ -689,8 +729,9 @@
     default参数，则返回ValueError错误。
   - 如果有多普通参数，不能使用default关键字参数。
 
-  两种情况都能使用key关键字参数（与list.sort()函数的用法相同）。[[http://www.oschina.net/code/snippet_111708_16478][@优雅先
-  生]]：
+  两种情况都能使用key关键字参数（与list.sort()函数的用法相同）。
+
+  [[http://www.oschina.net/code/snippet_111708_16478][@优雅先生]]
 
   #+BEGIN_SRC python :session
     # 最简单的形似：
@@ -826,7 +867,7 @@
   | 'U'  | (deprecated)                           |
 
   默认模式为'r'（即'rt'），'w+b'为以二进制模式读写，'r+b'为以二进制模
-  式读写，但不先清空文件。
+  式只读，但不先清空文件。
 
   第三个参数buffering：？？？
 
@@ -922,30 +963,30 @@
   如下：
 
   #+BEGIN_SRC python :session
-    class C:
-        def __init__(self):
-            self._x = None
-        def getx(self):
-            return self._x
-        def setx(self, value):
-            self._x = value
-        def delx(self):
-            del self._x
-        x = property(getx, setx, delx, "I'am the 'x' property")
+        class C:
+            def __init__(self):
+                self._x = None
+            def getx(self):
+                return self._x
+            def setx(self, value):
+                self._x = value
+            def delx(self):
+                del self._x
+            x = property(getx, setx, delx, "I'am the 'x' property")
 
-    c1 = C()
-    c2 = C()
-    c1.setx(1)
-    c2.setx(2)
-    print(c1.x)
-    print(c2.x)
-    getattr(c1, 'x')
-    c1.delx()
+        c1 = C()
+        c2 = C()
+        c1.setx(1)
+        c2.setx(2)
+        print(c1.x)
+        print(c2.x)
+        getattr(c1, 'x')
+        c1.delx()
   #+END_SRC
 
-  #+RESULTS[70ecfc554ffa7ba73bacc8af9a85e8883d1acfa3]:
+  #+RESULTS[82aee607ce577f2685a4a888d74050de04737142]:
   :
-  : ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> >>> 1
+  : ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> 1
   : 2
   : 1
 
@@ -968,9 +1009,9 @@
     print(p.valtage)
   #+END_SRC
 
-  #+RESULTS[3385a68fb321b737ede78518742f5298b2d74ba3]:
+  #+RESULTS[b4c02727563e97325c50abd4097cc5b32f1fa0f0]:
   :
-  : ... ... ... ... ... ... >>> >>> 10000
+  : ... ... ... ... ... ... >>> >>> >>> 10000
 
   此例使用@property装饰器将voltage()方法转换为了'getter'函数，来获取
   相同名字的自读属性，且将voltage属性的文档字符串转换为了"获取当权
@@ -1003,12 +1044,11 @@
 
     del c1.x
     print(c1.x)
-
   #+END_SRC
 
-  #+RESULTS[1e429386352e63f218b5c094cc598acb2c9a1b25]:
+  #+RESULTS[feeb5fcd43940653050201154541b24e78923642]:
   :
-  : ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> >>> c1
+  : ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> >>> >>> c1
   : c2
   : >>> >>> Traceback (most recent call last):
   :   File "<stdin>", line 1, in <module>
@@ -1138,7 +1178,7 @@
     sorted(l)
   #+END_SRC
 
-  #+RESULTS[d994abc65e987d515a904fd0bb682c9b64089d66]:
+  #+RESULTS[efbfd7caa673456a4bfce5d7c3d7799f3fd2f755]:
   :
   : [1, 2, 3]
 
@@ -1173,13 +1213,23 @@
   静态方法不接受"self"参数，如：
 
   #+BEGIN_SRC python :session
-     class C:
-         @staticmethod
-         def f(arg1, arg2):
-             return
+    class C:
+        @staticmethod
+        def f(a):
+            return a
+
+    c = C
+    C.f(1)
+    c.f(1)
   #+END_SRC
 
+  #+RESULTS[e82424bfb3649a459a871840d116e5c5a8f533a7]:
+  :
+  : ... ... ... >>> >>> >>> 1
+  : 1
+
   可在实例中调用（C().f()），也可在类上调用（C.f()）。
+
 * class *str* (object='')
 * class *str* (object=b'',encoding='utf-8',errors='strict')
   返回object用字符串表示的形式。
@@ -1198,7 +1248,7 @@
   : 6
   : 106
 
-  其他几个函数对特定情况效率更高：
+  对于非数值计算，下面几个函数对特定情况效率更高：
 
    - ''.join(sequence)：拼接字符串。
 
@@ -1237,12 +1287,14 @@
   #+END_SRC
 
 * *tuple* ([iterable])
-  实际上是tuple类。
+  实际上是tuple类构造函数。
 
   #+BEGIN_SRC python :session
-     t = tuple([1, 2, 3, 4])
-     t
+    tuple([1, 2, 3, 4])
   #+END_SRC
+
+  #+RESULTS[be2d2aa00f3b18ace9c1500aae9dfafc3cc727e3]:
+  : (1, 2, 3, 4)
 
 * class *type* (object)
 * class *type* (name,bases,dict)
@@ -1272,9 +1324,9 @@
     print(b.x)
   #+END_SRC
 
-  #+RESULTS[d37428187a9dbbe229d36b85cbbe6a32477f9f0e]:
+  #+RESULTS[34695b1f8c0502d2419b6d4239f5a43b389a6e64]:
   :
-  : ... >>> >>> >>> >>> >>> []
+  : ... >>> >>> >>> >>> >>> >>> []
   : []
   : >>> >>> [100]
   : [100]
@@ -1306,7 +1358,7 @@
   将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
   那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
   中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
-
+  
   #+BEGIN_SRC python :session
     l = [1, 2, 3, 4]
     t = ('a', 'b', 'c')
@@ -1317,15 +1369,15 @@
     print(list(zip(l)))
     print(list(zip()))
   #+END_SRC
-
+  
   #+RESULTS[c8a30348b76fcbcc5bd5093685909aff2476db0c]:
   :
-  : >>> >>> <zip object at 0x7f2fe9291c48>
+  : >>> >>> <zip object at 0x7f1fe75acb88>
   : [(1, 'a'), (2, 'b'), (3, 'c')]
   : >>> [(1,), (2,), (3,), (4,)]
   : []
-
+  
 * *__import__* (name,globals=None,locals=None,formlist=(),level=0)
   代码中调用import时，相当于调用了此函数。
-
+  
   *注意* ：如importlib.import_module一样，日常写Python完全不需要。

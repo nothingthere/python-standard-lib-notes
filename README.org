@@ -3,3 +3,4 @@
 * [[file:%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0.org][内置函数]]
 * [[file:%E5%86%85%E7%BD%AE%E5%B8%B8%E9%87%8F.org][内置常量]]
 * [[file:%E5%86%85%E7%BD%AE%E7%B1%BB%E5%9E%8B.org][内置类型]]
+* [[file:faq.org][FAQ]]

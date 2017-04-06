@@ -10,6 +10,25 @@
   - 自定义类中有__bool__和__len()__方法，且实例的此方法返回0或布尔值
     False。
 
+  #+BEGIN_SRC python :session
+    class Foo:
+        def __init__(self, num):
+            self.num = num
+        def __bool__(self):
+            return bool(self.num)
+
+    f0 = Foo(0)
+    f1 = Foo(1)
+
+    any([None, False, 0, 0.0, 0j, '', [], (), {}, f0, f2])
+    any([f1])
+  #+END_SRC
+
+  #+RESULTS[0137abfc43ce548b5c7c5a908abfd134c19ec952]:
+  :
+  : ... ... ... ... >>> >>> >>> >>> >>> >>> False
+  : True
+
   操作符（Operations）和内置函数如果返回布尔型，要么返回1或True作为
   “真”，要么返回0或False作为“假”。
 
@@ -32,66 +51,66 @@
       not b为语法错误。
 
 * 比较
-   Python有8个比较操作符，优先级相同，不过都比布尔值操作符高。比较操作
-   可任意组合，如x < y <= z等价于x < y and y <= z（与C不同），不过y只
-   计算一次，且如果x < y 为加，不计算z，直接返回False。
+  Python有8个比较操作符，优先级相同，不过都比布尔值操作符高。比较操作
+  可任意组合，如x < y <= z等价于x < y and y <= z（与C不同），不过y只
+  计算一次，且如果x < y 为假，不计算z，直接返回False。
 
-   | 操作符 | 含义         |
-   |--------+--------------|
-   | <      | 小于         |
-   | <=     | 小于等于     |
-   | >      | 大于         |
-   | >=     | 大于等于     |
-   | ==     | 等于         |
-   | !=     | 不等于       |
-   | is     | 对象完全相同 |
-   | is not | 不为相同对象 |
+  | 操作符 | 含义         |
+  |--------+--------------|
+  | <      | 小于         |
+  | <=     | 小于等于     |
+  | >      | 大于         |
+  | >=     | 大于等于     |
+  | ==     | 等于         |
+  | !=     | 不等于       |
+  | is     | 对象完全相同 |
+  | is not | 不为相同对象 |
 
-   除不同类型的数字外，所有不同对象之间的比较都返回False。
+  除不同类型的数字外，所有不同对象之间的比较都返回False。
 
-   除非声明__eq__()方法，相同类的不同实例不相等。
+  除非声明__eq__()方法，相同类的不同实例不相等。
 
-   相同类的不同实例不能排序，除非有定
-   义__lt__()、__le__()、__gt__()和__ge__()方法。（如需只进行比较，定
-   义__lt__()和__gt__()方法就足够。）
+  相同类的不同实例不能排序，除非有定
+  义__lt__()、__le__()、__gt__()和__ge__()方法。（如需只进行比较，定
+  义__lt__()和__gt__()方法就足够。）
 
-   is和is not不能定制，可接受任意2个对象，从不返回错误。
+  is和is not不能定制，可接受任意2个对象，从不返回错误。
 
-   in 和 not in两个操作符具有比较操作符的相同优先级，仅支持sequence类
-   型。
+  in 和 not in两个操作符具有比较操作符的相同优先级，仅支持sequence类
+  型。
 
 * 数字类型-int、float、complex
-   一共有3种数字类型：整型、浮点型和复数。此外，布尔型是整型的子类型。
-   整型精度无限，浮点型通常与C中的double型精度相同（可使用
-   sys.float_info变量查看）。复数分实部和虚部（都为浮点型），如果z为复
-   数，则可使用z.real和z.image分别获取实部和虚部。数字后添加j或J可转变
-   为虚数。
+  一共有3种数字类型：整型、浮点型和复数。此外，布尔型是整型的子类型。
+  整型精度无限，浮点型通常与C中的double型精度相同（可使用
+  sys.float_info变量查看）。复数分实部和虚部（都为浮点型），如果z为复
+  数，则可使用z.real和z.image分别获取实部和虚部。数字后添加j或J可转变
+  为虚数。
 
-   Python支持不同的数字类型一起计算。多个类型一起计算时，“窄类型”转换
-   为“宽类型”，整型比浮点型窄，浮点型比复数窄。数字之间的比较也使用相
-   同方法。
+  Python支持不同的数字类型一起计算。多个类型一起计算时，“窄类型”转换
+  为“宽类型”，整型比浮点型窄，浮点型比复数窄。数字之间的比较也使用相
+  同方法。
 
-   下表为除复数，所有数字类型都可使用的操作符，按优先级从低到高排序
-   （所有数字操作符的优先级都比比较操作符低）。
+  下表为除复数，所有数字类型都可使用的操作符，按优先级从低到高排序
+  （所有数字操作符的优先级都比比较操作符低）。
 
-   | 操作符          | 结果                         | 注意点 | 完整文档  |
-   |-----------------+------------------------------+--------+-----------|
-   | x + y           | 和                           |        |           |
-   | x - y           | 差                           |        |           |
-   | x * y           | 积                           |        |           |
-   | x / y           | 商                           |        |           |
-   | x // y          | x整除y的结果                 | (1)    |           |
-   | x % y           | x / y的余值                  | (2)    |           |
-   | -x              | 相反数                       |        |           |
-   | +x              | 保持不变                     |        |           |
-   | abs(x)          | x的绝对值或虚部              |        | abs()     |
-   | int(x)          | 将x转换为整型                | (3)(6) | int()     |
-   | float(x)        | 将x转换为浮点型              | (4)(6) | float()   |
-   | complex(re, im) | 生成复数，img虚数部分默认为0 | (6)    | complex() |
-   | c.conjugate()   | 复数c的共轭？                |        |           |
-   | divmode(x, y)   | 相当于tuple(x // y, x % y)   | (2)    | divmode() |
-   | pow(x, y)       | x的y次方                     | (5)    | pow()     |
-   | x ** y          | x的y次方                     | (5)    |           |
+  | 操作符          | 结果                         | 注意点 | 完整文档  |
+  |-----------------+------------------------------+--------+-----------|
+  | x + y           | 和                           |        |           |
+  | x - y           | 差                           |        |           |
+  | x * y           | 积                           |        |           |
+  | x / y           | 商                           |        |           |
+  | x // y          | x整除y的结果                 | (1)    |           |
+  | x % y           | x / y的余值                  | (2)    |           |
+  | -x              | 相反数                       |        |           |
+  | +x              | 保持不变                     |        |           |
+  | abs(x)          | x的绝对值或虚部              |        | abs()     |
+  | int(x)          | 将x转换为整型                | (3)(6) | int()     |
+  | float(x)        | 将x转换为浮点型              | (4)(6) | float()   |
+  | complex(re, im) | 生成复数，img虚数部分默认为0 | (6)    | complex() |
+  | c.conjugate()   | 复数c的共轭？                |        |           |
+  | divmode(x, y)   | 相当于tuple(x // y, x % y)   | (2)    | divmode() |
+  | pow(x, y)       | x的y次方                     | (5)    | pow()     |
+  | x ** y          | x的y次方                     | (5)    |           |
 
    1. 结果无小数，不一定为整型。结果总是向负的最小值靠近：
 
@@ -111,7 +130,7 @@
    3. 将浮点型转换为整数时，同C一样会“舍入”。参考math.floor()和
       math.ceil()函数。
 
-   4. 浮点型可接受字符串“nan”和"inf"作为非数字和无线数，前面可带正负号。
+   4. 浮点型可接受字符串“nan”和"inf"作为非数字和无限数，前面可带正负号。
 
    5. 如其他语言一样，Python规定pow(0,0)和0**0的值都为1。
 
@@ -150,43 +169,66 @@
 
 ** 整型的额外方法
 *** int. *bit_length* ()
-	 返回以二进制表示整数的位数：
+	返回以二进制表示整数的位数：
 
-	 #+BEGIN_EXAMPLE python
-       >>> n = -37
-       >>> bin(n)
-       '-0b100101'
-       >>> n.bit_length()
-       6
-	 #+END_EXAMPLE
+    #+BEGIN_SRC python :session
+       n = -37
+       bin(n)
+       n.bit_length()
+    #+END_SRC
 
-	 等价于：
+    #+RESULTS[8810302f5722bb340d6945ff9942a8590dbc799f]:
+     :
+     : '-0b100101'
+     : 6
 
-	 #+BEGIN_SRC python
+	等价于：
+
+	#+BEGIN_SRC python
        def bit_length(self):
            s = bin(self)
            s = s.lstrip('-0b')
            return len(s)
-	 #+END_SRC
+	#+END_SRC
 
 *** int. *to_bytes* (length,byteorder,*,signed=False)？？？
 *** clasmethod int *from_bytes* (bytes,byteorder,*,signed=False)？？？
 ** 浮点型的额外方法
 *** float. *as_integer_ratio* ()
+
+    #+BEGIN_SRC python :session
+      (-0.2).as_integer_ratio()
+      (1.0).as_integer_ratio()
+    #+END_SRC
+
+    #+RESULTS[f517333064b3617d1033e12581eab9467fed88f8]:
+    : (-3602879701896397, 18014398509481984)
+    : (1, 1)
+
 *** float. *is_integer* ()
+
+    #+BEGIN_SRC python :session
+      (-0.2).is_integer()
+      (3.2).is_integer()
+    #+END_SRC
+
+    #+RESULTS[4a065e04afa4e754ac4170314f2b848504579849]:
+    : False
+    : False
+
 *** float. *hex* ()
 *** classmethod float. *fromhex* (s)
 ** numeric类型哈希计算（Hashing）
 * Iterator类型
-   Python支持在容器（container）外面嵌套一个迭代层。此实现使用了2个不
-   同的方法，帮助用户自定义类主持迭代。后面讨论的Sequence总是支持下面
-   的迭代方法。
+  Python支持在容器（container）外面嵌套一个迭代层。此实现使用了2个不
+  同的方法，帮助用户自定义类支持迭代。后面讨论的Sequence总是支持下面
+  的迭代方法。
 
-   容器对象需支持container. *__iter__* ()方法提供迭代支持，此方法： 返
-   回一个迭代对象。
+  容器对象需支持container. *__iter__* ()方法提供迭代支持，此方法： 返
+  回一个迭代对象。
 
-   迭代对象本身需支持iterator. *__iter__* ()和iterator. *__next__* ()
-   方法。
+  迭代对象本身需支持iterator. *__iter__* ()和iterator. *__next__* ()
+  方法。
 
 ** Generator类型
 	如果容器对象有__iter__()方法，且为generator实现，则自动返回迭代对
@@ -221,45 +263,59 @@
    同类型的sequence可做比较。比如链表和元组，为逐个比较其中的元素。即
    两个Sequence相等，则需对应位置的元素相等，且类型相同，长度相等：
 
-   #+BEGIN_EXAMPLE python
-      >>> [1,2,3] == [1,2,3]
-      True
-      >>> [1,2,3] == (1,2,3)
-      False
-      >>> a = [1,2,3]
-      >>> b = [1,2,3]
-      >>> a == b
-      True
-   #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     [1, 2, 3] == [1, 2, 3]
+     [1, 2, 3] == (1, 2, 3)
+   #+END_SRC
+
+   #+RESULTS[53ca1bdf37af220736955e12a718c6509d8f0c06]:
+   : True
+   : False
 
    注意点：
 
 	1. in和not in通常用来判断是否包含某元素，不过一些特殊的Sequence，
        如str、bytes和bytearray也可同样使用：
 
-	   #+BEGIN_EXAMPLE python
-         >>> 'gg' in 'egge'
-         True
+    #+BEGIN_SRC python :session
+      'gg' in 'egg'
+      b'a' in b'abc'
+      'a' in b'abc'
+    #+END_SRC
 
-         >>> b'a' in b'abc'
-         True
-         >>> 'a' in b'abc'
-         Traceback (most recent call last):
-           File "<stdin>", line 1, in <module>
-           TypeError: a bytes-like object is required, not 'str'
-	   #+END_EXAMPLE
+    #+RESULTS[14b5f1634155ec3e15feeb4aebda2079e4a135fb]:
+    : True
+    : True
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : TypeError: a bytes-like object is required, not 'str'
 
-	2. n如果小于0，则作为0对待，返回相同类型的Sequence，但其中无元素。
-       注意，复制s本身并不是正真复制，而是多次引用原来的元素：
+	2. n如果小于0，则作为0对待，即返回相同类型的Sequence，但其中无元素。
 
-	   #+BEGIN_EXAMPLE python
-         >>> lists = [[]] * 3
-         >>> lists
-         [[], [], []]
-         >>> lists[0].append(3)
-         >>> lists
-         [[3], [3], [3]]
-	   #+END_EXAMPLE
+       #+BEGIN_SRC python :session
+          l = [1, 2, 3]
+          l * 0
+          l * -1
+       #+END_SRC
+
+       #+RESULTS[a7f3ebdeb4c93a76e0799a5c836d2cb5619ed431]:
+       :
+       : []
+       : []
+
+    *注意* ：复制s本身并不是正真复制，而是多次引用原来的元素：
+
+    #+BEGIN_SRC python :session
+      lists = [[]] * 3
+      print(lists)
+      lists[0].append(3)
+      print(lists)
+    #+END_SRC
+
+    #+RESULTS[d58102302c25ac67990798dc71a99e9ec03ae85e]:
+     :
+     : [[], [], []]
+     : >>> [[3], [3], [3]]
 
 	3. 如果i或j为负数，则相当于les(s)+i和len(s)+j。
 
@@ -296,20 +352,21 @@
    此特性可使immutable类型，如元组，可作为字典(dict)的key值，或另存为
    set或frozenset。
 
-   #+BEGIN_EXAMPLE python
-      >>> hash((1,2,3))
-      2528502973977326415
-   #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     hash((1, 2, 3))
+   #+END_SRC
 
    如果尝试hash含unhashable元素的immutable类型，则返回Typeerror错误。
    如：
 
-   #+BEGIN_EXAMPLE python
-      >>> hash((1,2,[2]))
-      Traceback (most recent call last):
-        File "<stdin>", line 1, in <module>
-        TypeError: unhashable type: 'list'
-   #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     hash(([1, 2], 3))
+   #+END_SRC
+
+   #+RESULTS[6a128c1614b208c615c076ac9b4fdc89231aa315]:
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : TypeError: unhashable type: 'list'
 
 ** Mutable Sequence类型
    下表为只有mutable类型才有的操作。其中s为mutable类型的实例，t为任何
@@ -336,19 +393,21 @@
 
 	1. t需与截断的长度相等。
 
-	   #+BEGIN_EXAMPLE python
-         >>> s = [1,2,3,4]
-         >>> s[0::2]
-         [1, 3]
-         >>> s[0::2] = ['a','b']
-         >>> s
-         ['a', 2, 'b', 4]
-         >>> s[0::2] = ['a','b', 'c']
-         Traceback (most recent call last):
-           File "<stdin>", line 1, in <module>
-         ValueError: attempt to assign sequence of size 3 to extended slice of size
-          2
-	   #+END_EXAMPLE
+       #+BEGIN_SRC python :session
+          s = [1, 2, 3, 4]
+          print(s[0::2])
+          s[0::2] = ['a', 'b']
+          print(s)
+          s[0::2] = ['a', 'b', 'c']
+       #+END_SRC
+
+       #+RESULTS[1e58544f13894e154d7091d122d872093f579d6d]:
+        :
+        : [1, 3]
+        : >>> ['a', 2, 'b', 4]
+        : Traceback (most recent call last):
+        :   File "<stdin>", line 1, in <module>
+        : ValueError: attempt to assign sequence of size 3 to extended slice of size 2
 
 	2. 可选参数i默认值为-1，即默认删除最后一个元素。
 	3. 如果s中不存在元素x，则返回Valueerror错误。
@@ -359,15 +418,18 @@
 	6. n为整数，或有__index__()方法的对象。当n<=0时，清空。同上，复制
        自身并不是真正复制，而是复制reference：
 
-	   #+BEGIN_EXAMPLE python
-         >>> t = [[1],[2]]
-         >>> t *= 2
-         >>> t
-         [[1], [2], [1], [2]]
-         >>> t[0].append(1000)
-         >>> t
-         [[1, 1000], [2], [1, 1000], [2]]
-	   #+END_EXAMPLE
+       #+BEGIN_SRC python :session
+          t = [[1], [2]]
+          t *= 2
+          print(t)
+          t[0].append(1000)
+          print(t)
+       #+END_SRC
+
+       #+RESULTS[ef737dbf67d1269a29a39f6bc2426bd90792ec54]:
+       :
+       : >>> [[1], [2], [1], [2]]
+       : >>> [[1, 1000], [2], [1, 1000], [2]]
 
 ** 链表（List）
    链表为mutable类型的sequence，一般用来存储相同类型的元素。
@@ -385,17 +447,23 @@
 	 iterator对象。 如果iterable本身就是链表，则是复制其reference。如
 	 果没有参数，则返回空链表：
 
-	 #+BEGIN_EXAMPLE python
-       >>> a = [[1],[2]]
-       >>> b = list(a)
-       >>> b
-       [[1], [2]]
-       >>> b[0].append(100)
-       >>> b
-       [[1, 100], [2]]
-       >>> a
-       [[1, 100], [2]]
-	 #+END_EXAMPLE
+     #+BEGIN_SRC python :session
+       a = [[1], [2]]
+       b = list(a)
+       print(a)
+       print(b)
+
+       a[0].append(1000)
+       print(a)
+       print(b)
+     #+END_SRC
+
+     #+RESULTS[17f994bc42b7147fa28aa69158de0314e9f754a3]:
+     :
+     : >>> [[1], [2]]
+     : [[1], [2]]
+     : >>> >>> [[1, 1000], [2]]
+     : [[1, 1000], [2]]
 
 	 有许多其他操作符可生成链表，如sorted()。
 
@@ -420,17 +488,18 @@
    如内置函数enumarate()的返回的2元素元组；有时也用于存储immutable类
    型的Sequence，如作为set或dict的元素。？
 
-   #+BEGIN_EXAMPLE python
-     >>> e = enumerate(['a', 'b', 'c'])
-     >>> next(e, 'end')
-     (0, 'a')
-     >>> next(e, 'end')
-     (1, 'b')
-     >>> next(e, 'end')
-     (2, 'c')
-     >>> next(e, 'end')
-     'end'
-   #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     e = enumerate([1, 2, 3])
+     for i in range(4):
+         print(next(e, 'end'))
+   #+END_SRC
+
+   #+RESULTS[a2bde2e71d838787de06a4c6aa1d60a37029e796]:
+   :
+   : ... ... (0, 1)
+   : (1, 2)
+   : (2, 3)
+   : end
 
 *** class *tuple* ([iterable])
 	构造元组有下面方法：
@@ -445,30 +514,23 @@
 	 本来就是元组，则同链表一样，也是复制其reference，如果无参数则生成
 	 空元组：
 
-	 #+BEGIN_EXAMPLE python
-       >>> t = ([1],[2],[3])
-       >>> t
-       ([1], [2], [3])
-       >>> s = tuple(t)
-       >>> s
-       ([1], [2], [3])
-       >>> t[0].append(1)
-       >>> t
-       ([1, 1], [2], [3])
-       >>> s
-       ([1, 1], [2], [3])
+     #+BEGIN_SRC python :session
+       l = [[1], [2], [3]]
+       t = tuple(l)
+       print(l)
+       print(t)
 
-       # 元组与链表转换时也只是复制其reference
-       >>> t = [[1],[2],[3]]
-       >>> s = tuple(t)
-       >>> s
-       ([1], [2], [3])
-       >>> s[0].append(1000)
-       >>> s
-       ([1, 1000], [2], [3])
-       >>> t
-       [[1, 1000], [2], [3]]
-	 #+END_EXAMPLE
+       l[0].append(100)
+       print(l)
+       print(t)
+     #+END_SRC
+
+     #+RESULTS[24c4e8175a011b7d25226ccf417569e120f5af04]:
+     :
+     : >>> [[1], [2], [3]]
+     : ([1], [2], [3])
+     : >>> >>> [[1, 100], [2], [3]]
+     : ([1, 100], [2], [3])
 
 	 *注意* ：实际上是逗号，而非小括号构成的元组。小括号基本可省略，但
 	 在造成语义混淆的地方不可少，如f(a,b,c)为函数调用3个参数，二
@@ -480,74 +542,80 @@
 	 过字符串名称获取索引，比纯数字索引更合适。
 
 ** 范围（Range）
-	range类型为immutable的数字Sequence，常与for语句搭配表示循环次数。
+   range类型为immutable的数字Sequence，常与for语句搭配表示循环次数。
 *** class *range* (stop)
 *** class *range* (start,stop[,step])
-	 所有参数都须为整数（内置int类型或有__index__方法的对象）。如果
-	 无step参数，默认为1；如果无start参数，默认为0；如果step参数为0，
-	 则返回ValueError错误。下面为range的用法举例：
+	所有参数都须为整数（内置int类型或有__index__方法的对象）。如果
+	无step参数，默认为1；如果无start参数，默认为0；如果step参数为0，
+	则返回ValueError错误。下面为range的用法举例：
 
-	 #+BEGIN_EXAMPLE python
-       >>> list(range(10))
-       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-       >>> list(range(1, 11))
-       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-       >>> list(range(0, 30, 5))
-       [0, 5, 10, 15, 20, 25]
-       >>> list(range(0, 10, 3))
-       [0, 3, 6, 9]
-       >>> list(range(0, -10, -1))
-       [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
-       >>> list(range(0, -10, 1))
-       []
-       >>> list(range(0))
-       []
-       >>> list(range(1, 0))
-       []
-	 #+END_EXAMPLE
+    #+BEGIN_SRC python :session
+       list(range(10))
+       list(range(1, 11))
+       list(range(0, 30, 5))
+       list(range(0, 10, 3))
+       list(range(0, -10, -1))
+       list(range(0, -10, 1))
+       list(range(0))
+       list(range(1, 0))
+    #+END_SRC
 
-	 除拼接和复制外，range支持上面第一小节中所有Sequence支持的操作。原
-	 因为range对象只能表示严格模式的Sequence，拼接和复制会损坏此模式。
+    #+RESULTS[b8870d8540cdec15e1316a334965df02944ffc11]:
+     : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+     : [0, 5, 10, 15, 20, 25]
+     : [0, 3, 6, 9]
+     : [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+     : []
+     : []
+     : []
 
-	 range对象有start、stop和step3属性，分别对应创建时的三个值：
+	除拼接和复制外，range支持上面第一小节中所有Sequence支持的操作。原
+	因为range对象只能表示严格模式的Sequence，拼接和复制会损坏此模式。
 
-	 #+BEGIN_EXAMPLE python
-       >>> r = range(1, 20, 5)
-       >>> r.start
-       1
-       >>> r.stop
-       20
-       >>> r.step
-       5
-	 #+END_EXAMPLE
+	range对象有start、stop和step3属性，分别对应创建时的三个值：
 
-	 较之链表和元组，range占用内存更小。无论表示序列个数多少，所占内存
-	 固定：只存储start、stop和step3个值，各元素需要时才计算。
+    #+BEGIN_SRC python :session
+      r = range(1, 1000, 10)
+      print(r.start)
+      print(r.stop)
+      print(r.step)
+    #+END_SRC
 
-	 range实现了collections.abc.Sequence ABC，支持元素包含测试，索引查
-	 找，截断和负截断：
+    #+RESULTS[f9fc1c5f14e3ac7337647f34fb759a95de1b6673]:
+    :
+    : 1
+    : 1000
+    : 10
 
-	 #+BEGIN_EXAMPLE python
-       >>> r = range(0, 20, 2)
-       >>> r
-       range(0, 20, 2)
-       >>> 11 in r
-       False
-       >>> 10 in r
-       True
-       >>> r.index(10)
-       5
-       >>> r[5]
-       10
-       >>> r[:5]
-       range(0, 10, 2)
-       >>> r[-1]
-       18
-	 #+END_EXAMPLE
+	较之链表和元组，range占用内存更小。无论表示序列个数多少，所占内存
+	固定：只存储start、stop和step3个值，各元素需要时才计算。
 
-	 使用==和!=判断range是否相等时，同一般Sequence一样，即两者中元素是
-	 否逐个相等。两个相等的range可有不同的start、stop和step值，如
-	 range(0) == range(2, 1, 3)。
+	range实现了collections.abc.Sequence ABC，支持元素包含测试，索引查
+	找，截断和负截断：
+
+    #+BEGIN_SRC python :session
+      r = range(1, 10)
+      2 in r
+      20 in r
+      r.index(5)
+      r[5]
+      r[:5]
+      r[-1]
+    #+END_SRC
+
+    #+RESULTS[4b45307c89036dddea5d4fb032b6b58603e9644d]:
+    :
+    : True
+    : False
+    : 4
+    : 6
+    : range(1, 6)
+    : 9
+
+	使用==和!=判断range是否相等时，同一般Sequence一样，即两者中元素是
+	否逐个相等。两个相等的range可有不同的start、stop和step值，如
+	range(0) == range(2, 1, 3)。
 
 * 文本Sequence类型-str
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
@@ -560,7 +628,7 @@
 
    三引号表示的字符串可跨行书写，且保留换行符。
 
-   在同一个表达式中，如果字符串间只有空格，则字典拼接：("spam"
+   在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
    "eggs") == "spam eggs"。
 
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
@@ -601,46 +669,64 @@
    法。
 *** str. *capitalize* ()
 	返回复制后的字符串，第一个字母大写，其余字母小写。
+
+    #+BEGIN_SRC python :session
+      'claudio'.capitalize()
+    #+END_SRC
+
+    #+RESULTS[d5f95c7fff1851f22a9d61bf878206b0b5f4ca80]:
+    : 'Claudio'
+
 *** str. *casefold* ()
 	相当于str.lower()方法。[[http://www.cnblogs.com/zhanmeiliang/p/5988207.html][@爱尔兰时空]]：
 
 	lower()只对'A-Z'有效，不能处理其他语言中小写的问题，如德语中'ß'的
 	小写为'ss'：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'ß'
-       >>> s.lower()
-       'ß'
-       >>> s.casefold()
-       'ss'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'ß'
+      s.lower()
+      s.casefold()
+    #+END_SRC
+
+    #+RESULTS[0697c4ef3a8e1439fb26555eec81d54e4f776435]:
+    :
+    : 'ß'
+    : 'ss'
+
 *** str. *center* (width[,fillchar])
 	将字符串扩展为长度width，原字符串至于中间，空白处使用fillchar字符
 	填充（默认为ASCII空格字符），如果width小于或等于len(s)，则返回原
 	来字符串：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'claudio'
-       >>> s.center(10)
-       ' claudio  '
-       >>> s.center(10, '|')
-       '|claudio||'
-       >>> s.center(1)
-       'claudio'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'claudio'
+      s.center(10)
+      s.center(10, '|')
+      s.center(1)
+    #+END_SRC
+
+    #+RESULTS[b34234826f548cd7dc3ae6e917ea372e112a11ea]:
+    :
+    : ' claudio  '
+    : '|claudio||'
+    : 'claudio'
 
 *** str. *count* (sub[,start[,end]])
 	返回字符串sub出现的次数，可指定在截断[start:end]间计算：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.count('an')
-       2
-       >>> s.count('an', -3)
-       1
-       >>> s.count('an', 3)
-       1
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.count('an')
+      s.count('an', -3)
+      s.count('an', 3)
+    #+END_SRC
+
+    #+RESULTS[c6e9c6f7614c91601f8268bce67cb034ccde5ff6]:
+    :
+    : 2
+    : 1
+    : 1
 
 *** str. *encode* (encoding='utf-8',errors='strict')
 	以bytes对象的形式返回字符串编码后的结果。默认编码为utf-8；默认
@@ -648,118 +734,142 @@
 	取值为ignore、replace、xmlcharrefreplace和backslashreplace，以及
 	其他通过codecs.register_error()方法寄存的名称。
 
-	#+BEGIN_EXAMPLE python
-       >>> 'claudio'.encode()
-       b'claudio'
-       >>> '学习'.encode()
-       b'\xe5\xad\xa6\xe4\xb9\xa0';
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'claudio'.encode()
+      '学习'.encode()
+    #+END_SRC
+
+    #+RESULTS[90b9e4e1f2822bcabab7dffa1fe415529f2845b9]:
+    : b'claudio'
+    : b'\xe5\xad\xa6\xe4\xb9\xa0'
 
 *** str. *endswith* (suffix,[,start[,end]])
 	如果字符串以suffix结尾返回True，否则返回False。可指定在截断
 	[start:end]中计算：
 
-	#+BEGIN_EXAMPLE
-       >>> 'banana'.endswith('na')
-       True
-       >>> 'banana'.endswith('na', 5)
-       False
-       >>> '香蕉'.endswith('蕉')
-       True
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'banana'.endswith('na')
+      'banana'.endswith('na', 5)
+      '香蕉'.endswith('蕉')
+    #+END_SRC
+
+    #+RESULTS[fdedc626806beab522f616fa23bce60945428848]:
+    : True
+    : False
+    : True
+
 *** str. *expandtabs* (tabsize=8)
 	返回复制后的字符串，其中tab字符使用一个或多个空格替代，可指定一个
 	tab字符所占列数：
 
-	#+BEGIN_EXAMPLE python
-       >>> '01\t012\t0123\t01234'.expandtabs()
-       '01      012     0123    01234'
-       >>> '01\t012\t0123\t01234'.expandtabs(4)
-       '01  012 0123    01234'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '01\t012\t0123\t01234'.expandtabs()
+      '01\t012\t0123\t01234'.expandtabs(4)
+    #+END_SRC
+
+    #+RESULTS[5c811a8cf738b66e5eb6517da4244e1c7ca2f24f]:
+    : '01      012     0123    01234'
+    : '01  012 0123    01234'
+
 *** str. *find* (sub[,start[,end]])
 	返回从左到右起，sub出现在字符串中的索引，可指定在截断[start:end]
 	中计算，如果无sub字符串出现，则返回-1。
 
-	#+BEGIN_EXAMPLE python
-       >>> 'banana'.find('a')
-       1
-       >>> 'banana'.find('a', 4)
-       5
-       >>> 'banana'.find('a', 19)
-       -1
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'banana'.find('a')
+      'banana'.find('a', 4)
+      'banana'.find('a', 19)
+    #+END_SRC
+
+    #+RESULTS[d9397cf5feceb92c9230f86b913e32c0fc27863a]:
+    : 1
+    : 5
+    : -1
 
 	为效率考虑，只有需知道sub在字符串中的索引时才使用find()方法，如果
 	只是判断是否出现sub，使用in操作符即可：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'Py' in 'Python'
-       True
-       >>> 'py' in 'Python'
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'Py' in 'Python'
+      'py' in 'Python'
+    #+END_SRC
+
+    #+RESULTS[f0de536f15e64dbeacaf66261e8059886f0fb0da]:
+    : True
+    : False
 
 *** str. *format* (*args,**kwargs)
 	对字符串进行格式化。字符串中可含普通字符，也可含需被替换的place
 	holder，用{}表示。{}中可为数字或关键字参数，分别对应format中的
 	args和kwargs：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'The sum of 1 + 2 is {0}'.format(1+2)
-       'The sum of 1 + 2 is 3'
-       >>> 'The sum of {a} + {b} is {0}'.format(1+2, a=1, b=2)
-       'The sum of 1 + 2 is 3'
-	#+END_EXAMPLE
-
 	如需打印大括号本身，使用双层大括号：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'format 中使用{{}}表示placeholder'.format()
-       'format 中使用{}表示placeholder'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'the sum of 1 + 2 is {0}'.format(1 + 2)
+      'the sum of {a} + {b} is {0}'.format(1 + 2, a=1, b=2)
+      'format中使用{{{{}}}}表示{{}}本身.'.format()
+    #+END_SRC
+
+    #+RESULTS[b5afbc7c13efc2e8d2869e68a97d0b0879f36beb]:
+    : 'the sum of 1 + 2 is 3'
+    : 'the sum of 1 + 2 is 3'
+    : 'format中使用{{}}表示{}本身.'
 
 *** str. *format_map* (mapping)
-	与str.format(***mapping)类型，不过是直接使用mapping，而不是复制到
+	与str.format(***mapping)相同，不过是直接使用mapping，而不是复制到
 	dict中。如果mapping本身就是dict的一个子类，则非常方便。？？？：
 
-	#+BEGIN_EXAMPLE
-       >>> d = {'name': 'Guido'}
-       >>> '{name} was born in ?'.format(**d)
-       'Guido was born in ?'
+    #+BEGIN_SRC python :session
+      d = {'name': 'Claudio'}
+      '{name} was born in ?'.format(**d)
+      '{name} was born in ?'.format_map(d)
 
-       >>> class Default(dict):
-       ...     def __missing__(self, key):
-       ...             return key
-       ...
-       >>> '{name} was born in {country}'.format_map(Default(name='Guido'))
-       'Guido was born in country'
-	#+END_EXAMPLE
+      class Default(dict):
+          def __missing(self, key):
+              return key
+
+      '{name} was born in ?'.format(**Default(name='Claudio'))
+      '{name} was born in ?'.format_map(Default(name='Claudio'))
+    #+END_SRC
+
+    #+RESULTS[5660bc8c376ff0e2df9a65871e66b07b291471ea]:
+    :
+    : 'Claudio was born in ?'
+    : 'Claudio was born in ?'
+    : >>> >>> ... ... ... >>> >>> 'Claudio was born in ?'
+    : 'Claudio was born in ?'
 
 *** str. *index* (sub[,start[,end]])
 	同find()方法类似，不过当不能在字符串中找到sub时返回ValueError错误，
 	而非-1：
 
-	#+BEGIN_EXAMPLE
-       >>> 'banana'.index('a')
-       1
-       >>> 'banana'.index('aD')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         ValueError: substring not found
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'banana'.index('a')
+      'banana'.index('A')
+    #+END_SRC
+
+    #+RESULTS[d1f99aec023cad1e2df83201b6c18bb4b9be277e]:
+    : 1
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: substring not found
 
 *** str. *isalnum* ()
 	如果字符串不为空，且其中所有字符非数字即"字母"，则返回True：
 
-	#+BEGIN_EXAMPLE
-       >>> '111'.isalnum()
-       True
-       >>> ''.isalnum()
-       False
-       >>> '11#'.isalnum()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '111'.isalnum()
+      '1abc'.isalnum()
+      ''.isalnum()
+      '11#'.isalnum()
+    #+END_SRC
+
+    #+RESULTS[64c759e1c39d76d3bf059fa4eae875f0dc58e9ba]:
+    : True
+    : True
+    : False
+    : False
 
 	只要c.isalpha()、c.isdecimal()、c.isdigit()或c.isnumeric()中一个
 	返回True，则c.isalnum()就返回True。
@@ -770,33 +880,50 @@
 
 	*注意* ：不同于Unicode Standard中定义的"Alphabetic"。
 
-	#+BEGIN_EXAMPLE python
-       >>> 'a'.isalpha()
-       True
-       >>> '一'.isalpha()
-       True
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'a'.isalpha()
+      '一'.isalpha()
+    #+END_SRC
+
+    #+RESULTS[a642291f6b8b9de18b3c7270c3edee58f4829289]:
+    : True
+    : True
+
 *** str. *isdecimal* ()
 	字符串不为空，且所有字符都是十进制数字符，即所有能用于表示十进制
 	数的字符。
+
+    #+BEGIN_SRC python :session
+      '1212'.isdecimal()
+      '12.2'.isdecimal()
+    #+END_SRC
+
+    #+RESULTS[43583aa61fbd503d3184e8ee9697cc11352fcbce]:
+    : True
+    : False
+
 *** str. *isdigit* ()
 	除isdecimal字符外，还包含“compatibility superscript digits”。？？？
 *** str. *isidentifier* ()
 	如果是Python中合法的identifier（变量名、函数名和类名），则返回
 	True：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'is_identifer'.isidentifier()
-       True
-       >>> 'is-identifer'.isidentifier()
-       False
-       >>> 'is2identifer'.isidentifier()
-       True
-       >>> '_is_identifer'.isidentifier()
-       True
-       >>> '_is_identifer#'.isidentifier()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'isidentifier'.isidentifier()
+      'is_identifier'.isidentifier()
+      'is-identifier'.isidentifier()
+      'is2identifier'.isidentifier()
+      '_is_idendify'.isidentifier()
+      'is_identifier?'.isidentifier()
+    #+END_SRC
+
+    #+RESULTS[47ec6e8c215cd5da97416a61af5045e47c381b40]:
+    : True
+    : True
+    : False
+    : True
+    : True
+    : False
 
 	如需判断是否是“保留字”，使用keuword.iskeyword()方法：
 
@@ -811,108 +938,138 @@
        >>> keyword.iskeyword('__init__')
        False
 	#+END_EXAMPLE
+
+    #+BEGIN_SRC python :session
+      import keyword
+      keyword.iskeyword('def')
+      keyword.iskeyword('class')
+      keyword.iskeyword('__init__')
+    #+END_SRC
+
+    #+RESULTS[41997db43a0fe4c570c41715ad478f071347bd36]:
+    :
+    : True
+    : True
+    : False
+
 *** str. *islower* ()
 	含至少一个有大小写区分的字符，且所有有大小写区别的字符都为小写：
 
-	#+BEGIN_EXAMPLE
-       >>> 'abc'.islower()
-       True
-       >>> ''.islower()
-       False
-       >>> 'ab三'.islower()
-       True
-       >>> 'ab3'.islower()
-       True
-       >>> '一'.islower()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'abc'.islower()
+      ''.islower()
+      'ab三'.islower()
+      '三'.islower()
+      'ab3'.islower()
+    #+END_SRC
+
+    #+RESULTS[b9478b3115cb34d7665feff76ec18f68d49a7c2e]:
+    : True
+    : False
+    : True
+    : False
+    : True
 
 *** str. *isnumeric* ()？？？
 	字符串不为空，且所有字符都为数字字符：
 
-	#+BEGIN_EXAMPLE python
-       >>> '012'.isnumeric()
-       True
-       >>> '0X12'.isnumeric()
-       False
-       >>> '0x12'.isnumeric()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '012'.isdigit()
+      '0x12'.isdigit()
+      '0X12'.isdigit()
+    #+END_SRC
+
+    #+RESULTS[59a1298bfa65b97c02eba9800d8d6cb7bdefcd21]:
+    : True
+    : False
+    : False
 
 	*？* ：和isdigit的区别。
 
 *** str. *isprintable* ()
 	只含所有可见字符+空格字符，以及空字符串返回True：
 
-	#+BEGIN_EXAMPLE python
-       >>> ' '.isprintable()
-       True
-       >>> '\n '.isprintable()
-       False
-       >>> ''.isprintable()
-       True
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'a'.isprintable()
+      ' '.isprintable()
+      ''.isprintable()
+      '\n\t'.isprintable()
+    #+END_SRC
+
+    #+RESULTS[bb1ef90eea86f098a2d903594e3096f10108cc38]:
+    : True
+    : True
+    : True
+    : False
+
 *** str. *isspace* ()
 	所有空白字符。
-	#+BEGIN_EXAMPLE python
-       >>> ''.isspace()
-       False
-       >>> ' '.isspace()
-       True
-       >>> '\n\t'.isspace()
-       True
-	#+END_EXAMPLE
+
+    #+BEGIN_SRC python :session
+      ''.isspace()
+      ' '.isspace()
+      '\n\t'.isspace()
+      '\b\v'.isspace()
+    #+END_SRC
+
+    #+RESULTS[9699c54afdb2f683e2a23a886401e3966bfc80aa]:
+    : False
+    : True
+    : True
+    : False
+
 *** str. *istitle* ()
 	含至少一个字符，为标题形式的字符串返回True。
 
-	#+BEGIN_EXAMPLE
-       >>> 'I Have A Dream'.istitle()
-       True
-       >>> 'I Have a Dream'.istitle()
-       False
-       >>> 'I HAVE A Dream'.istitle()
-       False
-       >>> 'I HavE A Dream'.istitle()
-       False
-       >>> '我是标题'.istitle()
-       False
-       >>> 'The Way to Go'.istitle()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      ''.istitle()
+      'A'.istitle()
+      'I Have a Dream!'.istitle()
+      'I Have A Dream!'.istitle()
+      '我是标题'.istitle()
+    #+END_SRC
+
+    #+RESULTS[eb48c8706d34a6b053e0eae5b5c72c6c0b133fe5]:
+    : False
+    : True
+    : False
+    : True
+    : False
+
 *** str. *isupper* ()
 	含至少一个有大小写区分的字符，且所有区分大小写的字符都为大写。
 *** str. *join* (iterable)
 	使用字符串将iterable中的所有元素拼接，如果任何一个元素不为字符串
 	（含bytes类型），则返回Valueerror错误。
 
-	#+BEGIN_EXAMPLE python
-       >>> '|'.join(['a','b','c'])
-       'a|b|c'
+    #+BEGIN_SRC python :session
+      '|'.join(['a', 'b', 'c'])
+      '|'.join([])
+      '|'.join(['a', 'b', 3])
+    #+END_SRC
 
-       >>> '|'.join(['a','b',3])
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         TypeError: sequence item 2: expected str instance, int found
-       >>> '|'.join(['a','b',b'c'])
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         TypeError: sequence item 2: expected str instance, bytes found
+    #+RESULTS[c075e66eb2c17aeda663059c9b16d4a34b15ca31]:
+    : 'a|b|c'
+    : ''
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : TypeError: sequence item 2: expected str instance, int found
 
-       >>> '|'.join([])
-       ''
-	#+END_EXAMPLE
-*** str. *ljust* (width[,fillchar])
+*** str. *ljust* (width[,fillchar=' ''])
 	返回指定宽带为width，左对齐后的字符串，使用fillchar填充空白字符。
 	如果width<=len(s)则返回原来字符串。
 
-	#+BEGIN_EXAMPLE python
-       >>> 'claudio'.ljust(10)
-       'claudio   '
-       >>> 'claudio'.ljust(10, '|')
-       'claudio|||'
-       >>> 'claudio'.ljust(1, '|')
-       'claudio'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'claudio'.ljust(10)
+      'claudio'.ljust(10, '|')
+      'claudio'.ljust(1, '|')
+    #+END_SRC
+
+    #+RESULTS[dcb9657934abdb6a91649b27b950df16f0730db4]:
+    : 'claudio   '
+    : 'claudio|||'
+    : 'claudio'
+
 *** str. *lower* ()
 	返回复制后的字符串，并将所有有大小写区别的字符转换为小写。
 *** str. *lstrip* ([chars])
@@ -921,12 +1078,15 @@
 
 	*注意* ：chars不是前缀，而是单个字符的组合：
 
-	#+BEGIN_EXAMPLE python
-       >>> '   i have a dream    '.lstrip()
-       'i have a dream    '
-       >>> 'www.bing.com'.lstrip('w.com')
-       'bing.com'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '   i have a dream   '.lstrip()
+      'www.google.com'.lstrip('w.com')
+    #+END_SRC
+
+    #+RESULTS[a8e1dc00f6da29a29748f54e695f3b1dc4aa4642]:
+    : 'i have a dream   '
+    : 'google.com'
+
 *** static str. *maketrans* (x[,y[,z]])
 	此方法为静态方法。作用是返回一个用于str.translate()方法翻译字符串
 	的字典类型。
@@ -941,122 +1101,122 @@
 	典的key值，对应的value值则为None，即使用str.translate()方法时将删
 	除的字符：
 
-	#+BEGIN_EXAMPLE python
-       >>> str.maketrans({'a': '98'})
-       {97: '98'}
-       >>> str.maketrans({'a': 98})
-       {97: 98}
-       >>> str.maketrans({'a': None})
-       {97: None}
-       >>> str.maketrans({97: 'qw' })
-       {97: 'qw'}
+    #+BEGIN_SRC python :session
+      str.maketrans({'1': '一'})
+      str.maketrans("123456789", '一二三四五六七八九')
+      str.maketrans("123456789", '一二三四五六七八九', '0')
+    #+END_SRC
 
-       >>> str.maketrans('aeiou', '123')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         ValueError: the first two maketrans arguments must have equal length
-       >>> str.maketrans('aeiou', '12345')
-       {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
-       >>> str.maketrans('aeiou', '12345', 'XZ')
-       {97: 49, 117: 53, 88: None, 105: 51, 90: None, 101: 50, 111: 52}
+    #+RESULTS[75c947fec4f31fd9ba3d5798910f73edebc9a61e]:
+    : {49:     '一'}
+    : {49:     19968, 50: 20108, 51: 19977, 52: 22235, 53: 20116, 54: 20845, 55: 19971, 56: 20843, 57: 20061}
+    : {48:     None, 49: 19968, 50: 20108, 51: 19977, 52: 22235, 53: 20116, 54: 20845, 55: 19971, 56: 20843, 57: 20061}
 
-	#+END_EXAMPLE
 *** str. *partition* (sep)
 	将字符串在第一次出现sep时分割，返回一个3元素元组，其中第一个元素
 	为sep前面的字符串，第二个元素为sep本身，第三个元素为后面的字符串。
 	如果字符串中不含sep，则第一个元素为字符串本身，后面两个元素为空字
 	符串：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.partition('a')
-       ('b', 'a', 'nana')
-       >>> s.partition('an')
-       ('b', 'an', 'ana')
-       >>> s.partition('X')
-       ('banana', '', '')
-       >>> s.partition('')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         ValueError: empty separator
-	#+END_EXAMPLE
-*** str. *replace* (old,new[,count])
-	 将字符串中所有的old都替换为new。如果有count参数，则只替换左起
-	 count个：
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.partition('a')
+      s.partition('an')
+      s.partition('X')
+    #+END_SRC
 
-	 #+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.replace('an', 'AN')
-       'bANANa'
-       >>> s.replace('an', 'AN', 1)
-       'bANana'
-       >>> s.replace('an', 'AN', 100)
-       'bANANa'
-       >>> s.replace('an', 'AN', 0)
-       'banana'
-       >>> s.replace('an', 'AN', -1)
-       'bANANa'
-       >>> s.replace('an', 'AN', -2)
-       'bANANa'
-	 #+END_EXAMPLE
+    #+RESULTS[167d06c51b698a164715738c32e400adbc15d635]:
+    :
+    : ('b', 'a', 'nana')
+    : ('b', 'an', 'ana')
+    : ('banana', '', '')
+
+*** str. *replace* (old,new[,count])
+	将字符串中所有的old都替换为new。如果有count参数，则只替换左起
+	count个：
+
+    #+BEGIN_SRC python :session
+       s = 'banana'
+       s.replace('an', 'AN')
+       s.replace('an', 'AN', 1)
+       s.replace('an', 'AN', 100)
+       s.replace('an', 'AN', 0)
+    #+END_SRC
+
+    #+RESULTS[638d9f173428bafc184b40e255e33fde7cf72077]:
+     :
+     : 'bANANa'
+     : 'bANana'
+     : 'bANANa'
+     : 'banana'
+
 *** str. *rfind* (sub[,start[,end]])
 	返回从右其字符串中第一次出现sub的索引，可指定在截断[start:end]中
 	计算。如果无sub字符串出现，则返回-1：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.rfind('a')
-       5
-       >>> s.rfind('A')
-       -1
-       >>> s.rfind('a', -4, -2)
-       3
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.rfind('a')
+      s.rfind('A')
+      s.rfind('a', -4, -2)
+    #+END_SRC
+
+    #+RESULTS[244605f9cd087cc3b50276e9fd7b0e389a508043]:
+    :
+    : 5
+    : -1
+    : 3
 
 *** str. *rindex* (sub[,start[,end]])
 	同rfind，不过如果无sub字符串出现返回ValueError错误：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.rindex('a')
-       5
-       >>> s.rindex('A')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         ValueError: substring not found
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.rindex('a')
+      s.rindex('A')
+    #+END_SRC
+
+    #+RESULTS[3146c25983573041bac9396b8d16a24c7c4cae69]:
+    :
+    : 5
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: substring not found
 
 *** str. *rjust* (width[,fillchar])
 	返回右对齐后的字符串，使用fillchar填充空白字符，默认为空格字符。
 	如果width小于或等于len(s)，则返回字符串本身：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'claudio'.rjust(10)
-       '   claudio'
-       >>> 'claudio'.rjust(10, '|')
-       '|||claudio'
-       >>> 'claudio'.rjust(1, '|')
-       'claudio'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'claudio'.rjust(10)
+      'claudio'.rjust(10, '|')
+      'claudio'.rjust(1, '|')
+    #+END_SRC
+
+    #+RESULTS[f74fdefa345dac22326797229bc1683b3b9045bd]:
+    : '   claudio'
+    : '|||claudio'
+    : 'claudio'
 
 *** str. *rpartition* (sep)
 	同str.partition，不过是从右起分割；且如果sep不出现在字符串中，返
 	回的3元素元组前两个元素为空字符串，最后一个为字符串本身：
 
-	#+BEGIN_EXAMPLE python
-       >>> s = 'banana'
-       >>> s.rpartition('a')
-       ('banan', 'a', '')
-       >>> s.rpartition('n')
-       ('bana', 'n', 'a')
-       >>> s.rpartition('X')
-       ('', '', 'banana')
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.rpartition('a')
+      s.rpartition('an')
+      s.rpartition('X')
+    #+END_SRC
+
+    #+RESULTS[081c08918c8c300c6a508ed2e25de9758e5599a9]:
+    :
+    : ('banan', 'a', '')
+    : ('ban', 'an', 'a')
+    : ('', '', 'banana')
 
 *** str. *rsplit* (sep=None,maxsplit=-1)
-	 与split函数相同，只是从右边分割。
-
-	 *？* ：既然有split函数，此函数还有啥子卵用？
+	与split函数相同，只是从右边分割。
 
 *** str. *rstrip* ([chars])
 	返回字符串的副本，末尾中的字符只要出现在chars则被移除。如果无
@@ -1064,65 +1224,79 @@
 
 	*注意* ：chars不是后缀，而是所有需移除字符的集合。
 
-	#+BEGIN_EXAMPLE
-       >>> 'www.bing.com'.rstrip('w.com')
-       'www.bing'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'www.google.com'.rstrip('w.com')
+    #+END_SRC
+
+    #+RESULTS[e67751d5c79e1b962dd63d291734c8fd606097e6]:
+    : 'www.google'
 
 *** str. *split* (sep=None,maxsplit=-1)
 	返回字符串中所有“单词”组成的链表，使用sep作为单词间的分隔符。如果
 	指定maxsplit参数，则进行maxsplit次分割（即结果最多可有maxsplit+1
 	个元素）；如果未指定maxsplit参数，或其值为-1，则最大限度分割。
 
-	#+BEGIN_EXAMPLE
-       >>> s = 'banana'
-       >>> s.split('a')
-       ['b', 'n', 'n', '']
-       >>> s.split('a', 1)
-       ['b', 'nana']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'banana'
+      s.split('a')
+      s.split('a', 1)
+    #+END_SRC
+
+    #+RESULTS[eda13b345172dbe1d5b067936e4df63fb00f45c9]:
+    :
+    : ['b', 'n', 'n', '']
+    : ['b', 'nana']
 
 	如果有sep参数，连续的分割字符串间会生成空白字符：
 
-	#+BEGIN_EXAMPLE python
-       >>> '1,,2'.split(',')
-       ['1', '', '2']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'a,,b'.split(',')
+    #+END_SRC
+
+    #+RESULTS[b6d18eea0ed928ab07637d86a78168b7b73cae9d]:
+    : ['a', '', 'b']
 
 	分割字符串可为多个字符：
 
-	#+BEGIN_EXAMPLE python
-       >>> '1<>2<>3'.split('<>')
-       ['1', '2', '3']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'a<>b<>c'.split('<>')
+    #+END_SRC
+
+    #+RESULTS[33b33bada493f7de1ed6647d21ee3c836d9e798a]:
+    : ['a', 'b', 'c']
 
 	如果指定sep参数，且字符串为空，则生成的链表只含一个空字符串；如果
 	不指定sep参数，且原字符串为空，或只含空白字符，则返回空链表：
 
-	#+BEGIN_EXAMPLE python
-       >>> ''.split()
-       []
-       >>> ''.split(',')
-       ['']
+    #+BEGIN_SRC python :session
+      ''.split(',')
+      ''.split()
+      '  '.split()
+    #+END_SRC
 
-       >>> '   '.split()
-       []
-	#+END_EXAMPLE
+    #+RESULTS[b85162feb08832b6c28a97bf67574d339a3ee9d8]:
+    : ['']
+    : []
+    : []
 
 	如果无sep参数，或为None，则使用不同的算法：使用空白字符作为分割字
 	符，且删除相邻的空字符，即使首末有空格，返回的链表中也不会含空字
 	符串：
 
-	#+BEGIN_EXAMPLE python
-      >>> '1 2 3'.split()
-      ['1', '2', '3']
-      >>> '1 2 3'.split(maxsplit=1)
-      ['1', '2 3']
-      >>> '1     2  3'.split()
-      ['1', '2', '3']
-      >>> '   a    b   c  '.split()
-      ['a', 'b', 'c']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '1 2 3'.split()
+      '1\t2\t3'.split()
+      '1 2 3'.split(maxsplit=1)
+      '1    2     3'.split()
+      '   1 2     3    '.split()
+    #+END_SRC
+
+    #+RESULTS[d65caf767d58fa5c6226de706eca5a30559a7337]:
+    : ['1', '2', '3']
+    : ['1', '2', '3']
+    : ['1', '2 3']
+    : ['1', '2', '3']
+    : ['1', '2', '3']
 
 *** str. *splitlines* ([keepends])
 	在字符串中换行符处分割，返回链表。下表中的字符都会被当做换行符：
@@ -1141,21 +1315,21 @@
     | \u2028   |      |
     | \u2029   |      |
 
-	#+BEGIN_EXAMPLE python
-       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines()
-       ['ab c', '', 'de fd', 'kl']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'ab c\n\rde fd\rkl\r\n'.splitlines()
+    #+END_SRC
+
+    #+RESULTS[1c42d82d7f2c0863a3bfeb487066a2c2a0903cf4]:
+    : ['ab c', '', 'de fd', 'kl']
 
 	结果中如需包含各种换行符，可指定keppends：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines(keepends=True)
-       ['ab c\n', '\r', 'de fd\r', 'kl\r\n']
-       >>> 'ab c\n\rde fd\rkl\r\n'.splitlines(keepends='\n')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         TypeError: an integer is required (got type str)
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'ab c\n\rde fd\rkl\r\n'.splitlines(keepends=True)
+    #+END_SRC
+
+    #+RESULTS[2d930a038874c7e68af164c122f10b1486d4341c]:
+    : ['ab c\n', '\r', 'de fd\r', 'kl\r\n']
 
 	不同于split()函数，如果指定sep参数，且原字符串为空，此函数返回空
 	链表，末尾的换行符后并不生成一个空字符串：
@@ -1167,14 +1341,25 @@
        ['One line']
 	#+END_EXAMPLE
 
+    #+BEGIN_SRC python :session
+      ''.splitlines()
+      'One line\n'.splitlines()
+    #+END_SRC
+
+    #+RESULTS[0fd7f2dcd3174d0153de510519a398d0e8bb1957]:
+    : []
+    : ['One line']
+
 	而split('\n')的对应结果为：
 
-	#+BEGIN_EXAMPLE
-       >>> ''.split('\n')
-       ['']
-       >>> 'One line\n'.split('\n')
-       ['One line', '']
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      ''.split('\n')
+      'One line\n'.split('\n')
+    #+END_SRC
+
+    #+RESULTS[6acf371cf5b13cd57288971494c8aa7ec2578147]:
+    : ['']
+    : ['One line', '']
 
 *** str. *startswith* (prefix[,start[,end]])
 	如果字符串有前缀prefix，则返回True，可指定在截断[start:end]中计算：
@@ -1196,10 +1381,12 @@
 
 	*注意* ：chars不是前缀或后缀，而是所有需移除字符的集合。
 
-	#+BEGIN_EXAMPLE
-       >>> 'www.bing.com'.strip('w.com')
-       'bing'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'www.google.com'.strip('w.com')
+    #+END_SRC
+
+    #+RESULTS[b3c40593f07df6cabd71d2d402b00fe15408a6db]:
+    : 'google'
 
 *** str. *swapcase* ()
 
@@ -1207,58 +1394,66 @@
 
 	*注意* ：s.swapcase().swapcase() 可能并不等于s。
 
-	#+BEGIN_EXAMPLE
-       >>> s = 'Banana'
-       >>> s.swapcase()
-       'bANANA'
-       >>> s.swapcase().swapcase()
-       'Banana'
+    #+BEGIN_SRC python :session
+      s = 'Banana'
+      s.swapcase()
+      s.swapcase().swapcase()
 
-       >>> s = '一二三'
-       >>> s.swapcase()
-       '一二三'
-       >>> s.swapcase().swapcase()
-       '一二三'
+      s = '一二三'
+      s.swapcase()
+      s.swapcase().swapcase()
 
-       >>> s = 'ß'
-       >>> s.swapcase()
-       'SS'
-       >>> s.swapcase().swapcase()
-       'ss'
-	#+END_EXAMPLE
+      s = 'ß'
+      s.swapcase()
+      s.swapcase().swapcase()
+    #+END_SRC
+
+    #+RESULTS[9ef42a90cca670dcf9c3a8cc8bde065df5272eef]:
+    :
+    : 'bANANA'
+    : 'Banana'
+    : >>> >>> '一二三'
+    : '一二三'
+    : >>> >>> 'SS'
+    : 'ss'
+
 *** str. *title* ()
 	将原字符串中每个单词首字母大写，其他字母小写作为返回值：
 
-	#+BEGIN_EXAMPLE python
-       >>> 'i have a dream'.title()
-       'I Have A Dream'
-       >>> 'I Have a Dream'.title()
-       'I Have A Dream'
-       >>> '我有一个梦想'.title()
-       '我有一个梦想'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      'i have a dream'.title()
+      '我有一个梦想'.title()
+    #+END_SRC
+
+    #+RESULTS[7d7209d1da419540555d154a16ff9b599355fb7c]:
+    : 'I Have A Dream'
+    : '我有一个梦想'
 
 	*注意* ：此函数只将连续字母看做"单词"，所以可能结果不能如愿：
 
-	#+BEGIN_EXAMPLE
-       >>> "they'are bill's friends from the UK".title()
-       "They'Are Bill'S Friends From The Uk"
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      "they'are bill's friends from the UK".title()
+    #+END_SRC
+
+    #+RESULTS[753ae2da13d282b4be40c7994280c574508a5b86]:
+    : "They'Are Bill'S Friends From The Uk"
 
 	可使用正则勉强解决：
 
-	#+BEGIN_SRC python
-       #!/usr/bin/python3.5
-       import re
+    #+BEGIN_SRC python :session
+      import re
 
-       def titlecase(s):
-           return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
-                         lambda mo: mo.group(0)[0].upper() + mo.group(0)[1:].lower(),
-                         s)
+      def titlecase(s):
+          return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
+                        lambda mo: mo.group(0)[0].upper() + mo.group(0)[1:].lower(),
+                        s)
 
-       print(titlecase("they're bill's friends from UK"))
-       # They're Bill's Friends From Uk
-	#+END_SRC
+      titlecase("they're bill's friends from UK")
+    #+END_SRC
+
+    #+RESULTS[43e1ab81788234d1ee6c74f232252744b80b458d]:
+    :
+    : >>> ... ... ... ... >>> "They're Bill's Friends From Uk"
 
 *** str. *translate* (table)
 	将字符串中的字符逐个与参数table中的元素对应，如果相同，则转换，返
@@ -1266,35 +1461,40 @@
 
 	[[http://www.runoob.com/python/att-string-translate.html][@runoob]]：
 
-	#+BEGIN_EXAMPLE python
-       >>> str = 'a a'
-       >>> intab = 'aeiou'
-       >>> outtab = '12345'
-       >>> tantab = str.maketrans(intab, outtab) #创建翻译字典
-       >>> tantab
-       {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
-       >>> str = 'this is a string example...wow!!!'
-       >>> str.translate(tantab)       #翻译
-       'th3s 3s 1 str3ng 2x1mpl2...w4w!!!'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      str = 'a a'
+      intab = 'aeiou'
+      outtab = '12345'
+      tabtab = str.maketrans(intab, outtab)
+      print(tabtab)
+      'this is a string example...wow!!!'.translate(tabtab)
+    #+END_SRC
+
+    #+RESULTS[30a74361585819b3a712fbad0367d850c2f1723f]:
+    :
+    : >>> >>> >>> {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
+    : 'th3s 3s 1 str3ng 2x1mpl2...w4w!!!'
 
 	table参数须为通过__getitem__()方法实现索引的对象，即mapping或
 	sequence对象。当字典key值为整数时，可翻译为：单个字符、Unicode值；
 	如果为None则删除原来字符。
 
-	#+BEGIN_EXAMPLE python
-       >>> str = 'a a'
-       >>> str.translate({97:'A'})
-       'A A'
-       >>> str.translate({97:'ABC'})
-       'ABC ABC'
-       >>> str.translate({97: None})
-       ' '
-       >>> str.translate({97: 'A'})
-       'A A'
-       >>> str.translate({97: 1234})
-       'Ӓ Ӓ'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      s = 'a a'
+      s.translate({97: 'A'})
+      s.translate({'a': 'A'})
+      s.translate({97: 'ABC'})
+      s.translate({97: None})
+      s.translate({97: 1234})
+    #+END_SRC
+
+    #+RESULTS[a3422bd0f199a8a6f2d5c42f92efeb5fc77d9f7f]:
+    :
+    : 'A A'
+    : 'a a'
+    : 'ABC ABC'
+    : ' '
+    : 'Ӓ Ӓ'
 
 *** str. *upper* ()
 	返回字符串副本，将有大小写区别的字符转换为大写。
@@ -1302,98 +1502,104 @@
 	*注意* ：如果str中只含无大小写区分字符，str.upper().isupper()可能
 	返回False：
 
-	#+BEGIN_EXAMPLE python
-       >>> '测试'.isupper()
-       False
-       >>> 'abc测试'.upper().isupper()
-       True
-       >>> '测试'.upper().isupper()
-       False
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '测试'.isupper()
+      'abc测试'.upper().isupper()
+      '测试'.upper().isupper()
+    #+END_SRC
+
+    #+RESULTS[22cba8cf8d5aaa810d1aa66a8fc466f989b73b80]:
+    : False
+    : True
+    : False
 
 *** str. *zfill* (width)
 	返回字符串副本，使用ASCII'0'填充扩张到width长度后的左边的空白。如果有正
 	负号，则先添加。如果width小于或等于len(s)则返回字符串本身：
 
-	#+BEGIN_EXAMPLE python
-       >>> '42'.zfill(5)
-       '00042'
-       >>> '-42'.zfill(5)
-       '-0042'
-       >>> '-qwdqw'.zfill(5)
-       '-qwdqw'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      '42'.zfill(5)
+      '-42'.zfill(5)
+      'claudio'.zfill(10)
+    #+END_SRC
+
+    #+RESULTS[fdb203cebd9fb9bde71be632a5bc43a4d1fc46bb]:
+    : '00042'
+    : '-0042'
+    : '000claudio'
 
 ** printf风格的格式化输出
    *注意* ：最好使用str.format()接口格式化字符串。
 
-* 二进制Sequence类型-bytes、bytearray、menoryviewb
+* 二进制Sequence类型-bytes、bytearray、memoryview
   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryview类支
   持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他对象
   的内存地址。？
-
+  
   array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
   数。
-
+  
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
 	 比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
 	 只含ASCII字符，直接遍历就可；单如果有非ASCII字符，这些字符可能占
 	 多个字节，就不能通过遍历每个字符来实现遍历每个字节。
 *** 进一步说明 [[https://segmentfault.com/a/1190000004450876][@xu_zhoufeng]]
-	 Bytes类似字符串，不过是由单个字节（8位，取值范围为0-255）作为基本
-	 元素的Sequence类型，也为Immutable。
+	Bytes类似字符串，不过是由单个字节（8位，取值范围为0-255）作为基本
+	元素的Sequence类型，也为Immutable。
 
-	 Bytes对象的形式为b'xxxx'，其中x为单个字节。单个字节的表示方式为
-	 \xHH，其中\x为16进制转义符，HH为16进制数（取值范围为10进制的
-	 0-255）。对于同一字符串，使用不同编码形式生成的Bytes对象，就会有
-	 不同的值：
+	Bytes对象的形式为b'xxxx'，其中x为单个字节。单个字节的表示方式为
+	\xHH，其中\x为16进制转义符，HH为16进制数（取值范围为10进制的
+	0-255）。对于同一字符串，使用不同编码形式生成的Bytes对象，就会有
+	不同的值：
 
-	 #+BEGIN_EXAMPLE python
-       >>> s = 'a1一'
-       >>> b = bytes(s, 'utf-8')
-       >>> b
-       b'a1\xe4\xb8\x80'
-       >>> c = bytes(s, 'gb2312')
-       >>> c
-       b'a1\xd2\xbb'
-	 #+END_EXAMPLE
+    符串s分别使用utf-8和gb2312编码转换为了Bytes对象a和c。由于
+	编码不同，长度也不同：
 
-	 上例将字符串s分别使用utf-8和gb2312编码转换为了Bytes对象b和c。由于
-	 编码不同，长度也不同：
+    #+BEGIN_SRC python :session
+       s = 'a1一'
+       a = bytes(s, 'utf-8')
+       b = bytearray(s, 'utf-8')
+       c = bytes(s, 'gb2312')
+       print(a, b, c)
+       print(len(a), len(b), len(c))
+    #+END_SRC
 
-	 #+BEGIN_EXAMPLE
-       >>> len(b)
-       5
-       >>> len(c)
-       4
-	 #+END_EXAMPLE
+    #+RESULTS[848498726a295116d76664340e1ed999657f16dc]:
+     :
+     : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
+     : 5 5 4
 
-	 使用Bytes对象的decode方法就可实现解码，如果编码参数与编码时相同，
-	 就会与原来相同的字符，否则就可能返回UnicodeDecodeError错误：
+	使用Bytes对象的decode方法就可实现解码，如果编码参数与编码时相同，
+	就会与原来相同的字符，否则就可能返回UnicodeDecodeError错误：
 
-	 #+BEGIN_EXAMPLE python
-       >>> b.decode('utf-8')
-       'a1一'
-       >>> c.decode('gb2312')
-       'a1一'
+    #+BEGIN_SRC python :session
+      bytes('a1一', 'utf-8').decode('utf-8')
+      bytes('a1一', 'gb2312').decode('gb2312')
 
-       >>> b.decode('gb2312')
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-         UnicodeDecodeError: 'gb2312' codec can't decode byte 0x80 in position 4: incomplete multibyte sequence
-	 #+END_EXAMPLE
+      bytes('a1一', 'gb2312').decode('utf-8')
+      bytes('a1一', 'utf-8').decode('gb2312')
+    #+END_SRC
 
-	 可通过字面量形式创建Bytes对象，不过仅限于ASCII范围内的字符：
+    #+RESULTS[9753a73ca632282e558aa0120784aff49e2df5e0]:
+    : 'a1一'
+    : 'a1一'
+    : >>> 'a1һ'
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : UnicodeDecodeError: 'gb2312' codec can't decode byte 0x80 in position 4: incomplete multibyte sequence
 
-	 #+BEGIN_EXAMPLE python
-       >>> d = b'1a一'
-         File "<stdin>", line 1
-         SyntaxError: bytes can only contain ASCII literal characters.
-         >>> d = b'1a'
-         >>> d
-         b'1a'
-	 #+END_EXAMPLE
+	可通过字面量形式创建Bytes对象，不过仅限于ASCII范围内的字符：
+
+    #+BEGIN_SRC python :session
+      a = b'1abc'
+      a = b'1a一'
+    #+END_SRC
+
+    #+RESULTS[1f2b8f954aac91264f856f9dde063d0afbb1273c]:
+    :
+    : File "<stdin>", line 1
+    : SyntaxError: bytes can only contain ASCII literal characters.
 
 ** Bytes对象
    bytes对象是由单个bytes元素组成的immutable类型的Sequence。由于主要
@@ -1411,24 +1617,32 @@
 
 	同字符串字面量相同，可在添加前缀r，指定不处理转义序列？：
 
-	#+BEGIN_EXAMPLE python
-      >>> s = r'a\nb'
-      >>> s
-      'a\\nb'
-      >>> print(s)
-      a\nb
-      >>> s = 'a\nb'
-      >>> print(s)
-      a
-      b
+    #+BEGIN_SRC python :session
+      s = r'a\nb'
+      print(s)
 
-      >>> b = b'a\nb'
-      >>> print(b)
-      b'a\nb'
-      >>> b = br'a\nb'
-      >>> print(b)
-      b'a\\nb'
-	#+END_EXAMPLE
+      s = 'a\nb'
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[d946bf1d3966287b06650151aadb692a02453eec]:
+    :
+    : a\nb
+    : >>> >>> a
+    : b
+
+    #+BEGIN_SRC python :session
+      b = br'a\nb'
+      print(b)
+
+      b = b'a\nb'
+      print(b)
+    #+END_SRC
+
+    #+RESULTS[ce0d74ddc6eb34f89a941c2e7297926c3c7a3f09]:
+    :
+    : b'a\\nb'
+    : >>> >>> b'a\nb'
 
 	尽管bytes字面量的表示基于ASCII文本，但bytes对象实际上更像immutable
 	类型的整数序列，其中元素的取值范围为0<=x<256。
@@ -1446,29 +1660,51 @@
 	classmethod bytes. *fromhex* (string)：解码字符串，忽视空格，返回
 	bytes对象：
 
-	#+BEGIN_EXAMPLE python
-      >>> bytes.fromhex('')
-      b''
-      >>> bytes.fromhex('2ef0 F1F2   ')
-      b'.\xf0\xf1\xf2'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      bytes.fromhex('')
+      bytes.fromhex('ff 2ef0 F1   F1')
+      chr(2 * 16 + 14)                # 16进制2e代表的字符
+    #+END_SRC
+
+    #+RESULTS[f0a6caace8150a90d746b011cbf87001a3293549]:
+    : b''
+    : b'\xff.\xf0\xf1\xf1'
+    : '.'
 
 	bytes. *hex* ()：将bytes对象转换为16进制形式的字符串：
 
-	#+BEGIN_EXAMPLE python
-      >>> b'\xf0\xf1\xf2'.hex()
-      'f0f1f2'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      b'\x2e\xff'.hex()
+    #+END_SRC
+
+    #+RESULTS[b887eb86a961598c396ed5555de416ada934079d]:
+    : '2eff'
 
 	与字符串对象不同的是，如果b为bytes对象，b[0]会返回整数，b[0:1]会返
 	回长度为1的bytes对象。
 
+    #+BEGIN_SRC python :session
+      b'abc1'[0]
+      b'abc1'[0:1]
+    #+END_SRC
+
+    #+RESULTS[e456ea1a3e4a4b020f60f330f1ed5028529be3a0]:
+    : 97
+    : b'a'
+
 	b'...'形式表示比bytes([46, 46, 46])更有用，不过还是可使用list函数
 	将bytes对象转换为整数链表。
 
+    #+BEGIN_SRC python :session
+      list(b'abc')
+    #+END_SRC
+
+    #+RESULTS[18d791e2473a4717b786bc3ec7c9ab399fbd556d]:
+    : [97, 98, 99]
+
 ** Bytearray对象
-	bytearray对象相当于immutable形式的bytes对象。不过没有相应的字面量
-	表示方法，只可用构造器函数构造：
+   bytearray对象相当于immutable形式的bytes对象。不过没有相应的字面量
+   表示方法，只可用构造器函数构造：
 
 	- 创建空实例：bytearray()
 	- 指定长度，使用0填充每个元素：bytearray(10)
@@ -1480,20 +1716,23 @@
 
 	与bytes一样，bytearray也有类方法fromhex()和方法hex()：
 
-	#+BEGIN_EXAMPLE python
-      >>> bytearray.fromhex('2Ef0 F1f2')
-      bytearray(b'.\xf0\xf1\xf2')
-      >>> bytearray(b'\xf0\xf1\xf2').hex()
-      'f0f1f2'
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      bytearray.fromhex('FF2E F0 F1F1')
+      bytearray(b'abc').hex()
+    #+END_SRC
+
+    #+RESULTS[f25622bd6cc957b56ae34802575eb18049982278]:
+    : bytearray(b'\xff.\xf0\xf1\xf1')
+    : '616263'
 
 	同样也可使用list函数转换为整数链表：
 
-	#+BEGIN_EXAMPLE python
-      >>> b = bytearray(b'...')
-      >>> list(b)
-      [46, 46, 46]
-	#+END_EXAMPLE
+    #+BEGIN_SRC python :session
+      list(bytearray(b'abc'))
+    #+END_SRC
+
+    #+RESULTS[17a60f9a3af17d02d885f04e2644ef32bf104a98]:
+    : [97, 98, 99]
 
 ** Bytes和bytearray操作符
 
@@ -1502,19 +1741,63 @@
    象”（bytes-like object，bytes、bytearray和许多常见的memoryview对象）
    一起使用，返回结果由出现顺序而定（为先出现类型）：
 
-   #+BEGIN_EXAMPLE python
-     >>> b = byte
-     bytearray(  bytes(
-     >>> b = bytes(b'abc')
-     >>> ba = bytearray(b'123')
-     >>> ba + b
-     bytearray(b'123abc')
-     >>> b + ba
-     b'abc123'
-   #+END_EXAMPLE
+   #+BEGIN_SRC python :session
+     b = b'abc'
+     ba = bytearray(b'123')
+
+     b + ba
+     ba + a
+   #+END_SRC
+
+   #+RESULTS[8c1fb8db2985fe0e751c7c9bfb11c2025f1c9f24]:
+   :
+   : >>> >>> b'abc123'
+   : bytearray(b'1231abc')
+
+   但bytes和bytearray的方法不接受字符串作为参数，反之亦然：
+
+   #+BEGIN_SRC python :session
+     s = 'abc'
+     b = b'abc'
+
+     s.replace('a', 'A')
+     b.replace(b'a', b'A')
+
+     b.replace(b'a', 'A')
+   #+END_SRC
+
+   #+RESULTS[ffe67e7436899e0ccfed8472285792bdb49df2bf]:
+   :
+   : >>> >>> 'Abc'
+   : b'Abc'
+   : >>> Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : TypeError: a bytes-like object is required, not 'str'
 
 *** bytes. *count* (sub[,start[,end]])
 *** bytearray. *count* (sub[,start[,end]])
+
+    返回SUB的出现次数，可通过START和END参数指定截断。
+
+    SUB可为所有“类bytes对象”，以及0-255的整数。
+
+    #+BEGIN_SRC python :session
+      b = bytes('a1a一a', 'utf-8')
+
+      b.count(b'a')
+      b.count(b'a', 1)
+      b.count(b'a', 1, 3)
+      b.count(97)
+      b.count(bytearray(b'a'))
+    #+END_SRC
+
+    #+RESULTS[0c38d602277518715a68da77ce9edd4d1e05b338]:
+    :
+    : >>> 3
+    : 2
+    : 1
+    : 3
+    : 3
 
 *** bytes. *decode* (encoding='utf-8',errors='strict')
 *** bytearray. *decode* (encoding='utf-8',errors='strict')
@@ -1588,12 +1871,10 @@
 *** bytearray. *upper* ()
 *** bytes. *zfill* ()
 *** bytearray. *zfill* ()
-** 使用printf风格格式化Byes
+** 使用printf风格格式化Bytes
 ** Memory Views
 * Set类型-set、frozenset
 * Mapping类型-dict
 * Context Manager 类型
-
 * 其他内置类型
-
 * 特殊属性
