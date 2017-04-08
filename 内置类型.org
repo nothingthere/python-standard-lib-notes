@@ -621,47 +621,47 @@
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
   可用下面方式表示：
-  
+
    - 单引号：'里面可用"双引号"'。
    - 双引号："里面可有'单引号'"。
    - 三引号：'''可以是三个单引号'''，"""也可以是三个双引号"""。
-     
+
    三引号表示的字符串可跨行书写，且保留换行符。
-   
+
    在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
    "eggs") == "spam eggs"。
-   
+
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
    值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
-   
+
    由于字符串本身为immutable，为保证效率，可拼接字符串时可使用
    str.join()和io.StringIO方法。
-   
+
    - class *str* (object='')
    - class *str* (object='', encoding='utf-8',errors='strict')
 	 返回object的字符串形式。如果无object参数，返回空字符串；否则，返
      回值由下面规则决定：
-     
+
 	 如果encoding和errors参数都没有，返回值实际上是object.__str__()方
      法的返回值。对于字符串对象，则是返回该字符串本身；如果
      object无__str__()方法，则是返回调用repr(object)函数的返回值。
-     
+
 	 如果encoding和errors中只要出现任意一个，object就须为类bytes对象
      （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
      bytes.decode(encoding, errors)。
-     
+
 	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
      正式"字符串：
-     
+
    #+BEGIN_SRC python :session
      str(b'Zoot')
      str(b'Zoot', encoding='utf-8')
    #+END_SRC
-   
+
    #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
    : "b'Zoot'"
    : 'Zoot'
-   
+
 ** 字符串方法
    字符串类型支持所有Sequence通用的操作，此外还支持下面列举的操作。
 
@@ -1535,10 +1535,10 @@
   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryview类支
   持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他对象
   的内存地址。？
-
+  
   array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
   数。
-
+  
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
 	 比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
@@ -2416,26 +2416,91 @@
 ** Memory Views
    memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
    地址。
+   
+*** 写在前面 [[https://segmentfault.com/q/1010000007137721][@segmentfault]] （还是没懂）
 
-*** class *memoryview* (obj)：
-*** *__eq__* (exproter)：
-*** *tobytes* ()：
-*** *hex* ()：
-*** *tolist* ()：
-*** *release* ()：
-*** *cast* (fromat[,shape])：
-*** *obj* ：
-*** *nbytes* ：
-*** *readonly* ：
-*** *format* ：
-*** *itemsize* ：
-*** *ndim* ：
-*** *shape* ：
-*** *strides* ：
-*** *suboffets* ：
-*** *c_contiguous* ：
-*** *f_contiguous* ：
-*** *contiguous*：
+    str和bytearray切片时会复制数据，生成新的数据；bytes和memoryview切
+    片时不会：
+
+    不使用memoryview：
+
+    #+BEGIN_SRC python :session
+      a = 'abcdefg'
+      b = a[:2]                       # 会生成新的字符串
+
+      a = bytearray('abcdefg', 'utf-8')  # 会生成新的bytearray
+      b = a[:2]
+      b[:2] = b'bb'                   # 对b的改动不影响b
+      a
+      b
+    #+END_SRC
+
+    #+RESULTS[c1c892b196daf3801846c0ca2fd6da47f3e7131b]:
+    :
+    : >>> >>> >>> >>> >>> bytearray(b'abcdefg')
+    : bytearray(b'bb')
+
+    使用memoryview：
+
+    #+BEGIN_SRC python :session
+      a = b'abcdefg'
+      ma = memoryview(a)
+      ma.readonly                     # 只读
+      mb = ma[:2]                     # 不会生成新的bytes
+
+      a = bytearray(b'abcdefg')
+      ma = memoryview(a)
+      ma.readonly                     # 不为只读
+      mb = ma[:2]
+      mb[:2] = b'AA'                  # 对mb的改动会影响ma
+      ma.tobytes()
+      mb.tobytes()
+    #+END_SRC
+
+    #+RESULTS[ca75b35e9866dc79fe404515b992d4ef4e83b03f]:
+    :
+    : >>> True
+    : >>> >>> >>> >>> >>> False
+    : >>> >>> b'AAcdefg'
+    : b'AA'
+
+    使用struct进行unpack解析时可直接接受memoryview对象，避免解析大字符
+    串时大量切片：（没懂！！！）
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      mv = memoryview(bytes(20))
+      type, len = struct.unpack('!BI', mv[:5])
+      type, len
+    #+END_SRC
+
+    #+RESULTS[9ccffb54d4a9a9f2c3c17d7bf809f6ee90606531]:
+    :
+    : >>> >>> >>> (0, 0)
+
+*** class *memoryview* (obj)
+    创建指向OBJ的memoryview对象。OBJ须支持buffer protocol，包含bytes和
+    bytearray对象，及array.array对象。
+    
+*** *__eq__* (exproter)
+*** *tobytes* ()
+*** *hex* ()
+*** *tolist* ()
+*** *release* ()
+*** *cast* (fromat[,shape])
+*** *obj*
+*** *nbytes*
+*** *readonly*
+*** *format*
+*** *itemsize*
+*** *ndim*
+*** *shape*
+*** *strides*
+*** *suboffets*
+*** *c_contiguous*
+*** *f_contiguous*
+*** *contiguous*
 * Set类型-set、frozenset
 ** class *set* ([iterable])：
 ** class *frozenset* ([iterable])：

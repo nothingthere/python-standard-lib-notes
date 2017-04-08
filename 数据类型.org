@@ -1,0 +1,88 @@
+#+TITLE: 数据类型
+
+* array - 高效数字数组
+  此模块为精简表示基本数据类型的数组：字符型、整型和浮点型。array类型
+  与链表类型十分相似，只是存储其中的数据类型有约束。类型名以单个字母表
+  示：
+  
+  | 类型字符串 | 对应C类型          | Python类型        | 最小byte数 | 注意点 |
+  |------------+--------------------+-------------------+------------+--------|
+  | 'b'        | signed char        | int               |          1 |        |
+  | 'B'        | unsigned char      | int               |          1 |        |
+  | 'u'        | Py_UNICODE         | Unicode character |          2 | (1)    |
+  | 'h'        | signed short       | int               |          2 |        |
+  | 'H'        | unsigned short     | int               |          2 |        |
+  | 'i'        | signed int         | int               |          2 |        |
+  | 'I'        | unsigned int       | int               |          2 |        |
+  | 'l'        | signed long        | int               |          4 |        |
+  | 'L'        | unsigned long      | int               |          4 |        |
+  | 'q'        | signed long long   | int               |          8 | (2)    |
+  | 'Q'        | unsigned long long | int               |          8 | (2)    |
+  | 'f'        | float              | float             |          4 |        |
+  | 'd'        | double             | float             |          8 |        |
+  
+  注意点：
+  
+  1. 'u'类型代码将废除，不建议使用。
+  2. 'q'和'Q'类型代码仅限的有效情况为：编译Python的C编译器支持C语言的
+     “long long”类型，或Windows系统，或__int64。？？？
+     
+  各类型代码表示的真实值取值范围取决于C实现，可使用itemsize属性获取。
+  
+** 此模块定义的类型有
+*** class array. *array* (typecode[,initializer])
+    
+    #+BEGIN_SRC python :session
+      import array
+      a = array.array('l')
+      print(a)
+    #+END_SRC
+    
+    #+RESULTS[9ea6657044c06d9c5d806196d1b8d6e6ae27709f]:
+    :
+    : >>> array('l')
+    
+** 此模块定义的方法有
+*** array. *typecodes*
+    
+    #+BEGIN_SRC python :session
+      import array
+      array.typecodes
+    #+END_SRC
+    
+    #+RESULTS[7074593501113d8e9937d05a679498f45f29bbda]:
+    :
+    : 'bBuhHiIlLqQfd'
+    
+*** array. *typecode*
+
+    #+BEGIN_SRC python :session
+      from array import array
+      l = array('l')
+      l.typecode
+    #+END_SRC
+
+    #+RESULTS[eb39c5d86496465cd464400d9363abe0bcf7e2a1]:
+    :
+    : >>> 'l'
+
+*** array. *itemsize*
+*** array. *append* (x)
+*** array. *buffer_info* ()
+*** array. *byteswap* ()
+*** array. *count* (x)
+*** array. *extend* (iterable)
+*** array. *frombytes* (s)
+*** array. *fromfile* (f, n)
+*** array. *fromlist* (list)
+*** array. *fromunicode* (s)
+*** array. *index* (x)
+*** array. *insert* (i, x)
+*** array. *pop* ([i])
+*** array. *remove* (x)
+*** array. *reverse* ()
+*** array. *tobytes* ()
+*** array. *tofile* ()
+*** array. *tolist* ()
+*** array. *tostring* ()
+*** array. *tounicode* ()

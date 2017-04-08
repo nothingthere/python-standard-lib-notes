@@ -6,3 +6,11 @@
   - bytearray
   - array.array
   - memoryview
+    
+* Buffer Protocol
+  
+  含内置对象：bytes和bytearray类型。
+  
+  以及一些扩展对象：如array.array
+  
+  以及第三方库定义的类型，如一些用于图像处理和数字分析的类型。？？？
