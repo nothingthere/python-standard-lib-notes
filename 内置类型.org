@@ -621,47 +621,47 @@
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
   可用下面方式表示：
-
+  
    - 单引号：'里面可用"双引号"'。
    - 双引号："里面可有'单引号'"。
    - 三引号：'''可以是三个单引号'''，"""也可以是三个双引号"""。
-
+     
    三引号表示的字符串可跨行书写，且保留换行符。
-
+   
    在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
    "eggs") == "spam eggs"。
-
+   
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
    值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
-
+   
    由于字符串本身为immutable，为保证效率，可拼接字符串时可使用
    str.join()和io.StringIO方法。
-
+   
    - class *str* (object='')
    - class *str* (object='', encoding='utf-8',errors='strict')
 	 返回object的字符串形式。如果无object参数，返回空字符串；否则，返
      回值由下面规则决定：
-
+     
 	 如果encoding和errors参数都没有，返回值实际上是object.__str__()方
      法的返回值。对于字符串对象，则是返回该字符串本身；如果
      object无__str__()方法，则是返回调用repr(object)函数的返回值。
-
+     
 	 如果encoding和errors中只要出现任意一个，object就须为类bytes对象
      （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
      bytes.decode(encoding, errors)。
-
+     
 	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
      正式"字符串：
-
+     
    #+BEGIN_SRC python :session
      str(b'Zoot')
      str(b'Zoot', encoding='utf-8')
    #+END_SRC
-
+   
    #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
    : "b'Zoot'"
    : 'Zoot'
-
+   
 ** 字符串方法
    字符串类型支持所有Sequence通用的操作，此外还支持下面列举的操作。
 
@@ -1535,10 +1535,10 @@
   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryview类支
   持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他对象
   的内存地址。？
-  
+
   array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
   数。
-  
+
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
 	 比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
@@ -1801,80 +1801,723 @@
 
 *** bytes. *decode* (encoding='utf-8',errors='strict')
 *** bytearray. *decode* (encoding='utf-8',errors='strict')
+
+    返回解码结果，默认编码为“utf-8”，默认错误处理方式为"strict"。
+
+    #+BEGIN_SRC python :session
+      b = bytes('我是claudio', 'utf-8')
+      b
+      b.decode('utf-8')
+      b.decode('gb2312', 'ignore')
+      b.decode('gb2312', 'replace')
+      b.decode('gb2312', 'strict')
+    #+END_SRC
+
+    #+RESULTS[5da449004438bd4e775c5a74683cb697176aec86]:
+    :
+    : b'\xe6\x88\x91\xe6\x98\xafclaudio'
+    : '我是claudio'
+    : 'claudio'
+    : '������claudio'
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : UnicodeDecodeError: 'gb2312' codec can't decode byte 0xe6 in position 0: illegal multibyte sequence
+
 *** bytes. *endswith* (suffix[,stat[,end]])
 *** bytearray. *endswith* (suffix[,stat[,end]])
+
+    是否以SUFFIX结尾，可使用START和END指定搜索截断。
+    #+BEGIN_SRC python :session
+      b = b'abc'
+      b.endswith(b'c')
+      b.endswith(b'c', 0, 2)
+      b.endswith(bytearray(b'c'))
+      b.endswith((b'a', b'c', bytearray(b'1')))
+    #+END_SRC
+
+    #+RESULTS[be33bec035e4781038ecf1fbbb02cba3ffe14602]:
+    :
+    : True
+    : False
+    : True
+    : True
+
 *** bytes. *find* (sub[,start[,end]])
 *** bytearray. *find* (sub[,start[,end]])
+
+    返回SUB的索引，如果没有，则返回-1，可使用start和end作为截断。
+
+    SUB参数可为“类bytes对象”，或0-255的整数。
+
+    #+BEGIN_SRC python :session
+      b = b'banana'
+      b.find(b'a')
+      b.find(97)
+      b.find(b'a', 2)
+      b.find(b'z')
+    #+END_SRC
+
+    #+RESULTS[fd1b81f517aec1b80d4ae1024839cff1950bb0f8]:
+    :
+    : 1
+    : 1
+    : 3
+    : -1
+
 *** bytes. *index* (sub[,start[,end]])
 *** bytearray. *index* (sub[,start[,end]])
+    参数和返回值同find方法，只是在没有找到的情况下返回错误，而不是-1。
+
+    #+BEGIN_SRC python :session
+      b = b'banana'
+      b.index(b'a')
+      b.index(97)
+      b.index(b'a', 2)
+      b.index(b'z')
+    #+END_SRC
+
+    #+RESULTS[f46b03ac06bdb29074c197ab78d142cde261d91b]:
+    :
+    : 1
+    : 1
+    : 3
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: substring not found
+
 *** bytes. *join* (iterable)
 *** bytearray. *join* (iterable)
+
+    返回使用byte/bytearray连接ITERABLE中元素的结果，ITERABLE中的元素须
+    都为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b'a'.join([b'1', b'2'])
+      bytearray(b'a').join([b'1', b'2'])
+      b'a'.join([b'1', bytearray(b'2')])
+    #+END_SRC
+
+    #+RESULTS[ce770386874acea807e03cd827b71dc2977f8c00]:
+    : b'1a2'
+    : bytearray(b'1a2')
+    : b'1a2'
+
 *** static bytes.maketrans(from, to)
 *** static bytearray.maketrans(from, to)
+
+    此为静态方法，返回用于bytes.translate()方法的翻译表。FROM和TO须为
+    “类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      intab = bytes(b'123')
+      outtab = bytes('一二三', 'gb2312')
+      bytes.maketrans(intab, outtab)
+      print(outtab)
+    #+END_SRC
+
+    #+RESULTS[a6facac108c4b92bfe9857a9fa77349181dea38f]:
+    :
+    : >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: maketrans arguments must have same length
+    : b'\xd2\xbb\xb6\xfe\xc8\xfd'
+
 *** bytes. *partition* (sep)
 *** bytearray. *partition* (sep)
+    在出现SEP分割，生成3元素元组，第一个元素为SEP前的内容，第二个元素
+    为SEP，第三个元素为SEP后的内容。如果不含SEP，则第一个元素为原
+    bytes/bytearray的副本，后两个元素为空bytes/bytearray。
+
+    SEP须为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b = b'banana'
+      b.partition(b'n')
+      b.partition(b'Z')
+      b.partition('n')
+    #+END_SRC
+
+    #+RESULTS[f66c939f804e036b68c4b452ef96b9ac075f6419]:
+    :
+    : (b'ba', b'n', b'ana')
+    : (b'banana', b'', b'')
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : TypeError: a bytes-like object is required, not 'str'
+
 *** bytes. *replace* (old, new, [count])
 *** bytearray. *replace* (old, new, [count])
+    返回bytes/bytearray的副本，其中出现OLD的地方用NEW替换。默认替换所
+    有，如果有COUNT参数，在从左到右替换COUNT个。
+
+    OLD和NEW需为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b = b'banana'
+      ba = b'banana'
+
+      b.replace(b'a', b'A')
+      b.replace(b'a', b'A', 2)
+    #+END_SRC
+
+    #+RESULTS[631503ec53cc6ddcd1ae2e2287c509b568bdc372]:
+    :
+    : >>> >>> b'bAnAnA'
+    : b'bAnAna'
+
+    *注意* ：如果用于bytearray，则不是操作其副本，而是返回一个新的对象。
+
 *** bytes. *rfind* (subp[,start[,end]])
 *** bytearray. *rfind* (subp[,start[,end]])
+    同find方法，只是从右边计算。
+
+    #+BEGIN_SRC python :session
+      b'banana'.rfind(b'a')
+    #+END_SRC
+
+    #+RESULTS[ab1d9b092390515e042f96800fbffd3b12acae48]:
+    : 5
+
 *** bytes. *rindex* (sub[,start[,end]])
 *** bytearray. *rindex* (sub[,start[,end]])
+    同index方法，只是从右边开始计算：
+
+    #+BEGIN_SRC python :session
+      b'banana'.rindex(b'a')
+    #+END_SRC
+
+    #+RESULTS[8981fe48ac5ebbf00c56e92434a754d28b93554f]:
+    : 5
+
 *** bytes. *rpartition* (sep)
 *** bytearray. *rpartition* (sep)
+    同partition方法，只是从最右边出现SEP处分割。且如果无SEP出现，也是将
+    元bytes/bytearray作为最后一个元素。
+
+    #+BEGIN_SRC python :session
+      b'banana'.rpartition(b'n')
+      b'banana'.rpartition(b'z')
+    #+END_SRC
+
+    #+RESULTS[64620ca198eebd551388a74cdef95aec1f9cca73]:
+    : (b'bana', b'n', b'a')
+    : (b'', b'', b'banana')
+
 *** bytes. *startswith* (prefix,[start[,end]])
 *** bytearray. *startswith* (prefix,[start[,end]])
+    是否一PREFIX开始，可指定截断START和END。PREFIX可为包含多个前缀的元
+    组，只要一个满足条件就返回True。
+
+    PREFIX或其中的元素须为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b'banana'.startswith(b'ba')
+      b'banana'.startswith((b'ba', b'baz'))
+    #+END_SRC
+
+    #+RESULTS[eb8cc1fa898041d657807a4eeecc86375054bb5a]:
+    : True
+    : True
+
 *** bytes. *translate* (table[,delete])
 *** bytearray. *translate* (table[,delete])
-*** bytes. *center* (width[,fillchar])
-*** bytearray. *center* (width[,fillchar])
-*** bytes. *ljust* (width[,fillchar])
-*** bytearray. *ljust* (width[,fillchar])
+    返回bytes/bytearray的副本。根据TABLE替换内容，如果有DELETE参数，则
+    删除其中的内容。
+
+    可使用bytes.maketrans()方法生成TABLE。DELETE需为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b'i have a dream!'.translate(bytes.maketrans(b'aeiou', b'AEIOU'))
+    #+END_SRC
+
+    #+RESULTS[147409ce4bdc449e383c36dd4ab4e01d6f938891]:
+    : b'I hAvE A drEAm!'
+
+    如果TABLE为None，则是仅删除元素：
+
+    #+BEGIN_SRC python :session
+      b'i have a dream!'.translate(None, b'aeiou')
+    #+END_SRC
+
+    #+RESULTS[8b9ab85c12c61eded385c6461e3c55e2d34ac6e7]:
+    : b' hv  drm!'
+
+*** bytes. *center* (width[,fillbyte])
+*** bytearray. *center* (width[,fillbyte])
+
+    *bytes返回副本，bytearray返回新对象。下同。*
+
+    如果WIDTH小于或等于原来长度，bytes会返回原来对象。
+
+    将原对象扩展到WIDTH宽度，默认使用空白字符填充，可使用FILLBYTE指定
+    填充字符。
+
+    #+BEGIN_SRC python :session
+      b'banana'.center(10)
+      b'banana'.center(10, b'|')
+      b'banana'.center(0)
+    #+END_SRC
+
+    #+RESULTS[bae3733368575798d333e733f8252d73e02ffc41]:
+    : b'  banana  '
+    : b'||banana||'
+    : b'banana'
+
+*** bytes. *ljust* (width[,fillbyte])
+*** bytearray. *ljust* (width[,fillbyte])
+    按WIDTH左对齐，填充字符FILLBYTE为空格（ASCII Space）。
+
+    如果WITH小于或等于原来宽度，返回bytes本身。
+
+    #+BEGIN_SRC python :session
+      b'banana'.ljust(10)
+      b'banana'.ljust(10, b'|')
+      b'banana'.ljust(1)
+    #+END_SRC
+
+    #+RESULTS[c200c11d607fcc058d5dc751551914d2c9edc6c6]:
+    : b'banana    '
+    : b'banana||||'
+    : b'banana'
+
 *** bytes. *lstrip* ([chars])
 *** bytearray. *lstrip* ([chars])
-*** bytes. *rjust* (width[,fillchar])
-*** bytearray. *rjust* (width[,fillchar])
+    CHARS不是前缀，而是byte的结合。如果为None或缺省，默认删除空格
+    （ASCII Space）。
+
+    CHARS须为“类bytes对象”。
+
+    #+BEGIN_SRC python :session
+      b'   banana   '.lstrip()
+      b'www.google.com'.lstrip(b'.wcom')
+    #+END_SRC
+
+    #+RESULTS[5e9957d13da552d9e6351c4b81cbcb892654d374]:
+    : b'banana   '
+    : b'google.com'
+
+*** bytes. *rjust* (width[,fillbyte])
+*** bytearray. *rjust* (width[,fillbyte])
+    同ljust方法，只是右对齐：
+
+    #+BEGIN_SRC python :session
+       b'banana'.rjust(10)
+       b'banana'.rjust(10, b'|')
+       b'banana'.rjust(1)
+    #+END_SRC
+
+    #+RESULTS[a15af7d169fedb54b8067eb14f2067da25621e4f]:
+    : b'    banana'
+    : b'||||banana'
+    : b'banana'
+
 *** bytes. *rsplit* (sep=None,maxsplit=-1)
 *** bytearray. *rsplit* (sep=None,maxsplit=-1)
+    见下面split方法。
 *** bytes. *rstrip* ([chars])
 *** bytearray. *rstrip* ([chars])
+    同lstrpe，只是删除右边的CHARS。
+
+    #+BEGIN_SRC python :session
+      b'   banana   '.rstrip()
+      b'www.google.com'.rstrip(b'.wcom')
+    #+END_SRC
+
+    #+RESULTS[a7f653d1aa116ea26971d32c6643cf95541aab72]:
+    : b'   banana'
+    : b'www.google'
+
 *** bytes. *split* (sep=None,maxsplit=-1)
 *** bytearray. *split* (sep=None,maxsplit=-1)
+    同字符串的split方法，只是SEP参数须为“类bytes对象”。
 *** bytes. *strip* ([chars])
 *** bytearray. *strip* ([chars])
+    相当于lstrip和rstrip的结合：
+
+    #+BEGIN_SRC python :session
+      b'   banana   '.strip()
+      b'www.google.com'.strip(b'.wcom')
+    #+END_SRC
+
+    #+RESULTS[e323b44045a00507996b484308651ac380c01adf]:
+    : b'banana'
+    : b'google'
+
+    下面的bytes和bytearray方法默认使用ASCII兼容的二进制形式，不过也可
+    使用任意二进制数据作为参数。
+
+    对于bytearray对象，下面的方法并不是返回副本（in-place操作），而是生成新的对象。
+
 *** bytes. *capitalize* ()
 *** bytearray. *capitalize* ()
+    第一个byte大写，后面所有bytes小写。非ASCII bytes保持不变。
+
+    #+BEGIN_SRC python :session
+      b'i have a dream!'.capitalize()
+    #+END_SRC
+
+    #+RESULTS[067de7929dd22c6c491c51c02fb8dc21e8617fff]:
+    : b'I have a dream!'
+
 *** bytes. *expandtabs* (tabsize=8)
 *** bytearray. *expandtabs* (tabsize=8)
+    将b'\t'替换为1个或多个空格
+
+    #+BEGIN_SRC python :session
+      b'01\t012\t0123\t01234'.expandtabs()
+      b'01\t012\t0123\t01234'.expandtabs(4)
+    #+END_SRC
+
+    #+RESULTS[1f9699cff994f739841006814d08f3243d007d7d]:
+    : b'01      012     0123    01234'
+    : b'01  012 0123    01234'
+
 *** bytes. *isalnum* ()
 *** bytearray. *isalnum* ()
+    是否为只含ASCII字母和数字，且至少有一个元素：
+
+    ASCII字母：
+
+    #+BEGIN_EXAMPLE
+      abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+    #+END_EXAMPLE
+
+    ASCII数字：
+
+    #+BEGIN_EXAMPLE
+      0123456789
+    #+END_EXAMPLE
+
+    #+BEGIN_SRC python :session
+      b'ABCabc1'.isalnum()
+      b'ABC abc1'.isalnum()
+      b''.isalnum()
+    #+END_SRC
+
+    #+RESULTS[03d4840e58522c3ff9c5d618a9c8dd96ecd013e2]:
+    : True
+    : False
+    : False
+
 *** bytes. *isalpha* ()
 *** bytearray. *isalpha* ()
+    只含ASCII字母，且不为空：
+
+    #+BEGIN_SRC python :session
+      b'ABCabc'.isalpha()
+      b'ABCabc1'.isalpha()
+    #+END_SRC
+
+    #+RESULTS[63e061228b23e4fdf96024183a58b7892ddb6345]:
+    : True
+    : False
+
 *** bytes. *isdigit* ()
 *** bytearray. *isdigit* ()
+    只含ASCII数字，且不为空：
+
+    #+BEGIN_SRC python :session
+      b'1234'.isdigit()
+      b'12.3'.isdigit()
+    #+END_SRC
+
+    #+RESULTS[7f2b3ee224a4c398aeaa268cd96b8107b5b630e6]:
+    : True
+    : False
+
 *** bytes. *islower* ()
 *** bytearray. *islower* ()
+    至少含一个ASCII字母，且所有字母都为小写：
+
+    #+BEGIN_SRC python :session
+      b'hello,world'.islower()
+      b''.islower()
+      b'.'.islower()
+    #+END_SRC
+
+    #+RESULTS[68627e842332f7c742bb5c6d8b4b8064dbb45bc1]:
+    : True
+    : False
+    : False
+
 *** bytes. *isspace* ()
 *** bytearray. *isspace* ()
+    是否只含b' \t\n\r\x0b\f'（空格、tab、换行符、carriage return、
+    vertical tab和form feed）中的字符，且不为空。
+
 *** bytes. *istitle* ()
 *** bytearray. *istitle* ()
+    为ASCII形式的标题，且不为空。
+
+    #+BEGIN_SRC python :session
+      b'Hello World'.istitle()
+      b'Hello world'.istitle()
+    #+END_SRC
+
+    #+RESULTS[92e0462ad3e3a897497c25b30eecc2563405ac9d]:
+    : True
+    : False
+
 *** bytes. *isupper* ()
 *** bytearray. *isupper* ()
+    至少含一个ASCII字符，且所有ASCII字符都为大写：
+
+    #+BEGIN_SRC python :session
+      b'HELLO WORLD'.isupper()
+      b'Hello World'.isupper()
+      b''.isupper()
+      b'.'.isupper()
+    #+END_SRC
+
+    #+RESULTS[e458e84ca2055831ef7d45b9f7edd805e53a30d2]:
+    : True
+    : False
+    : False
+    : False
+
 *** bytes. *lower* ()
 *** bytearray. *lower* ()
+    将所有ASCII字母转换为小写：
+
+    #+BEGIN_SRC python :session
+      b'Hello World'.lower()
+    #+END_SRC
+
+    #+RESULTS[4c6f6c591b99ce338524ccd6a30b80244ce99cf5]:
+    : b'hello world'
+
 *** bytes. *splitlines* (keepends=False)
 *** bytearray. *splitlines* (keepends=False)
+    在换行符处分割，Unix换行符'\n'，Windows换行符'\r\n'和Macintosh换行
+    符'\r'都可识别：
+
+    #+BEGIN_SRC python :session
+      b'ab c\n\nde fg\rkl\r\nmn'.splitlines()
+    #+END_SRC
+
+    #+RESULTS[7e0f5845314c3277d769ecd0e71369821e467715]:
+    : [b'ab c', b'', b'de fg', b'kl', b'mn']
+
+    如果要保留换行符，可指定KEEPENDS参数为True：
+
+    #+BEGIN_SRC python :session
+      b'ab c\n\nde fg\rkl\r\nmn'.splitlines(keepends=True)
+    #+END_SRC
+
+    #+RESULTS[702b6db16629067811004483252cf49ff98e4c80]:
+    : [b'ab c\n', b'\n', b'de fg\r', b'kl\r\n', b'mn']
+
+    与split方法不同，对于空字符串此方法返回空链表：
+
+    #+BEGIN_SRC python :session
+      b''.split(b'\n'), b'Two lines\n'.split(b'\n')
+      b''.splitlines(), b'One line\n'.splitlines()
+    #+END_SRC
+
+    #+RESULTS[2bf40baae7050e181ee5681642a516314ae440eb]:
+    : ([b''], [b'Two lines', b''])
+    : ([], [b'One line'])
+
 *** bytes. *swapcase* ()
 *** bytearray. *swapcase* ()
+    交换大小写：
+
+    #+BEGIN_SRC python :session
+      b'Hello World'.swapcase()
+    #+END_SRC
+
+    #+RESULTS[1a6dd25caeb08f03c9a65704892ebce94a9e31c7]:
+    : b'hELLO wORLD'
+
+    *注意* ：不同于str.swapcase()：
+
+    #+BEGIN_SRC python :session
+      bin.swapcase().swapcase() == bin
+    #+END_SRC
+
 *** bytes. *title* ()
 *** bytearray. *title* ()
+    将所有“单词”中第一个字母转换为大写，其余转换为小写，非ASCII字母保
+    持不变。
+
+    #+BEGIN_SRC python :session
+      b'hello world'.title()
+    #+END_SRC
+
+    #+RESULTS[bdafb952ad15cceb90d15bc96703872af5b1f15c]:
+    : b'Hello World'
+
+    此方法的算法仅是将连续字母作为单词，不能通用，如：
+
+    #+BEGIN_SRC python :session
+      b"they're bill's firends from the UK".title()
+    #+END_SRC
+
+    #+RESULTS[1e881816ebb27eedcac3e49c467698de5fa2d6b5]:
+    : b"They'Re Bill'S Firends From The Uk"
+
+    可使用正则大致修复：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      def titlecase(s):
+          return re.sub(rb"[A-Za-z]+('[A-Za-z]+)?",
+                        lambda mo: mo.group(0)[0:1].upper() +
+                        mo.group(0)[1:].lower(),
+                        s)
+
+      titlecase(b"they'are bill's friends from UK.")
+    #+END_SRC
+
+    #+RESULTS[853b00c6a51a260ebf749297803170f9d503bb8b]:
+    :
+    : >>> >>> ... ... ... ... ... >>> >>> b"They'are Bill's Friends From Uk."
+
 *** bytes. *upper* ()
 *** bytearray. *upper* ()
-*** bytes. *zfill* ()
-*** bytearray. *zfill* ()
+    将所有ASCII字母转换为大写：
+
+    #+BEGIN_SRC python :session
+      b'Hello, World'.upper()
+    #+END_SRC
+
+    #+RESULTS[ea1adac72e687af6f2bf119cf97fdcd0c240d0b3]:
+    : b'HELLO, WORLD'
+
+*** bytes. *zfill* (width)
+*** bytearray. *zfill* (width)
+    扩展到WIDTH宽度，左边使用b'0'填充。
+
+    如果WIDTH小于或等于原来宽度，bytes返回自己本身，bytearray仍然返回
+    新对象。
+
+    #+BEGIN_SRC python :session
+      b'42'.zfill(6)
+      b'-42'.zfill(6)
+    #+END_SRC
+
+    #+RESULTS[b172afe84921d69bd78fad3e8fdc26e6c7d9f52b]:
+    : b'000042'
+    : b'-00042'
+
 ** 使用printf风格格式化Bytes
+
+   #+BEGIN_SRC python :session
+     print(b'%(language)s hash %(number)03d quete types.' %
+           {b'language': b'Python', b'number': 2})
+   #+END_SRC
+
+   #+RESULTS[9b24f198baa6c3efba515245c84adadba9533b83]:
+   :
+   : b'Python hash 002 quete types.'
+   : <class 'NoneType'>
+
 ** Memory Views
+   memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
+   地址。
+
+*** class *memoryview* (obj)：
+*** *__eq__* (exproter)：
+*** *tobytes* ()：
+*** *hex* ()：
+*** *tolist* ()：
+*** *release* ()：
+*** *cast* (fromat[,shape])：
+*** *obj* ：
+*** *nbytes* ：
+*** *readonly* ：
+*** *format* ：
+*** *itemsize* ：
+*** *ndim* ：
+*** *shape* ：
+*** *strides* ：
+*** *suboffets* ：
+*** *c_contiguous* ：
+*** *f_contiguous* ：
+*** *contiguous*：
 * Set类型-set、frozenset
+** class *set* ([iterable])：
+** class *frozenset* ([iterable])：
+** *len(s)* ：
+** *x in s* ：
+** *x not in s* ：
+** *isdisjont* (other)：
+** *issubset* (other)：
+** *set <= other* ：
+** *set < other* ：
+** *issuperset* (other)：
+** *set >= other* ：
+** *set > other* ：
+** *union* (*thers)：
+** *set | other | ...* ：
+** *intersection* (*others)：
+** *set & other & ...* ：
+** *difference* (*others)：
+** *set - other - ...* ：
+** *symmetric_difference* (other)：
+** *set ^ other* ：
+** *copy* ()：
+** *update* (*others)：
+** *set |= other | ...* ：
+** *intersection_update* (*others)：
+** *set &= other & ...* ：
+** *difference_update* (*others)：
+** *set -= other | ...* ：
+** *symmetric_difference_update* (other)：
+** *set ^= other* ：
+** *add* (elem)：
+** *remove* (elem)：
+** *discard* (elem)：
+** *pop* ()：
+** *clear* ()：
 * Mapping类型-dict
+** class *dict* (**kwarg)
+** class *dict* (mapping,**kwarg)
+** class *dict* (iterable,**kwarg)
+** *len(d)*
+** *d[key]*
+** *d[key] = value*
+** *del d[key]*
+** *key in d*
+** *key not in d*
+** *iter(d)*
+** *clear* ()
+** *copy* ()
+** classmethod *fromkeys* (seq[,value])
+** *get* (key[,default])
+** *items* ()
+** *keys* ()
+** *pop* (key[,default])
+** *popitem* ()
+** *setdefault* [key[,default]]
+** *update* ([other])
+** *values* ()
+** Dictionary View 对象
+*** *len(dictview)*
+*** *iter(dictview)*
+*** *x in dictview*
 * Context Manager 类型
+** contextmanager. *__enter__* ()：
+** contextmanager. *__exit__* (exc_type,exc_val,exc_tb)：
 * 其他内置类型
-* 特殊属性
+** 模块（Modules）
+** 类和类实例（Class and Class Instance）
+** 函数（Functions）
+** 方法（Methods）
+** 代码对象（Code Objects）
+** 类型对象（Type Objects）
+** Null 对象（The Null Object）
+** Ellipsis对象（The Ellipsis Object）
+** 未实现对象（The Nonimplemented Objects）
+** 布尔值（Boolean Values）
+** 内部对象（Internal Objects）
+* 特殊属性（Special Attribute）
+** object. *__dict__*
+** instace. *__class__*
+** class. *__bases__*
+** definition. *__name__*
+** definition. *__qualname__*
+** class. *__mro__*
+** class. *mro* ()
+** class. *__subclass__* ()
