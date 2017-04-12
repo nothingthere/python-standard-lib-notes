@@ -2,8 +2,11 @@
 
 * array - 高效数字数组
   此模块为精简表示基本数据类型的数组：字符型、整型和浮点型。array类型
-  与链表类型十分相似，只是存储其中的数据类型有约束。类型名以单个字母表
-  示：
+  与链表类型十分相似，只是存储其中的数据类型有约束。
+  
+  *注意* ：适用于链表的方法也适用于array。
+  
+  类型名以单个字母表示：
   
   | 类型字符串 | 对应C类型          | Python类型        | 最小byte数 | 注意点 |
   |------------+--------------------+-------------------+------------+--------|
@@ -31,29 +34,111 @@
   
 ** 此模块定义的类型有
 *** class array. *array* (typecode[,initializer])
-    
+    INITIALIZER参数可选，须为“类bytes对象”，或类型合适的iterable对象。
+
+    如果数组元素类型与第一个参数（类型参数）不一致，则报错：
+
     #+BEGIN_SRC python :session
       import array
       a = array.array('l')
+      b = array.array('i', [123, 456, 789])
+      print(a)
+      print(b)
+
+      c = array.array('i', [1.2])
+    #+END_SRC
+
+    #+RESULTS[94793e0efba0c83ed00e446f38859d540df4a914]:
+    :
+    : >>> >>> array('l')
+    : array('i', [123, 456, 789])
+    : >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : TypeError: integer argument expected, got float
+
+    INITIALIZER为“类bytes”对象：
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      # bytes
+      a = array('b', b'abc')
+      print(a)
+
+      # bytearray
+      a = array('b', bytearray(b'abc'))
+      print(a)
+
+      # array.array
+      a = array('b', a)
+      print(a)
+
+      # memoryview
+    #+END_SRC
+
+    #+RESULTS[02efac5a2e7f225059f0f115b1dfe21f902c233c]:
+    :
+    : >>> ... >>> array('b', [97, 98, 99])
+    : >>> ... >>> array('b', [97, 98, 99])
+    : >>> ... >>> array('b', [97, 98, 99])
+
+    为类型合适的iterable对象：
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      # range
+      a = array('i', range(3))
+      print(a)
+
+      # 链表
+      a = array('i', [1, 2, 3])
+      print(a)
+
+      # 元组
+      a = array('i', (1, 2, 3))
+      print(a)
+
+      # set
+      a = array('i', {1, 2, 3})
+      print(a)
+
+      # 字典
+      a = array('i', {1: 'a', 2: 'b', 3: 'c'})
+      print(a)
+
+      # 字符串
+      a = array('u', 'abc')
       print(a)
     #+END_SRC
-    
-    #+RESULTS[9ea6657044c06d9c5d806196d1b8d6e6ae27709f]:
+
+    #+RESULTS[dad6d297885c927c88adc5725b3471b0d32a7ea2]:
     :
-    : >>> array('l')
-    
+    : >>> ... >>> array('i', [0, 1, 2])
+    : >>> ... >>> array('i', [1, 2, 3])
+    : >>> ... >>> array('i', [1, 2, 3])
+    : >>> ... >>> array('i', [1, 2, 3])
+    : >>> ... >>> array('i', [1, 2, 3])
+    : >>> ... >>> array('u', 'abc')
+
+    如果INITIALIZER为链表，或字符串（'u'类型代码），实际上是调用了
+    array的fromlist()、frombytes()或fromunicode()方法将新元素添加到数
+    组中；如其它情况则是使用extend()方法将INITIALIZER中的元素添加到数
+    组中。
+
 ** 此模块定义的方法有
 *** array. *typecodes*
-    
+    返回所有可用的类型代码。
+
     #+BEGIN_SRC python :session
       import array
       array.typecodes
     #+END_SRC
-    
+
     #+RESULTS[7074593501113d8e9937d05a679498f45f29bbda]:
     :
     : 'bBuhHiIlLqQfd'
-    
+
 *** array. *typecode*
 
     #+BEGIN_SRC python :session
@@ -67,22 +152,407 @@
     : >>> 'l'
 
 *** array. *itemsize*
+
+    数组中单个元素所占byte数。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('b', b'abc')
+      a.itemsize
+
+      b = array('l', [1, 2, 3])
+      b.itemsize
+    #+END_SRC
+
+    #+RESULTS[b3de761c87e2a3d615e9ad657b2103c2eba0c31a]:
+    :
+    : >>> >>> 1
+    : >>> >>> 8
+
 *** array. *append* (x)
+    追加元素。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [1, 2, 3])
+      a.append(4)
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[f7833086dd3b94bd190eda019826e8d48e850c75]:
+    :
+    : >>> >>> >>> array('i', [1, 2, 3, 4])
+
 *** array. *buffer_info* ()
-*** array. *byteswap* ()
+    返回数组的内存地址，以及元素个数，可使用array.buffer_info()[1] *
+    a.itemsize获取数组所在内存大小：
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('d', range(3))
+      print(a)
+      print(a.buffer_info())
+      a.buffer_info()[1] * a.itemsize
+    #+END_SRC
+
+    #+RESULTS[6e71f7d6b36251fe4ab70871129d1f01d38839f1]:
+    :
+    : >>> >>> array('d', [0.0, 1.0, 2.0])
+    : (93900589887952, 3)
+    : 24
+
+    *注意* ：此方法为向后兼容方法，不建议使用。
+
+    如需获取内存大小，可使用len函数：
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('l', [1, 2, 3])
+      len(a) * a.itemsize
+    #+END_SRC
+
+    #+RESULTS[fa5139b84c7e779f9b1116ad01dd98652ec5428c]:
+    :
+    : >>> >>> 24
+
+*** array. *byteswap* () ？？？
+    对数组中内个元素进行byte交换。即最低位byte与最高位交换，倒数第2位
+    byte与第二位交换...。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [255])
+      print(a)
+
+      a.byteswap()
+      print(a)
+
+      bin(255)
+      bin(-1677216)
+    #+END_SRC
+
+    #+RESULTS[6b267cb87f1db4b94a6f062cedea9b0d3e26d03c]:
+    :
+    : >>> >>> array('i', [255])
+    : >>> >>> array('i', [-16777216])
+    : >>> '0b11111111'
+    : '-0b110011001011110100000'
+
+    *？* ：不知道有啥卵用。
+    [[http://stackoverflow.com/questions/27506474/how-to-byte-swap-a-32-bit-integer-in-python]]
+
 *** array. *count* (x)
+    返回数组中X的个数。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('i', [1, 2, 1, 2, 1])
+      a.count(1)
+      a.count(10)
+    #+END_SRC
+
+    #+RESULTS[f1c97056afb4d3b634ac4c14c9f62e592cc13002]:
+    :
+    : >>> 3
+    : 0
+
 *** array. *extend* (iterable)
+    将ITERABLE中的内容追加到ARRAY后。如果ITERABLE也是数组，须有相同的
+    类型代码；如果不为数组，则其元素类型必须适合原数组。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('i', [1, 2, 3])
+      a.extend([4, 5, 6, 7, 8])
+      print(a)
+      print(a.typecode, a.itemsize)
+      a.extend(array('i', [9, 10]))
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[e811275fdcb3796ead201c9fe43396bcde65a162]:
+    :
+    : >>> >>> array('i', [1, 2, 3, 4, 5, 6, 7, 8])
+    : i 4
+    : >>> array('i', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
 *** array. *frombytes* (s)
+    与fromfile方法相似，只是将将字符串的所有内容读入数组中。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('B')
+      a.fromstring('abcdef一')
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[44c840e0e043d0095bd97433646911d37488b942]:
+    :
+    : >>> >>> array('B', [97, 98, 99, 100, 101, 102, 228, 184, 128])
+
 *** array. *fromfile* (f, n)
+    从文件对象F中逐个读取N个数组中元素大小一样的对象，添加到数组后。
+
+    如果F中的内容不足，会返回EOFError错误，不过会将所有能读取的内容读
+    取到数组中。
+
+    *注意* ：F须以二进制形式访问。F须为真实的内置文件对象。
+
+    #+BEGIN_EXAMPLE emma.txt
+    a b c d e f g h i j k l m n o p q r s t u v w x y z
+    #+END_EXAMPLE
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('b')
+
+      with open('files/emma.txt', 'br') as fp:
+          a.fromfile(fp, 10)
+          print(a)
+          a.fromfile(fp, 100)
+          print(a)
+
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[e15fa97b39006f87611567713225ac1b4e6ffd7f]:
+    :
+    : >>> >>> >>> ... ... ... ... ... array('b', [97, 32, 98, 32, 99, 32, 100, 32, 101, 32])
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 4, in <module>
+    : EOFError: read() didn't return enough bytes
+    : array('b', [97, 32, 98, 32, 99, 32, 100, 32, 101, 32, 102, 32, 103, 32, 104, 32, 105, 32, 106, 32, 107, 32, 108, 32, 109, 32, 110, 32, 111, 32, 112, 32, 113, 32, 114, 32, 115, 32, 116, 32, 117, 32, 118, 32, 119, 32, 120, 32, 121, 32, 122, 10])
+
 *** array. *fromlist* (list)
+    将链表LIST中的元素逐个添加到ARRAY末尾。相当于：
+
+    #+BEGIN_SRC python
+      for x in list:
+          a.append(x)
+    #+END_SRC
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('i', [1, 2, 3])
+      b = array('i', [1, 2, 3])
+
+      a.fromlist([4, 5, 6])
+      for i in [4, 5, 6]:
+          b.append(i)
+
+      print(a)
+      print(b)
+    #+END_SRC
+
+    #+RESULTS[ee6ff5728d7dd3ed2f1481230284520c42489b8b]:
+    :
+    : >>> >>> >>> >>> ... ... >>> array('i', [1, 2, 3, 4, 5, 6])
+    : array('i', [1, 2, 3, 4, 5, 6])
+
+*** array. *fromstring* ()
+    已废弃。改名为frombytes。
 *** array. *fromunicode* (s)
+    将Unicode字符串中的数据添加到数组后，数组必须为'u'类型数组，否则会
+    返回ValueError错误。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('u', 'abc')
+      a.fromunicode('def一')
+      print(a)
+
+      # 不为'u'类型数组
+      b = array('i', [1, 2, 3])
+      b.fromunicode('abc')
+    #+END_SRC
+
+    #+RESULTS[d6457c5ac18c4741783bab57ffb429334eea4928]:
+    :
+    : >>> >>> array('u', 'abcdef一')
+    : >>> >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: fromunicode() may only be called on unicode type arrays
+
 *** array. *index* (x)
+    返回ARRAY中最先出现X的索引，如果不含X，则返回ValueError错误。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('b', b'abc')
+      a.index(98)
+      print(a)
+      a.index(100)
+    #+END_SRC
+
+    #+RESULTS[bb9d8baefcc99d829f5a3af14533565e7a851413]:
+    :
+    : >>> 1
+    : array('b', [97, 98, 99])
+    : >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: array.index(x): x not in list
+
 *** array. *insert* (i, x)
+    将X添加到数组索引I前，如果大于最大索引添加到最后，如果为负数则相对
+    于最后一个元素索引。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [1, 2, 3])
+      a.insert(0, 100)
+      print(a)
+
+      # 大于最大索引
+      a.insert(100, 0)
+      print(a)
+
+      # 负数
+      a.insert(-1, -1)
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[6564376c693bbd71df7dce2800dee714b94964f9]:
+    :
+    : >>> >>> >>> array('i', [100, 1, 2, 3])
+    : >>> >>> array('i', [100, 1, 2, 3, 0])
+    : >>> >>> array('i', [100, 1, 2, 3, -1, 0])
+
 *** array. *pop* ([i])
+    索引为I的元素从数组中移除，并返回被移除的元素。I默认为-1，即移除最
+    后一个元素。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('i', [1, 2, 3])
+      a.pop()
+      print(a)
+
+      a.pop(0)
+      print(a)
+
+      for i in range(10):
+          a.pop()
+    #+END_SRC
+
+    #+RESULTS[0b39d4d5c284af2cc42ec5ed4bfe237aa9efa871]:
+    :
+    : >>> 3
+    : array('i', [1, 2])
+    : >>> 1
+    : array('i', [2])
+    : >>> ... ... 2
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 2, in <module>
+    : IndexError: pop from empty array
+
 *** array. *remove* (x)
+    删除数组中第一个X元素，如果无，则返回ValueError错误。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [1, 10, 1, 20])
+      a.remove(1)
+      print(a)
+
+      a.remove(1000)
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[212f24988fd8120f618e52af64fffe195b557b73]:
+    :
+    : >>> >>> >>> array('i', [10, 1, 20])
+    : >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: array.remove(x): x not in list
+    : array('i', [10, 1, 20])
+
 *** array. *reverse* ()
+    将数组中所有元素所有元素逆序。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [1, 2, 3])
+      a.reverse()
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[a3ef9ffca5d7ce923173522f468e9b7a1e90c125]:
+    :
+    : >>> >>> >>> array('i', [3, 2, 1])
+
 *** array. *tobytes* ()
+    将数组中的元素转换为byte表示。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('b', b'abc')
+      a.tobytes()
+    #+END_SRC
+
+    #+RESULTS[d4989066b60c3172edaa8eed0da52edb9e2ab8f0]:
+    :
+    : >>> >>> b'abc'
+
 *** array. *tofile* ()
+    与tobytes方法相似，只是将内容写入文件。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('b', b'abcd\ne\n')
+
+      with open('files/emma.txt', 'wb') as fp:
+          a.tofile(fp)
+    #+END_SRC
+
 *** array. *tolist* ()
+    将数组转换为普通链表。
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('i', [1, 2, 3])
+      a.tolist()
+    #+END_SRC
+
+    #+RESULTS[35127e89bdf3a9ad6716c8a97a98efbbbb398081]:
+    :
+    : >>> >>> [1, 2, 3]
+
 *** array. *tostring* ()
+    已废除，新名为tobytes()。
+
+    #+BEGIN_SRC python :session
+      from array import array
+      a = array('i', [1, 2, 3])
+      a.tostring()
+    #+END_SRC
+
+    #+RESULTS[d3991e96b25ff5dac6845e725808a54ad7d2dc63]:
+    :
+    : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+
 *** array. *tounicode* ()
+    将数组转换为Unicode字符串，数组的类型代码须为'u'，否则返回
+    ValueError错误。
+    
+    #+BEGIN_SRC python :session
+      from array import array
+
+      a = array('u', '我有一个梦想！')
+      a.tounicode()
+    #+END_SRC
+    
+    #+RESULTS[bad025bc9fc8783610f892471d66e555a8fe1f74]:
+    :
+    : >>> >>> '我有一个梦想！'

@@ -1541,21 +1541,21 @@
   
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
-	 比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
-	 只含ASCII字符，直接遍历就可；单如果有非ASCII字符，这些字符可能占
-	 多个字节，就不能通过遍历每个字符来实现遍历每个字节。
+	比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
+	只含ASCII字符，直接遍历就可；单如果有非ASCII字符，这些字符可能占
+	多个字节，就不能通过遍历每个字符来实现遍历每个字节。
 *** 进一步说明 [[https://segmentfault.com/a/1190000004450876][@xu_zhoufeng]]
 	Bytes类似字符串，不过是由单个字节（8位，取值范围为0-255）作为基本
 	元素的Sequence类型，也为Immutable。
-
+    
 	Bytes对象的形式为b'xxxx'，其中x为单个字节。单个字节的表示方式为
 	\xHH，其中\x为16进制转义符，HH为16进制数（取值范围为10进制的
 	0-255）。对于同一字符串，使用不同编码形式生成的Bytes对象，就会有
 	不同的值：
-
+    
     符串s分别使用utf-8和gb2312编码转换为了Bytes对象a和c。由于
 	编码不同，长度也不同：
-
+    
     #+BEGIN_SRC python :session
        s = 'a1一'
        a = bytes(s, 'utf-8')
@@ -1564,15 +1564,15 @@
        print(a, b, c)
        print(len(a), len(b), len(c))
     #+END_SRC
-
+    
     #+RESULTS[848498726a295116d76664340e1ed999657f16dc]:
-     :
-     : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
-     : 5 5 4
-
+    :
+    : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
+    : 5 5 4
+    
 	使用Bytes对象的decode方法就可实现解码，如果编码参数与编码时相同，
 	就会与原来相同的字符，否则就可能返回UnicodeDecodeError错误：
-
+    
     #+BEGIN_SRC python :session
       bytes('a1一', 'utf-8').decode('utf-8')
       bytes('a1一', 'gb2312').decode('gb2312')
@@ -1580,27 +1580,27 @@
       bytes('a1一', 'gb2312').decode('utf-8')
       bytes('a1一', 'utf-8').decode('gb2312')
     #+END_SRC
-
+    
     #+RESULTS[9753a73ca632282e558aa0120784aff49e2df5e0]:
     : 'a1一'
     : 'a1一'
     : >>> 'a1һ'
-    : Traceback (most recent call last):
+    : Traceback (most recent call last): 
     :   File "<stdin>", line 1, in <module>
     : UnicodeDecodeError: 'gb2312' codec can't decode byte 0x80 in position 4: incomplete multibyte sequence
-
+    
 	可通过字面量形式创建Bytes对象，不过仅限于ASCII范围内的字符：
-
+    
     #+BEGIN_SRC python :session
       a = b'1abc'
       a = b'1a一'
     #+END_SRC
-
+    
     #+RESULTS[1f2b8f954aac91264f856f9dde063d0afbb1273c]:
     :
     : File "<stdin>", line 1
     : SyntaxError: bytes can only contain ASCII literal characters.
-
+    
 ** Bytes对象
    bytes对象是由单个bytes元素组成的immutable类型的Sequence。由于主要
    的二进制协议都基于ASCII文本编码，bytes对象中有几个方法只在处理
@@ -2416,7 +2416,7 @@
 ** Memory Views
    memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
    地址。
-   
+
 *** 写在前面 [[https://segmentfault.com/q/1010000007137721][@segmentfault]] （还是没懂）
 
     str和bytearray切片时会复制数据，生成新的数据；bytes和memoryview切
@@ -2482,7 +2482,7 @@
 *** class *memoryview* (obj)
     创建指向OBJ的memoryview对象。OBJ须支持buffer protocol，包含bytes和
     bytearray对象，及array.array对象。
-    
+
 *** *__eq__* (exproter)
 *** *tobytes* ()
 *** *hex* ()
