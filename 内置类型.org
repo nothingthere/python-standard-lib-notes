@@ -1547,15 +1547,15 @@
 *** 进一步说明 [[https://segmentfault.com/a/1190000004450876][@xu_zhoufeng]]
 	Bytes类似字符串，不过是由单个字节（8位，取值范围为0-255）作为基本
 	元素的Sequence类型，也为Immutable。
-    
+
 	Bytes对象的形式为b'xxxx'，其中x为单个字节。单个字节的表示方式为
 	\xHH，其中\x为16进制转义符，HH为16进制数（取值范围为10进制的
 	0-255）。对于同一字符串，使用不同编码形式生成的Bytes对象，就会有
 	不同的值：
-    
+
     符串s分别使用utf-8和gb2312编码转换为了Bytes对象a和c。由于
 	编码不同，长度也不同：
-    
+
     #+BEGIN_SRC python :session
        s = 'a1一'
        a = bytes(s, 'utf-8')
@@ -1564,15 +1564,15 @@
        print(a, b, c)
        print(len(a), len(b), len(c))
     #+END_SRC
-    
+
     #+RESULTS[848498726a295116d76664340e1ed999657f16dc]:
     :
     : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
     : 5 5 4
-    
+
 	使用Bytes对象的decode方法就可实现解码，如果编码参数与编码时相同，
 	就会与原来相同的字符，否则就可能返回UnicodeDecodeError错误：
-    
+
     #+BEGIN_SRC python :session
       bytes('a1一', 'utf-8').decode('utf-8')
       bytes('a1一', 'gb2312').decode('gb2312')
@@ -1580,27 +1580,27 @@
       bytes('a1一', 'gb2312').decode('utf-8')
       bytes('a1一', 'utf-8').decode('gb2312')
     #+END_SRC
-    
+
     #+RESULTS[9753a73ca632282e558aa0120784aff49e2df5e0]:
     : 'a1一'
     : 'a1一'
     : >>> 'a1һ'
-    : Traceback (most recent call last): 
+    : Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
     : UnicodeDecodeError: 'gb2312' codec can't decode byte 0x80 in position 4: incomplete multibyte sequence
-    
+
 	可通过字面量形式创建Bytes对象，不过仅限于ASCII范围内的字符：
-    
+
     #+BEGIN_SRC python :session
       a = b'1abc'
       a = b'1a一'
     #+END_SRC
-    
+
     #+RESULTS[1f2b8f954aac91264f856f9dde063d0afbb1273c]:
     :
     : File "<stdin>", line 1
     : SyntaxError: bytes can only contain ASCII literal characters.
-    
+
 ** Bytes对象
    bytes对象是由单个bytes元素组成的immutable类型的Sequence。由于主要
    的二进制协议都基于ASCII文本编码，bytes对象中有几个方法只在处理
@@ -1709,7 +1709,7 @@
 	- 创建空实例：bytearray()
 	- 指定长度，使用0填充每个元素：bytearray(10)
 	- 使用只含整型iterable类型：bytearray(range(20))
-	- 通过buffer协议复制二进制数据：bytearray(b'Hi!')
+	- 通过buffer protocol复制二进制数据：bytearray(b'Hi!')
 
 	bytearray支持所有前面中所有mutable类型Sequence支持的操作，以
 	及后面将介绍的bytes和bytearray常见的操作。
@@ -2408,22 +2408,21 @@
            {b'language': b'Python', b'number': 2})
    #+END_SRC
 
-   #+RESULTS[9b24f198baa6c3efba515245c84adadba9533b83]:
+   #+RESULTS[6a760f6a28f9065b3d9105090c3f3acc3e6358b1]:
    :
    : b'Python hash 002 quete types.'
-   : <class 'NoneType'>
 
 ** Memory Views
    memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
    地址。
-
+   
 *** 写在前面 [[https://segmentfault.com/q/1010000007137721][@segmentfault]] （还是没懂）
-
+    
     str和bytearray切片时会复制数据，生成新的数据；bytes和memoryview切
     片时不会：
-
+    
     不使用memoryview：
-
+    
     #+BEGIN_SRC python :session
       a = 'abcdefg'
       b = a[:2]                       # 会生成新的字符串
@@ -2434,14 +2433,14 @@
       a
       b
     #+END_SRC
-
+    
     #+RESULTS[c1c892b196daf3801846c0ca2fd6da47f3e7131b]:
     :
     : >>> >>> >>> >>> >>> bytearray(b'abcdefg')
     : bytearray(b'bb')
-
+    
     使用memoryview：
-
+    
     #+BEGIN_SRC python :session
       a = b'abcdefg'
       ma = memoryview(a)
@@ -2456,17 +2455,17 @@
       ma.tobytes()
       mb.tobytes()
     #+END_SRC
-
+    
     #+RESULTS[ca75b35e9866dc79fe404515b992d4ef4e83b03f]:
     :
     : >>> True
     : >>> >>> >>> >>> >>> False
     : >>> >>> b'AAcdefg'
     : b'AA'
-
+    
     使用struct进行unpack解析时可直接接受memoryview对象，避免解析大字符
     串时大量切片：（没懂！！！）
-
+    
     #+BEGIN_SRC python :session
       import struct
 
@@ -2474,25 +2473,211 @@
       type, len = struct.unpack('!BI', mv[:5])
       type, len
     #+END_SRC
-
+    
     #+RESULTS[9ccffb54d4a9a9f2c3c17d7bf809f6ee90606531]:
     :
     : >>> >>> >>> (0, 0)
-
+    
 *** class *memoryview* (obj)
     创建指向OBJ的memoryview对象。OBJ须支持buffer protocol，包含bytes和
     bytearray对象，及array.array对象。
+    
+    memoryview元素的内存大小由OBJ决定，如果OBJ为bytes或bytearray对象，
+    则为1bytes，如果为array.array对象，则可能更大。
+    
+    len(view)的值等于tolist方法返回的值。如果view.ndim==0，则长度为1,；
+    如果view.ndim==1，则长度为view中元素的个数。如果维度更大，则为第一
+    层嵌套元素的个数。itemsize属性可返回单个元素所在byte个数。
+    
+    #+BEGIN_SRC python :session
+      from array import array
 
-*** *__eq__* (exproter)
+      a = array('l')
+      m = memoryview(a)
+
+      m.ndim
+      m.tolist()
+      len(m), m.itemsize
+    #+END_SRC
+    
+    #+RESULTS[5082e229bae9ad245ec196b3f40f7fc12f9b713d]:
+    :
+    : >>> >>> >>> >>> 1
+    : []
+    : (0, 8)
+    
+    memoryview支持切片和索引获取元素，一维切片返回内存子集：
+    
+    #+BEGIN_SRC python :session
+      v = memoryview(b'abcdefg')
+      v[1]
+      v[-1]
+      v[1:4]
+      bytes(v[1:4])
+    #+END_SRC
+    
+    #+RESULTS[a9028679c859d0e4f647abc666e156e9e2e5eef0]:
+    :
+    : 98
+    : 103
+    : <memory at 0x7fe514205408>
+    : b'bcd'
+    
+    如果OBJ为mutable类型，则memoryview对象也mutable，单不能改变元素个
+    数：
+    
+    #+BEGIN_SRC python :session
+      data = bytearray(b'abcdefg')
+      v = memoryview(data)
+
+      v.readonly
+      v[0] = ord('z')
+      data, v.tobytes()
+
+      data[1:4] = b'123'
+      data, v.tobytes()
+    #+END_SRC
+    
+    #+RESULTS[81d60fdf8bdaedfc8122daf23dc1516f8ef43bfc]:
+    :
+    : >>> >>> False
+    : >>> (bytearray(b'zbcdefg'), b'zbcdefg')
+    : >>> >>> (bytearray(b'z123efg'), b'z123efg')
+    
+*** *__eq__* (exproter) ？？？
 *** *tobytes* ()
+    转换为bytes对象：
+
+    #+BEGIN_SRC python :session
+      m = memoryview(b'abc')
+      m.tobytes()
+      bytes(m)
+    #+END_SRC
+
+    #+RESULTS[3418f9e79a7f31e2c0f4c168ac4d4e0daf664fba]:
+    :
+    : b'abc'
+    : b'abc'
+
 *** *hex* ()
+    返回字符串，用16进制数表示每个byte：
+
+    #+BEGIN_SRC python :session
+      m = memoryview(b'abc')
+      m.hex()
+    #+END_SRC
+
+    #+RESULTS[07a1b67e4959b506eed8e0a3085c002129826210]:
+    :
+    : '616263'
+
 *** *tolist* ()
+    返回每个元素组成的数组：
+
+    #+BEGIN_SRC python :session
+      from array import array
+
+      memoryview(b'abc').tolist()
+
+      a = array('d', [1.1, 2.2, 3.3])
+      m = memoryview(a)
+      m.tolist()
+    #+END_SRC
+
+    #+RESULTS[56e4a91855c5afff65fb1cfb0cd6d71ae7f63bd4]:
+    :
+    : >>> [97, 98, 99]
+    : >>> >>> >>> [1.1, 2.2, 3.3]
+
 *** *release* ()
-*** *cast* (fromat[,shape])
+    释放view，被传入memoryview的对象在释放前不能进行mute操作（如
+    bytearray不能改变元素个数），所有需使用此方法取消限制：
+
+    #+BEGIN_SRC python :session
+      b = bytearray(b'abc')
+      b.append(ord('d'))
+      print(b)
+
+      # 传入memoryview对象后
+      m = memoryview(b)
+      b.append(ord('e'))
+
+      # 释放
+      m.release()
+      b.append(ord('e'))
+      print(b)
+    #+END_SRC
+
+    #+RESULTS[05b35e46afb1daafb531730a65dff874854ab615]:
+    :
+    : >>> bytearray(b'abcd')
+    : >>> ... >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : BufferError: Existing exports of data: object cannot be re-sized
+    : >>> ... >>> >>> bytearray(b'abcde')
+
+    memoryview对象被释放后，不能进一步操作：
+
+    #+BEGIN_SRC python :session
+      m = memoryview(b'abc')
+      m[0]
+
+      m.release()
+      m[0]
+    #+END_SRC
+
+    #+RESULTS[7c4a8ae52af4353ab2b74c136ff665998c69cc84]:
+    :
+    : 97
+    : >>> >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: operation forbidden on released memoryview object
+
+    使用context management protocol可得到相同效果，即操作完成后自动释
+    放：
+
+    #+BEGIN_SRC python :session
+      with memoryview(b'abc') as m:
+          m[0]
+
+      m[0]
+    #+END_SRC
+
+    #+RESULTS[6ae2b69926c4549141d0dd69f4eb917f046b7445]:
+    :
+    : ... 97
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : ValueError: operation forbidden on released memoryview object
+
+*** *cast* (fromat[,shape]) ？？？
 *** *obj*
+    返回被memoryview获取的对象：
+
+    #+BEGIN_SRC python :session
+      b = bytearray(b'zbc')
+      m = memoryview(b)
+      m.obj is b
+    #+END_SRC
+
+    #+RESULTS[a1da99bfd44e22f7b96100bbb8c7519fb0d40436]:
+    :
+    : >>> True
+
 *** *nbytes*
+
 *** *readonly*
 *** *format*
+
+    #+BEGIN_SRC python :session
+      m = memoryview(b'abc')
+      m.format
+    #+END_SRC
+
+    #+RESULTS[1c2ddcce241cc2a063c56a83cd24eb76af58955f]:
+    :
+    : >>> 'B'
+
 *** *itemsize*
 *** *ndim*
 *** *shape*

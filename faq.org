@@ -1,12 +1,12 @@
 #+TITLE: 常见问题
 
 * 类bytes对象（bytes-like object）包含哪些？
-  
+
   - bytes
   - bytearray
   - array.array
   - memoryview
-    
+
 * Buffer Protocol
   
   支持buffer protocol的对象：
@@ -14,3 +14,4 @@
   1. 含内置对象：bytes和bytearray类型。
   2. 以及一些扩展对象：如array.array
   3. 以及第三方库定义的类型，如一些用于图像处理和数字分析的类型。？？？
+  4. memoryview。？？？

@@ -1,0 +1,466 @@
+#+TITLE: 二进制数据处理
+
+此章模块提供对二进制数据的基本操作，其他如“文件格式”和“网络协议”的二进
+制数据操作在相关章节介绍。
+
+Python内置的二进制序列有：bytes、bytearray和memoryview。
+
+* struct
+** 写在前面 [[http://kaiyuan.me/2015/12/25/python-struct/][@kaiyun]]
+** 格式字符串（Format Strings）
+   格式字符串用于限定打包（packing）和解包（unpacking）时的数据排布，
+   由下面2小节的“Byte顺序、大小和对齐”和“格式字符”共同控制。
+
+*** Byte顺序、大小和对齐
+
+    默认情况下，C语言类型内存分布，由电脑本地的格式和byte顺序决定，并
+    根据需要通过“跳过”bytes位置来对齐（由C编译器决定）。
+
+    此外，下表中的字符可用在格式字符串第一个位置，指定数据打包时的byte
+    顺序、大小和对齐。
+
+    | 字符 | Byte顺序             | 大小     | 对齐   |
+    |------+----------------------+----------+--------|
+    | @    | native               | native   | native |
+    | \=   | native               | standard | none   |
+    | <    | little-endian        | standard | none   |
+    | >    | big-endian           | standard | none   |
+    | \!   | network(=big-endian) | standard | none   |
+
+    - 本地字节序可用“sys.byteorder”获取：
+
+    #+BEGIN_SRC python :session
+      import sys
+      sys.byteorder
+    #+END_SRC
+
+    #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
+    :
+    : 'little'
+
+    - 如果第一个字符不是上表中的任何有个，默认为“@”。
+    - “native”字节序有当前主机决定。
+    - “native”大小和对齐由C编译器的sizeof表达式决定。总是与本地字节序
+      适应？？？
+    - “standard”大小仅由下一节的“格式字符串决定”。
+    - “!”用于简写网络字节序（防止不能记住）。
+    - 无法指定非本地字节序（强制字节序交换）；需适应“>”和“>”指定。
+
+    *注意* ：
+
+    1. 仅在结构体相邻的数据间有padding，首位无。
+    2. 使用非本地字节序时，不会有padding。即使用“<”、“>”和“!”时。
+    3. 如需将结构体padding到某种类型的大小，可在格式字符串最后重复该类
+       型，并指定其数量为0：
+
+       前面的数字1和2都占4个字节，3为short型（2个字节），再使用"0i"（4
+       个字节），就在后面添加了2个字节。
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      x = struct.pack('iih0i', 1, 2, 3)
+      len(x), x
+    #+END_SRC
+
+    #+RESULTS[3f5a2483d97794840917fc17a3edca72f0b221d1]:
+    :
+    : >>> >>> (12, b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00')
+
+**** 字节序（endian）[[https://zh.wikipedia.org/wiki/%25E5%25AD%2597%25E8%258A%2582%25E5%25BA%258F][@wiki]]
+     数据在内存中排序情况。如数字“12”，如果为“小端序（little-endian）”
+     则内存中“2”在“1”之前，“大端序（bit-endian）”则“1”在“2”之前。
+
+     在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
+     同 标准的字节序。
+
+*** 格式字符
+    下表为所有执行数据类型的格式字符。第二列C类型可见其类型，第4列标准
+    为大小，当使用“<”、“>”、“=”或“!”时为本地大小（有当前主机决定）。
+
+    | 格式字符 | C类型              | Python类型         | 标准大小 | 注意点  |
+    |----------+--------------------+--------------------+----------+---------|
+    | x        | pad type           | no value           |          |         |
+    | c        | char               | 长度为1的bytes类型 |        1 |         |
+    | b        | signed char        | integer            |        1 | (1),(3) |
+    | B        | unsigned char      | integer            |        1 | (3)     |
+    | ?        | _Bool              | bool               |        1 | (1)     |
+    | h        | short              | integer            |        2 | (3)     |
+    | H        | unsigned short     | integer            |        2 | (3)     |
+    | i        | int                | integer            |        4 | (3)     |
+    | I        | unsigned int       | integer            |        4 | (3)     |
+    | l        | long               | integer            |        4 | (3)     |
+    | L        | unsigned long      | integer            |        4 | (3)     |
+    | q        | long long          | integer            |        8 | (2),(3) |
+    | Q        | unsigned long long | integer            |        8 | (2),(3) |
+    | n        | ssize_t            | integer            |          | (4)     |
+    | N        | size_t             | integer            |          | (4)     |
+    | f        | float              | float              |        4 | (5)     |
+    | d        | double             | float              |        8 | (5)     |
+    | s        | char[]             | bytes              |          |         |
+    | p        | char[]             | bytes              |          |         |
+    | P        | void *             | integer            |          | (6)     |
+
+    注意点：
+
+    1. “?”对应C99中的_Bool类型。如果没有此类型，则相当于字符类型。在标
+       准模式下，总是用一个字节吧表示。
+    2. 如果在本地模式下，仅当主机C编译器支持C的long long类型时才有效。
+       标准模式下总是有效。
+    3. 如果试图使用整型格式打包将非整型数据，如果该非整型数据
+       有__index__()方法，则使用该方法调用返回值。
+    4. “n”和“N”类型仅在本地大小模式下有效（即第一个字符缺省，或为“@”），
+       如需指定大小，选择上面合适的整型格式字符替换。
+    5. “f”和“d”格式会忽视本地主机浮点数格式，分别使用IEEE的binary32和
+       binary64格式。
+    6. “P”格式仅限于本地字节序模式（缺省第一个字符或为“@”）。struct模
+       块不将其解释为本地字节序，所以无效？？？
+
+    其他注意点：
+
+    - 上表中的格式字符前可跟整数，指定重复数量，如“4h”等价于“hhhh”。
+    - 格式字符串间的空格会被忽视，但指定重复的整数与其对应的格式字符间
+      不能有空格。
+    - 如果对“s”指定重复数量，指定的是byte长度。如“10s”表示单个10-byte
+      的字符串，而“10c”表示10个字符。如果不指定重复，默认为1，即长度为
+      1-byte的字符串。打包时，字符串会根据指定格式truncted或padded；解
+      包时，结果与指定的byte数相同。为与C语言保持一致，“0s”表示单个空
+      字符串（“0c”表示0个字符）。
+
+      #+BEGIN_SRC python :session
+      import struct
+
+      x = struct.pack('2s1s0s', b'abc', b'ABC', b'XYZ')
+      print(x)
+
+      struct.unpack('3s', x)
+      #+END_SRC
+
+      #+RESULTS[ffdf2ef6608e61a74473dca90a2c5cbf73d84377]:
+      :
+      : >>> >>> b'abA'
+      : >>> (b'abA',)
+
+    - “s”与“p”的区别为：前者为C形式字符串，后者为Pascal形式字符串。
+
+    - 使用“?”格式字符时，打包结果只是0或1或标准布尔值，解包结果为True
+      或False。
+
+      #+BEGIN_SRC python :session
+      import struct
+
+      x = struct.pack('?', b'X')
+      print(x)
+
+      struct.unpack('?', x)
+      print(x)
+      #+END_SRC
+
+      #+RESULTS[7cabf81697f5a2dfa9cf2e773bc9c50f5e9cd991]:
+     :
+     : >>> >>> b'\x01'
+     : >>> (True,)
+     : b'\x01'
+
+** 函数和Exceptions
+*** exception struct. *error*
+    所有报错入口，其参数报错信息。
+
+*** struct. *pack* (fmt,v1,v2...)
+    返回bytes对象，包含所有V1、V2...根据FMT打包后的结果。所有参数需满
+    足FMT指定形式。
+
+    #+BEGIN_SRC python :session
+      import struct
+      from array import array
+
+      struct.pack('4s4si', '一'.encode('utf-8'), bytearray(b'a'), 97)
+    #+END_SRC
+
+    #+RESULTS[142f8bd5ae0019ed3c6eda23eaf3733ebc95a762]:
+    :
+    : >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00a\x00\x00\x00'
+
+*** struct. *pack_into* (fmt,buffer,offset,v1,v2)
+    将V1、V2...根据FMT写入BUFFER中，必须指定开始写入位置，即OFFSET参数。
+
+    *注意* ：BUFFER须为可读写的“类bytes对象”，如array.array和bytearray。
+
+    #+Begin_SRC python :session
+      import struct
+      from array import array
+
+      b = bytearray(100)
+      a = array('b', b'123')
+
+      struct.pack_into('3s', b, 3, b'abc')
+      struct.pack_into('3s', a, 0, b'abc')
+
+      print(b)
+      print(a)
+    #+END_SRC
+
+    #+RESULTS[857a048b2b5463576ece658fad95154e035792d2]:
+    :
+    : >>> >>> >>> >>> >>> >>> >>> >>> bytearray(b'\x00\x00\x00abc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    : array('b', [97, 98, 99])
+
+*** struct. *unpack* (fmt,buffer)
+    根据FMT，将BUFFER（通过pack(FMT,..)打包的结果）解包。BUFFER中的
+    byte数需与FMT指定相同。
+
+    返回结果即使只有单个值，也为元组。
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      fmt = '3s2i'
+      b = struct.pack(fmt, b'abc', 1, 2)
+      struct.unpack(fmt, b)
+    #+END_SRC
+
+    #+RESULTS[f97b5a2b81c314ebb3c2913890eb1e23796c7437]:
+    :
+    : >>> >>> >>> (b'abc', 1, 2)
+
+*** struct. *unpack_from* (fmt,buffer,offset=0)
+    从OFFSET开始，根据FMT将BUFFER解包。即时只有一个值，返回值也为元组。
+
+    BUFFER的byte数减去OFFSET须 >= FMT指定的长度。
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      b = struct.pack('3s2i', b'abc', 1, 2)
+      print(b)
+      struct.unpack_from('2i', b, 4)
+    #+END_SRC
+
+    #+RESULTS[e89ae04c0a016610c35203529dc29585978b4556]:
+    :
+    : >>> >>> b'abc\x00\x01\x00\x00\x00\x02\x00\x00\x00'
+    : (1, 2)
+
+*** struct. *iter_unpack* (fmt,buffer)
+    根据FMT迭代解包BUFFER，直到BUFFER耗尽。返回iterator对象，其中每个
+    元素为FMT指定形式组成的元组。
+
+    BUFFER的大小须为FMT自定大小的整数倍。
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      b = struct.pack('3i', 1, 2, 3)
+      for x in struct.iter_unpack('i', b):
+          print(x)
+    #+END_SRC
+
+    #+RESULTS[aa2d5b758701f132340e7eca03b5303f1d63944f]:
+    :
+    : >>> >>> ... ... (1,)
+    : (2,)
+    : (3,)
+
+*** struct. *calcsize* (fmt)
+    返回格式字符串指定的大小：
+
+    #+BEGIN_SRC python :session
+      import struct
+
+      struct.calcsize('l')
+      struct.calcsize('=l')
+    #+END_SRC
+
+    #+RESULTS[42a5d996453be8e2a1d1fe030314e57898587b32]:
+    :
+    : >>> 8
+    : 4
+
+** 类
+*** class struct. *Struct* (fmt)
+    返回根据FMT构建的Struct对象，永远读取二进制数据。由于创建Struct对
+    象时会编译FMT字符串，调用对象上的方法较之对应的函数效率更快。
+
+    下面为Struct对象上的方法和属性：
+
+**** *pack* (v1,v2...)
+     等价于pack函数。len(result) == .size。
+
+     #+BEGIN_SRC python :session
+       import struct
+       s = struct.Struct('3s2i')
+
+       b = s.pack(b'abc', 1, 2)
+       print(b)
+       len(b) == s.size
+     #+END_SRC
+
+     #+RESULTS[bc8f876784beaff3b30c21bfeb91305d53f6e8fe]:
+     :
+     : >>> >>> >>> b'abc\x00\x01\x00\x00\x00\x02\x00\x00\x00'
+     : True
+
+**** *pack_into* (buffer,offset,v1,v2...)
+     等价于pack_into函数。
+
+     #+BEGIN_SRC python :session
+       import struct
+       s = struct.Struct('3s2i')
+
+       ba = bytearray(12)
+       s.pack_into(ba, 0, b'XYZ', 3, 7)
+
+       print(ba)
+     #+END_SRC
+
+     #+RESULTS[cea1ac6651adfc2d897777716f278ed34dc56858]:
+     :
+     : >>> >>> >>> >>> >>> bytearray(b'XYZ\x00\x03\x00\x00\x00\x07\x00\x00\x00')
+
+**** *unpack* (buffer)
+
+     #+BEGIN_SRC python :session
+       import struct
+       s = struct.Struct('3s2i')
+       b = s.pack(b'abc', 1, 2)
+       s.unpack(b)
+     #+END_SRC
+
+     #+RESULTS[7d337156510e3cc11ca3c89be5178daa651b0f44]:
+     :
+     : >>> >>> (b'abc', 1, 2)
+
+**** *unpack_from* (buffer,offset=0)
+
+     #+BEGIN_SRC python :session
+       import struct
+       s = struct.Struct('3s2i')
+
+       b = s.pack(b'XYZ', 3, 7)
+       s.unpack_from(b, 0)
+     #+END_SRC
+
+     #+RESULTS[e6fc692fa31c44cbb5f3da7d62ec7f7aa098eb2d]:
+     :
+     : >>> >>> >>> (b'XYZ', 3, 7)
+
+**** *iter_unpack* (buffer)
+
+     #+BEGIN_SRC python :session
+       import struct
+       s = struct.Struct('3i')
+       b = s.pack(1, 2, 3)
+
+       s1 = struct.Struct('i')
+       for x in s1.iter_unpack(b):
+           print(x)
+     #+END_SRC
+
+     #+RESULTS[4b7f84c46db82d5129616af5ea3bce347d070b47]:
+     :
+     : >>> >>> >>> >>> ... ... (1,)
+     : (2,)
+     : (3,)
+
+**** *format*
+     返回构建对象时的格式字符串。
+
+     #+BEGIN_SRC python :session
+       import struct
+
+       s = struct.Struct('3s2i')
+       s.format
+     #+END_SRC
+
+     #+RESULTS[527dd7247d1fc2a71049cc01f03398ce69d5887b]:
+     :
+     : >>> >>> b'3s2i'
+
+**** *size*
+     返回格式字符串指定的byte数。
+
+     #+BEGIN_SRC python :session
+       import struct
+
+       s = struct.Struct('3s2i')
+       s.size
+     #+END_SRC
+
+     #+RESULTS[084fba739a667b43b0f15c172512fe0266510193]:
+     :
+     : >>> >>> 12
+
+** 举例
+   整数基本打包和解包：
+
+   #+BEGIN_SRC python :session
+     import struct
+
+     struct.pack('=hhl', 1, 2, 3)
+     struct.unpack('=hhl', struct.pack('=hhl', 1, 2, 3))
+     struct.calcsize('=hhl')
+   #+END_SRC
+
+   #+RESULTS[89df059a5f59249c58b331dfee8fb2df05703867]:
+   :
+   : >>> b'\x01\x00\x02\x00\x03\x00\x00\x00'
+   : (1, 2, 3)
+   : 8
+
+   解包结果可赋值变量，或named元组：
+
+   #+BEGIN_SRC python :session
+     import struct
+     from collections import namedtuple
+
+     record = b'raymond   \x32\x12\x08\x01\x08'
+
+     name, serialnum, school, gradelevel = struct.unpack('<10sHHb', record)
+     print(name, serialnum, school, gradelevel)
+
+     Student = namedtuple('Student', 'name serialnum school gradelevel')
+     Student._make(struct.unpack('<10sHHb', record))
+   #+END_SRC
+
+   #+RESULTS[4ed9cd69c591f5d90fd668457238b325c2b93c17]:
+   :
+   : >>> >>> >>> >>> >>> b'raymond   ' 4658 264 8
+   : >>> >>> Student(name=b'raymond   ', serialnum=4658, school=264, gradelevel=8)
+
+   由于需要padding，格式字符串的顺序会影响大小：
+
+   #+BEGIN_SRC python :session
+     import struct
+
+     struct.pack('ci', b'*', 0x12131415)
+     struct.pack('ic', 0x12131415, b'*')
+
+     struct.calcsize('ci'), struct.calcsize('ic')
+   #+END_SRC
+
+   #+RESULTS[03a0880639a62525e2c396b34d0adbe60734dbc7]:
+   :
+   : >>> b'*\x00\x00\x00\x15\x14\x13\x12'
+   : b'\x15\x14\x13\x12*'
+   : >>> (8, 5)
+
+   在本地大小和对其模式下，可在可行字符前添加数字0强制对齐：
+
+   #+BEGIN_SRC python :session
+     import struct
+
+     struct.pack('llh', 1, 2, 3)
+     struct.pack('llh0l', 1, 2, 3)
+
+     struct.pack('=llh0l', 1, 2, 3)
+     struct.pack('=llh0l', 1, 2, 3)
+   #+END_SRC
+
+   #+RESULTS[f3ddf8ee2f2f8987c367f73a155f85b9f2851a00]:
+   :
+   : >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00'
+   : b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
+   : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
+   : b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
+
+* codecs

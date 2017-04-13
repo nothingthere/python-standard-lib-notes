@@ -1,0 +1,46 @@
+#    -*- mode: org -*-
+
+Archived entries from file /home/claudio/Desktop/Python/python-standard-lib-notes/二进制数据处理.org
+
+* struct. *calcsize* (fmt)
+  :PROPERTIES: 
+  :ARCHIVE_TIME: 2017-04-13 Thu 09:45
+  :ARCHIVE_FILE: ~/Desktop/Python/python-standard-lib-notes/二进制数据处理.org
+  :ARCHIVE_OLPATH: struct/函数和Exceptions
+  :ARCHIVE_CATEGORY: 二进制数据处理
+  :END:      
+  返回格式字符串指定的大小：
+  
+  #+BEGIN_SRC python :session
+    import struct
+
+    struct.calcsize('d')
+    struct.calcsize('=d')
+  #+END_SRC
+  
+  #+RESULTS[709f3c7833b17da5c709d59a385b73ff6e42e6f2]:
+  :
+  : >>> 8
+  : 8
+  
+* *iter_unpack* (buffer)
+  :PROPERTIES: 
+  :ARCHIVE_TIME: 2017-04-13 Thu 11:07
+  :ARCHIVE_FILE: ~/Desktop/Python/python-standard-lib-notes/二进制数据处理.org
+  :ARCHIVE_OLPATH: struct/类/class struct. *Struct* (fmt)
+  :ARCHIVE_CATEGORY: 二进制数据处理
+  :END:
+  
+  #+BEGIN_SRC python :session
+    import struct
+    s = struct.Struct('3i')
+
+    b = s.pack(1, 2, 3)
+
+    for x in s.iter_unpack(b):
+        print(x)
+  #+END_SRC
+  
+  #+RESULTS[087f9fb66bf1cd512918ce998e4f2c09a4709e6e]:
+  :
+  : >>> >>> >>> >>> ... ... (1, 2, 3)
