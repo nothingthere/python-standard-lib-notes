@@ -8,10 +8,38 @@
   - memoryview
 
 * Buffer Protocol
-  
+
   支持buffer protocol的对象：
-  
+
   1. 含内置对象：bytes和bytearray类型。
   2. 以及一些扩展对象：如array.array
   3. 以及第三方库定义的类型，如一些用于图像处理和数字分析的类型。？？？
   4. memoryview。？？？
+
+* 可哈希对象（hashable object）
+  一个对象如果有哈希值（即需有__hash__()方法），该值在生命周期内不会改
+  变，则为可哈希对象。可用于与其他对象比较（需__eq__()方法）。如果两个
+  可哈希对象相等，则需两者哈希值相等。
+
+  可哈希对象主要是用作字典的key值，和set对象的元素。
+
+  Python中所有内置immutable对象都为可哈希对象，而所有mutable容器（如链
+  表和字典）都不为可哈希对象。
+
+  所有用户自定义类的实例都默认为可哈希对象，除与自身外都不相等，其哈希
+  值可由id()函数获取。
+* 浅层复制（shallow copy）和深层复制（deep copy） [[https://en.wikipedia.org/wiki/Object_copying#Shallow_copy][@wiki]]
+** 浅层复制
+   如复制A对象到B，复制A对象的每个field。如果field为primitive类型，则复制
+   其值；如果为对象，则是复制其指针，即A和B共享此对象，B上面修改此对象，
+   A上面也会被修改。
+
+   在没有primitive类型的语言中（如JavaScript，一切皆对象），所有复制都
+   是复制对象指针。
+
+   可见，浅层复制效率更高。
+** 深层复制
+   不管是primitive类型，还是对象，都创建新的对象。B上面的对象与A上面的
+   对象相互独立。
+
+   可见，深层复制效率耕地。

@@ -1535,10 +1535,10 @@
   bytes和bytearray是Python核心内置处理二进制数据的类。由memoryview类支
   持，此类使用"缓存协议（buffer protocol）"，不用复制就可获得其他对象
   的内存地址。？
-  
+
   array模块支持高效率存储基本数据类型，如32位整数和IEEE754双精度浮点
   数。
-  
+
 ** 写在前面
 *** 用处举例 [[http://blog.csdn.net/hanhuili/article/details/9069507][@李寒辉的技术日记]]
 	比如对字符串进行加密处理，通常是逐个处理字符串中的单个字节。如果
@@ -1776,7 +1776,6 @@
 
 *** bytes. *count* (sub[,start[,end]])
 *** bytearray. *count* (sub[,start[,end]])
-
     返回SUB的出现次数，可通过START和END参数指定截断。
 
     SUB可为所有“类bytes对象”，以及0-255的整数。
@@ -1910,17 +1909,16 @@
 
     #+BEGIN_SRC python :session
       intab = bytes(b'123')
-      outtab = bytes('一二三', 'gb2312')
+      # outtab = bytes('一二三', 'gb2312')
+      # bytes.maketrans(intab, outtab)
+      outtab = bytes(b'abc')
       bytes.maketrans(intab, outtab)
-      print(outtab)
+      # print(outtab)
     #+END_SRC
 
-    #+RESULTS[a6facac108c4b92bfe9857a9fa77349181dea38f]:
+    #+RESULTS[52d5d800d6e22bbcc88f3454132132f8a4c9f568]:
     :
-    : >>> Traceback (most recent call last):
-    :   File "<stdin>", line 1, in <module>
-    : ValueError: maketrans arguments must have same length
-    : b'\xd2\xbb\xb6\xfe\xc8\xfd'
+    : ... ... >>> b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !"#$%&\'()*+,-./0abc456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff'
 
 *** bytes. *partition* (sep)
 *** bytearray. *partition* (sep)
@@ -2415,14 +2413,14 @@
 ** Memory Views
    memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
    地址。
-   
+
 *** 写在前面 [[https://segmentfault.com/q/1010000007137721][@segmentfault]] （还是没懂）
-    
+
     str和bytearray切片时会复制数据，生成新的数据；bytes和memoryview切
     片时不会：
-    
+
     不使用memoryview：
-    
+
     #+BEGIN_SRC python :session
       a = 'abcdefg'
       b = a[:2]                       # 会生成新的字符串
@@ -2433,14 +2431,14 @@
       a
       b
     #+END_SRC
-    
+
     #+RESULTS[c1c892b196daf3801846c0ca2fd6da47f3e7131b]:
     :
     : >>> >>> >>> >>> >>> bytearray(b'abcdefg')
     : bytearray(b'bb')
-    
+
     使用memoryview：
-    
+
     #+BEGIN_SRC python :session
       a = b'abcdefg'
       ma = memoryview(a)
@@ -2455,17 +2453,17 @@
       ma.tobytes()
       mb.tobytes()
     #+END_SRC
-    
+
     #+RESULTS[ca75b35e9866dc79fe404515b992d4ef4e83b03f]:
     :
     : >>> True
     : >>> >>> >>> >>> >>> False
     : >>> >>> b'AAcdefg'
     : b'AA'
-    
+
     使用struct进行unpack解析时可直接接受memoryview对象，避免解析大字符
     串时大量切片：（没懂！！！）
-    
+
     #+BEGIN_SRC python :session
       import struct
 
@@ -2473,22 +2471,22 @@
       type, len = struct.unpack('!BI', mv[:5])
       type, len
     #+END_SRC
-    
+
     #+RESULTS[9ccffb54d4a9a9f2c3c17d7bf809f6ee90606531]:
     :
     : >>> >>> >>> (0, 0)
-    
+
 *** class *memoryview* (obj)
     创建指向OBJ的memoryview对象。OBJ须支持buffer protocol，包含bytes和
     bytearray对象，及array.array对象。
-    
+
     memoryview元素的内存大小由OBJ决定，如果OBJ为bytes或bytearray对象，
     则为1bytes，如果为array.array对象，则可能更大。
-    
-    len(view)的值等于tolist方法返回的值。如果view.ndim==0，则长度为1,；
+
+    len(view)的值等于tolist方法返回的值。如果view.ndim==0，则长度为1；
     如果view.ndim==1，则长度为view中元素的个数。如果维度更大，则为第一
     层嵌套元素的个数。itemsize属性可返回单个元素所在byte个数。
-    
+
     #+BEGIN_SRC python :session
       from array import array
 
@@ -2499,15 +2497,15 @@
       m.tolist()
       len(m), m.itemsize
     #+END_SRC
-    
+
     #+RESULTS[5082e229bae9ad245ec196b3f40f7fc12f9b713d]:
     :
     : >>> >>> >>> >>> 1
     : []
     : (0, 8)
-    
+
     memoryview支持切片和索引获取元素，一维切片返回内存子集：
-    
+
     #+BEGIN_SRC python :session
       v = memoryview(b'abcdefg')
       v[1]
@@ -2515,17 +2513,17 @@
       v[1:4]
       bytes(v[1:4])
     #+END_SRC
-    
+
     #+RESULTS[a9028679c859d0e4f647abc666e156e9e2e5eef0]:
     :
     : 98
     : 103
     : <memory at 0x7fe514205408>
     : b'bcd'
-    
-    如果OBJ为mutable类型，则memoryview对象也mutable，单不能改变元素个
+
+    如果OBJ为mutable类型，则memoryview对象也mutable，但不能改变元素个
     数：
-    
+
     #+BEGIN_SRC python :session
       data = bytearray(b'abcdefg')
       v = memoryview(data)
@@ -2537,190 +2535,977 @@
       data[1:4] = b'123'
       data, v.tobytes()
     #+END_SRC
-    
+
     #+RESULTS[81d60fdf8bdaedfc8122daf23dc1516f8ef43bfc]:
     :
     : >>> >>> False
     : >>> (bytearray(b'zbcdefg'), b'zbcdefg')
     : >>> >>> (bytearray(b'z123efg'), b'z123efg')
-    
-*** *__eq__* (exproter) ？？？
-*** *tobytes* ()
-    转换为bytes对象：
 
-    #+BEGIN_SRC python :session
-      m = memoryview(b'abc')
-      m.tobytes()
-      bytes(m)
-    #+END_SRC
+*** 方法
+**** *__eq__* (exproter) ？？？
 
-    #+RESULTS[3418f9e79a7f31e2c0f4c168ac4d4e0daf664fba]:
-    :
-    : b'abc'
-    : b'abc'
+     只要ma.tolist() == mb.tolist，则ma == mb。
+     #+BEGIN_SRC python :session
+       from array import array
 
-*** *hex* ()
-    返回字符串，用16进制数表示每个byte：
+       a = array('I', [1, 2, 3])
+       b = array('d', [1.0, 2.0, 3.0])
+       x = a.tolist()
+       y = b.tolist()
 
-    #+BEGIN_SRC python :session
-      m = memoryview(b'abc')
-      m.hex()
-    #+END_SRC
+       x == y
+     #+END_SRC
 
-    #+RESULTS[07a1b67e4959b506eed8e0a3085c002129826210]:
-    :
-    : '616263'
+     #+RESULTS[2313e696f45e3e734b389337ef559f77d3e13595]:
+     :
+     : >>> >>> >>> >>> >>> >>> True
 
-*** *tolist* ()
-    返回每个元素组成的数组：
+     如果元素的数据类型不在struct模块中的格式字符串中，则永远不相等（含
+     自身）。
 
-    #+BEGIN_SRC python :session
+     #+BEGIN_SRC python :session
+       from ctypes import BigEndianStructure, c_long
+
+       class BEPoint(BigEndianStructure):
+           _fields_ = [('x', c_long), ('y', c_long)]
+
+       point = BEPoint(100, 200)
+       a = memoryview(point)
+       b = memoryview(point)
+       a == point
+       a == b
+       a == a
+     #+END_SRC
+
+     #+RESULTS[5ae769c5841bbfc419f8612abf6b2dd8abe3311c]:
+     :
+     : >>> >>> ... ... >>> >>> >>> >>> >>> False
+     : False
+     : False
+
+     *注意* ：对于浮点数，即时ma is mb，ma == mb也会返回false。？？？
+
+**** *tobytes* ()
+     转换为bytes对象：
+
+     #+BEGIN_SRC python :session
+       m = memoryview(b'abc')
+       m.tobytes()
+       bytes(m)
+     #+END_SRC
+
+     #+RESULTS[3418f9e79a7f31e2c0f4c168ac4d4e0daf664fba]:
+     :
+     : b'abc'
+     : b'abc'
+
+**** *hex* ()
+     返回字符串，用16进制数表示每个byte：
+
+     #+BEGIN_SRC python :session
+       m = memoryview(b'abc')
+       m.hex()
+       bytes.fromhex(m.hex())
+     #+END_SRC
+
+     #+RESULTS[20295c723328fd3f5c60059475ba93b4e505c964]:
+     :
+     : '616263'
+     : b'abc'
+
+**** *tolist* ()
+     返回每个元素组成的数组：
+
+     #+BEGIN_SRC python :session
+       from array import array
+
+       memoryview(b'abc').tolist()
+
+       a = array('d', [1.1, 2.2, 3.3])
+       m = memoryview(a)
+       m.tolist()
+     #+END_SRC
+
+     #+RESULTS[56e4a91855c5afff65fb1cfb0cd6d71ae7f63bd4]:
+     :
+     : >>> [97, 98, 99]
+     : >>> >>> >>> [1.1, 2.2, 3.3]
+
+**** *release* ()
+     释放view，被传入memoryview的对象在释放前不能进行mute操作（如
+     bytearray不能改变元素个数），所有需使用此方法取消限制：
+
+     #+BEGIN_SRC python :session
+       b = bytearray(b'abc')
+
+       # 传入memoryview对象后
+       m = memoryview(b)
+       b.append(ord('e'))
+
+       # 释放
+       m.release()
+       b.append(ord('e'))
+       print(b)
+     #+END_SRC
+
+     #+RESULTS[b893fab646a87a1269b4555431d20c3a06b27694]:
+     :
+     : >>> ... >>> Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     : BufferError: Existing exports of data: object cannot be re-sized
+     : >>> ... >>> >>> bytearray(b'abce')
+
+     memoryview对象被释放后，不能进一步操作：
+
+     #+BEGIN_SRC python :session
+       m = memoryview(b'abc')
+       m[0]
+
+       m.release()
+       m[0]
+     #+END_SRC
+
+     #+RESULTS[7c4a8ae52af4353ab2b74c136ff665998c69cc84]:
+     :
+     : 97
+     : >>> >>> Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     : ValueError: operation forbidden on released memoryview object
+
+     使用context management protocol可得到相同效果，即操作完成后自动释
+     放：
+
+     #+BEGIN_SRC python :session
+       with memoryview(b'abc') as m:
+           m[0]
+
+       m[0]
+     #+END_SRC
+
+     #+RESULTS[6ae2b69926c4549141d0dd69f4eb917f046b7445]:
+     :
+     : ... 97
+     : Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     : ValueError: operation forbidden on released memoryview object
+
+**** *cast* (fromat[,shape]) ？？？
+     改变memoryview的单个元素内存大小，或形状（维度），返回新的
+     memoryview对象，但仍指原来的对象。
+
+     SHAPE的默认值为"[byte_length // new_itemsize]"，即默认转换为一维。
+
+     FORMAT参数需为struct模块中指定的格式字符。 原来的格式字符和新的格
+     式字符需至少有一个为byte形式（即'B'、'b'或'c'）。
+
+     返回值的byte数须与原byte数相同。
+
+     一维long -> 一维unsigned char：
+
+     #+BEGIN_SRC python :session
       from array import array
 
-      memoryview(b'abc').tolist()
-
-      a = array('d', [1.1, 2.2, 3.3])
+      a = array('l', [1, 2, 3])
       m = memoryview(a)
-      m.tolist()
-    #+END_SRC
+      print(m.tobytes())
+      m.format, m.itemsize, len(m), m.nbytes
 
-    #+RESULTS[56e4a91855c5afff65fb1cfb0cd6d71ae7f63bd4]:
+      m1 = m.cast('B')
+      print(m1.tobytes())
+      m1.format, m1.itemsize, len(m1), m1.nbytes
+     #+END_SRC
+
+     #+RESULTS[113bede3effa1e93792a64dc9da6056cf7eced99]:
     :
-    : >>> [97, 98, 99]
-    : >>> >>> >>> [1.1, 2.2, 3.3]
+    : >>> >>> >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
+    : ('l', 8, 3, 24)
+    : >>> >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
+    : ('B', 1, 24, 24)
 
-*** *release* ()
-    释放view，被传入memoryview的对象在释放前不能进行mute操作（如
-    bytearray不能改变元素个数），所有需使用此方法取消限制：
+     一维unsigned char -> 一维char：
 
-    #+BEGIN_SRC python :session
+     #+BEGIN_SRC python :session
       b = bytearray(b'abc')
-      b.append(ord('d'))
-      print(b)
-
-      # 传入memoryview对象后
       m = memoryview(b)
-      b.append(ord('e'))
+      m[0] = b'X'
 
-      # 释放
-      m.release()
-      b.append(ord('e'))
+      m1 = m.cast('c')
+      m1[0] = b'X'
       print(b)
-    #+END_SRC
+     #+END_SRC
 
-    #+RESULTS[05b35e46afb1daafb531730a65dff874854ab615]:
+     #+RESULTS[d6ce75ecca0d2b0192031a8295fbdc5ec68e0d4b]:
     :
-    : >>> bytearray(b'abcd')
-    : >>> ... >>> Traceback (most recent call last):
+    : >>> Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
-    : BufferError: Existing exports of data: object cannot be re-sized
-    : >>> ... >>> >>> bytearray(b'abcde')
+    : TypeError: memoryview: invalid type for format 'B'
+    : >>> >>> >>> bytearray(b'Xbc')
 
-    memoryview对象被释放后，不能进一步操作：
+     一维byte -> 三维int -> 一维signed char
+     #+BEGIN_SRC python :session
+      import struct
+
+      buf = struct.pack('i' * 12, *list(range(12)))
+      m = memoryview(buf)
+      m = m.cast('i', shape=[2, 2, 3])
+      m.tolist()
+      m.format, m.itemsize, m.ndim, len(m), m.nbytes
+
+      m = m.cast('b')
+      m.tolist()
+      m.format, m.itemsize, m.ndim, len(m), m.nbytes
+     #+END_SRC
+
+     #+RESULTS[801de728b7c0b43f5c7dd7636579f21eebd8e9ac]:
+    :
+    : >>> >>> >>> >>> [[[0, 1, 2], [3, 4, 5]], [[6, 7, 8], [9, 10, 11]]]
+    : ('i', 4, 3, 2, 48)
+    : >>> >>> [0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 7, 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 10, 0, 0, 0, 11, 0, 0, 0]
+    : ('b', 1, 1, 48, 48)
+
+     一维byte -> 二维unsigned long：
+
+     #+BEGIN_SRC python :session
+      import struct
+      buf = struct.pack('L' * 6, *list(range(6)))
+      m = memoryview(buf)
+      m.tolist()
+      len(m), m.ndim, m.nbytes
+
+      m = m.cast('L', shape=[2, 3])
+      m.tolist()
+      len(m), m.ndim, m.nbytes
+     #+END_SRC
+
+     #+RESULTS[082c13753ffb19c0ceec21b682d475f160264311]:
+    :
+    : >>> >>> [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0]
+    : (48, 1, 48)
+    : >>> >>> [[0, 1, 2], [3, 4, 5]]
+    : (2, 2, 48)
+
+*** 属性
+**** *obj*
+     返回被memoryview获取的对象：
+
+     #+BEGIN_SRC python :session
+       b = bytearray(b'zbc')
+       m = memoryview(b)
+       m.obj is b
+
+       memoryview(b'xyz').obj
+     #+END_SRC
+
+     #+RESULTS[e8e145a1eb99573865f7dcca4614b94265dbfb3a]:
+     :
+     : >>> True
+     : >>> b'xyz'
+
+**** *nbytes*
+     在内存中连续表示memoryview的byte数，不一定等于len(m)。
+
+     #+BEGIN_SRC python :session
+       from array import array
+
+       a = array('i', [1, 2, 3, 4, 5])
+       m = memoryview(a)
+
+       len(m), m.nbytes
+
+       y = m[::2]
+       len(y), y.nbytes
+
+       y.tobytes()
+     #+END_SRC
+
+     #+RESULTS[dcf44f7928f8ff2f83b659d50546e86360dc0cb6]:
+     :
+     : >>> >>> >>> >>> (5, 20)
+     : >>> >>> (3, 12)
+     : >>> b'\x01\x00\x00\x00\x03\x00\x00\x00\x05\x00\x00\x00'
+
+     多维：
+
+     #+BEGIN_SRC python :session
+       import struct
+
+       buf = struct.pack('b' * 12, *[x for x in range(97, 109)])
+       print(buf)
+
+       x = memoryview(buf)
+       y = x.cast('b', shape=[3, 4])
+       print(y.tolist())
+       print(y.ndim)
+       len(y), y.nbytes
+     #+END_SRC
+
+     #+RESULTS[fda5df420e910818a3e668615bf721ef294c26d7]:
+     :
+     : >>> >>> b'abcdefghijkl'
+     : >>> >>> >>> [[97, 98, 99, 100], [101, 102, 103, 104], [105, 106, 107, 108]]
+     : 2
+     : (3, 12)
+
+**** *readonly*
+     是否只读。即创建momeryview时的OBJ是否为immutable类型。
+
+     #+BEGIN_SRC python :session
+       from array import array
+
+       a = memoryview(b'abc')
+       b = memoryview(bytearray(b'abc'))
+       c = memoryview(array('B', [97, 98, 99]))
+
+       a.readonly, b.readonly, c.readonly
+     #+END_SRC
+
+     #+RESULTS[752b0e677dec3793eb7a3352b0f483d29a6f8454]:
+     :
+     : >>> >>> >>> >>> >>> (True, False, False)
+
+**** *format*
+     返回元素类型（对应struct模块中的格式字符）。
+
+     #+BEGIN_SRC python :session
+       import struct
+       from array import array
+
+       m = memoryview(b'abc')
+       m.format
+
+       m = memoryview(struct.pack('2s1i', b'ab', 1))
+       m.format
+
+       m = memoryview(array('i', [1, 2, 3]))
+       m.format
+     #+END_SRC
+
+     #+RESULTS[35cae04c64fec21b827ea057a0483ff5346fd42e]:
+     :
+     : >>> >>> >>> 'B'
+     : >>> >>> 'B'
+     : >>> >>> 'i'
+
+**** *itemsize*
+     单个元素所在内存大小。
+
+     #+BEGIN_SRC python :session
+       import array
+       import struct
+       m = memoryview(array.array('H', [1000, 2000, 3000]))
+       m.itemsize, m[0]
+       struct.calcsize('H') == m.itemsize
+     #+END_SRC
+
+     #+RESULTS[b03bc69847a105273e4595e1ec952dbb6fbcccd0]:
+     :
+     : >>> >>> (2, 1000)
+     : True
+
+**** *ndim*
+     返回整数，表示内存表示多维数组的维度。
+
+     #+BEGIN_SRC python :session
+       from array import array
+       import struct
+
+       m = memoryview(array('i'))
+       m.ndim
+
+       m = memoryview(b'abc')
+       m.ndim
+
+       m = m.cast('b', shape=[1, 3])
+       print(m.tolist())
+       m.ndim
+     #+END_SRC
+
+     #+RESULTS[3828428e9fae4bf68efd1b663161a9bcf509c8e4]:
+     :
+     : >>> >>> >>> 1
+     : >>> >>> 1
+     : >>> >>> [[97, 98, 99]]
+     : 2
+
+**** *shape*
+     返回元组，第一个元素为第一层元素个数，第二个元素为维度（如果>=2）。
+
+     #+BEGIN_SRC python :session
+       from array import array
+       import struct
+
+       m = memoryview(b'abc')
+       m.shape
+
+       m = memoryview(b'')
+       m.shape
+
+       buf = struct.pack('i' * 10, *[x for x in range(10)])
+
+       m = memoryview(buf)
+       m = m.cast('i', [5, 2])
+       print(m.tolist())
+       m.shape
+     #+END_SRC
+
+     #+RESULTS[c033c0c23dc254ebcc51e2002a25c82a4622bd05]:
+     :
+     : >>> >>> >>> (3,)
+     : >>> >>> (0,)
+     : >>> >>> >>> >>> >>> [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+     : (5, 2)
+
+**** *strides* ？？？
+     返回元组，第一个元素为第一层元素所在byte数，第二个元素为单个元素所
+     在byte数（当维度>=2时）。
+
+     #+BEGIN_SRC python :session
+       import struct
+       from array import array
+
+       m = memoryview(array('i', [1, 2, 3]))
+       m.strides
+
+       m = memoryview(struct.pack('i' * 6, *[x for x in range(6)]))
+
+       m = m.cast('i', shape=[2, 3])
+       print(m.tolist())
+       m.strides
+     #+END_SRC
+
+     #+RESULTS[ffd9ac7405caddf578da59410de45268d6155b97]:
+     :
+     : >>> >>> >>> (4,)
+     : >>> >>> >>> >>> [[0, 1, 2], [3, 4, 5]]
+     : (12, 4)
+
+**** *suboffets* ？？？
+
+     #+BEGIN_SRC python :session
+       import struct
+       import array
+
+       m = memoryview(b'abc')
+       m.suboffsets
+
+       m = memoryview(struct.pack('i' * 10, *list(range(10))))
+       m = m.cast('i', [5, 2])
+       m.suboffsets
+     #+END_SRC
+
+     #+RESULTS[39e91b8f6c0aded9dbc4ed2cab8f323e2d8a42fd]:
+     :
+     : >>> >>> >>> ()
+     : >>> >>> >>> ()
+
+**** *contiguous*
+
+     只要是“C形式连续”或“Fortran形式连续”则“连续”。维度为0的对象，即是C
+     形式连续，也是Fortran形式连续。一维数组中，每个元素需连续存储。在
+     多维数组中如果要访问单个元素，C形式连续的对象最后一个元素最快，
+     Fortran形式中，则是第一个元素最快。？？？
+
+     #+BEGIN_SRC python :session
+       import struct
+
+       m = memoryview(b'abc')
+       m.contiguous
+
+       # 多维
+       buf = struct.pack('b' * 12, *[x for x in range(12)])
+       m = memoryview(buf).cast('b', shape=[3, 4])
+       m.contiguous
+     #+END_SRC
+
+     #+RESULTS[94c1df69a64fe2d11466a46f29ecee366e449d30]:
+     :
+     : >>> >>> True
+     : >>> >>> ... >>> >>> True
+
+**** *c_contiguous*
+     是否是C形式连续。
+
+     #+BEGIN_SRC python :session
+       memoryview(b'abc').c_contiguous
+     #+END_SRC
+
+     #+RESULTS[d79b6ffa0d3f6e8fe1693e045559bc51e725c5c2]:
+     : True
+
+**** *f_contiguous*
+     是否是Fortran形式连续。
+
+     *？* ：为何相同数据，两种情况都为True。
+
+     #+BEGIN_SRC python :session
+       import struct
+
+       memoryview(b'abc').f_contiguous
+
+       s = struct.pack('lh0ll', 1, 2, 3)
+       memoryview(s).f_contiguous
+     #+END_SRC
+
+     #+RESULTS[ffddbd152879d78363c97c65f769b866a8fe5dab]:
+     :
+     : >>> True
+     : >>> >>> True
+
+* Set类型-set、frozenset
+  set对象为无序，没有重复的，“可哈希（hashable）对象”的集合。
+  
+  set对象的主要作用包括：元素包含测试，序列去重，数学集合操作，如交集、
+  并集、差集和对称差集。
+  
+  同其他集合一样，set支持'x in set'、'len(set)'和'for x in set'操作。
+  由于是无序序列，set不会记录元素插入时的位置和顺序。因此，也不支持索
+  引求值，截断和其他“类序列”操作。
+  
+  有两种内置set类型：set和frozenset。set类型为mutable，其中元素可通过
+  add()和remove()方法改变，由于为mutable，没有哈希值，不能作为字典的
+  key值和其他set的元素。frozenset类型为immutable，可求哈希值，创建后元
+  素不可改变；单可用于字典key值和其他set的元素。
+  
+  除set构造器外，非空set(不含frozenset)可通过字面量形式创建，
+  如'{'jack', 'sjoerd'}'。
+  
+  set和frozenset的用法完全相同。
+  
+** class *set* ([iterable])
+** class *frozenset* ([iterable])
+   返回新的set/frozenset，元素为ITERABLE中的元素（字典去重）。ITERABLE
+   中的元素须为“可哈希对象”。如果需将set作为元素，须为frozenset。如果
+   缺省ITERABLE，则返回新的空对象。
+
+   #+BEGIN_SRC python :session
+     l = [1, 2, 1, 2, 1, 2, 1, 2]
+     set(l), frozenset(l)
+     set(), frozenset()
+   #+END_SRC
+
+   #+RESULTS[63de2b9bfd88afbfff1170d3cb9f2aa4308cfaa8]:
+   :
+   : ({1, 2}, frozenset({1, 2}))
+   : (set(), frozenset())
+
+** set和frozenset通用操作
+*** *len(s)*
+    返回S中元素的个数。
 
     #+BEGIN_SRC python :session
-      m = memoryview(b'abc')
-      m[0]
-
-      m.release()
-      m[0]
+      len(set([1, 2, 3, 1, 2]))
     #+END_SRC
 
-    #+RESULTS[7c4a8ae52af4353ab2b74c136ff665998c69cc84]:
-    :
-    : 97
-    : >>> >>> Traceback (most recent call last):
-    :   File "<stdin>", line 1, in <module>
-    : ValueError: operation forbidden on released memoryview object
+    #+RESULTS[9613d60a78f5e5028ae3966f175a3ab4b8d231bd]:
+    : 3
 
-    使用context management protocol可得到相同效果，即操作完成后自动释
-    放：
+*** *x in s*
+    S中是否不含X。
 
     #+BEGIN_SRC python :session
-      with memoryview(b'abc') as m:
-          m[0]
-
-      m[0]
+      1 in set([1, 2, 1, 2])
+      10 in set([1, 2, 1, 2])
     #+END_SRC
 
-    #+RESULTS[6ae2b69926c4549141d0dd69f4eb917f046b7445]:
+    #+RESULTS[b9f55b0f64d4f744b27372a48ad374dd2f90d489]:
+    : True
+    : False
+
+*** *x not in s*
+    S中是否不含X。
+
+    #+BEGIN_SRC python :session
+      1 not in set([1, 2, 1, 2])
+      10 not in set([1, 2, 1, 2])
+    #+END_SRC
+
+    #+RESULTS[4fc9fa3c0766cb1ae25cb33b06e48e2c04171d83]:
+    : False
+    : True
+
+*** *isdisjoint* (other)
+    如果元素没有一个与OTHER中的元素相等，则返回True。即两者交集为空set
+    时返回True。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.isdisjoint([4, 5, 6])
+      s.isdisjoint(range(3))
+    #+END_SRC
+
+    #+RESULTS[296fc409f953f2ba90fd41059cf2b8e86ceb1d91]:
     :
-    : ... 97
+    : True
+    : False
+
+*** *issubset* (other)
+*** *set <= other*
+    如果所有元素都在OTHER中，则返回True。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.issubset(range(4))
+      s <= set(range(4))
+
+      s.issubset(range(2))
+      s <= set(range(2))
+    #+END_SRC
+
+    #+RESULTS[c5412fb90efe18e7f10db9b4f09e32ec3f6dcea7]:
+    :
+    : True
+    : True
+    : >>> False
+    : False
+*** *set < other*
+    是否为OTHER的子集，且差集为空。等价于set <= other and set != other。
+
+    #+BEGIN_SRC python :session
+      set(range(2)) < set(range(3))
+      set(range(2)) < set(range(2))
+    #+END_SRC
+
+    #+RESULTS[8d773d302f84fe8e78a9d3e8e6e3a2ee6adac4bd]:
+    : True
+    : False
+
+*** *issuperset* (other)
+*** *set >= other*
+    如果OTHER中的所有元素都有，则返回True。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.issuperset(range(1, 3))
+      s >= set(range(1, 3))
+
+      s.issuperset(range(3))
+      s >= set(range(3))
+    #+END_SRC
+
+    #+RESULTS[97353492929c65f232551911b3c6a5dec72082dc]:
+    :
+    : True
+    : True
+    : >>> False
+    : False
+
+*** *set > other*
+    等价于's >= other and s != other'
+
+    #+BEGIN_SRC python :session
+      set([1, 2, 3]) > set([1, 2, 3])
+      set([1, 2, 3]) > set([1, 2])
+    #+END_SRC
+
+    #+RESULTS[e01dcbef4f65620914ccf3c7252bddbc66534c7f]:
+    : False
+    : True
+
+*** *union* (*others)
+*** *set | other | ...*
+    返回新set，其中包含set和OTHERS中所有元素。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s1 = set(range(3))
+      s2 = set(range(3, 10))
+      s.union(s1, s2)
+      s | s1 | s2
+    #+END_SRC
+
+    #+RESULTS[1b782b943963bc7111700919974022dccbd63327]:
+    :
+    : >>> >>> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+    : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+*** *intersection* (*others)
+*** *set & other & ...*
+    返回新set，只含set和OTHERS中都有的元素。
+
+    #+BEGIN_SRC python :session
+      s = set(range(3))
+      s1 = set(range(2, 5))
+      s2 = set(range(2, 10))
+      s.intersection(s1, s2)
+      s & s1 & s2
+    #+END_SRC
+
+    #+RESULTS[49ae4ce78b4cbf10dc184cd20bab4b5037e19ed6]:
+    :
+    : >>> >>> {2}
+    : {2}
+
+*** *difference* (*others)
+*** *set - other - ...*
+    返回新set，只含set中有而OTHERS中没有的元素。
+
+    #+BEGIN_SRC python :session
+      s = set(range(3))
+      s1 = set(range(2, 5))
+      s2 = set(range(1, 5))
+
+      s.difference(s1, s2)
+      s - s1 - s2
+    #+END_SRC
+
+    #+RESULTS[c65fb9e62f01e71da0050bc1b84203c021d1bdb4]:
+    :
+    : >>> >>> >>> {0}
+    : {0}
+
+*** *symmetric_difference* (other)
+*** *set ^ other*
+    返回新set，去除两者都包含的元素。
+
+    #+BEGIN_SRC python :session
+      s1 = set(range(1, 5))
+      s2 = set(range(1, 10))
+
+      s1.symmetric_difference(s2)
+      s1 ^ s2
+    #+END_SRC
+
+    #+RESULTS[c3b212af11caa3361aa98501f02ceaed52bb3b4b]:
+    :
+    : >>> >>> {5, 6, 7, 8, 9}
+    : {5, 6, 7, 8, 9}
+
+*** *copy* ()
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3, (4, 5, 6)])
+      s1 = s.copy()
+
+      s1, s1 is s
+    #+END_SRC
+
+    #+RESULTS[4e5a92d18bebd6d69460a738698ae96f238884aa]:
+    :
+    : >>> >>> ({1, 2, 3, (4, 5, 6)}, False)
+
+    *注意* ：
+
+    - union、intersection、difference、symmetric_difference、issubset
+      和issupperset方法的参数只要是iterable类型即可。但对应的简写形式
+      则需也为set类型。尽量避免使用简写形式，如set('abc') & 'abc'；使
+      用更易读的全写形式，set('abc').intersection('abc')。
+    - set/frozenset支持相互比较。两个set互为子集则相等，A为B的超集则
+      A>B，A为B的子集则A<B。
+
+      #+BEGIN_SRC python :session
+        set([1, 2, 3]) == set([3, 2, 1])
+        set([1, 2, 3]) > set([1, 2])
+      #+END_SRC
+
+      #+RESULTS[b404bbafe937d8a38e47bdbef40fec0f32ec3790]:
+      : True
+      : True
+
+    - set与frozenset间的比较只考虑各自的元素。
+
+      #+BEGIN_SRC python :session
+         set('abc') == frozenset('abc')
+         set('abc') in set([frozenset('abc')])
+      #+END_SRC
+
+      #+RESULTS[89677d60a682dc2b1aa99bc0ef7d803459e38172]:
+      : True
+      : True
+
+    - 如果两个非空set交集为空集，则a<b、a==b、a>b都会返回False。
+
+      #+BEGIN_SRC python :session
+         s1 = set([1, 2, 3])
+         s2 = set([4, 5, 6])
+         s1 < s2, s1 == s2, s1 > s2
+      #+END_SRC
+
+    - 由于set只定义了集合关系，不能使用list.sort()方法操作set链表获得
+      正确值。
+
+      #+BEGIN_SRC python :session
+        l = [3, 2, 1]
+        l.sort()
+        print(l)
+
+        l = [set([1, 2]), set([3, 4]), set([4, 5])]
+        l.sort(reverse=True)
+        print(l)
+      #+END_SRC
+
+      #+RESULTS[a49c1f4784f0e33df5da49ac5645f14471d91358]:
+      :
+      : >>> [1, 2, 3]
+      : >>> >>> >>> [{1, 2}, {3, 4}, {4, 5}]
+
+    - 当二元操作符的操作对象一个为set，一个为frozenset时，返回结果与第
+      一个相同。
+
+      #+BEGIN_SRC python :session
+        set('ab') | frozenset('bc')
+        frozenset('ab') | set('bc')
+      #+END_SRC
+
+      #+RESULTS[2a165e4c07c3b514b14519f53e203de0296f27ab]:
+      : {'a', 'b', 'c'}
+      : frozenset({'a', 'b', 'c'})
+
+** 只有set有frozenset没有的操作
+*** *update* (*others)
+*** *set |= other | ...*
+    将OTHERS中的所有元素添加。
+
+    #+BEGIN_SRC python :session
+      s = set(range(3))
+      s1 = set(range(3, 6))
+      s2 = set(range(6, 10))
+
+      s.update(s1, s2)
+      # s |= s1 | s2
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[f2edb8a066b7e961c8638a70c4cc9d0f7963e40d]:
+    :
+    : >>> >>> >>> >>> ... {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+*** *intersection_update* (*others)
+*** *set &= other & ...*
+    将SET中的元素过滤为自身和OTHERS中都含有的元素。
+
+    #+BEGIN_SRC python :session
+      s = set(range(3))
+      s1 = set(range(2, 10))
+      s.intersection_update(s1)
+      # s &= s1
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[0108a6063f146cd253e6fbd143e80ac87bcb82da]:
+    :
+    : >>> >>> ... {2}
+
+*** *difference_update* (*others)
+*** *set -= other | ...*
+    去除自身出现在OTHERS中的元素。
+
+    #+BEGIN_SRC python :session
+      s = set(range(3))
+      s1 = set(range(2, 10))
+      s.difference_update(s1)
+      # s -= s1
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[254712a38f7ae21a3530e68b8f1972a869840d3f]:
+    :
+    : >>> >>> ... {0, 1}
+
+*** *symmetric_difference_update* (other)
+*** *set ^= other*
+    仅保留不同时在自身和OTHERS中的元素。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s1 = set([1, 2])
+      # s ^= s1
+      s.symmetric_difference_update(s1)
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[ebeff3199e76d1e178cf1be9cf008ebb8037df5d]:
+    :
+    : >>> ... >>> {3}
+
+*** *add* (elem)
+    在set中添加元素ELEM。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.add(4)
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[164d55787c9b6c38edeed4f9c86079add8772c2e]:
+    :
+    : >>> {1, 2, 3, 4}
+
+*** *remove* (elem)
+    删除set中的ELEM元素，如果ELEM不存在，则返回KeyError错误。
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.remove(1)
+      print(s)
+      s.remove(100)
+      print(s)
+    #+END_SRC
+
+    #+RESULTS[6c3012fb765127ce811241d0e9b21aa040430c08]:
+    :
+    : >>> {2, 3}
     : Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
-    : ValueError: operation forbidden on released memoryview object
+    : KeyError: 100
+    : {2, 3}
 
-*** *cast* (fromat[,shape]) ？？？
-*** *obj*
-    返回被memoryview获取的对象：
-
-    #+BEGIN_SRC python :session
-      b = bytearray(b'zbc')
-      m = memoryview(b)
-      m.obj is b
-    #+END_SRC
-
-    #+RESULTS[a1da99bfd44e22f7b96100bbb8c7519fb0d40436]:
-    :
-    : >>> True
-
-*** *nbytes*
-
-*** *readonly*
-*** *format*
+*** *discard* (elem)
+    当set中有ELEM元素时才移除。
 
     #+BEGIN_SRC python :session
-      m = memoryview(b'abc')
-      m.format
+      s = set([1, 2, 3])
+      s.discard(1)
+      print(s)
+      s.discard(100)
+      print(s)
     #+END_SRC
 
-    #+RESULTS[1c2ddcce241cc2a063c56a83cd24eb76af58955f]:
+    #+RESULTS[84cd8f9a6f002576bb1e6f6adebe66c814c46c7c]:
     :
-    : >>> 'B'
+    : >>> {2, 3}
+    : >>> {2, 3}
 
-*** *itemsize*
-*** *ndim*
-*** *shape*
-*** *strides*
-*** *suboffets*
-*** *c_contiguous*
-*** *f_contiguous*
-*** *contiguous*
-* Set类型-set、frozenset
-** class *set* ([iterable])：
-** class *frozenset* ([iterable])：
-** *len(s)* ：
-** *x in s* ：
-** *x not in s* ：
-** *isdisjont* (other)：
-** *issubset* (other)：
-** *set <= other* ：
-** *set < other* ：
-** *issuperset* (other)：
-** *set >= other* ：
-** *set > other* ：
-** *union* (*thers)：
-** *set | other | ...* ：
-** *intersection* (*others)：
-** *set & other & ...* ：
-** *difference* (*others)：
-** *set - other - ...* ：
-** *symmetric_difference* (other)：
-** *set ^ other* ：
-** *copy* ()：
-** *update* (*others)：
-** *set |= other | ...* ：
-** *intersection_update* (*others)：
-** *set &= other & ...* ：
-** *difference_update* (*others)：
-** *set -= other | ...* ：
-** *symmetric_difference_update* (other)：
-** *set ^= other* ：
-** *add* (elem)：
-** *remove* (elem)：
-** *discard* (elem)：
-** *pop* ()：
-** *clear* ()：
+*** *pop* ()
+    删除set中任意一个元素，返回删除元素。如果set为空，则返回KeyError错
+    误。
+
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      for i in range(4):
+          print(s.pop(), s)
+    #+END_SRC
+
+    #+RESULTS[5163984fb033f12492031e8f59c87773ac113ed9]:
+    :
+    : ... ... 1 {2, 3}
+    : 2 {3}
+    : 3 set()
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 2, in <module>
+    : KeyError: 'pop from an empty set'
+
+*** *clear* ()
+    清空set。
+    
+    #+BEGIN_SRC python :session
+      s = set([1, 2, 3])
+      s.clear()
+      print(s)
+    #+END_SRC
+    
+    #+RESULTS[adfb057e204c950a4bc0c63dab9c0d41ef46dd7c]:
+    :
+    : >>> set()
+    
+    *注意* ：
+    
+    - update、intersection_update、difference_update和
+      symmetric_difference_update方法可接受任意iterable类型作为参数。
+      
+    - __contains__()、remove()和discard()的参数可以是frozenset对象。为
+      做比较，在搜索和重置过程中ELEM为mutable形式。在搜索过程中不要读
+      取或改变此元素。
+      
 * Mapping类型-dict
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)

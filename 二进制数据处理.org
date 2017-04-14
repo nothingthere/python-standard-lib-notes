@@ -10,7 +10,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 ** 格式字符串（Format Strings）
    格式字符串用于限定打包（packing）和解包（unpacking）时的数据排布，
    由下面2小节的“Byte顺序、大小和对齐”和“格式字符”共同控制。
-
+   
 *** Byte顺序、大小和对齐
 
     默认情况下，C语言类型内存分布，由电脑本地的格式和byte顺序决定，并
@@ -77,7 +77,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** 格式字符
     下表为所有执行数据类型的格式字符。第二列C类型可见其类型，第4列标准
     为大小，当使用“<”、“>”、“=”或“!”时为本地大小（有当前主机决定）。
-
+    
     | 格式字符 | C类型              | Python类型         | 标准大小 | 注意点  |
     |----------+--------------------+--------------------+----------+---------|
     | x        | pad type           | no value           |          |         |
@@ -100,11 +100,11 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     | s        | char[]             | bytes              |          |         |
     | p        | char[]             | bytes              |          |         |
     | P        | void *             | integer            |          | (6)     |
-
+    
     注意点：
-
+    
     1. “?”对应C99中的_Bool类型。如果没有此类型，则相当于字符类型。在标
-       准模式下，总是用一个字节吧表示。
+       准模式下，总是用一个字节表示。
     2. 如果在本地模式下，仅当主机C编译器支持C的long long类型时才有效。
        标准模式下总是有效。
     3. 如果试图使用整型格式打包将非整型数据，如果该非整型数据
@@ -115,9 +115,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        binary64格式。
     6. “P”格式仅限于本地字节序模式（缺省第一个字符或为“@”）。struct模
        块不将其解释为本地字节序，所以无效？？？
-
+       
     其他注意点：
-
+    
     - 上表中的格式字符前可跟整数，指定重复数量，如“4h”等价于“hhhh”。
     - 格式字符串间的空格会被忽视，但指定重复的整数与其对应的格式字符间
       不能有空格。
@@ -126,7 +126,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       1-byte的字符串。打包时，字符串会根据指定格式truncted或padded；解
       包时，结果与指定的byte数相同。为与C语言保持一致，“0s”表示单个空
       字符串（“0c”表示0个字符）。
-
+      
       #+BEGIN_SRC python :session
       import struct
 
@@ -135,17 +135,17 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
       struct.unpack('3s', x)
       #+END_SRC
-
+      
       #+RESULTS[ffdf2ef6608e61a74473dca90a2c5cbf73d84377]:
       :
       : >>> >>> b'abA'
       : >>> (b'abA',)
-
+      
     - “s”与“p”的区别为：前者为C形式字符串，后者为Pascal形式字符串。
-
+      
     - 使用“?”格式字符时，打包结果只是0或1或标准布尔值，解包结果为True
       或False。
-
+      
       #+BEGIN_SRC python :session
       import struct
 
@@ -155,13 +155,13 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack('?', x)
       print(x)
       #+END_SRC
-
+      
       #+RESULTS[7cabf81697f5a2dfa9cf2e773bc9c50f5e9cd991]:
      :
      : >>> >>> b'\x01'
      : >>> (True,)
      : b'\x01'
-
+      
 ** 函数和Exceptions
 *** exception struct. *error*
     所有报错入口，其参数报错信息。
