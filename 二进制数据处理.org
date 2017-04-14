@@ -183,9 +183,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
 *** struct. *pack_into* (fmt,buffer,offset,v1,v2)
     将V1、V2...根据FMT写入BUFFER中，必须指定开始写入位置，即OFFSET参数。
-
+    
     *注意* ：BUFFER须为可读写的“类bytes对象”，如array.array和bytearray。
-
+    
     #+Begin_SRC python :session
       import struct
       from array import array
@@ -199,18 +199,18 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(b)
       print(a)
     #+END_SRC
-
+    
     #+RESULTS[857a048b2b5463576ece658fad95154e035792d2]:
     :
     : >>> >>> >>> >>> >>> >>> >>> >>> bytearray(b'\x00\x00\x00abc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
     : array('b', [97, 98, 99])
-
+    
 *** struct. *unpack* (fmt,buffer)
     根据FMT，将BUFFER（通过pack(FMT,..)打包的结果）解包。BUFFER中的
     byte数需与FMT指定相同。
-
+    
     返回结果即使只有单个值，也为元组。
-
+    
     #+BEGIN_SRC python :session
       import struct
 
@@ -218,16 +218,16 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       b = struct.pack(fmt, b'abc', 1, 2)
       struct.unpack(fmt, b)
     #+END_SRC
-
+    
     #+RESULTS[f97b5a2b81c314ebb3c2913890eb1e23796c7437]:
     :
     : >>> >>> >>> (b'abc', 1, 2)
-
+    
 *** struct. *unpack_from* (fmt,buffer,offset=0)
     从OFFSET开始，根据FMT将BUFFER解包。即时只有一个值，返回值也为元组。
-
+    
     BUFFER的byte数减去OFFSET须 >= FMT指定的长度。
-
+    
     #+BEGIN_SRC python :session
       import struct
 
@@ -235,12 +235,12 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(b)
       struct.unpack_from('2i', b, 4)
     #+END_SRC
-
+    
     #+RESULTS[e89ae04c0a016610c35203529dc29585978b4556]:
     :
     : >>> >>> b'abc\x00\x01\x00\x00\x00\x02\x00\x00\x00'
     : (1, 2)
-
+    
 *** struct. *iter_unpack* (fmt,buffer)
     根据FMT迭代解包BUFFER，直到BUFFER耗尽。返回iterator对象，其中每个
     元素为FMT指定形式组成的元组。
@@ -280,9 +280,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** class struct. *Struct* (fmt)
     返回根据FMT构建的Struct对象，永远读取二进制数据。由于创建Struct对
     象时会编译FMT字符串，调用对象上的方法较之对应的函数效率更快。
-
+    
     下面为Struct对象上的方法和属性：
-
+    
 **** *pack* (v1,v2...)
      等价于pack函数。len(result) == .size。
 
@@ -392,7 +392,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
 ** 举例
    整数基本打包和解包：
-
+   
    #+BEGIN_SRC python :session
      import struct
 
@@ -400,15 +400,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.unpack('=hhl', struct.pack('=hhl', 1, 2, 3))
      struct.calcsize('=hhl')
    #+END_SRC
-
+   
    #+RESULTS[89df059a5f59249c58b331dfee8fb2df05703867]:
    :
    : >>> b'\x01\x00\x02\x00\x03\x00\x00\x00'
    : (1, 2, 3)
    : 8
-
+   
    解包结果可赋值变量，或named元组：
-
+   
    #+BEGIN_SRC python :session
      import struct
      from collections import namedtuple
@@ -421,14 +421,14 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      Student = namedtuple('Student', 'name serialnum school gradelevel')
      Student._make(struct.unpack('<10sHHb', record))
    #+END_SRC
-
+   
    #+RESULTS[4ed9cd69c591f5d90fd668457238b325c2b93c17]:
    :
    : >>> >>> >>> >>> >>> b'raymond   ' 4658 264 8
    : >>> >>> Student(name=b'raymond   ', serialnum=4658, school=264, gradelevel=8)
-
+   
    由于需要padding，格式字符串的顺序会影响大小：
-
+   
    #+BEGIN_SRC python :session
      import struct
 
@@ -437,15 +437,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
      struct.calcsize('ci'), struct.calcsize('ic')
    #+END_SRC
-
+   
    #+RESULTS[03a0880639a62525e2c396b34d0adbe60734dbc7]:
    :
    : >>> b'*\x00\x00\x00\x15\x14\x13\x12'
    : b'\x15\x14\x13\x12*'
    : >>> (8, 5)
-
-   在本地大小和对其模式下，可在可行字符前添加数字0强制对齐：
-
+   
+   在本地大小和对齐模式下，可在可行字符前添加数字0强制对齐：
+   
    #+BEGIN_SRC python :session
      import struct
 
@@ -455,12 +455,12 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.pack('=llh0l', 1, 2, 3)
      struct.pack('=llh0l', 1, 2, 3)
    #+END_SRC
-
+   
    #+RESULTS[f3ddf8ee2f2f8987c367f73a155f85b9f2851a00]:
    :
    : >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
    : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
-
+   
 * codecs

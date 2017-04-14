@@ -3054,24 +3054,24 @@
 
 * Set类型-set、frozenset
   set对象为无序，没有重复的，“可哈希（hashable）对象”的集合。
-  
+
   set对象的主要作用包括：元素包含测试，序列去重，数学集合操作，如交集、
   并集、差集和对称差集。
-  
+
   同其他集合一样，set支持'x in set'、'len(set)'和'for x in set'操作。
   由于是无序序列，set不会记录元素插入时的位置和顺序。因此，也不支持索
   引求值，截断和其他“类序列”操作。
-  
+
   有两种内置set类型：set和frozenset。set类型为mutable，其中元素可通过
   add()和remove()方法改变，由于为mutable，没有哈希值，不能作为字典的
   key值和其他set的元素。frozenset类型为immutable，可求哈希值，创建后元
   素不可改变；单可用于字典key值和其他set的元素。
-  
+
   除set构造器外，非空set(不含frozenset)可通过字面量形式创建，
   如'{'jack', 'sjoerd'}'。
-  
+
   set和frozenset的用法完全相同。
-  
+
 ** class *set* ([iterable])
 ** class *frozenset* ([iterable])
    返回新的set/frozenset，元素为ITERABLE中的元素（字典去重）。ITERABLE
@@ -3486,52 +3486,467 @@
 
 *** *clear* ()
     清空set。
-    
+
     #+BEGIN_SRC python :session
       s = set([1, 2, 3])
       s.clear()
       print(s)
     #+END_SRC
-    
+
     #+RESULTS[adfb057e204c950a4bc0c63dab9c0d41ef46dd7c]:
     :
     : >>> set()
-    
+
     *注意* ：
-    
+
     - update、intersection_update、difference_update和
       symmetric_difference_update方法可接受任意iterable类型作为参数。
-      
+
     - __contains__()、remove()和discard()的参数可以是frozenset对象。为
       做比较，在搜索和重置过程中ELEM为mutable形式。在搜索过程中不要读
       取或改变此元素。
-      
-* Mapping类型-dict
+
+* 映射类型（Mapping）-dict
+  映射对象可将“可哈希值”映射到任意对象上。映射对象为mutable类型。目前
+  为止，Python只有一个标准的映射类型-字典（dict）。
+  
+  除“不可哈希”类型，即含链表，字典或其他mutable类型（比较时使用值比较，
+  而不是内存比较）外，都可用作字典的key值。当使用数数字作为key值时，使
+  用值比较，如1和1.0都可映射到同一值。（由于计算机存储浮点数实际上是存
+  储的近似值，所以最好不要用浮点数作为key值。）
+  
+  除dict构造器外，可使用使用字面量形式创建字典：
+  
+  #+BEGIN_SRC python :session
+    d = {'name': 'claudio', 'age': 18, 'gender': 'male'}
+  #+END_SRC
+  
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)
 ** class *dict* (iterable,**kwarg)
-** *len(d)*
-** *d[key]*
-** *d[key] = value*
-** *del d[key]*
-** *key in d*
-** *key not in d*
-** *iter(d)*
-** *clear* ()
-** *copy* ()
-** classmethod *fromkeys* (seq[,value])
-** *get* (key[,default])
-** *items* ()
-** *keys* ()
-** *pop* (key[,default])
-** *popitem* ()
-** *setdefault* [key[,default]]
-** *update* ([other])
-** *values* ()
+   根据可选参数和关键字参数返回新的字典对象。
+
+   - 如果没有参数，返回空字典。
+   - 如果只有一个参数：
+     - 如果为映射对象，则新生成字典与其有相同的键值对。
+     - 否则须为iterable类型，其每个元素须为有2个元素的iterable类型，第
+       一个元素成为key值，第二个元素成为value值。如果key值重复，则后面
+       出现的value值为最终值。
+   - 如果有关键字参数，则各个关键字参数成为字典的键值对。如果不是第一
+     个参数，则添加到第一个参数生成的字典后；如果key值有重复。则关键字
+     参数的值成为最终值。
+
+   为演示不同构建方法，下面每种方法都会生成相同的字典：
+
+   #+BEGIN_SRC python :session
+     a = dict(one=1, two=2, three=3)
+     b = {'one': 1, 'two': 2, 'three': 3}
+     c = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
+     d = dict([('two', 2), ('one', 1), ['three', 3]])
+     e = dict({'three': 3, 'two': 2, 'one': 1})
+
+     a == b == c == d == e
+   #+END_SRC
+
+   #+RESULTS[6e9e0b8dd1d9e321b87fc3c7593b320b1bf16d46]:
+   :
+   : >>> >>> >>> >>> >>> True
+
+** Dict类型支持的操作
+   下面为Dict类型支持的操作。（自定义映射类型也用该支持下面的操作）。
+
+*** *len(d)*
+    返回键值对个数。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      len(d)
+    #+END_SRC
+
+    #+RESULTS[2dd6e204a93d6a4c18875d24a72496b1993f0b53]:
+    :
+    : 3
+
+*** *d[key]*
+    返回KEY对应的值。如果KEY不存在，则返回KeyError错误。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d['a']
+      d['A']
+    #+END_SRC
+
+    #+RESULTS[45733b4152773b1781074b5e8ee2879873763b2d]:
+    :
+    : >>> 1
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : KeyError: 'A'
+
+    如果dict类型的子类定义了__missing__()方法，则调用d[key]时，如果key
+    不存在，则返回该方法的返回值，或返回该方法抛出的错误。
+
+    #+BEGIN_SRC python :session
+      class Counter(dict):
+          def __missing__(self, key):
+              return 0
+
+      c = Counter()
+      c['blue']
+
+      c['blue'] += 1
+      c['blue']
+    #+END_SRC
+
+    #+RESULTS[c032d9a3f092881b927acf8f4059538bae2dd136]:
+    :
+    : ... ... >>> >>> >>> 0
+    : >>> >>> 1
+
+*** *d[key] = value*
+    将KEY对应的值设置为VALUE。如果KEY不存在，则创建。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d['a'] = 10
+      print(d)
+
+      d['d'] = 4
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[44b9c50878a2e79a1caa96b4789ef906f885fb4f]:
+    :
+    : >>> >>> {'a': 10, 'b': 2, 'c': 3}
+    : >>> >>> {'a': 10, 'd': 4, 'b': 2, 'c': 3}
+
+*** *del d[key]*
+    将KEY对应的键值对删除，如果KEY不存在，则返回KeyError错误。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      del d['a']
+      print(d)
+
+      del d['A']
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[4a45e5f23fbd8a16de7b0cf40a4344995a3df46b]:
+    :
+    : >>> {'b': 2, 'c': 3}
+    : >>> Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : KeyError: 'A'
+    : {'b':    2, 'c': 3}
+
+*** *key in d*
+    KEY是否为D的key值。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      'a' in d, 'A' in d
+    #+END_SRC
+
+    #+RESULTS[25b6e0424eaf0dadeb034be74b0fe99793b3b262]:
+    :
+    : (True, False)
+
+*** *key not in d*
+    相当于not key in d。
+*** *iter(d)*
+    返回D的所有key值组成的iterator对象。实际上为iter(d.keys())的简写。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      i1 = iter(d)
+      i2 = iter(d.keys())
+      print(i1)
+      print(i2)
+
+      list(i1), list(i2)
+    #+END_SRC
+
+    #+RESULTS[d6188383cf7c13b8d003ace4ba2911f37c751ebd]:
+    :
+    : >>> >>> >>> <dict_keyiterator object at 0x7f84d7b7c4f8>
+    : <dict_keyiterator object at 0x7f84d7b7c278>
+    : >>> (['a', 'b', 'c'], ['a', 'b', 'c'])
+
+*** *clear* ()
+    情况所有内容。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d.clear()
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[a3a855600237f696408dde8bdde97452266395c3]:
+    :
+    : >>> >>> {}
+
+*** *copy* ()
+    返回“浅层复制”的字典。
+
+    #+BEGIN_SRC python :session
+      d = {'a': [1, 2, 3], 'b': (4, 5, 6)}
+      d1 = d.copy()
+      print(d1)
+
+      d1['a'].append(4)
+      print(d)
+      print(d1)
+    #+END_SRC
+
+    #+RESULTS[9ae101171c8349407999491bea80a1453e3641a4]:
+    :
+    : >>> {'a': [1, 2, 3], 'b': (4, 5, 6)}
+    : >>> >>> {'a': [1, 2, 3, 4], 'b': (4, 5, 6)}
+    : {'a':    [1, 2, 3, 4], 'b': (4, 5, 6)}
+
+*** classmethod *fromkeys* (seq[,value])
+    类方法，返回字典，SEQ中的各个元素成为key值，对应的值都为VALUE。
+
+    如果VALUE缺省，则所有值都为None。
+
+    #+BEGIN_SRC python :session
+      dict.fromkeys('abc')
+      dict.fromkeys('abc', [1, 2])
+    #+END_SRC
+
+    #+RESULTS[588fce7b98136278796dcb8a785a7460f8ae95b5]:
+    : {'a':    None, 'b': None, 'c': None}
+    : {'a':    [1, 2], 'b': [1, 2], 'c': [1, 2]}
+
+*** *get* (key[,default])
+    返回KEY对应的值，如果KEY不存在则返回DEFAULT对应的值。DEFAULT的默认
+    值为None，所以方法不会返回KeyError错误。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d.get('a')
+      d.get('A', 100)
+      print(d.get('A'))
+    #+END_SRC
+
+    #+RESULTS[a363d6b5554bbe048ab78a5eac4d82fddae856a4]:
+    :
+    : >>> 1
+    : 100
+    : None
+
+*** *items* ()
+    返回字典键值对组成的view对象。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      x = d.items()
+      print(x)
+      type(x)
+    #+END_SRC
+
+    #+RESULTS[9791e75308de1b93862e8f11df090906cdde07ae]:
+    :
+    : >>> >>> dict_items([('a', 1), ('b', 2), ('c', 3)])
+    : <class 'dict_items'>
+
+*** *keys* ()
+    返回字典所有key值组成的view对象。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      x = d.keys()
+      print(x)
+      type(x)
+    #+END_SRC
+
+    #+RESULTS[b568db3a6e2e98d1cefbb8ef59e351d3cb697144]:
+    :
+    : >>> dict_keys(['a', 'b', 'c'])
+    : <class 'dict_keys'>
+
+*** *pop* (key[,default])
+    将KEY对应的键值对从字典中移除，返回KEY对应的值。
+
+    如果KEY不存在，则返回DEFAULT；如果DEFAULT参数也缺省，则返回
+    KeyError错误。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d.pop('a')
+      d.pop('A', 100)
+      d.pop('A')
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[465a7cbdc4bde64f6c33e8e49a840c4a204f3746]:
+    :
+    : >>> 1
+    : 100
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : KeyError: 'A'
+    : {'b':    2, 'c': 3}
+
+*** *popitem* ()
+    删除任意键值对，返回被删除键值对组成的元组。如果字典为空，则返回
+    KeyError错误。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2}
+      d.popitem()
+      d.popitem()
+      d.popitem()
+    #+END_SRC
+
+    #+RESULTS[62eb195a939bab78d6c9e38f9730c3a8a3c24821]:
+    :
+    : ('a', 1)
+    : ('b', 2)
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : KeyError: 'popitem(): dictionary is empty'
+
+    此方法在结构历遍字典时非常有用（常用于集合算法）。？？？
+
+*** *setdefault* [key[,default]]
+    如果字典中有KEY，则返回其对应的值。如果无KEY，则添加此键值对，并返
+    回DEFAULT。DEFAULT的默认值为None。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d.setdefault('a', 100)
+      print(d)
+
+      d.setdefault('A', 100)
+      print(d)
+
+      d.setdefault('Z')
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[0b9d472cbcc5ca4b8ee81ecb674aae0ea3627983]:
+    :
+    : >>> 1
+    : {'a':    1, 'b': 2, 'c': 3}
+    : >>> 100
+    : {'a':    1, 'A': 100, 'b': 2, 'c': 3}
+    : >>> >>> {'a': 1, 'Z': None, 'A': 100, 'b': 2, 'c': 3}
+
+*** *update* ([other])
+    更新字典的键值对，覆盖已有键值对，返回值为None。
+
+    参数可为：
+
+    - 另一个字典
+    - iterable对象，需每个元素都含2个元素。
+    - 关键字参数。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      # 覆盖原来键值对
+      d.update(a=100)
+      print(d)
+      # 参数为字典
+      d.update({'e': 4, 'f': 5})
+      print(d)
+
+      # 参数为其他iterable对象
+      d.update([['g', 6], ('h', 7)])
+      print(d)
+
+      # 关键字参数
+      d.update(i=8, j=9)
+      print(d)
+    #+END_SRC
+
+    #+RESULTS[ab0db07d040c5d35425024ada5dfb2f01947d60f]:
+    :
+    : >>> ... >>> {'a': 100, 'b': 2, 'c': 3}
+    : ... >>> {'e': 4, 'a': 100, 'f': 5, 'b': 2, 'c': 3}
+    : >>> ... >>> {'g': 6, 'h': 7, 'a': 100, 'b': 2, 'e': 4, 'f': 5, 'c': 3}
+    : >>> ... >>> {'i': 8, 'g': 6, 'h': 7, 'a': 100, 'b': 2, 'j': 9, 'e': 4, 'f': 5, 'c': 3}
+
+*** *values* ()
+    返回所有值组成的view对象。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      d.values()
+    #+END_SRC
+
+    #+RESULTS[d819a119acea0fea8e041e5ef92f63edf875f5fe]:
+    :
+    : >>> dict_values([1, 2, 3])
+
 ** Dictionary View 对象
+   dict.keys()、dict.values()和dict.items()返回的对象都为 /view/ 对象。
+   当字典中的键值对发生变化时，他们的值也会随之变化。
+   
+   字典view对象支持历遍操作和包含测试：
+   
 *** *len(dictview)*
+    返回字典键值对个数，相当于len(d)。
+    
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      len(d.keys()), len(d)
+    #+END_SRC
+    
+    #+RESULTS[1c52c1299998cc326111eacbc9812cc38278d5c9]:
+    :
+    : (3, 3)
+    
 *** *iter(dictview)*
+    将keys、values、items生成的view类型转换为迭代对象。其中items转换成
+    的迭代对象中，各个键值对用元组表示。
+    
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+      ks = iter(d.keys())
+      vs = iter(d.values())
+      items = iter(d.items())
+
+      type(ks), type(vs), type(items)
+
+      for k in ks:
+          print(k)
+
+      for v in vs:
+          print(v)
+
+      for item in items:
+          print(item)
+    #+END_SRC
+    
+    #+RESULTS[0f20d8d0266efcb8e933b2dc9205c2802325ed76]:
+    #+begin_example
+    
+    >>> >>> >>> >>> (<class 'dict_keyiterator'>, <class 'dict_valueiterator'>, <class 'dict_itemiterator'>)
+    >>> ... ... a
+    b
+    c
+    ... ... 1
+    2
+    3
+    >>> ... ... ('a', 1)
+    ('b', 2)
+    ('c', 3)
+    #+end_example
+    
 *** *x in dictview*
+*** 举例
 * Context Manager 类型
 ** contextmanager. *__enter__* ()：
 ** contextmanager. *__exit__* (exc_type,exc_val,exc_tb)：

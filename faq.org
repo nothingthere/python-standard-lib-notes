@@ -43,3 +43,11 @@
    对象相互独立。
 
    可见，深层复制效率耕地。
+* 映射（Mapping）
+  映射（Mapping）类型为支持任意键值对查询的对象容器，具备Mapping或
+  MutableMapping abstract base类的方法。支持此功能的类型有：
+  
+  - dict
+  - collections.defaultdict
+  - collections.OrderDict
+  - collections.Counter

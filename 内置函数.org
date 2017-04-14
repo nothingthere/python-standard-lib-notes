@@ -518,9 +518,9 @@
 * *id* (object)
   返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
   如果两个对象的生命周期没有交集，可能相同。
-
+  
   *CPython实现中：*  此值为该对象的内存地址。
-
+  
   #+BEGIN_SRC python :session
     id(1)
     id(1)
@@ -529,14 +529,14 @@
     a = 1
     id(a)
   #+END_SRC
-
+  
   #+RESULTS[41942b13a487f866d820bb2b080cdbf025f18660]:
-  : 94640587853440
-  : 94640587853440
-  : 94640587853472
-  : '0x7f398c2b2110'
-  : >>> 94640587853440
-
+  : 93851494420096
+  : 93851494420096
+  : 93851494420128
+  : '0x7f84d841e110'
+  : >>> 93851494420096
+  
 * *input* ([prompt])
   如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
   输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
@@ -656,23 +656,34 @@
   range），也可为collection（如dictionary、set或frozen set）。
 
   #+BEGIN_SRC python :session
+    from array import array
+
     len('abc')
     len(b'abc')
+    len(bytearray(b'abc'))
     len((1, 2, 3))
     len([1, 2, 3])
     len(range(3))
     len({'a': 1, 'b': 2, 'c': 3})
     len({1, 2, 3})
+    len(memoryview(b'abc'))
+    len(array('i', [1, 2, 3]))
   #+END_SRC
 
-  #+RESULTS[65b89e8f4e5a336c1e4ef02c1b8ec7e4c3975a7d]:
-  : 3
-  : 3
-  : 3
-  : 3
-  : 3
-  : 3
-  : 3
+  #+RESULTS[291e26aaa1cda66e75509b8aed662d6abc153dc2]:
+  #+begin_example
+
+  >>> 3
+  3
+  3
+  3
+  3
+  3
+  3
+  3
+  3
+  3
+  #+end_example
 
 * class *list* ([iterable])
   list实际上是一个mutable sequence类型。
@@ -1358,7 +1369,7 @@
   将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
   那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator
   中每个tuple只有1个元素，如果无参数，则返回一个空的iterator。
-  
+
   #+BEGIN_SRC python :session
     l = [1, 2, 3, 4]
     t = ('a', 'b', 'c')
@@ -1369,15 +1380,15 @@
     print(list(zip(l)))
     print(list(zip()))
   #+END_SRC
-  
+
   #+RESULTS[c8a30348b76fcbcc5bd5093685909aff2476db0c]:
   :
   : >>> >>> <zip object at 0x7f1fe75acb88>
   : [(1, 'a'), (2, 'b'), (3, 'c')]
   : >>> [(1,), (2,), (3,), (4,)]
   : []
-  
+
 * *__import__* (name,globals=None,locals=None,formlist=(),level=0)
   代码中调用import时，相当于调用了此函数。
-  
+
   *注意* ：如importlib.import_module一样，日常写Python完全不需要。
