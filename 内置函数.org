@@ -80,7 +80,7 @@
 * *bin* (x)
   返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
   法__index__()：
-
+  
   #+BEGIN_SRC python :session
     class Test:
         def __init__(self, num):
@@ -91,7 +91,7 @@
     t = Test(2**10)
     bin(t.num)
     bin(-1024)
-  #+END_SRC
+  #+END_SR
 
   #+RESULTS[80c2c0951ac7490de33c293a4c1e8584250590a0]:
   :
@@ -518,9 +518,9 @@
 * *id* (object)
   返回表示该对象“身份”的整数。此整数在对象的整个生命周期内都独一无二。
   如果两个对象的生命周期没有交集，可能相同。
-  
+
   *CPython实现中：*  此值为该对象的内存地址。
-  
+
   #+BEGIN_SRC python :session
     id(1)
     id(1)
@@ -529,14 +529,14 @@
     a = 1
     id(a)
   #+END_SRC
-  
+
   #+RESULTS[41942b13a487f866d820bb2b080cdbf025f18660]:
   : 93851494420096
   : 93851494420096
   : 93851494420128
   : '0x7f84d841e110'
   : >>> 93851494420096
-  
+
 * *input* ([prompt])
   如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
   输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError

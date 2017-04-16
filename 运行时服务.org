@@ -1,0 +1,31 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-04-15 23:26:21
+# Commentary:
+#+TITLE: 运行时服务（Runtime Services）
+
+* sys - 系统参数和函数
+* sysconfig - 提供Python的配置信息
+* builtins - 内置对象
+* __main__ - 顶层脚本环境
+* warnings - 警告控制
+* contextlib - with语句上下文环境工具
+** 工具
+   工具和类。
+   
+*** @contextlib. *contextmanager*
+*** contextlib. *closing* (thing)
+*** contextlib. *suppress* (*exceptions)
+*** contextlib. *redirect_stdout* (new_target)
+*** contextlib. *redirect_stderr* (new_target)
+*** class contextlib. *ContextDecorator*
+    
+** 例子和指点
+** 单次使用、重复使用和和可重入的上下文管理器
+* abc - Abstract Base Classes
+* atexit - Exit处理
+* traceback - 打印或找回traceback
+* __future__ - 将要实现的语句定义
+* gc - 垃圾回收器接口
+* inspect - 检查正在活动的对象
+* sit - Site专用配置钩子
+* fpectl - 浮点数错误抛出控制

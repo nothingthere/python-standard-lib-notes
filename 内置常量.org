@@ -30,9 +30,11 @@
      import site
      dir(site)
      site.USER_BASE
+     site.PREFIXES
    #+END_SRC
    
-   #+RESULTS[87f3b8e21f5227d4b01272c9882003698f36d8cc]:
+   #+RESULTS[d5122fda78e1b264b7583787db966efe3237e041]:
    :
-   : ['CONFIG_LINE', 'ENABLE_USER_SITE', 'PREFIXES', 'USER_BASE', 'USER_SITE', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_init_pathinfo', '_script', '_sitebuiltins', 'abs_paths', 'addpackage', 'addsitedir', 'addsitepackages', 'addusersitepackages', 'aliasmbcs', 'builtins', 'check_enableusersite', 'enablerlcompleter', 'execsitecustomize', 'execusercustomize', 'getsitepackages', 'getuserbase', 'getusersitepackages', 'main', 'makepath', 'os', 'removeduppaths', 'setcopyright', 'sethelper', 'setquit', 'sys', 'venv']
+   : >>> ['CONFIG_LINE', 'ENABLE_USER_SITE', 'PREFIXES', 'USER_BASE', 'USER_SITE', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_init_pathinfo', '_script', '_sitebuiltins', 'abs_paths', 'addpackage', 'addsitedir', 'addsitepackages', 'addusersitepackages', 'aliasmbcs', 'builtins', 'check_enableusersite', 'enablerlcompleter', 'execsitecustomize', 'execusercustomize', 'getsitepackages', 'getuserbase', 'getusersitepackages', 'main', 'makepath', 'os', 'removeduppaths', 'setcopyright', 'sethelper', 'setquit', 'sys', 'venv']
    : '/home/claudio/.local'
+   : ['/usr', '/usr']

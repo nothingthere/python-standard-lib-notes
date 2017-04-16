@@ -81,10 +81,19 @@
 
 * 数字类型-int、float、complex
   一共有3种数字类型：整型、浮点型和复数。此外，布尔型是整型的子类型。
-  整型精度无限，浮点型通常与C中的double型精度相同（可使用
+  整型大小无限，浮点型通常与C中的double型精度相同（可使用
   sys.float_info变量查看）。复数分实部和虚部（都为浮点型），如果z为复
   数，则可使用z.real和z.image分别获取实部和虚部。数字后添加j或J可转变
   为虚数。
+
+  #+BEGIN_SRC python :session
+    import sys
+    sys.float_info
+  #+END_SRC
+
+  #+RESULTS[a67a42ba1e272f9459d008ec6d22f6d99c5e35e2]:
+  :
+  : sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
 
   Python支持不同的数字类型一起计算。多个类型一起计算时，“窄类型”转换
   为“宽类型”，整型比浮点型窄，浮点型比复数窄。数字之间的比较也使用相
@@ -125,7 +134,7 @@
         0
 	  #+END_EXAMPLE
 
-   2. 不适用于复数，而是使用abs()函数转换为浮点型。？？？
+   2. 不适用于复数，而是使用abs()复数转换为浮点型。？？？
 
    3. 将浮点型转换为整数时，同C一样会“舍入”。参考math.floor()和
       math.ceil()函数。
@@ -146,22 +155,22 @@
    | math.ceil(x)  | >=x 的最小整数                                        |
 
 ** 整数位运算
-	位运算只适用于整数。负数进行位运算时取反补码（以保证足够的bit防止
-	计算时溢出）。
+   位运算只适用于整数。负数进行位运算时取反补码（以保证足够的bit防止
+   计算时溢出）。
 
-	位运算操作符优先级高于比较运算符，低于算术运算符；~运算符与加减运
-	算符有相同优先级。
+   位运算操作符优先级高于比较运算符，低于算术运算符；~运算符与加减运
+   算符有相同优先级。
 
-	下表为优先级从低到高的的位运算符：
+   下表为优先级从低到高的的位运算符：
 
-    | 操作     | 结果 | 注意点 |
-    |----------+------+--------|
-    | x 竖线 y | 或   |        |
-    | x ^ y    | XOR  |        |
-    | x & y    | 和   |        |
-    | x << n   | 左移 | (1)(2) |
-    | x >> n   | 右移 | (1)(3) |
-    | ~x       | 取反 |        |
+   | 操作     | 结果 | 注意点 |
+   |----------+------+--------|
+   | x 竖线 y | 或   |        |
+   | x ^ y    | XOR  |        |
+   | x & y    | 和   |        |
+   | x << n   | 左移 | (1)(2) |
+   | x >> n   | 右移 | (1)(3) |
+   | ~x       | 取反 |        |
 
 	1. n为负数时返回ValueError错误
 	2. 位左移相当于没有溢出检查的乘以pow(2,n)
@@ -191,10 +200,88 @@
            return len(s)
 	#+END_SRC
 
-*** int. *to_bytes* (length,byteorder,*,signed=False)？？？
-*** clasmethod int *from_bytes* (bytes,byteorder,*,signed=False)？？？
+*** int. *to_bytes* (length,byteorder,*,signed=False)
+    返回用bytes类型表示的整数。
+
+    LENGTH为byte数量，应足够表示该整数，否则返回OverFlowError错误。
+
+    BYTEODER的取值可为littele或big，前者表示重要byte位于后面，后者表示
+    重要byte位于前面。可通过sys.byteorder获取本机相应值：
+
+    #+BEGIN_SRC python :session
+      import sys
+      sys.byteorder
+    #+END_SRC
+
+    #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
+    :
+    : 'little'
+
+    SIGNED参数的含义为是否采用补码（two's complement）方式表示负数。如
+    果为False，且整数为负数，则返回OverflowError。所以表示负数时SIGNED
+    应为True。SIGNED默认为False。
+
+    #+BEGIN_SRC python :session
+      (255).to_bytes(1, byteorder='big', signed=False)
+      (-1).to_bytes(2, byteorder='big', signed=True)
+      (-1).to_bytes(2, byteorder='big', signed=False)
+    #+END_SRC
+
+    #+RESULTS[f8e57b85a7bd068e03b704747c88c41d79387e1a]:
+    : b'\xff'
+    : b'\xff\xff'
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : OverflowError: can't convert negative int to unsigned
+
+    #+BEGIN_SRC python :session
+      (1024).to_bytes(2, byteorder='little')
+      (1024).to_bytes(2, byteorder='big')
+      (1024).to_bytes(8, byteorder='big')
+      (1024).to_bytes(10, byteorder='big')
+      (1024).to_bytes(16, byteorder='big')
+      (255).to_bytes(1, byteorder='big')
+      (256).to_bytes(1, byteorder='big')
+    #+END_SRC
+
+    #+RESULTS[3480bdad73607250c656f9be770a4630bcacd447]:
+    : b'\x00\x04'
+    : b'\x04\x00'
+    : b'\x00\x00\x00\x00\x00\x00\x04\x00'
+    : b'\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00'
+    : b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00'
+    : b'\xff'
+    : Traceback (most recent call last):
+    :   File "<stdin>", line 1, in <module>
+    : OverflowError: int too big to convert
+
+*** clasmethod int *from_bytes* (bytes,byteorder,*,signed=False)
+    BYTES参数须为“类bytes对象”，或生成bytes对象的可迭代对象。
+
+    BYTEORDER和SIGNED参数与to_bytes方法的用法相同。
+
+    #+BEGIN_SRC python :session
+      b = b'\x00\x10'
+
+      int.from_bytes(b, byteorder='big')
+      int.from_bytes(b, byteorder='little'), pow(2, 12)
+
+      b = b'\xfc\x00'
+      int.from_bytes(b, byteorder='big', signed=True)
+      int.from_bytes(b, byteorder='big', signed=False)
+    #+END_SRC
+
+    #+RESULTS[3fff88f467c24f0fb6eae00705d87950ba57e95a]:
+    :
+    : >>> 16
+    : (4096, 4096)
+    : >>> >>> -1024
+    : 64512
+
 ** 浮点型的额外方法
 *** float. *as_integer_ratio* ()
+    返回两个整数组成的元素，这两个整数的比率与原浮点数完全相同。如果为
+    负数，则分母为负数。
 
     #+BEGIN_SRC python :session
       (-0.2).as_integer_ratio()
@@ -206,14 +293,14 @@
     : (1, 1)
 
 *** float. *is_integer* ()
-
+    “看起来像整数”则返回True。
     #+BEGIN_SRC python :session
-      (-0.2).is_integer()
+      (-2.0).is_integer()
       (3.2).is_integer()
     #+END_SRC
 
-    #+RESULTS[4a065e04afa4e754ac4170314f2b848504579849]:
-    : False
+    #+RESULTS[18894a74b9b2eb36d7fe9951b2c9a4e0ebec73f5]:
+    : True
     : False
 
 *** float. *hex* ()
@@ -2544,8 +2631,8 @@
 
 *** 方法
 **** *__eq__* (exproter) ？？？
-
      只要ma.tolist() == mb.tolist，则ma == mb。
+
      #+BEGIN_SRC python :session
        from array import array
 
@@ -2726,21 +2813,18 @@
      一维unsigned char -> 一维char：
 
      #+BEGIN_SRC python :session
-      b = bytearray(b'abc')
-      m = memoryview(b)
-      m[0] = b'X'
+       b = bytearray(b'abc')
+       m = memoryview(b)
+       m[0] = b'X'
 
-      m1 = m.cast('c')
-      m1[0] = b'X'
-      print(b)
+       m1 = m.cast('c')
+       m1[0] = b'X'
+       print(b)
      #+END_SRC
 
-     #+RESULTS[d6ce75ecca0d2b0192031a8295fbdc5ec68e0d4b]:
-    :
-    : >>> Traceback (most recent call last):
-    :   File "<stdin>", line 1, in <module>
-    : TypeError: memoryview: invalid type for format 'B'
-    : >>> >>> >>> bytearray(b'Xbc')
+     #+RESULTS[0ce2002c9c7e4fa8a31f24a1ee2b8986f1c96034]:
+     :
+     : >>> ... >>> >>> >>> bytearray(b'Xbc')
 
      一维byte -> 三维int -> 一维signed char
      #+BEGIN_SRC python :session
@@ -2916,17 +3000,17 @@
        m = memoryview(b'abc')
        m.ndim
 
-       m = m.cast('b', shape=[1, 3])
+       m = m.cast('b', shape=[1, 1, 3])
        print(m.tolist())
        m.ndim
      #+END_SRC
 
-     #+RESULTS[3828428e9fae4bf68efd1b663161a9bcf509c8e4]:
+     #+RESULTS[ebd0e1ca3e2f93f1274acebb5c00e03a413fc89d]:
      :
      : >>> >>> >>> 1
      : >>> >>> 1
-     : >>> >>> [[97, 98, 99]]
-     : 2
+     : >>> >>> [[[97, 98, 99]]]
+     : 3
 
 **** *shape*
      返回元组，第一个元素为第一层元素个数，第二个元素为维度（如果>=2）。
@@ -2957,7 +3041,7 @@
      : (5, 2)
 
 **** *strides* ？？？
-     返回元组，第一个元素为第一层元素所在byte数，第二个元素为单个元素所
+     返回元组，第一个元素为第一层元素所有byte数，第二个元素为单个元素所
      在byte数（当维度>=2时）。
 
      #+BEGIN_SRC python :session
@@ -3074,7 +3158,7 @@
 
 ** class *set* ([iterable])
 ** class *frozenset* ([iterable])
-   返回新的set/frozenset，元素为ITERABLE中的元素（字典去重）。ITERABLE
+   返回新的set/frozenset，元素为ITERABLE中的元素（自动去重）。ITERABLE
    中的元素须为“可哈希对象”。如果需将set作为元素，须为frozenset。如果
    缺省ITERABLE，则返回新的空对象。
 
@@ -3131,10 +3215,10 @@
     #+BEGIN_SRC python :session
       s = set([1, 2, 3])
       s.isdisjoint([4, 5, 6])
-      s.isdisjoint(range(3))
+      s.isdisjoint(range(3, 10))
     #+END_SRC
 
-    #+RESULTS[296fc409f953f2ba90fd41059cf2b8e86ceb1d91]:
+    #+RESULTS[42a977d90f9d7485cdaaba926734b0b5d5d3f995]:
     :
     : True
     : False
@@ -3388,7 +3472,7 @@
 
 *** *difference_update* (*others)
 *** *set -= other | ...*
-    去除自身出现在OTHERS中的元素。
+    去除自身不在OTHERS中的元素。
 
     #+BEGIN_SRC python :session
       s = set(range(3))
@@ -3509,18 +3593,18 @@
 * 映射类型（Mapping）-dict
   映射对象可将“可哈希值”映射到任意对象上。映射对象为mutable类型。目前
   为止，Python只有一个标准的映射类型-字典（dict）。
-  
+
   除“不可哈希”类型，即含链表，字典或其他mutable类型（比较时使用值比较，
   而不是内存比较）外，都可用作字典的key值。当使用数数字作为key值时，使
   用值比较，如1和1.0都可映射到同一值。（由于计算机存储浮点数实际上是存
   储的近似值，所以最好不要用浮点数作为key值。）
-  
+
   除dict构造器外，可使用使用字面量形式创建字典：
-  
+
   #+BEGIN_SRC python :session
     d = {'name': 'claudio', 'age': 18, 'gender': 'male'}
   #+END_SRC
-  
+
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)
 ** class *dict* (iterable,**kwarg)
@@ -3677,7 +3761,7 @@
     : >>> (['a', 'b', 'c'], ['a', 'b', 'c'])
 
 *** *clear* ()
-    情况所有内容。
+    清空所有内容。
 
     #+BEGIN_SRC python :session
       d = {'a': 1, 'b': 2, 'c': 3}
@@ -3707,7 +3791,7 @@
     :
     : >>> {'a': [1, 2, 3], 'b': (4, 5, 6)}
     : >>> >>> {'a': [1, 2, 3, 4], 'b': (4, 5, 6)}
-    : {'a':    [1, 2, 3, 4], 'b': (4, 5, 6)}
+    : {'a': [1, 2, 3, 4], 'b': (4, 5, 6)}
 
 *** classmethod *fromkeys* (seq[,value])
     类方法，返回字典，SEQ中的各个元素成为key值，对应的值都为VALUE。
@@ -3837,10 +3921,10 @@
     #+RESULTS[0b9d472cbcc5ca4b8ee81ecb674aae0ea3627983]:
     :
     : >>> 1
-    : {'a':    1, 'b': 2, 'c': 3}
+    : {'a': 1, 'b': 2, 'c': 3}
     : >>> 100
-    : {'a':    1, 'A': 100, 'b': 2, 'c': 3}
-    : >>> >>> {'a': 1, 'Z': None, 'A': 100, 'b': 2, 'c': 3}
+    : {'A': 100, 'a': 1, 'b': 2, 'c': 3}
+    : >>> >>> {'A': 100, 'a': 1, 'b': 2, 'Z': None, 'c': 3}
 
 *** *update* ([other])
     更新字典的键值对，覆盖已有键值对，返回值为None。
@@ -3893,25 +3977,25 @@
 ** Dictionary View 对象
    dict.keys()、dict.values()和dict.items()返回的对象都为 /view/ 对象。
    当字典中的键值对发生变化时，他们的值也会随之变化。
-   
+
    字典view对象支持历遍操作和包含测试：
-   
+
 *** *len(dictview)*
     返回字典键值对个数，相当于len(d)。
-    
+
     #+BEGIN_SRC python :session
       d = {'a': 1, 'b': 2, 'c': 3}
       len(d.keys()), len(d)
     #+END_SRC
-    
+
     #+RESULTS[1c52c1299998cc326111eacbc9812cc38278d5c9]:
     :
     : (3, 3)
-    
+
 *** *iter(dictview)*
     将keys、values、items生成的view类型转换为迭代对象。其中items转换成
     的迭代对象中，各个键值对用元组表示。
-    
+
     #+BEGIN_SRC python :session
       d = {'a': 1, 'b': 2, 'c': 3}
       ks = iter(d.keys())
@@ -3929,10 +4013,10 @@
       for item in items:
           print(item)
     #+END_SRC
-    
+
     #+RESULTS[0f20d8d0266efcb8e933b2dc9205c2802325ed76]:
     #+begin_example
-    
+
     >>> >>> >>> >>> (<class 'dict_keyiterator'>, <class 'dict_valueiterator'>, <class 'dict_itemiterator'>)
     >>> ... ... a
     b
@@ -3944,9 +4028,105 @@
     ('b', 2)
     ('c', 3)
     #+end_example
-    
+
+    键和值的顺序并不是随机的，由Python实现、字典删除和插入历史决定。在
+    使用键和值组成的view时，如果字典本身没有改变，则两者每个元素一一对
+    应。即：
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'c': 3, 'b': 2}
+      pairs1 = zip(d.values(), d.keys())
+      pairs2 = [(v, k) for (v, k) in d.items()]
+      print(list(pairs1))
+      print(pairs2)
+    #+END_SRC
+
+    #+RESULTS[2bb1c2257851e413af4bb218c48ad49af77b7657]:
+    :
+    : >>> >>> [(1, 'a'), (2, 'b'), (3, 'c')]
+    : [('a', 1), ('b', 2), ('c', 3)]
+
+    历遍键和值组成的view对象时，如果向字典中添加或删除键值对，可能返回
+    RuntimeError错误，或不能历遍整个view。
+
 *** *x in dictview*
+    当X在字典的键、值或键值对组成的view中时返回True。最后一种情况X应为元组(key,
+    value)。
+
+    #+BEGIN_SRC python :session
+      d = {'a': 1, 'b': 2, 'c': 3}
+
+      'a' in d.keys()
+      1 in d.values()
+      ('a', 1) in d.items()
+    #+END_SRC
+
+    #+RESULTS[f88f0a059db876d9d14d7c767177772d4dcdf878]:
+    :
+    : >>> True
+    : True
+    : True
+
+*** 类似集合（set）的操作
+    由字典keys组成的view类似于set类型，因为每个元素的都不同，且“可哈希”。
+    如果所有的值都“可哈希”，则键值对组成的元组(key, value)也“可哈希”，
+    进一步则items组成的view可“可哈希”。对于“类set”形似的view对象，可使
+    用collections.abc.Set定义的所有操作，如==、<和>。
+
+    #+BEGIN_SRC python :session
+     d1 = {'a': 1, 'b': 2, 'c': 3}
+     d2 = {'b': 20, 'e': 30, 'f': 40}
+
+     d1.keys() & d2.keys()
+     d1.keys() | d2.keys()
+     d1.items() | d2.items()
+    #+END_SRC
+
+    #+RESULTS[6a6001bf76540a0898f4747c1cc87430addf38db]:
+   :
+   : >>> >>> {'b'}
+   : {'a', 'b', 'e', 'c', 'f'}
+   : {('c', 3), ('b', 2), ('b', 20), ('e', 30), ('a', 1), ('f', 40)}
+
 *** 举例
+
+    #+BEGIN_SRC python :session
+      dishes = {'eggs': 2, 'sausage': 1, 'bacon': 1, 'spam': 500}
+      keys = dishes.keys()
+      values = dishes.values()
+
+      # 历遍
+      n = 0
+      for val in values:
+          n += val
+
+      print(n)
+
+      # 键和值组成的view位置一一对应
+      list(keys)
+      list(values)
+
+      # view会根据原字典动态变化
+      del dishes['eggs']
+      del dishes['sausage']
+      list(keys)
+      list(values)
+
+      # 使用set的操作符
+      keys & {'eggs', 'bacon', 'salad'}
+      keys ^ {'sausage', 'juice'}
+    #+END_SRC
+
+    #+RESULTS[71beae3d361bc0a7947a9b2e6c22dd4274f544f8]:
+    :
+    : >>> >>> >>> ... >>> ... ... >>> 504
+    : >>> ... ['sausage', 'eggs', 'bacon', 'spam']
+    : [1, 2, 1, 500]
+    : >>> >>> ... >>> >>> ['bacon', 'spam']
+    : [1, 500]
+    : >>> ... {'bacon'}
+    : {'sausage', 'bacon', 'juice', 'spam'}
+
 * Context Manager 类型
 ** contextmanager. *__enter__* ()：
 ** contextmanager. *__exit__* (exc_type,exc_val,exc_tb)：
