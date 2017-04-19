@@ -1,0 +1,30 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-04-19 17:12:50
+# Commentary:
+#+TITLE: 进程通讯和网络协议
+
+* socket - 网络基础接口
+** Socket家族
+*** AF_UNIX
+*** AF_INET
+*** AF_NETLINK
+*** AF_CAN
+*** AF_BLUETOOTH
+** 模块内容
+*** 错误抛出（Exceptions）
+*** 常量
+*** 函数
+**** 创建socket的函数
+**** 其他函数
+** Socket对象
+** Socket超时
+*** 超时和连接方法
+** 举例
+* ssl - TLS/SSL socket对象封装
+* select - 等待I/O完成
+* selectors - 高级I/O多路传输
+* asyncio - 异步I/O、事件循环、携程和任务
+* asyncore - 异步socket处理器（handler）
+* asynchat - 异步socket命令/反馈处理器
+* signal - 为异步事件设置处理器
+* mmap - 文件内存映射支持

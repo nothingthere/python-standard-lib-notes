@@ -46,8 +46,38 @@
 * 映射（Mapping）
   映射（Mapping）类型为支持任意键值对查询的对象容器，具备Mapping或
   MutableMapping abstract base类的方法。支持此功能的类型有：
-  
+
   - dict
   - collections.defaultdict
   - collections.OrderDict
   - collections.Counter
+* 装饰器（decorator）
+  返回另外一个函数的函数。装饰器的常用场景为classmethod()和
+  staticmethod()。
+
+  装饰器仅仅是语法糖，下面两个例子在语义上完全相等：
+
+  #+BEGIN_SRC python :session
+    def f(...):
+        ...
+
+    f = staticmethod(f)
+
+    @staticmethod
+    def f(...):
+        ...
+  #+END_SRC
+
+  类中的方法定义同样可以使用装饰器，不过相对少用。
+* 生成器（generator）
+  返回“生成器迭代器”的函数。与普通函数看起来相同，使用含yield表达式，
+  用来生成一系列值。这些值可用在for循环语句或使用next()函数中，每次返
+  回一个其生成值。
+
+  通常称为“生成器函数”，也可称为“生成器迭代器”。
+
+* 生成器迭代器（generator iterator）
+  由生成器创建的对象。
+  
+  每一个yield语句会暂停函数进程，记住当前代码执行的位置(含局部变量和未
+  解决的try语句)。当yield语句执行完后，再次回到原来位置。？？？
