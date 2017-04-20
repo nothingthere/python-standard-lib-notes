@@ -175,7 +175,7 @@
 	1. n为负数时返回ValueError错误
 	2. 位左移相当于没有溢出检查的乘以pow(2,n)
 	3. 位右移相当于没有溢出检查的除以pow(2,n)
-
+       
 ** 整型的额外方法
 *** int. *bit_length* ()
 	返回以二进制表示整数的位数：
@@ -708,47 +708,47 @@
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
   可用下面方式表示：
-
+  
    - 单引号：'里面可用"双引号"'。
    - 双引号："里面可有'单引号'"。
    - 三引号：'''可以是三个单引号'''，"""也可以是三个双引号"""。
-
+     
    三引号表示的字符串可跨行书写，且保留换行符。
-
+   
    在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
    "eggs") == "spam eggs"。
-
+   
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
    值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
-
+   
    由于字符串本身为immutable，为保证效率，可拼接字符串时可使用
    str.join()和io.StringIO方法。
-
+   
    - class *str* (object='')
    - class *str* (object='', encoding='utf-8',errors='strict')
 	 返回object的字符串形式。如果无object参数，返回空字符串；否则，返
      回值由下面规则决定：
-
+     
 	 如果encoding和errors参数都没有，返回值实际上是object.__str__()方
      法的返回值。对于字符串对象，则是返回该字符串本身；如果
      object无__str__()方法，则是返回调用repr(object)函数的返回值。
-
+     
 	 如果encoding和errors中只要出现任意一个，object就须为类bytes对象
      （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
      bytes.decode(encoding, errors)。
-
+     
 	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
      正式"字符串：
-
+     
    #+BEGIN_SRC python :session
      str(b'Zoot')
      str(b'Zoot', encoding='utf-8')
    #+END_SRC
-
+   
    #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
    : "b'Zoot'"
    : 'Zoot'
-
+   
 ** 字符串方法
    字符串类型支持所有Sequence通用的操作，此外还支持下面列举的操作。
 

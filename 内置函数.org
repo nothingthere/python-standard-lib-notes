@@ -2,24 +2,24 @@
 
 * *abs* (x)
   返回绝对值，参数可为整数或浮点数，如果为复数，则返回虚部。
-
+  
   #+BEGIN_SRC python :session
     abs(1)
     abs(-1)
     abs(complex(1, 2))
     abs(100)
   #+END_SRC
-
+  
   #+RESULTS[078ae593c13bae192d6eb3dc53b0dde37465227f]:
   : 1
   : 1
   : 2.23606797749979
   : 100
-
-* *all* (/iterable/)
-  如果所有iterable的元素为true，则返回True。如果iterable为空，也返回
-  true。相当于：
-
+  
+* *all* (iterable)
+  如果所有ITERABLE的元素为True，则返回True。如果ITERABLE为空，也返回
+  True。相当于：
+  
   #+BEGIN_SRC python :session
     def all(iterable):
         for element in iterable:
@@ -41,7 +41,7 @@
   : True
 
 * *any* (iterable)
-  如果iterable中任何一个元素为true则返回True，如果为空则返回False。
+  如果ITERABLE中任何一个元素为true则返回True，如果为空则返回False。
 
   #+BEGIN_SRC python :session
     def any(iterable):
@@ -65,8 +65,8 @@
   : False
 
 * *ansii* (object)
-  同repr()含义一样，返回object的打印时的字符串。不同的是，会转义非
-  ascii码：
+  同repr()含义一样，返回OBJECT的打印时的字符串。不同的是，会转义非
+  ASCII码：
 
   #+BEGIN_SRC python :session
     repr("我")
@@ -78,9 +78,9 @@
   : "'\\u6211'"
 
 * *bin* (x)
-  返回整数x的二进制字符串。如果x不是整数(int)对象，则需为其定义方
+  返回整数x的二进制字符串。如果X不是整数(int)对象，则需为其定义方
   法__index__()：
-  
+
   #+BEGIN_SRC python :session
     class Test:
         def __init__(self, num):
@@ -120,15 +120,15 @@
   : False
   : False
   : False
-  
+
 * class *bytearray* ([source[,encoding[,errors]]])
   返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
   bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，
   以及绝大多数bytes具有的方法。
-
+  
   参数传递方式为：
-
-   - 如果为字符串，必须添加encoding参数（errors参数可选）；然后使用
+  
+   - 如果为字符串，必须添加ENCODING参数（ERRORS参数可选）；然后使用
      str.encoding()函数将字符串转换为bytes对象。
 
 	 #+BEGIN_SRC python :session
@@ -171,7 +171,7 @@
   参数传递方式同bytearray函数。
 * *callable* (object)
 
-  如果object可被调用，则返回True
+  如果OBJECT可被调用，则返回True
 
   #+BEGIN_SRC python :session
      def foo():
@@ -237,14 +237,14 @@
 * *dir* ([object])
   如果无参数，返回当前local scope中的name链表。如果有参数，则返回该对
   象的有效属性链表。
-
-  如果object有__dir__()方法，则返回该方法（必须以链表作为返回值）的返
+  
+  如果OBJECT有__dir__()方法，则返回该方法（必须以链表作为返回值）的返
   回链表值。可使用__getattr__()或__getattribute__()修饰dir()。
-
-  - 如果object是一个module对象，则返回该module的属性名链表。
-  - 如果object是类实例，则返回其本身的属性名，及递归到的父类属性名。
+  
+  - 如果OBJECT是一个module对象，则返回该module的属性名链表。
+  - 如果OBJECT是类实例，则返回其本身的属性名，及递归到的父类属性名。
   - 否则，为该object的属性名，加所属类的属性名，加递归到的父类属性名。
-
+    
   #+BEGIN_SRC python :session
     import struct
     dir(struct)
@@ -288,22 +288,20 @@
   果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通常
   为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
   都非常难接近a。
-
+  
   #+BEGIN_SRC python :session
-    10 // 3
-    10 % 3
+    10 // 3, 10 % 3
     divmod(10, 3)
     divmod(10.4, 3)
   #+END_SRC
-
-  #+RESULTS[9b8df55bbbbbb828235beda328b4671ea04edcde]:
-  : 3
-  : 1
+  
+  #+RESULTS[5708e0a49580a5907a4389a75b1d02e79ee42b53]:
+  : (3, 1)
   : (3, 1)
   : (3.0, 1.4000000000000004)
 
 * *enumerate* (iterable, start=0)
-  返回enumerate对象。参数iterable必须为sequence，或iterator，或其他支
+  返回enumerate对象。参数ITERABLE必须为sequence，或iterator，或其他支
   持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
   为索引（默认从0开始），第二个元素为原来对象的元素。
 
@@ -315,7 +313,7 @@
     for i in range(6):
         print(next(e, 'nothing'))
   #+END_SRC
-
+  
   #+RESULTS[1a5d100ebc67e86bbb239b5cc62441835a7b31be]:
   : [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Wintwer')]
   : [(10, 'Spring'), (11, 'Summer'), (12, 'Fall'), (13, 'Wintwer')]
@@ -339,10 +337,10 @@
 * *eval* (expression,globals=None,locals=None)？？？
 * *exec* (object[,globals[,locals]])？？？
 * *filter* (function,iterable)
-  返回按照function判断后iterable中元素为True的所有元素组成的iterator对
-  象。如果function为None，则包含iterable中自身为True的元素（如不含0）。
+  返回按照FUNCTION判断后ITERABLE中元素为True的所有元素组成的ITERATOR对
+  象。如果FUNCTION为None，则包含ITERABLE中自身为True的元素（如不含0）。
 
-  如果function不为None，则相当于(item for item in iterable if
+  FUNCTION不为None，则相当于(item for item in iterable if
   function(item))；如果function为None则相当于(item for item in
   iterable if item)。
 
@@ -353,12 +351,12 @@
     def even(x):
         return x % 2 == 0
 
-    list((i for i in nums if even(i)))
+    [i for i in nums if even(i)]
     list(filter(None, nums))
-    list((i for i in nums if i))
+    [i for i in nums if i]
   #+END_SRC
 
-  #+RESULTS[2cccfb97b9392936c087bbd9485d5b34711343e2]:
+  #+RESULTS[3b3dcecd28778124fa431a5c9ca409ba3d217476]:
   :
   : [1, 3, 5, 7, 9]
   : >>> ... ... >>> [0, 2, 4, 6, 8]
@@ -366,9 +364,9 @@
   : [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 * class *float* ([x])
-  返回x表示的浮点数，x可为数值或字符串。如果无参数，则返回0.0。
+  返回X表示的浮点数，X可为数值或字符串。如果无参数，则返回0.0。
 
-  如果x为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
+  如果X为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
   的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
   且可不区分大小写。
 
@@ -392,16 +390,16 @@
   : ValueError: could not convert string to float: '12三'
 
 * *format* (value[,format_spec])
-  按照format_spec将value格式转换为字符串。如果format_spec为空字符串，
+  按照FORMAT_SPEC将VALUE格式转换为字符串。如果FORMAT_SPEC为空字符串，
   则相当于str(value)：
-
+  
   #+BEGIN_SRC python :session
     format('me', '<30')
     format('me', '>30')
     format('me', '30')
     format('me', '')
   #+END_SRC
-
+  
   #+RESULTS[7d9f7695a2bcff1a8a6e257ea0de60fee4d33af3]:
   : 'me                            '
   : '                            me'
@@ -437,11 +435,11 @@
   在命令行查看帮助文档。如果不带参数，则进入帮助文档交互模式。如果为字
   符串，则显示对应的module、函数、类、方法、关键字或相关文档。如果参数
   为对象，则显示对应文档，如help(1)显示整型对应的帮助文档。
-
+  
   #+BEGIN_SRC python :session
      help('None')
   #+END_SRC
-
+  
   #+RESULTS[03660dd42543bc8ef9a78feadea965279d7ead6b]:
   #+begin_example python
   Help on NoneType object:
@@ -458,7 +456,7 @@
    |  __repr__(self, /)
    |      Return repr(self).
   #+end_example
-
+  
 * *hash* (object)
   返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
   较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
@@ -498,7 +496,7 @@
   #+RESULTS[fbfef14bc4a0f7b843a2e503a80dcf79f29a24c8]:
   : '0xff'
   : '-0x18'
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : TypeError: 'str' object cannot be interpreted as an integer
 
@@ -538,17 +536,17 @@
   : >>> 93851494420096
 
 * *input* ([prompt])
-  如果有prompt字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
+  如果有PROMPT字符串，则输出到标准输出流（不换行）。此函数读取 *一行*
   输入，将其转换为字符串并去除换行符。如果输入值为EOF，则返回EOFError
   错误。
-
+  
   #+BEGIN_EXAMPLE python
     >>> s = input('---> ')
     ---> hello world
     >>> s
     'hello world'
   #+END_EXAMPLE
-
+  
 * class *int* (x=0)
 * class *int* (x, base=10)
   返回x（可为数字和字符串）表示的数字。如果没有参数，返回0；如果x为数
@@ -1230,13 +1228,15 @@
             return a
 
     c = C
+    C().f(1)
     C.f(1)
     c.f(1)
   #+END_SRC
 
-  #+RESULTS[e82424bfb3649a459a871840d116e5c5a8f533a7]:
+  #+RESULTS[443a8b3f94fdda9cdb8635a5344b3e6a6a7f5c13]:
   :
   : ... ... ... >>> >>> >>> 1
+  : 1
   : 1
 
   可在实例中调用（C().f()），也可在类上调用（C.f()）。
@@ -1248,32 +1248,32 @@
   具体用法参考[[file:%E5%86%85%E7%BD%AE%E7%B1%BB%E5%9E%8B.org][ 内置类型]] 中字符串的专门章节。
 * *sum* (iterable[,start])
   将start与iterable中的每个元素从左到右相加，返回总和。iterable中的元
-  素通畅为数字，start的值不允许为字符串。
-
+  素通常为数字，start的值不允许为字符串。
+  
   #+BEGIN_SRC python :session
     sum([1, 2, 3])
     sum([1, 2, 3], 100)
   #+END_SRC
-
+  
   #+RESULTS[4547939e97d7ecd5c2157937a72316ead272e58a]:
   : 6
   : 106
-
+  
   对于非数值计算，下面几个函数对特定情况效率更高：
-
+  
    - ''.join(sequence)：拼接字符串。
-
+     
    #+BEGIN_SRC python :session
      l = ['a', 'b', 'c']
      '|'.join(l)
    #+END_SRC
-
+   
    #+RESULTS[76a1ced480bffb460fe5a86dd76b78447b151bde]:
    :
    : 'a|b|c'
-
+   
    - math.fsum()：求浮点数和，且保留精度。
-
+     
    #+BEGIN_SRC python :session
      floats = [10 / 3, 10 / 7, 10 / 9]
      sum(floats)
@@ -1281,14 +1281,14 @@
      import math
      math.fsum(floats)
    #+END_SRC
-
+   
    #+RESULTS[ccbb2dc630f640f9a1073f19ab9cd8a18d4e7191]:
    :
    : 5.8730158730158735
    : >>> >>> 5.8730158730158735
-
+   
    - itertools.chain()：拼接多个iterable。
-
+     
 * *super* ([type[,object-or-type]])
 
   #+BEGIN_SRC python :session

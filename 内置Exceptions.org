@@ -1,1 +1,384 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-04-20 11:55:45
+# Commentary:
 #+TITLE: 内置Exceptions
+
+* 基础类
+** exception *BaseException*
+*** *args*
+*** *with_traceback* (tb)
+** exception *Exception*
+** exception *ArithmeticError*
+** exception *BufferError*
+** exception *LookupError*
+* 特定Exception
+** exception *AssertionError*
+   当assert语句返回False时抛出：
+
+   #+BEGIN_SRC python :session
+     assert 1 == 1
+     assert 1 == 0
+   #+END_SRC
+
+   #+RESULTS[910303b204f68612c4fcdc1b06d2eedd1e752656]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : AssertionError
+
+** exception *AttributeError*
+   当属性获取/赋值失败时抛出。
+
+   #+BEGIN_SRC python :session
+     s = 'abc'
+     s.x = 1
+   #+END_SRC
+
+   #+RESULTS[1f59b8de4c7048a6d5f410b38ea49b6d442160b2]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : AttributeError: 'str' object has no attribute 'x'
+
+   当对象不支持属性获取/赋值时返回TypeError错误。
+
+** exception *EOFError*
+   当input()函数还没读取到任何数据就遇到EOF时抛出。
+** exception *FloatingPointError*
+   当操作浮点数失败时抛出。只有当Python命令使用--with-fpectl选项，或
+   pyconfig.h中定义WANT_SIGFPE_HANDLER时抛出。
+
+** exception *GeneratorExit*
+   当generator或coroutine对象关闭后抛出。
+
+   直接继承于BaseException，而不是Exception。技术层面上讲者并不是一个error。
+
+** exception *ImportError*
+   当模块或模块中不存在属性/方法时抛出。
+   #+BEGIN_SRC python :session
+     import xyz
+     from contextlib import xyz
+   #+END_SRC
+
+   #+RESULTS[1de671e6db02b57472dc3ea7dad8b62e4f5d1187]:
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : ImportError: No module named 'xyz'
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : ImportError: cannot import name 'xyz'
+
+** exception *IndexError*
+   当索引超过范围是抛出。
+
+   截断时，会自动规范索引范围。
+
+   如果索引为非数字，则抛出TypeError错误。
+
+   #+BEGIN_SRC python :session
+     l = [1, 2, 3]
+     l[100]
+     l[:100]
+     l['i']
+   #+END_SRC
+
+   #+RESULTS[d62803316e3469facf295738158b3b1c62a162eb]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : IndexError: list index out of range
+   : [1, 2, 3]
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : TypeError: list indices must be integers or slices, not str
+
+** exception *KeyError*
+   当映射对象（字典）的key不存在时抛出。
+
+   #+BEGIN_SRC python :session
+     d = {'a': 1, 'b': 2}
+     d['abc']
+   #+END_SRC
+
+   #+RESULTS[3ab45dde06357329ebbc6d0f183f26c61f918543]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : KeyError: 'abc'
+
+** exception *KeybordInterrupt*
+   用户在执行程序时使用手动强制结束程序（C-c或Delete）时抛出。
+
+** exception *MemoryError*
+   当耗尽内存时抛出。
+** exception *NameError*
+   当本地或全局变量不存在时抛出。
+
+   #+BEGIN_SRC python :session
+     print(nothing)
+   #+END_SRC
+
+   #+RESULTS[1bee6bdc31025c427bcc8faa0861d054e7ef5958]:
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : NameError: name 'nothing' is not defined
+
+** exception *NotImplementedError*
+   继承自RuntimeError。在自定义的基础类中，抽象方法如需集成类重置此方
+   法，则需抛出此错误。
+
+** exception *OSError* ([arg])
+** exception *OSError* (errno,strerror[,filename[,winerror[,finename2]]])
+*** *errno*
+*** *winerror*
+*** *strerror*
+*** *filename*
+*** *filename2*
+** exception *OverflowError*
+   当数值过大不能表示时抛出。
+   #+BEGIN_SRC python :session
+     from array import array
+     array('b', [1111111111111])
+   #+END_SRC
+
+   #+RESULTS[9cf095ae4df769b3b2c43b3b3c59e3373b084ae7]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : OverflowError: signed short integer is greater than maximum
+
+** exception *RecursionError*
+
+   #+BEGIN_SRC python :eval never
+     import sys
+
+     sys.getrecursionlimit()
+
+     def test():
+         test()
+
+     test()
+   #+END_SRC
+
+   #+RESULTS[ef190f92a0eae7db4a0fae756f8af5d1710eabc0]:
+   #+begin_example
+     >>> 1000
+     >>> >>> ... ... >>> >>> Traceback (most recent call last):
+       File "<stdin>", line 1, in <module>
+       File "<stdin>", line 2, in test
+       File "<stdin>", line 2, in test
+       .......
+     RecursionError: maximum recursion depth exceeded
+   #+end_example
+
+** exception *ReferenceError* ？？？
+** exception *RuntimeError*
+   所有不明错误，都使用此此抛出。
+** exception *StopIteration*
+   由内置next函数和迭代器的__next__方法抛出，表示不能再从迭代器中获取
+   元素。
+
+   #+BEGIN_SRC python :session
+     l = iter([])
+     next(l)
+   #+END_SRC
+
+   #+RESULTS[dc0cacb13f3c7bd62498b120655cb8ef0ca2009f]:
+   :
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : StopIteration
+
+** exception *StopAsyncIteration* ？？？
+** exception *SyntaxError*
+   当解析器遇到语法错误时抛出。
+
+   #+BEGIN_SRC python :session
+     a =
+   #+END_SRC
+
+   #+RESULTS[9c0ff12f58058f438841251aaa454b3f54b60c57]:
+   : File "<stdin>", line 1
+   :     a =
+   :       ^
+   : SyntaxError: invalid syntax
+
+** exception *IndentationError*
+   代码缩进不正确时抛出，为SyntaxError的子类。
+
+   #+BEGIN_SRC python :session
+     a = 1
+         b = 1
+   #+END_SRC
+
+   #+RESULTS[dc8a2e99cb0beb0adb12ff94b9bae2b0dfed510b]:
+   :
+   : File "<stdin>", line 1
+   :     b = 1
+   :     ^
+   : IndentationError: unexpected indent
+
+** exception *TabError*
+   空格和tab混用时抛出。为IndentationError的子类。
+
+** exception *SystemError*
+** exception *SystemExit*
+*** *code*
+** exception *TypeError*
+   类型不正确时抛出。
+
+   #+BEGIN_SRC python :session
+     bytes('abc')
+   #+END_SRC
+
+   #+RESULTS[dabe16d72ebe0f25a11acb90aa38b48695e68857]:
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : TypeError: string argument without an encoding
+
+** exception *UnboundLocalError*
+   当在函数或方法中使用某变量，但该变量还没被赋予任何值时抛出。为
+   NameError的子类。
+
+** exception *UnicodeError*
+*** *encoding*
+*** *reason*
+*** *object*
+*** *start*
+*** *end*
+** exception *UnicodeEncodeError*
+** exception *UnicodeDecondeError*
+** exception *UnicodeTranslateError*
+** exception *ValueError*
+   当内置操作符或函数接受参数，其类型正确，但值不正确时抛出：
+
+   #+BEGIN_SRC python :session
+     from array import array
+
+     array('Z', [])
+   #+END_SRC
+
+   #+RESULTS[02d496fb5043732fa5f87064a456c9b15d013830]:
+   :
+   : >>> Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : ValueError: bad typecode (must be b, B, u, h, H, i, I, l, L, q, Q, f or d)
+
+** exception *ZeroDivisionError*
+   当使用0作为被除数，或用0作为模底时抛出。
+
+   #+BEGIN_SRC python :session
+     1 / 0
+     1 % 0
+   #+END_SRC
+
+   #+RESULTS[7b21a29e9b570c5362d43b3b0c444438b40cbe5d]:
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : ZeroDivisionError: division by zero
+   : Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : ZeroDivisionError: integer division or modulo by zero
+
+** exception *EnvironmentError*
+** exception *IOError*
+** exception *WindosError*
+   上面3个错误仅存在于Window系统中。
+
+** OS Exceptions
+*** exception *BlockingIOError*
+**** *characters_written*
+*** exception *ChildProcessError*
+*** exception *ConnectionError*
+*** exception *BrokenPipeError*
+*** exception *ConnectionAbortedError*
+*** exception *ConnectionRefeusedError*
+*** exception *ConnectionResetError*
+*** exception *FileExitsError*
+*** exception *FileNotFoundError*
+*** exception *InterruptedError*
+*** exception *IsADirectoryError*
+*** exception *NotADirectoryError*
+*** exception *PermissionError*
+*** exception *ProcessLookupError*
+*** exception *TimeoutError*
+
+* Warnings
+** exception *Waring*
+** exception *UserWarning*
+** exception *DeprecationWarning*
+** exception *PendingDeprecationWarning*
+** exception *SyntaxWarning*
+** exception *RuntimeWarning*
+** exception *FutureWarning*
+** exception *ImportWarning*
+** exception *UnicodeWarning*
+** exception *BytesWarning*
+** exception *ResourceWarnig*
+* Exception结构层次
+  
+  #+BEGIN_EXAMPLE
+    BaseException
+     +-- SystemExit
+     +-- KeyboardInterrupt
+     +-- GeneratorExit
+     +-- Exception
+          +-- StopIteration
+          +-- StopAsyncIteration
+          +-- ArithmeticError
+          |    +-- FloatingPointError
+          |    +-- OverflowError
+          |    +-- ZeroDivisionError
+          +-- AssertionError
+          +-- AttributeError
+          +-- BufferError
+          +-- EOFError
+          +-- ImportError
+          +-- LookupError
+          |    +-- IndexError
+          |    +-- KeyError
+          +-- MemoryError
+          +-- NameError
+          |    +-- UnboundLocalError
+          +-- OSError
+          |    +-- BlockingIOError
+          |    +-- ChildProcessError
+          |    +-- ConnectionError
+          |    |    +-- BrokenPipeError
+          |    |    +-- ConnectionAbortedError
+          |    |    +-- ConnectionRefusedError
+          |    |    +-- ConnectionResetError
+          |    +-- FileExistsError
+          |    +-- FileNotFoundError
+          |    +-- InterruptedError
+          |    +-- IsADirectoryError
+          |    +-- NotADirectoryError
+          |    +-- PermissionError
+          |    +-- ProcessLookupError
+          |    +-- TimeoutError
+          +-- ReferenceError
+          +-- RuntimeError
+          |    +-- NotImplementedError
+          |    +-- RecursionError
+          +-- SyntaxError
+          |    +-- IndentationError
+          |         +-- TabError
+          +-- SystemError
+          +-- TypeError
+          +-- ValueError
+          |    +-- UnicodeError
+          |         +-- UnicodeDecodeError
+          |         +-- UnicodeEncodeError
+          |         +-- UnicodeTranslateError
+          +-- Warning
+               +-- DeprecationWarning
+               +-- PendingDeprecationWarning
+               +-- RuntimeWarning
+               +-- SyntaxWarning
+               +-- UserWarning
+               +-- FutureWarning
+               +-- ImportWarning
+               +-- UnicodeWarning
+               +-- BytesWarning
+               +-- ResourceWarning
+  #+END_EXAMPLE
