@@ -111,7 +111,7 @@
     bool({})
     bool(())
   #+END_SRC
-
+  
   #+RESULTS[8e8b067dc176e346ddca2b7ea81a3c30504a6503]:
   : False
   : False
@@ -120,7 +120,7 @@
   : False
   : False
   : False
-
+  
 * class *bytearray* ([source[,encoding[,errors]]])
   返回一个全新的byes对象，元素为取值范围为0<=x<256的mutable序列。
   bytearray是mutable版本的bytes，具有所有mutable类型序列通有的方法，

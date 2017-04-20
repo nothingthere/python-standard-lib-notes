@@ -328,10 +328,10 @@
 ** 常用的Sequence操作符
    下表的操作对mutable和immutable都有效。其中s和t都是类型相同的
    Sequence，n、i和j都是整数索引，x？
-   
+
    整个表中的优先级递增。in和not in具有相同的优先级，+和*的优先级同用
    于数字运算一样。
-   
+
    | 操作符               | 结果                               | 注意点 |
    |----------------------+------------------------------------+--------|
    | x in s               | 如果x与s中某个元素equal，返回True  | (1)    |
@@ -346,21 +346,21 @@
    | max(s)               | s中最大的元素                      |        |
    | s.index[x[, i[, j]]] | s中第一个x的索引（索引i后，j前）   | (8)    |
    | s.count(x)           | s中x的个数                         |        |
-   
+
    同类型的sequence可做比较。比如链表和元组，为逐个比较其中的元素。即
    两个Sequence相等，则需对应位置的元素相等，且类型相同，长度相等：
-   
+
    #+BEGIN_SRC python :session
      [1, 2, 3] == [1, 2, 3]
      [1, 2, 3] == (1, 2, 3)
    #+END_SRC
-   
+
    #+RESULTS[53ca1bdf37af220736955e12a718c6509d8f0c06]:
    : True
    : False
-   
+
    注意点：
-   
+
 	1. in和not in通常用来判断是否包含某元素，不过一些特殊的Sequence，
        如str、bytes和bytearray也可同样使用：
 
@@ -708,47 +708,47 @@
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
   可用下面方式表示：
-  
+
    - 单引号：'里面可用"双引号"'。
    - 双引号："里面可有'单引号'"。
    - 三引号：'''可以是三个单引号'''，"""也可以是三个双引号"""。
-     
+
    三引号表示的字符串可跨行书写，且保留换行符。
-   
+
    在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
    "eggs") == "spam eggs"。
-   
+
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
    值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
-   
+
    由于字符串本身为immutable，为保证效率，可拼接字符串时可使用
    str.join()和io.StringIO方法。
-   
+
    - class *str* (object='')
    - class *str* (object='', encoding='utf-8',errors='strict')
 	 返回object的字符串形式。如果无object参数，返回空字符串；否则，返
      回值由下面规则决定：
-     
+
 	 如果encoding和errors参数都没有，返回值实际上是object.__str__()方
      法的返回值。对于字符串对象，则是返回该字符串本身；如果
      object无__str__()方法，则是返回调用repr(object)函数的返回值。
-     
+
 	 如果encoding和errors中只要出现任意一个，object就须为类bytes对象
      （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
      bytes.decode(encoding, errors)。
-     
+
 	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
      正式"字符串：
-     
+
    #+BEGIN_SRC python :session
      str(b'Zoot')
      str(b'Zoot', encoding='utf-8')
    #+END_SRC
-   
+
    #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
    : "b'Zoot'"
    : 'Zoot'
-   
+
 ** 字符串方法
    字符串类型支持所有Sequence通用的操作，此外还支持下面列举的操作。
 
@@ -3593,18 +3593,18 @@
 * 映射类型（Mapping）-dict
   映射对象可将“可哈希值”映射到任意对象上。映射对象为mutable类型。目前
   为止，Python只有一个标准的映射类型-字典（dict）。
-  
+
   除“不可哈希”类型，即含链表，字典或其他mutable类型（比较时使用值比较，
   而不是内存比较）外，都可用作字典的key值。当使用数数字作为key值时，使
   用值比较，如1和1.0都可映射到同一值。（由于计算机存储浮点数实际上是存
   储的近似值，所以最好不要用浮点数作为key值。）
-  
+
   除dict构造器外，可使用使用字面量形式创建字典：
-  
+
   #+BEGIN_SRC python :session
     d = {'name': 'claudio', 'age': 18, 'gender': 'male'}
   #+END_SRC
-  
+
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)
 ** class b*dict* (iterable,**kwarg)
@@ -4089,7 +4089,7 @@
    : {('c', 3), ('b', 2), ('b', 20), ('e', 30), ('a', 1), ('f', 40)}
 
 *** 举例
-    
+
     #+BEGIN_SRC python :session
       dishes = {'eggs': 2, 'sausage': 1, 'bacon': 1, 'spam': 500}
       keys = dishes.keys()
@@ -4131,11 +4131,11 @@
   Python的 /with/ 声明支持上下文管理器定义的的运行时上下文。自定义类
   型可定义__enter__()和__exit__()方法，分别在with语句的代码执行前执行，
   和with语句结束后执行。
-  
+
 ** contextmanager. *__enter__* ()：
    进入上下文时执行，返回自身对象或与运行时上下问相关的对象。返回值可
    用于赋值with语句as后面的变量：
-   
+
    #+BEGIN_SRC python :session
      class Test:
          def __enter__(self):
@@ -4159,7 +4159,7 @@
 ** contextmanager. *__exit__* (exc_type,exc_val,exc_tb)：
    离开运行时上下文执行，即在with语句结束后执行，返回Boolean值指定是否
    抑制错误抛出：
-   
+
    #+BEGIN_SRC python :session
      class Test:
          def __init__(self, flag):
@@ -4179,10 +4179,10 @@
          print('within with')
          1 / 0
    #+END_SRC
-   
+
    #+RESULTS[3102b035beb49a1d816cd396b3f479674785eed1]:
    #+begin_example
-   
+
    ... ... ... ... ... ... ... ... >>> >>> ... ... ... enter
    within with
    exit
@@ -4193,10 +4193,10 @@
      File "<stdin>", line 3, in <module>
    ZeroDivisionError: division by zero
    #+end_example
-   
+
    如果执行with内代码时有错误抛出，其参宿EXC_TYPE、EXC_VAL和EXC_TB分别
    对应该错误的exception类型、值和traceback信息，否则都为None：
-   
+
    #+BEGIN_SRC python :session
      class Test:
          def __init__(self, flag):
@@ -4222,10 +4222,10 @@
      with Test(False):
          1 / 0
    #+END_SRC
-   
+
    #+RESULTS[cb05f44472c83f8ac1e23b63b358bf357938efe7]:
    #+begin_example
-   
+
    ... ... ... ... ... ... ... ... ... >>> >>> ... ... 1.0
    None
    None
@@ -4242,12 +4242,12 @@
      File "<stdin>", line 2, in <module>
    ZeroDivisionError: division by zero
    #+end_example
-   
+
    如果此方法返回True，即使with语句中有错误抛出，也会执行后面的代码；
    如果有错误抛出且返回False，则抛出错误向上传播（propagation）：
-   
+
    *注意* ：下面的例子只能在脚本中测试，org中测试会失败：
-   
+
    #+BEGIN_SRC python :session
      class Test:
          def __init__(self, flag):
@@ -4305,7 +4305,11 @@
    #+end_example
 
 * 其他内置类型
+  解释器还支持下面几类对象，他们大多数只支持一个或两个操作。
+  
 ** 模块（Modules）
+   能对模块进行的特殊操作仅有属性： /m.name/ 。其中M为模块，NAME为模块
+   M中symbol table的内容。模块的属性可被赋值。
 
    #+BEGIN_SRC python :session
      import contextlib
@@ -4327,13 +4331,35 @@
    :   File "<stdin>", line 1, in <module>
    : AttributeError: type object 'int' has no attribute 'x'
 
+   每个模块都有特殊属性__dict__。类型为字典，包含模块的symbol table。
+   修改此字典就可修改模块的symbol table。不能直接赋值此字典，
+   如'm.__dict__={}'，只能单个赋值，如'm.__dict__['x']=1'。
+
+   *注意* ：不建议修改此值。
+
    #+BEGIN_SRC python :session
      print(int.__dict__)
+     int.__dict__['a'] = 1
+     print(int.__dict__['a'])
+     int.__dict__ = {}
    #+END_SRC
 
-   #+RESULTS[b4648d8a44d11838f5bc09a8d04d3f8bd844236b]:
-   : {'__pow__': <slot wrapper '__pow__' of 'int' objects>, '__ror__': <slot wrapper '__ror__' of 'int' objects>, '__xor__': <slot wrapper '__xor__' of 'int' objects>, '__doc__': "int(x=0) -> integer\nint(x, base=10) -> integer\n\nConvert a number or string to an integer, or return 0 if no arguments\nare given.  If x is a number, return x.__int__().  For floating point\nnumbers, this truncates towards zero.\n\nIf x is not a number or if base is given, then x must be a string,\nbytes, or bytearray instance representing an integer literal in the\ngiven base.  The literal can be preceded by '+' or '-' and be surrounded\nby whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\nBase 0 means to interpret the base from the string as an integer literal.\n>>> int('0b100', base=0)\n4", '__ceil__': <method '__ceil__' of 'int' objects>, '__rxor__': <slot wrapper '__rxor__' of 'int' objects>, 'to_bytes': <method 'to_bytes' of 'int' objects>, 'conjugate': <method 'conjugate' of 'int' objects>, '__invert__': <slot wrapper '__invert__' of 'int' objects>, '__getattribute__': <slot wrapper '__getattribute__' of 'int' objects>, '__trunc__': <method '__trunc__' of 'int' objects>, '__rdivmod__': <slot wrapper '__rdivmod__' of 'int' objects>, '__rmul__': <slot wrapper '__rmul__' of 'int' objects>, '__gt__': <slot wrapper '__gt__' of 'int' objects>, '__format__': <method '__format__' of 'int' objects>, '__rrshift__': <slot wrapper '__rrshift__' of 'int' objects>, '__le__': <slot wrapper '__le__' of 'int' objects>, '__rand__': <slot wrapper '__rand__' of 'int' objects>, '__and__': <slot wrapper '__and__' of 'int' objects>, '__truediv__': <slot wrapper '__truediv__' of 'int' objects>, 'numerator': <attribute 'numerator' of 'int' objects>, '__sizeof__': <method '__sizeof__' of 'int' objects>, '__divmod__': <slot wrapper '__divmod__' of 'int' objects>, '__neg__': <slot wrapper '__neg__' of 'int' objects>, '__abs__': <slot wrapper '__abs__' of 'int' objects>, '__int__': <slot wrapper '__int__' of 'int' objects>, '__hash__': <slot wrapper '__hash__' of 'int' objects>, '__float__': <slot wrapper '__float__' of 'int' objects>, '__bool__': <slot wrapper '__bool__' of 'int' objects>, '__rsub__': <slot wrapper '__rsub__' of 'int' objects>, '__or__': <slot wrapper '__or__' of 'int' objects>, '__mul__': <slot wrapper '__mul__' of 'int' objects>, 'bit_length': <method 'bit_length' of 'int' objects>, '__ge__': <slot wrapper '__ge__' of 'int' objects>, '__pos__': <slot wrapper '__pos__' of 'int' objects>, '__rtruediv__': <slot wrapper '__rtruediv__' of 'int' objects>, 'denominator': <attribute 'denominator' of 'int' objects>, '__rmod__': <slot wrapper '__rmod__' of 'int' objects>, '__round__': <method '__round__' of 'int' objects>, '__sub__': <slot wrapper '__sub__' of 'int' objects>, '__eq__': <slot wrapper '__eq__' of 'int' objects>, 'imag': <attribute 'imag' of 'int' objects>, '__rshift__': <slot wrapper '__rshift__' of 'int' objects>, '__getnewargs__': <method '__getnewargs__' of 'int' objects>, '__index__': <slot wrapper '__index__' of 'int' objects>, 'real': <attribute 'real' of 'int' objects>, '__repr__': <slot wrapper '__repr__' of 'int' objects>, '__lshift__': <slot wrapper '__lshift__' of 'int' objects>, '__rfloordiv__': <slot wrapper '__rfloordiv__' of 'int' objects>, '__new__': <built-in method __new__ of type object at 0x564d4554b9a0>, 'from_bytes': <method 'from_bytes' of 'int' objects>, '__floordiv__': <slot wrapper '__floordiv__' of 'int' objects>, '__ne__': <slot wrapper '__ne__' of 'int' objects>, '__mod__': <slot wrapper '__mod__' of 'int' objects>, '__str__': <slot wrapper '__str__' of 'int' objects>, '__lt__': <slot wrapper '__lt__' of 'int' objects>, '__rlshift__': <slot wrapper '__rlshift__' of 'int' objects>, '__radd__': <slot wrapper '__radd__' of 'int' objects>, '__rpow__': <slot wrapper '__rpow__' of 'int' objects>, '__add__': <slot wrapper '__add__' of 'int' objects>, '__floor__': <method '__floor__' of 'int' objects>}
+   #+RESULTS[8d4c8d38b65e71c19368b98f09d1d28db694aef1]:
+   #+begin_example
+   {'__xor__': <slot wrapper '__xor__' of 'int' objects>, '__float__': <slot wrapper '__float__' of 'int' objects>, '__mul__': <slot wrapper '__mul__' of 'int' objects>, '__or__': <slot wrapper '__or__' of 'int' objects>, '__format__': <method '__format__' of 'int' objects>, '__index__': <slot wrapper '__index__' of 'int' objects>, '__bool__': <slot wrapper '__bool__' of 'int' objects>, 'real': <attribute 'real' of 'int' objects>, 'numerator': <attribute 'numerator' of 'int' objects>, '__pos__': <slot wrapper '__pos__' of 'int' objects>, 'bit_length': <method 'bit_length' of 'int' objects>, '__rxor__': <slot wrapper '__rxor__' of 'int' objects>, '__rsub__': <slot wrapper '__rsub__' of 'int' objects>, 'denominator': <attribute 'denominator' of 'int' objects>, '__lt__': <slot wrapper '__lt__' of 'int' objects>, '__int__': <slot wrapper '__int__' of 'int' objects>, 'conjugate': <method 'conjugate' of 'int' objects>, '__new__': <built-in method __new__ of type object at 0x5601af4729a0>, '__round__': <method '__round__' of 'int' objects>, '__rfloordiv__': <slot wrapper '__rfloordiv__' of 'int' objects>, '__rand__': <slot wrapper '__rand__' of 'int' objects>, '__eq__': <slot wrapper '__eq__' of 'int' objects>, '__rmod__': <slot wrapper '__rmod__' of 'int' objects>, '__hash__': <slot wrapper '__hash__' of 'int' objects>, '__rtruediv__': <slot wrapper '__rtruediv__' of 'int' objects>, '__le__': <slot wrapper '__le__' of 'int' objects>, '__floordiv__': <slot wrapper '__floordiv__' of 'int' objects>, '__and__': <slot wrapper '__and__' of 'int' objects>, '__abs__': <slot wrapper '__abs__' of 'int' objects>, '__rdivmod__': <slot wrapper '__rdivmod__' of 'int' objects>, '__divmod__': <slot wrapper '__divmod__' of 'int' objects>, '__radd__': <slot wrapper '__radd__' of 'int' objects>, '__floor__': <method '__floor__' of 'int' objects>, '__trunc__': <method '__trunc__' of 'int' objects>, '__ror__': <slot wrapper '__ror__' of 'int' objects>, '__repr__': <slot wrapper '__repr__' of 'int' objects>, '__mod__': <slot wrapper '__mod__' of 'int' objects>, '__ge__': <slot wrapper '__ge__' of 'int' objects>, '__add__': <slot wrapper '__add__' of 'int' objects>, '__rmul__': <slot wrapper '__rmul__' of 'int' objects>, '__getnewargs__': <method '__getnewargs__' of 'int' objects>, '__str__': <slot wrapper '__str__' of 'int' objects>, '__gt__': <slot wrapper '__gt__' of 'int' objects>, '__ne__': <slot wrapper '__ne__' of 'int' objects>, '__sub__': <slot wrapper '__sub__' of 'int' objects>, '__doc__': "int(x=0) -> integer\nint(x, base=10) -> integer\n\nConvert a number or string to an integer, or return 0 if no arguments\nare given.  If x is a number, return x.__int__().  For floating point\nnumbers, this truncates towards zero.\n\nIf x is not a number or if base is given, then x must be a string,\nbytes, or bytearray instance representing an integer literal in the\ngiven base.  The literal can be preceded by '+' or '-' and be surrounded\nby whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\nBase 0 means to interpret the base from the string as an integer literal.\n>>> int('0b100', base=0)\n4", 'from_bytes': <method 'from_bytes' of 'int' objects>, '__truediv__': <slot wrapper '__truediv__' of 'int' objects>, '__pow__': <slot wrapper '__pow__' of 'int' objects>, '__ceil__': <method '__ceil__' of 'int' objects>, '__getattribute__': <slot wrapper '__getattribute__' of 'int' objects>, 'imag': <attribute 'imag' of 'int' objects>, '__invert__': <slot wrapper '__invert__' of 'int' objects>, '__lshift__': <slot wrapper '__lshift__' of 'int' objects>, 'to_bytes': <method 'to_bytes' of 'int' objects>, '__rrshift__': <slot wrapper '__rrshift__' of 'int' objects>, '__rpow__': <slot wrapper '__rpow__' of 'int' objects>, '__rshift__': <slot wrapper '__rshift__' of 'int' objects>, '__sizeof__': <method '__sizeof__' of 'int' objects>, '__rlshift__': <slot wrapper '__rlshift__' of 'int' objects>, '__neg__': <slot wrapper '__neg__' of 'int' objects>}
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: 'mappingproxy' object does not support item assignment
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   KeyError: 'a'
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: can't set attributes of built-in/extension type 'int'
+   #+end_example
 
+   解释器内部的模块和通过文件加载的模块会区别显示：
+   
    #+BEGIN_SRC python :session
      import contextlib
      print(contextlib)
@@ -4346,21 +4372,228 @@
    : <class 'int'>
 
 ** 类和类实例（Class and Class Instance）
+   参考 /Python Language Reference/ 关于“对象、值和类型” 和 “类定义”。
 ** 函数（Functions）
+   函数由函数定义创建。仅支持函数调用此唯一操作：func(argument-list)。
+
+   有两种形式的函数对象：内置函数和用户自定义函数。两者都支持相同操作
+   （即函数调用），但由于实现不同，所以为不同类型对象。
+
 ** 方法（Methods）
-** 代码对象（Code Objects）
+   方法为通过属性形式调用的函数。有两种形式的方法：内置方法（如链表的
+   append()）和类实例方法。
+   
+   当通过类实例获取方法时，就会获得一个特殊对象： /绑定方法/ （或称为
+   /实例方法/ ）对象。当调用时，会将“self”参数传入参数。实例方法有两个
+   特殊的只读属性：
+   
+   - m.__self__。为此方法操作的对象：
+     
+     #+BEGIN_SRC python :session
+     b = b'abc'
+
+     b.upper.__self__ is b
+     #+END_SRC
+     
+     #+RESULTS[884f4cc8fa51ebbaa531416d8e74d0c25eb919fe]:
+     :
+     : >>> True
+     
+   - m.__func__，实现此方法的函数。m(argumet-list)相当于
+     m.__func__(m.__self__, argument-list)，仅限于非内置对象方法：
+     
+     #+BEGIN_SRC python :session
+       b = b'abc'
+       b.upper
+
+       b.upper.__func__(b.upper.__self__)
+
+       class Test:
+           def __init__(self, name):
+               self.name = name
+           def hello(self):
+               print('hello {}'.format(self.name))
+
+       t = Test('me')
+       t.hello.__func__
+       t.hello
+       t.hello()
+       t.hello.__func__(t.hello.__self__)
+     #+END_SRC
+
+     #+RESULTS[ae42fecf6027c54b26beb98e4674a9c3a8263031]:
+     :
+     : <built-in method upper of bytes object at 0x7f0c785f9fd0>
+     : >>> Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     : AttributeError: 'builtin_function_or_method' object has no attribute '__func__'
+     : >>> >>> ... ... ... ... ... >>> >>> >>> <function Test.hello at 0x7f0c77ea57b8>
+     : <bound method Test.hello of <__main__.Test object at 0x7f0c77ea6390>>
+     : hello me
+     : hello me
+
+     同普通函数对象一样，实例方法对象也支持属性获取。不过，由于方法属性
+     实际上存储在内部的函数对象内（method.__func__），所以不允许直接绑
+     定方法属性：
+
+   #+BEGIN_SRC python :session
+     class C:
+         def method(self):
+             pass
+
+     c = C()
+     c.method.whoami = 'my name is method'
+     c.method.__func__.whoami = 'my name is method'
+     c.method.whoami
+   #+END_SRC
+
+   #+RESULTS[96ff08f13c7af393ba49671d0806aacaf63e4d17]:
+   :
+   : ... ... >>> >>> >>> Traceback (most recent call last):
+   :   File "<stdin>", line 1, in <module>
+   : AttributeError: 'method' object has no attribute 'whoami'
+   : >>> 'my name is method'
+
+** 代码对象（Code Objects） ？？？
 ** 类型对象（Type Objects）
+   类型对象用于表示不同类型对象。对象的类型可通过内置函数type()获取。
+   标准模块types定义了所有内置类型名：
+
+   #+BEGIN_SRC python :session
+     type(1)
+
+     class C:
+         pass
+
+     c = C()
+     type(c)
+   #+END_SRC
+
+   #+RESULTS[8276cd3ce13c3d82d2750e54c27d1797bee933f2]:
+   : <class 'int'>
+   : >>> ... ... >>> >>> <class '__main__.C'>
+
 ** Null 对象（The Null Object）
+   无返回值的函数返回此类型。仅只有一个Null对象，即None。
+   #+BEGIN_SRC python :session
+     def foo():
+         pass
+
+     type(foo())
+     None is foo()
+     type(None)() is None
+   #+END_SRC
+
+   #+RESULTS[019e5cae46f5a9bb9482d4a186ffff7f3c7b5abc]:
+   :
+   : ... >>> >>> <class 'NoneType'>
+   : True
+   : True
+
 ** Ellipsis对象（The Ellipsis Object）
+   
+   #+BEGIN_SRC python :session
+     type(Ellipsis)()
+   #+END_SRC
+
+   #+RESULTS[60a9cf5ed93f08a38d23eee82c39aec72082ca78]:
+   : Ellipsis
+
 ** 未实现对象（The Nonimplemented Objects）
 ** 布尔值（Boolean Values）
+   仅含False和True两个常量对象。如同数字看待，分别相当于0和1。可使用内
+   置函数bool将任意值转换为布尔值。
+
+   #+BEGIN_SRC python :session
+     bool(b'')
+     bool([1])
+   #+END_SRC
+
+   #+RESULTS[c94d2c95563cfa191280ff23ee12b079c0946f4a]:
+   : False
+   : True
+
 ** 内部对象（Internal Objects）
 * 特殊属性（Special Attribute）
 ** object. *__dict__*
-** instace. *__class__*
+   字典或其他映射对象，用于存储对象的可写属性。
+
+   #+BEGIN_SRC python :session
+     class F:
+         pass
+
+     f = F()
+     f.__dict__
+   #+END_SRC
+
+   #+RESULTS[f706444b5d68873f956182ac1ee8ae4dcc4fb4c8]:
+   :
+   : ... >>> >>> >>> {}
+
+** instance. *__class__*
+   返回对象所属类：
+
+   #+BEGIN_SRC python :session
+     a = 1
+     a.__class__
+   #+END_SRC
+
+   #+RESULTS[c30406889a285d02b73ad0b37f5409f6925c00c1]:
+   :
+   : <class 'int'>
+
 ** class. *__bases__*
+   返回类的父类组成的元组。
+
+   #+BEGIN_SRC python :session
+     from contextlib import ContextDecorator
+
+     class F(ContextDecorator):
+         pass
+
+     F.__bases__
+     bool.__base__
+   #+END_SRC
+
+   #+RESULTS[ecdbecdfe3e5c56e0adcd9d8e0ecbb1a89af0f2d]:
+   :
+   : >>> >>> ... ... >>> >>> (<class 'contextlib.ContextDecorator'>,)
+   : <class 'int'>
+
 ** definition. *__name__*
-** definition. *__qualname__*
+   类、函数、方法、描述器和生成器实例的名称：
+
+   #+BEGIN_SRC python :session
+     def foo():
+         pass
+
+     foo.__name__
+   #+END_SRC
+
+   #+RESULTS[fcba2a23937d37d1654fb1f4d59ad8efed574537]:
+   :
+   : ... >>> >>> 'foo'
+
+** definition. *__qualname__* ？？？
+
+   #+BEGIN_SRC python :session
+     def foo():
+         pass
+
+     foo.__qualname__
+   #+END_SRC
+
+   #+RESULTS[b6da4c73bb77582fdadf4a1c194f77b440d984ea]:
+   :
+   : ... >>> >>> 'foo'
+
 ** class. *__mro__*
 ** class. *mro* ()
 ** class. *__subclass__* ()
+   
+   #+BEGIN_SRC python :session
+     int.__subclasses__()
+   #+END_SRC
+   
+   #+RESULTS[a385bf1a3ff4b20d3fa58359f361a5b978f3a16d]:
+   : [<class 'bool'>]
