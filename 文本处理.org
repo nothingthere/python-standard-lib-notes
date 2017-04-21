@@ -536,20 +536,20 @@
      :    11    B   13 1011
 
 ** 模板字符串
-   
+
    #+BEGIN_SRC python :session
      from string import Template
      s = Template('你好，$who。 我是$me。')
 
      s.substitute(who='world', me='claudio')
    #+END_SRC
-   
+
    #+RESULTS[83b02956c092b2329a4db9acc744d9719f2c191b]:
    :
    : >>> >>> '你好，world。 我是claudio。'
-   
+
    基本规则：
-   
+
    1. $$表示$本身。
    2. $identifier表示需替换处，被映射中key为identifier的值替换。默认情
       况下，identifier需为ASCII小写字母或下划线，首字母须为ASCII小写字
@@ -557,7 +557,7 @@
    3. $identifier同${identifier}在绝大多数情况下等价，当当需将其置于单
       词中时则必须使用后者，如"${identifier}name"。
    4. 其他任何形式抛出ValueError错误。
-      
+
 *** class string. *Template* (template)
     接受单个模板字符串TEMPLATE，构造模板。
 **** *substitute* (mapping,**kwds)
@@ -711,22 +711,661 @@
 *** string. *capwords* (s,sep=None)
     对字符S调用str.split()方法，对每个单词调用str.capitalize()方法，再
     调用str.join()方法连接返回。
-    
+
     使用SEP参宿作为分割和连接字符串的分隔符，默认为空白字符。
-    
+
     #+BEGIN_SRC python :session
       from string import capwords
 
       capwords('i have a dream!')
       capwords('banana', sep='a')
     #+END_SRC
-    
+
     #+RESULTS[da595ad1f2d225e97f61633a716d197a60387985]:
     :
     : >>> 'I Have A Dream!'
     : 'BaNaNa'
-    
+
 * re - 正则表达式
+  此模块提供正则匹配操作，与Perl的正则相似。
+  
+  模板和被搜索的字符串都可为Unicode字符串和8-bit字符串。但是，Unicode
+  字符串和8-bit字符串不能混合使用：不能用byte形式的模板匹配Unicode字符
+  串，反之亦然；当进行替换时，模板和被搜索字符串都应为相同类型。
+  
+  正则表达式使用反斜杠（\）表示转义，表示特殊形式，或将特殊字符转换为
+  普通字符。这与Python中字符串字面量使用相同字符表示相同含义相冲突。如
+  要匹配反斜杠自身，需写为“\\\\”。因为正则本身为“\\”，每个反斜杠转义一
+  次，最后就成了4个反斜杠。
+  
+  解决方法为使用Python的“原生字符串”表达方式，这样反斜杠在任何字符前都
+  不会有特殊含义，如r"\n"是2个字符的字符串，即“\”和“n”；而“\n”则是表示
+  单个换行符的字符串。一般情况下，Python中使用“原生字符串”表示正则模板。
+  
+  值得注意的是，大多数情况下，模块层级的正则函数都有对应的编译后正则方
+  法。前者无需编译正则对象，但缺少优化的参数形式。
+  
+  #+BEGIN_QUOTE
+  *注意* ：第三方插件regex有与re模块兼容的接口，且提供了额外功能，以及
+  更丰富的Unicode支持。
+  #+END_QUOTE
+  
+** 正则基本语法
+   正则可连接：如果A和B都是正则，则AB也是正则。一般情况下，如果字符串p
+   匹配正则A，且字符串q匹配正则B，则pq也匹配正则AB。
+   
+   重复标记，如*、+、?、{m,n}等，不能直接嵌套。
+   
+*** .
+    默认情况下匹配除换行符以外的任意字符。如果指定了DOTALL标记，则包含
+    换行符。
+
+*** ^
+    匹配字符串其实位置。如果在MUTILINE模式下，则立即匹配新行后。
+
+*** $
+    匹配字符串末或换行符前。在MULTILINE模式下，还匹配换行符前。foo匹配
+    foo和foobar，但foo$则只匹配foo。foo.$会匹配foo1\nfoo2\n中的foo1，
+    但在MULTILINE模式下，则匹配foo1和foo2。此外，$匹配'foo\n'会得到两
+    个空字符，一个在换行符前，一个在换行符后。
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('foo.$', 'foo1\nfoo2\n')
+      re.findall('foo.$', 'foo1\nfoo2\n', re.MULTILINE)
+      re.findall('$', 'foo\n')
+      re.findall('$', 'foo')
+    #+END_SRC
+
+    #+RESULTS[d3b2a742803383792a331777c8e27576948378ef]:
+    :
+    : >>> ['foo2']
+    : ['foo1', 'foo2']
+    : ['', '']
+    : ['']
+
+*** *
+    匹配重复0个或多个。
+    
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('ab*', 'a')
+      re.findall('ab*', 'ab')
+      re.findall('ab*', 'abbb')
+      re.findall('ab*', 'ac')
+      re.findall('ab*', 'c')
+    #+END_SRC
+
+    #+RESULTS[f24e4106e8445523aed2669d9d6814b71831ec44]:
+    :
+    : >>> ['a']
+    : ['ab']
+    : ['abbb']
+    : ['a']
+    : []
+
+*** +
+    匹配一个多或多个。
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('ab+', 'a')
+      re.findall('ab+', 'ab')
+      re.findall('ab+', 'abbb')
+      re.findall('ab+', 'ac')
+      re.findall('ab+', 'c')
+    #+END_SRC
+
+    #+RESULTS[5fb2e20b51d181e1a1eb59cf40b2280cfc56a63a]:
+    :
+    : >>> []
+    : ['ab']
+    : ['abbb']
+    : []
+    : []
+
+*** ?
+    匹配0个或1个。
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('ab?', 'a')
+      re.findall('ab?', 'ab')
+      re.findall('ab?', 'abbb')
+      re.findall('ab?', 'ac')
+      re.findall('ab?', 'c')
+    #+END_SRC
+
+    #+RESULTS[c67f4728c42b21dd7a18ebba57c09641183f0571]:
+    :
+    : >>> ['a']
+    : ['ab']
+    : ['ab']
+    : ['a']
+    : []
+
+*** *?,+?,??
+    *、+和?都是贪婪匹配，添加?号将其转换为非贪婪匹配。
+    
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('<.*>', '<a> b <c>')
+      re.findall('<.*?>', '<a> b <c>')
+    #+END_SRC
+
+    #+RESULTS[d8cb1e2ca9816fb4636de72e5166daedb40935bd]:
+    :
+    : >>> ['<a> b <c>']
+    : ['<a>', '<c>']
+
+*** {m}
+    值得匹配个数为M。
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('ab{2}', 'ab')
+      re.findall('ab{2}', 'abb')
+      re.findall('ab{2}', 'abbbb')
+    #+END_SRC
+
+    #+RESULTS[395b9b3a7c4c905e8a6191bdb95167b82be70695]:
+    :
+    : >>> []
+    : ['abb']
+    : ['abb']
+
+*** {m,n}
+    匹配M->N个。如果缺省M，表示0->N个；缺省N，表示M->无限多个。
+
+*** {m,n}?
+    {m,n}的非贪婪形式：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall(r'ab{3,5}', 'abbbbb')
+      re.findall(r'ab{3,5}?', 'abbbbb')
+    #+END_SRC
+
+    #+RESULTS[62bec64cfe56bf86826fe0040c16cd784ac94601]:
+    :
+    : >>> ['abbbbb']
+    : ['abbb']
+
+*** \
+    转义特殊字符，如*、?和+等；或标记特殊序列（special sequence）。
+
+    为避免过多书写过多反斜杠，强烈建议除简单的正则表达式外，都使用“原
+    始字符串”。
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('\\\\', '\\')
+      re.findall(r'\\', '\\')
+    #+END_SRC
+
+    #+RESULTS[1f7d469e413645a70fabb6db47137355918e50e0]:
+    :
+    : >>> ['\\']
+    : ['\\']
+
+*** []
+    匹配字符组。
+    
+    - 匹配其中的任意一个字符：
+
+      #+BEGIN_SRC python :session
+        import re
+
+        re.findall('[ban]', 'banana')
+      #+END_SRC
+
+      #+RESULTS[1eb9d3f2efad30bfe84ad740f5dfa3ba1e8088cb]:
+      :
+      : >>> ['b', 'a', 'n', 'a', 'n', 'a']
+      
+    - 匹配字符范围，如需在其中匹配“-”本身，则需将其转义，如[a\-z]或放
+      在第一个或最后一个位置。
+      
+      #+BEGIN_SRC python :session
+        import re
+
+        re.findall('[a-z]{2}', 'banana')
+        re.findall('[-a-z]', '-ba')
+        re.findall('[a\-z]', '-ba')
+      #+END_SRC
+
+      #+RESULTS[8eae70c14173aa9e8177b05f2611134ab7d45665]:
+      :
+      : >>> ['ba', 'na', 'na']
+      : ['-', 'b', 'a']
+      : ['-', 'a']
+      
+    - 其中的特殊字符失去其特殊含义：
+      
+      #+BEGIN_SRC python :session
+      import re
+
+      re.findall('[(+*?)]', '[(+*?)]')
+      #+END_SRC
+
+    - 可在第一个位置使用^字符，表示不匹配其中任何字符。除在第一个位置
+      外，^失去特殊含义：
+
+      #+BEGIN_SRC python :session
+      import re
+
+      re.findall('[an]', 'banana')
+      re.findall('[^an]', 'banana')
+      re.findall('[an^]', '^banana')
+      #+END_SRC
+      
+      #+RESULTS[8a97c7d04b2f9977933348316d9b030513f89965]:
+      :
+      : >>> ['a', 'n', 'a', 'n', 'a']
+      : ['b']
+      : ['^', 'a', 'n', 'a', 'n', 'a']
+
+    - 如需在其中匹配右方括号，可使用反斜杠转义，或放在第一个位置：
+
+      #+BEGIN_SRC python :session
+        import re
+
+        re.findall('[][]', '[]')
+        re.findall('[[\]]', '[]')
+      #+END_SRC
+
+      #+RESULTS[051c649b5233f486047821138d10c7c5f1cc2402]:
+      :
+      : >>> ['[', ']']
+      : ['[', ']']
+
+*** |
+    A|B，A和B可为任意正则，匹配A或B。从A开始向右匹配，找到匹配立即停止，
+    即非贪婪。如需匹配数竖线本身，可使用反斜杠转义，或置于方括号内：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('(fuck|love) you', 'fuck you')
+
+      re.findall('[|]', '|')
+      re.findall(r'\|', '|')
+    #+END_SRC
+
+    #+RESULTS[10dfcde01aa124fbd812b003f56833f389d3e5f4]:
+    :
+    : >>> ['fuck']
+    : >>> ['|']
+    : ['|']
+
+*** (...)
+    分组匹配。匹配括号内的正则。匹配后可使用\number形式获取匹配内容。
+    匹配小括号本身可使用反斜杠转义，或置于方括号中：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      m = re.search(r'([0-9])\1', '55')
+      print(m.group())
+      re.findall('[()]', '()')
+      re.findall(r'(\(|\))', '()')
+    #+END_SRC
+
+    #+RESULTS[7425fa45b9283a1069c689729b5674e505e9c05c]:
+    :
+    : >>> >>> 55
+    : ['(', ')']
+    : ['(', ')']
+
+*** (?...) - 分组扩展
+    扩展标记。?后的第一个字符决定扩展方式。除(?P<name>...)外，所有扩展
+    都不形成新分组。下面为目前支持的扩展：
+    
+**** (?aiLmsux)
+     不匹配任何内容，只是指定正则标记。各个字母对应的模块属性和含义分
+     别为：
+     
+     | 字符 | 模块属性 | 含义                      |
+     |------+----------+---------------------------|
+     | a    | re.A     | 只匹配ASCII字符           |
+     | i    | re.I     | 不区分大小写              |
+     | L    | re.L     | 由本地环境决定            |
+     | m    | re.M     | 多行模式                  |
+     | s    | re.S     | 换行符也作为“.”的匹配     |
+     | x    | re.X     | 整个正则都使用verbose模式 |
+     
+     #+BEGIN_SRC python :session
+       import re
+       re.findall('(?ax)', '人')       # ???
+       re.findall('(?i)a', 'aA')
+       re.findall('a', 'aA')
+     #+END_SRC
+     
+     #+RESULTS[fbed4128058c4a06f0118e3589ca283e70d754be]:
+     :
+     : ['', '']
+     : ['a', 'A']
+     : ['a']
+     
+     *注意* ：(?x)标记决定整个正则的解析方式。需放在整个正则最前面，或
+     单个或多个空格前面。
+     
+**** (?:...)
+     (...)的非捕捉版本。唯一不同点为不能使用\number获取括号中匹配到的
+     内容。
+
+**** (?P<name>...)
+     在(...)的基础上为反向索引添加新名字NAME。如正常情况下可使用
+     \number获取分组匹配中的内容，使用此扩展后还可使用\name获取。
+
+     如下面匹配单/双引号括起来的内容：
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.search('(?P<quote>[\'\"])(?P<match>.*)(?P=quote)', '"name"')
+       print(m.group('match'))
+       re.findall('(?P<letter>abc)', 'abc')
+     #+END_SRC
+
+     #+RESULTS[1fd27221f28f134b95e3a61e1ee0bbb8c7338126]:
+     :
+     : >>> name
+     : ['abc']
+
+     被命名的分组可在下面3中情况下反向索引（以上例为准）：
+
+     | 使用情况                         | 引用方式                           |
+     |----------------------------------+------------------------------------|
+     | 在自身所处正则内                 | (?P=quote)或\1                     |
+     | 处理匹配对象m时                  | m.group('quote')或m.end('quote')等 |
+     | 传递给re.sub()方法作为repl参数时 | \g<quote>或\g<1>或\1               |
+
+**** (?P=name)
+     反向索引命名分组。
+**** (?#...)
+     注释。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall('(?#不区分大小写)(?i)a', 'aA')
+     #+END_SRC
+     
+     #+RESULTS[c309dce82dee2b20693b54c1752792be11fc6cfd]:
+     :
+     : >>> ['a', 'A']
+
+**** (?=...)
+     当...匹配才成功。为提前假设，不消耗字符串。如"Isaac (?=Asimov)"至有当"Isaac "
+     后有字符串"Asimov"时才匹配成功。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall('Isaac (?=Asimov)', 'Isaac')
+       re.findall('Isaac (?=Asimov)', 'Isaac Asimov')
+     #+END_SRC
+
+     #+RESULTS[2ce943bcbd23be1249a797c6490db4fdac85e6b3]:
+     :
+     : >>> []
+     : ['Isaac ']
+
+**** (?!...)
+     当...不匹配时才成功。为提前假设，不消耗字符串。如“Isaac
+     (?!Asimov)”只有当"Isaac "后不是"Asimov"才成功：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall('Isaac (?!Asimov)', 'Isaac Asimov')
+       re.findall('Isaac (?!Asimov)', 'Isaac Asim')
+     #+END_SRC
+     
+     #+RESULTS[450299fb22f39dd6945c95f7d816e718a723ef18]:
+     :
+     : >>> []
+     : ['Isaac ']
+
+**** (?<=...)
+     当前位置前匹配...才成功。也为提前假设，不消耗字符串。如
+     (?<=abc)def可将abcdef匹配成功。...需为固定个数的字符，如果abc或
+     a|b可以，但a*或a{3,4}则不可以。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.search('(?<=abc)def', 'abcdef')
+       m.group(0)
+     #+END_SRC
+
+     #+RESULTS[da583083430ea899544b1115ebd8cda5c730b752]:
+     :
+     : >>> >>> 'def'
+
+     如匹配前面有短横线的单词：
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.search('(?<=-)\w+', 'spam-egg')
+       print(m.group(0))
+     #+END_SRC
+
+     #+RESULTS[96e23d18b42112fb158ee88b04f2157b541a142a]:
+     :
+     : >>> egg
+
+**** (?<!...)
+     当前位置前不匹配...才成功。与(?<=...)相同，也为提前假设，不消耗字
+     符串；...字符串个数需固定。
+
+     #+BEGIN_SRC python :session
+       import re
+       re.findall('^(?<!-)\w+', 'spam-egg')
+       re.findall('(?<![a-z])\w+', 'spam-egg')
+     #+END_SRC
+
+     #+RESULTS[55ae9073dd63d587979f22e512c1332d3f353168]:
+     :
+     : ['spam']
+     : ['spam', 'egg']
+
+**** (?(id/name)yes-pattern|no-pattern)
+     如果给定ID/NAME指定的匹配组存在，则使用yes-pattern，否则使用
+     no-pattern。如下面简化的邮箱匹配正则：
+     
+     #+BEGIN_SRC python :session
+       import re
+       pattern = re.compile('^(<)?(\w+@\w+(?:\.\w+)+)(?(1)>|$)')
+       for email in ["<user1@host.com>", "user2@host.com", "<user3@host.com", "user4@host.com>"]:
+           if pattern.search(email):
+               print(email)
+     #+END_SRC
+     
+     #+RESULTS[d8cf2ffb28d6b1247dd9511ad9632d8f72963db2]:
+     :
+     : >>> ... ... ... <user1@host.com>
+     : user2@host.com
+     
+*** 特殊转义字符
+    如果转义下面没有列出的字符，只会匹配第二个。如\$会匹配$：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      re.findall('\$', '$')
+    #+END_SRC
+
+    #+RESULTS[037ca02c2abe1c063ca7555df2a105fb87a8336a]:
+    :
+    : >>> ['$']
+
+**** \number
+     反向索引。不能使用8进制数，最大数值99。
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.search(r'(.+) \1', '55 5')
+       m.group()
+     #+END_SRC
+
+     #+RESULTS[cb0c55418b4b668d953f47d1688c9e3219a59121]:
+     :
+     : >>> '5 5'
+     
+**** \A
+     匹配字符串起始位置。
+**** \b
+     匹配单词边界。一个单词为Unicode字母或下划线组成的序列，所以结束单
+     词的字符含：非alphnum字符、非下划线。
+
+     严格将，\b的定义为\w和\W间（或相反），或\w和字符串首/尾。
+
+     #+BEGIN_SRC python :session
+       import re
+       pattern = re.compile(r'\bfoo\b')
+       for x in ['foo', 'foo.', '(foo)', 'bar foo baz', 'foobar', 'foo3']:
+           if pattern.search(x):
+               print(x)
+     #+END_SRC
+
+     #+RESULTS[77147a892c8ffad8ff94d4844f21906dd6dac995]:
+     :
+     : >>> ... ... ... foo
+     : foo.
+     : (foo)
+     : bar foo baz
+
+     默认情况下使用Unicode的alphanum，但可由ASCII标记修改。？？？
+
+     在字符范围中，\b表示backspace字符。
+
+**** \B
+     与\b刚好相反。匹配不为单词边界。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       pattern = re.compile(r'py\b')
+
+       for x in ['python', 'py3', 'py2', 'py', 'py.', 'py!]']:
+           if pattern.search(x):
+               print(x)
+     #+END_SRC
+
+     #+RESULTS[fe1756f9e6a5f0257b3d2b3a15961439e4b889f8]:
+     :
+     : >>> >>> >>> ... ... ... py
+     : py.
+     : py!]
+
+**** \d
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall(r'\d', '123a')
+     #+END_SRC
+
+     #+RESULTS[fae72128019acd161ee76694fbb63a86e0be412c]:
+     :
+     : >>> ['1', '2', '3']
+
+     - Unicode：
+       匹配Unicode数字，即[0-9]及其他数字字符？？？。如果使用ASCII标记，
+       则相当于[0-9]，由于此标记影响整个正则，所有最好使用[0-9]。
+       
+     - 8-bit：
+       等价于[0-9]
+
+**** \D
+     与\d相反。匹配所有非Unicode数字字符。如果使用了ASCII标记，相当于
+     [^0-9]。由于使用标记会影响整个正则，所以最好使用[^0-9]。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall(r'\D', '\X001')
+     #+END_SRC
+
+     #+RESULTS[e4ad15a9cd0d2cdc7ac92b515f2b5973b31274ad]:
+     :
+     : >>> ['\\', 'X']
+
+**** \s
+     
+     #+BEGIN_SRC python :session
+       import re
+       re.findall('\s', ' a\t\n\r\f\vb')
+     #+END_SRC
+
+     #+RESULTS[ae98d13f622826d346f31aaa456f4c7922479de5]:
+     :
+     : [' ', '\t', '\n', '\r', '\x0c', '\x0b']
+
+     - Unicode
+       匹配空白字符，含[ \t\n\r\f\v]，及其他许多字符？？？。如果使用了
+       ASCII标记，则相当于[ \t\n\r\f\v]。由于标记会影响整个正则，所以
+       需要时使用[ \t\n\r\f\v]。
+     - 8-bit字符串
+       等价于[ \t\n\r\f\v]。
+       
+**** \S
+     与\s相反。
+**** \w
+
+     #+BEGIN_SRC python :session
+       import re
+       re.findall('\w', '我有一个梦想！')
+     #+END_SRC
+
+     #+RESULTS[ecd40b71a81cbec7a0e7480cba4fdc9c5d255d7e]:
+     :
+     : ['我', '有', '一', '个', '梦', '想']
+
+     - Unicode：
+       匹配组成单词的字符。含所有语言中能组成单词的字符，以及数字和下
+       划线。如果使用ASCII标记，则相当于[a-zA-Z0-9_]。
+     - 8-bit
+       等价于[a-zA-Z0-9_]。
+
+**** \W
+     与\w相反。
+**** \Z
+
+     匹配字符串结束处。？？？
+
+**** 其他
+     大多数Python字面量字符串的转义字符，正则中也可解析：
+
+     #+BEGIN_QUOTE
+     \a	\b	\f	\n
+     \r	\t	\u	\U
+     \v	\x	\\
+     #+END_QUOTE
+
+     注意点：
+
+     - \b在正则中为单词边界，在字符类中为backspace
+     - \u和\U只在Unicode模式下为转义字符。在bit模式下为普通字符。
+     - 如果第一个转义字符为0，或有3个八进制数字，则被看做八进制转义。
+       否则被看做组匹配反向索引。在字符串字面量中，8进制转义字符最多有
+       3个数字字符相邻。
+     - 3.6版本开始，使用\转义无效字符将被禁用。
+
+** 模块内容
+   
+** 正则表达式对象
+** 正则匹配对象
+** 使用举例
 * difflib
 * textwrap
 * unicodedate
