@@ -1,0 +1,735 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-04-20 17:08:42
+# Commentary:
+#+TITLE: 文本处理
+
+* str - 常用字符串操作
+** 字符串常量
+*** string. *ascii_letters*
+    ascii_lowercase和ascii_uppercase的结合。不由本地决定。
+    #+BEGIN_SRC python :session
+      import string
+      string.ascii_letters
+    #+END_SRC
+
+    #+RESULTS[dbc0c195ea9116af68a930af514a83f8927d0f88]:
+    :
+    : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+*** string. *ascii_lowercase*
+    小写字符。不由本地决定。
+    #+BEGIN_SRC python :session
+      import string
+      string.ascii_lowercase
+    #+END_SRC
+
+    #+RESULTS[43fac96fdd9792434ad6a060c9837b3382fe275e]:
+    :
+    : 'abcdefghijklmnopqrstuvwxyz'
+
+*** string. *ascii_uppercase*
+    大写字母。不由本地决定。
+    #+BEGIN_SRC python :session
+      import string
+      string.ascii_uppercase
+    #+END_SRC
+
+    #+RESULTS[3cc03248df9135f10c36b1d3ac4495c448e24ba1]:
+    :
+    : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+*** string. *digits*
+
+    #+BEGIN_SRC python :session
+      import string
+      string.digits
+    #+END_SRC
+
+    #+RESULTS[e90c3f3c2fff08a17d66c41e0b63e02925b58a4a]:
+    :
+    : '0123456789'
+
+*** string. *hexdigits*
+
+    #+BEGIN_SRC python :session
+      import string
+      string.hexdigits
+    #+END_SRC
+
+    #+RESULTS[10cdf01fc31dcc5777ec14d860faadc68e31268e]:
+    :
+    : '0123456789abcdefABCDEF'
+
+*** string. *octdigits*
+
+    #+BEGIN_SRC python :session
+      import string
+      string.octdigits
+    #+END_SRC
+
+    #+RESULTS[13332f71f3c21f481367d49f832f13393abb015f]:
+    :
+    : '01234567'
+
+*** string. *punctuation*
+    String of ASCII characters which are considered punctuation
+    characters in the C locale.
+
+    #+BEGIN_SRC python :session
+      import string
+      string.punctuation
+    #+END_SRC
+
+    #+RESULTS[7cabb4253ee71483da078dbdd7c55d5ec8426f1b]:
+    :
+    : '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+*** string. *printable*
+    digits、ascii_letters、punctuation和whitespace的结合。
+
+    #+BEGIN_SRC python :session
+      import string
+      string.printable
+    #+END_SRC
+
+    #+RESULTS[20dbfe464a9005e43fa7130f2344ef55fcc4653b]:
+    :
+    : '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c'
+
+*** string. *whitespace*
+    含空格、tab、linefeed、return、formfeed和vertical tab。
+    #+BEGIN_SRC python :session
+      import string
+      string.whitespace
+    #+END_SRC
+
+    #+RESULTS[7669f40dfae6126e364d36dfd57163f468b01bbb]:
+    :
+    : ' \t\n\r\x0b\x0c'
+
+** 定制字符串格式 ？？？
+*** class string. *Formatter*
+**** *format* (format_string,*arg,**kwargs)
+
+     #+BEGIN_SRC python :session
+       from string import Formatter
+
+       temp = 'hello {}'
+       temp.format('world')
+
+       # Formatter.format(temp,'')
+     #+END_SRC
+
+     #+RESULTS[0d139b494a1eddbd3eaa6ed75253b7ef0f782060]:
+     :
+     : >>> >>> 'hello world'
+
+**** *vformat* (format_string,args,kwargs)
+**** *parse* (format_string)
+**** *get_field* (field_name,args,kwargs)
+**** *get_value* (key,args,kwargs)
+**** *check_unused_args* (used_args,args,kwargs)
+**** *format_field* (value,format_spec)
+**** *convert_field* (value,conversion)
+** 字符串格式语法
+   格式化字符串时，str.format()方法和Formatter类使用相同的语法。使用后
+   者时，可定制格式语法。
+
+   格式字符串中需被替换的地方使用{}，其余文本保持原样。如需表示{}本身，
+   需使用{{}}。
+
+   一些简单的例子：
+
+   #+BEGIN_SRC python :session
+     import string
+
+     'First, thou shalt count to {0}'.format(1000)
+     'Bring me a {}'.format('book')
+     'From {} to {}'.format('New York', 'China')
+     'My quest is {name}'.format(name='Claudio')
+     'Units destroyed: {player[0]}'.format(player=[1, 2, 3])
+     'Weight in tons {0.digits}'.format(string)
+   #+END_SRC
+
+   #+RESULTS[ad8196a5794c94864c2ca2f0013241ca39d784a2]:
+   :
+   : >>> 'First, thou shalt count to 1000'
+   : 'Bring me a book'
+   : 'From New York to China'
+   : 'My quest is Claudio'
+   : 'Units destroyed: 1'
+   : 'Weight in tons 0123456789'
+
+   一般情况下，使用format函数时调用的是对象上的__format__()方法。不过，
+   可使用下面三个标记转换：
+
+   | 标记 | 调用函数 |
+   |------+----------|
+   | !s   | str()    |
+   | !r   | repr()   |
+   | !a   | ascii()  |
+
+   #+BEGIN_SRC python :session
+     '我是一个聪明的 {!s}'.format('男孩')
+     '我是一个聪明的 {!r}'.format('男孩')
+     '我是一个聪明的 {!a}'.format('男孩')
+   #+END_SRC
+
+   #+RESULTS[17870e409219a15570f5dad1340074afa9113f69]:
+   : '我是一个聪明的 男孩'
+   : "我是一个聪明的 '男孩'"
+   : "我是一个聪明的 '\\u7537\\u5b69'"
+
+*** 格式规范
+    模板字符串中可使用下列标记格式输出。
+**** 对齐标记
+     | 标记 | 含义                              |
+     |------+-----------------------------------|
+     | <    | 左对齐                            |
+     | >    | 右对齐                            |
+     | \=   | 仅对数字有效。在正/负号前增加间距 |
+     | \^   | 居中对齐                          |
+
+     #+BEGIN_SRC python :session
+       name = 'claudio'
+
+       '{}'.format(name)
+       '{:>10}'.format(name)
+       '{:<10}'.format(name)
+       '{:=10}'.format(-100)
+       '{:^10}'.format(name)
+     #+END_SRC
+
+     #+RESULTS[ecf346eb362e33e9160bba6190a0a11c2410e8b8]:
+     :
+     : >>> 'claudio'
+     : '   claudio'
+     : 'claudio   '
+     : '-      100'
+     : ' claudio  '
+
+**** 对数字正负号的标记
+
+     | 标记  | 含义                           |
+     |-------+--------------------------------|
+     | +     | 不管时正负数，都在前面添加符号 |
+     | -     | 仅在负数前添加符号             |
+     | space | 整数前用空格，负数前用负号     |
+
+     #+BEGIN_SRC python :session
+       '{:+}'.format(100)
+       '{:+}'.format(-100)
+
+       '{:-}'.format(100)
+       '{:-}'.format(-100)
+
+       '{: }'.format(100)
+       '{: }'.format(-100)
+     #+END_SRC
+
+     #+RESULTS[45bf5deb6bd6ff4171aad64fd3efccb562f068fe]:
+     : '+100'
+     : '-100'
+     : >>> '100'
+     : '-100'
+     : >>> ' 100'
+     : '-100'
+
+**** 整数进制转换
+
+     | 标记 | 含义                                |
+     |------+-------------------------------------|
+     | b    | 二进制                              |
+     | c    | 转换为Unicode字符                   |
+     | d    | 10进制                              |
+     | o    | 8进制                               |
+     | x    | 16进制，小写                        |
+     | X    | 16进制，大写                        |
+     | n    | 同'd'，不过会使用本地环境的间隔字符 |
+     | None | 同'd'                               |
+
+     此外，还可使用下面表示浮点数的标记。
+
+     #+BEGIN_SRC python :session
+       n = 10
+       '{:b}'.format(n)
+       '{:c}'.format(n)
+       '{:d}'.format(n)
+       '{:o}'.format(n)
+       '{:x}'.format(n)
+       '{:X}'.format(n)
+       '{:n}'.format(n)
+       '{:}'.format(n)
+     #+END_SRC
+
+     #+RESULTS[29af31cdf7cc6c6480470e2f38ab32044cea119d]:
+     :
+     : '1010'
+     : '\n'
+     : '10'
+     : '12'
+     : 'a'
+     : 'A'
+     : '10'
+     : '10'
+
+     可使用“#”显示进制：
+
+     #+BEGIN_SRC python :session
+       n = 10
+       '{:#b}'.format(n)
+       '{:c}'.format(n)
+       '{:#d}'.format(n)
+       '{:#o}'.format(n)
+       '{:#x}'.format(n)
+       '{:#X}'.format(n)
+       '{:#n}'.format(n)
+       '{:#}'.format(n)
+     #+END_SRC
+
+     #+RESULTS[50be5b3b00ec1a3e12e2421107e20074e88ce3f9]:
+     :
+     : '0b1010'
+     : '\n'
+     : '10'
+     : '0o12'
+     : '0xa'
+     : '0XA'
+     : '10'
+     : '10'
+
+     还可使用“,”在数字中插入逗号：
+
+     #+BEGIN_SRC python :session
+       '{:,}'.format(1233456)
+       '{:,}'.format(12334.56)
+     #+END_SRC
+
+     #+RESULTS[c285eba7a28d863f64d13e88be34504cd77975af]:
+     : '1,233,456'
+     : '12,334.56'
+
+**** 浮点数和整数都可用的标记
+     | 标记 | 含义                               |
+     |------+------------------------------------|
+     | e    | 科学计数法，小写e，默认精度6       |
+     | E    | 同上，大写E                        |
+     | f    | 固定小数点后位数为6位              |
+     | F    | 同上，不过将nan变为NAN，inf变为INF |
+     | g    | 智能使用科学计数法                 |
+     | G    |                                    |
+     | n    | 同g，不过根据本地环境插入分割字符  |
+     | %    | 百分数表示                         |
+     | None | 同g，。。。                        |
+
+     #+BEGIN_SRC python :session
+       n = 123456789.123456789
+
+       '{:e}'.format(n)
+       '{:E}'.format(n)
+       '{:f}'.format(n)
+       '{:F}'.format(n)
+       '{:g}'.format(n)
+       '{:G}'.format(n)
+       '{:n}'.format(n)
+       '{:%}'.format(n)
+       '{:}'.format(n)
+     #+END_SRC
+
+     #+RESULTS[44bc1c02d27f640d6b2889783f52f38bcf939153]:
+     #+begin_example
+
+     >>> '1.234568e+08'
+     '1.234568E+08'
+     '123456789.123457'
+     '123456789.123457'
+     '1.23457e+08'
+     '1.23457E+08'
+     '1.23457e+08'
+     '12345678912.345678%'
+     '123456789.12345679'
+     #+end_example
+
+*** 格式例子
+    大多数情况下，与使用%的传统形式相同，如'%03.2f'等价于'{:03.2f}'，
+    即使用冒号和大括号替换了百分号。
+
+    不过，此新新形式添加了一些先用法，下面例子中会体现。
+
+**** 通过位置获取参数
+
+     #+BEGIN_SRC python :session
+       '{0}, {1}, {2}'.format('a', 'b', b'c')
+       '{}, {}, {}'.format('a', 'b', 'c')
+       '{2}, {1}, {0}'.format('a', 'b', 'c')
+       '{2}, {1}, {0}'.format(*'abc')
+       '{0} and {1!r} and {0}'.format('apple', 'banana')
+     #+END_SRC
+
+     #+RESULTS[41fdca0209912ddff3a7f23f0cf4412f661662fd]:
+     : "a, b, b'c'"
+     : 'a, b, c'
+     : 'c, b, a'
+     : 'c, b, a'
+     : "apple and 'banana' and apple"
+
+**** 通过名称获取参数
+
+     #+BEGIN_SRC python :session
+       '{country}的首都是{capital}'.format(country='中国', capital='北京')
+
+       item = {'country': '中国', 'capital': '北京'}
+       '{country}的首都是{capital}'.format(**item)
+     #+END_SRC
+
+     #+RESULTS[efc629a84afdde096307cff5ccf4cb4b70f4e72d]:
+     : '中国的首都是北京'
+     : >>> >>> '中国的首都是北京'
+
+**** 获取参数的属性
+
+     #+BEGIN_SRC python :session
+       c = 3 - 5j
+       '复数{0}的实部为：{0.real}, 虚部为：{0.imag}'.format(c)
+
+       class Point:
+           def __init__(self, x, y):
+               self.x, self.y = x, y
+           def __str__(self):
+               return 'Point({self.x}, {self.y})'.format(self=self)
+
+       str(Point(3, 3))
+     #+END_SRC
+
+     #+RESULTS[c360263864b417d4161470c009ce24f9f9910113]:
+     :
+     : '复数(3-5j)的实部为：3.0, 虚部为：-5.0'
+     : >>> ... ... ... ... ... >>> 'Point(3, 3)'
+
+**** 获取参数中的元素
+
+     #+BEGIN_SRC python :session
+       point = [1, 2]
+       'X: {0[0]}; Y: {0[1]}'.format(point)
+     #+END_SRC
+
+     #+RESULTS[44c43572d18bbdfac83cdb06b2e9cfc67ec420bf]:
+     :
+     : 'X:      1; Y: 2'
+
+**** 使用%s代替%r
+
+     #+BEGIN_SRC python :session
+       'reper()函数会显示引号：{!r}；str()函数则不会：{!s}'.format('abc', 'ABC')
+     #+END_SRC
+
+     #+RESULTS[7ffd29edf6f25d4e7584bc7ea2b28592bd4228a5]:
+     : "reper()函数会显示引号：'abc'；str()函数则不会：ABC"
+
+**** 对齐和指定宽度
+     中文占两个字母宽度？？？
+
+     #+BEGIN_SRC python :session
+       '{:<20}'.format('左对齐')
+       '{:>20}'.format('右对齐')
+       '{:^20}'.format('居中')
+       '{:*^20}'.format('居中，用信号填补空白')
+     #+END_SRC
+
+     #+RESULTS[324468f0b45ad342ac39828391573e69028d3c3c]:
+     : '左对齐                 '
+     : '                 右对齐'
+     : '         居中         '
+     : '*****居中，用信号填补空白*****'
+
+**** 替换%+f、%-f和%f，并添加正负号
+
+     #+BEGIN_SRC python :session
+       from math import pi
+
+       '{:+f}; {:+f}'.format(pi, -pi)
+       '{: f}; {: f}'.format(pi, -pi)
+       '{:-f}; {:-f}'.format(pi, -pi)
+     #+END_SRC
+
+     #+RESULTS[9d9709337e8bb17e10f6ea020a3ab96182c7b6a7]:
+     :
+     : >>> '+3.141593; -3.141593'
+     : ' 3.141593; -3.141593'
+     : '3.141593; -3.141593'
+
+**** 替换%x和%o，并转换不同进制
+
+     #+BEGIN_SRC python :session
+       '10进制：{0:d}，16进制：{0:x}；8进制：{0:o}; 2进制：{0:b}'.format(42)
+       '10进制：{0:d}，16进制：{0:#x}；8进制：{0:#o}; 2进制：{0:#b}'.format(42)
+     #+END_SRC
+
+     #+RESULTS[2cad6a8e795f81c756462863e55fa248aaf208e2]:
+     : '10进制：42，16进制：2a；8进制：52; 2进制：101010'
+     : '10进制：42，16进制：0x2a；8进制：0o52; 2进制：0b101010'
+
+**** 使用逗号分割大数字
+
+     #+BEGIN_SRC python :session
+       '{:,}'.format(123456789)
+     #+END_SRC
+
+     #+RESULTS[5f51ce4e908837634f9c240f8eb939d04800ccce]:
+     : '123,456,789'
+
+**** 添加百分号
+
+     #+BEGIN_SRC python :session
+       '{:%}'.format(1 / 3)
+       '{:.2%}'.format(1 / 3)
+     #+END_SRC
+
+     #+RESULTS[63b0909883ed719c3d68a87ee2643a99578e3b74]:
+     : '33.333333%'
+     : '33.33%'
+
+**** 使用类型专门的格式
+
+     #+BEGIN_SRC python :session
+       import datetime
+
+       d = datetime.datetime(2017, 4, 22, 21, 30, 55)
+       '{:%Y-%m-%d %H:%M:%S}'.format(d)
+     #+END_SRC
+
+     #+RESULTS[3e8b8f3d61bd204b69eb01f7305b4c054293a415]:
+     :
+     : >>> >>> '2017-04-22 21:30:55'
+
+**** 嵌套
+
+     #+BEGIN_SRC python :session
+       for align, text in zip('<^>', ['left', 'center', 'right']):
+           '{0:{fill}{align}16}'.format(text, fill=align, align=align)
+
+       '{:02X}{:02X}{:02X}{:02X}'.format(*[192, 168, 0, 1])
+     #+END_SRC
+
+     #+RESULTS[bdca78ef7e568f0bf1fcc66ba1c40750d05be890]:
+     :
+     : ... 'left<<<<<<<<<<<<'
+     : '^^^^^center^^^^^'
+     : '>>>>>>>>>>>right'
+     : 'C0A80001'
+
+     #+BEGIN_SRC python :session
+       for num in range(5, 12):
+           for base in 'dXob':
+               print('{0:{width}{base}}'.format(num, base=base, width=5), end='')
+           print()
+     #+END_SRC
+
+     #+RESULTS[3c3b781a7a6d1d10aeae17fb2e357371278fbb5c]:
+     :
+     : ... ... ...     5    5    5  101
+     :     6    6    6  110
+     :     7    7    7  111
+     :     8    8   10 1000
+     :     9    9   11 1001
+     :    10    A   12 1010
+     :    11    B   13 1011
+
+** 模板字符串
+   
+   #+BEGIN_SRC python :session
+     from string import Template
+     s = Template('你好，$who。 我是$me。')
+
+     s.substitute(who='world', me='claudio')
+   #+END_SRC
+   
+   #+RESULTS[83b02956c092b2329a4db9acc744d9719f2c191b]:
+   :
+   : >>> >>> '你好，world。 我是claudio。'
+   
+   基本规则：
+   
+   1. $$表示$本身。
+   2. $identifier表示需替换处，被映射中key为identifier的值替换。默认情
+      况下，identifier需为ASCII小写字母或下划线，首字母须为ASCII小写字
+      母或下划线。在第一个非此类字母除将其结束。
+   3. $identifier同${identifier}在绝大多数情况下等价，当当需将其置于单
+      词中时则必须使用后者，如"${identifier}name"。
+   4. 其他任何形式抛出ValueError错误。
+      
+*** class string. *Template* (template)
+    接受单个模板字符串TEMPLATE，构造模板。
+**** *substitute* (mapping,**kwds)
+     进行替换，返回新字符串。MAPPING为“类字典”对象，key值对应
+     placeholder；也可使用关键字参数，关键字对应placeholder。如果
+     MAPPING参数和关键字参数有重名，则关键字参数中的值有效。
+
+     #+BEGIN_SRC python :session
+       from string import Template
+
+       temp = Template('hello, ${name}.')
+       temp.substitute({'name': 'world'}, name='Claudio')
+     #+END_SRC
+
+     #+RESULTS[ecb945d54827f4a43c35b4b65aee492dc6f65b28]:
+     :
+     : >>> >>> 'hello, Claudio.'
+
+**** *safe_substitute* (mapping,**kwds)
+     同substitute基本相同，只是当没找到对应key值时，identifier保持原样
+     输出。
+
+     *注意* ：其实一点也不“safe”。
+
+     #+BEGIN_SRC python :session
+       from string import Template
+
+       tmp = Template('${who}喜欢${what}')
+       tmp.substitute(who='我')
+       tmp.safe_substitute(who='你')
+     #+END_SRC
+
+     #+RESULTS[2f2410515ff5fe0cf485a3f3225d0d54bb5bbf77]:
+     :
+     : >>> >>> Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     :   File "/usr/lib/python3.5/string.py", line 129, in substitute
+     :     return self.pattern.sub(convert, self.template)
+     :   File "/usr/lib/python3.5/string.py", line 119, in convert
+     :     val = mapping[named]
+     : KeyError: 'what'
+     : '你喜欢${what}'
+
+**** *template*
+     公共数据属性。返回构建模板时的字符串。不要改变此属性，只将其作为
+     自读属性即可。
+
+     #+BEGIN_SRC python :session
+       from string import Template
+
+       temp = Template('${who}喜欢${what}')
+       temp.template
+     #+END_SRC
+
+     #+RESULTS[2ca94bc83125482c792b8f174cffaf55e8d6535f]:
+     :
+     : >>> >>> '${who}喜欢${what}'
+
+**** 改造
+     可以通过集成Template类，定制占位符语法，边界符（delimiter），或整
+     个解析模板字符串的正则。可重置的类属性有：
+
+     - delimiter：占位符字符串。默认为$。不要使用正则，因为实现会根据
+       需要对齐调用re.escape()方法。
+
+       #+BEGIN_SRC python :session
+         from string import Template
+
+         class MyTemp(Template):
+             delimiter = '#'
+
+         temp = MyTemp('hello #{name}')
+         temp.substitute(name='world')
+       #+END_SRC
+
+       #+RESULTS[fc099f2bb9ab16e7c1edf89910812ebd47ec3fae]:
+       :
+       : >>> >>> ... ... >>> >>> >>> 'hello world'
+
+     - idpattern： 在不使用大括号包裹placeholder时，会根据此正则默然添
+       加大括号，默认值为[_a-z][_a-z0-9]*。
+
+       #+BEGIN_SRC python :session
+         from string import Template
+
+         class MyTemp(Template):
+             idpattern = '[_a-z][_a-z0-9。]*'
+
+         temp = Template('我喜欢吃$food。')
+         mytemp = MyTemp('我喜欢吃${food}。')
+         mytemp1 = MyTemp('我喜欢吃$food。')
+         # mytemp1 = MyTemp('我喜欢吃$food。')
+         temp.substitute(food='orange')
+         mytemp.substitute(food='orange')
+         mytemp1.substitute(food='orange')
+       #+END_SRC
+
+       #+RESULTS[0374890ede19258988ff3970e5661dfbf14b2966]:
+       #+begin_example
+
+       >>> ... ... >>> >>> >>> >>> ... '我喜欢吃orange。'
+       '我喜欢吃orange。'
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+         File "/usr/lib/python3.5/string.py", line 129, in substitute
+           return self.pattern.sub(convert, self.template)
+         File "/usr/lib/python3.5/string.py", line 119, in convert
+           val = mapping[named]
+       KeyError: 'food。'
+       #+end_example
+
+     - flags：当编译用于识别替换的正则时使用的正则flags。默认值为
+       re.IGNORECASE。
+
+       *注意* ：re.VERBOSE总是会添加到flags中，所以定制idpatterns属性
+       时，需遵从verbose正则的规则。
+
+     另外，还可重置匹配整个placeholder的属性pattern。其值需为含4组
+     “named capture group”的正则。每组与上面的3条规则对应，另外还添加
+     了无效placeholder规则：
+
+     - escaped：边界符本身的正则。如默认值$$。
+     - named：不加大括号匹配placeholder名的正则。不要将边界付置于
+       capturing group中。
+     - braced：添加大括号时匹配placeholder名的正则。不要将边界符和大括
+       号置于capturing group中。
+     - invalid：This group matches any other delimiter pattern
+       (usually a single delimiter)？？？应出现在整个正则的最后。
+
+*** format和Template的区别  [[https://segmentfault.com/q/1010000006709792][@segmentfault]]
+    string.Template正如其名，适合于定义模板，如在函数和包里定义好模板，
+    就可在任意时间调用，而不用担心其细节；str.format则适合于当行表达式，
+    是%-format的替代，更灵活：
+
+    #+BEGIN_SRC python :session
+      from string import Template
+
+      class MyTem(Template):
+          delimiter = '#'
+
+      tem = MyTem('hello, #{name}')
+
+      print(tem.substitute(name='world'))
+    #+END_SRC
+
+    #+RESULTS[598b93ddce9c174f6e2fd165c9b7839f383272cd]:
+    :
+    : >>> ... ... >>> >>> >>> hello, world
+
+** 帮助函数
+*** string. *capwords* (s,sep=None)
+    对字符S调用str.split()方法，对每个单词调用str.capitalize()方法，再
+    调用str.join()方法连接返回。
+    
+    使用SEP参宿作为分割和连接字符串的分隔符，默认为空白字符。
+    
+    #+BEGIN_SRC python :session
+      from string import capwords
+
+      capwords('i have a dream!')
+      capwords('banana', sep='a')
+    #+END_SRC
+    
+    #+RESULTS[da595ad1f2d225e97f61633a716d197a60387985]:
+    :
+    : >>> 'I Have A Dream!'
+    : 'BaNaNa'
+    
+* re - 正则表达式
+* difflib
+* textwrap
+* unicodedate
+* stringprep
+* readline
+* rlconpleter
