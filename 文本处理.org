@@ -174,12 +174,12 @@
      '我是一个聪明的 {!r}'.format('男孩')
      '我是一个聪明的 {!a}'.format('男孩')
    #+END_SRC
-
+   
    #+RESULTS[17870e409219a15570f5dad1340074afa9113f69]:
    : '我是一个聪明的 男孩'
    : "我是一个聪明的 '男孩'"
    : "我是一个聪明的 '\\u7537\\u5b69'"
-
+   
 *** 格式规范
     模板字符串中可使用下列标记格式输出。
 **** 对齐标记
@@ -209,13 +209,13 @@
      : ' claudio  '
 
 **** 对数字正负号的标记
-
-     | 标记  | 含义                           |
-     |-------+--------------------------------|
-     | +     | 不管时正负数，都在前面添加符号 |
-     | -     | 仅在负数前添加符号             |
-     | space | 整数前用空格，负数前用负号     |
-
+     
+     | 标记  | 含义                         |
+     |-------+------------------------------|
+     | +     | 不管正负数，都在前面添加符号 |
+     | -     | 仅在负数前添加符号           |
+     | space | 整数前用空格，负数前用负号   |
+     
      #+BEGIN_SRC python :session
        '{:+}'.format(100)
        '{:+}'.format(-100)
@@ -226,7 +226,7 @@
        '{: }'.format(100)
        '{: }'.format(-100)
      #+END_SRC
-
+     
      #+RESULTS[45bf5deb6bd6ff4171aad64fd3efccb562f068fe]:
      : '+100'
      : '-100'
@@ -234,7 +234,7 @@
      : '-100'
      : >>> ' 100'
      : '-100'
-
+     
 **** 整数进制转换
 
      | 标记 | 含义                                |
@@ -1260,7 +1260,7 @@
            if pattern.search(x):
                print(x)
      #+END_SRC
-
+     
      #+RESULTS[fe1756f9e6a5f0257b3d2b3a15961439e4b889f8]:
      :
      : >>> >>> >>> ... ... ... py
@@ -1282,7 +1282,7 @@
      - Unicode：
        匹配Unicode数字，即[0-9]及其他数字字符？？？。如果使用ASCII标记，
        则相当于[0-9]，由于此标记影响整个正则，所有最好使用[0-9]。
-       
+
      - 8-bit：
        等价于[0-9]
 
@@ -1306,11 +1306,11 @@
        import re
        re.findall('\s', ' a\t\n\r\f\vb')
      #+END_SRC
-
+     
      #+RESULTS[ae98d13f622826d346f31aaa456f4c7922479de5]:
      :
      : [' ', '\t', '\n', '\r', '\x0c', '\x0b']
-
+     
      - Unicode
        匹配空白字符，含[ \t\n\r\f\v]，及其他许多字符？？？。如果使用了
        ASCII标记，则相当于[ \t\n\r\f\v]。由于标记会影响整个正则，所以
@@ -1362,9 +1362,168 @@
      - 3.6版本开始，使用\转义无效字符将被禁用。
 
 ** 模块内容
+   此模块定义了几个函数、常量和Exception。其中一些函数仅是编译正则方法
+   的简化版。
    
+   *注意* ：最好使用编译正则的方法。
+   
+*** 常量
+**** re. *A*
+**** re. *ASCII*
+     使\w、\W、\b、\B、\d、\D、\s和\S仅匹配ASCII对应的字符，而不是匹配
+     所有Unicode对应的字符。仅对Unicode正则有效，对byte正则无效。
+     
+     #+BEGIN_SRC python :session
+       import re
+       re.findall('\w', 'a一')
+       re.findall('\w', 'a一', re.ASCII)
+       bytes('a一', 'utf-8')
+       re.findall(b'\w', bytes('a一', 'utf-8'))
+       re.findall(b'\w', bytes('a一', 'utf-8'), re.ASCII)
+     #+END_SRC
+
+     #+RESULTS[ed4d0f18798a1a874b7a6f50735b63e6d7bc0399]:
+     :
+     : ['a', '一']
+     : ['a']
+     : b'a\xe4\xb8\x80'
+     : [b'a']
+     : [b'a']
+     
+**** re. *DEBUG*
+     显示编译正则的Debug信息。
+
+     #+BEGIN_SRC python :session
+       import re
+       re.compile('\w', re.DEBUG)
+     #+END_SRC
+
+     #+RESULTS[ada664fa569b3f8ea09eeaf17f5b73a3dabfe1a1]:
+     :
+     : IN
+     :   CATEGORY CATEGORY_WORD
+     : re.compile('\\w', re.DEBUG)
+
+**** re. *I*
+**** re. *IGNORECASE*
+     不区分大小写，所以[A-Z]也会匹配小写字母。不会被本地环境影响，且对
+     Unicode字符也有效。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall('[A-Z]', 'abc', re.IGNORECASE)
+     #+END_SRC
+
+     #+RESULTS[7ad7a5fe7c5ee7a3ae88b79dabdb0c3866209e2e]:
+     :
+     : >>> ['a', 'b', 'c']
+     
+**** re. *L*
+**** re. *LOCALE* （3.6版本将废除）
+     使\w、\W、\b、\B、\d、\D、\s和\S依赖本地环境决定匹配。不建议在本
+     地字符环境不可靠的情况下使用，且每次只处理一种“文化（culture）”。
+
+**** re. *M*
+**** re. *MULTILINE*
+     默认情况下，^只匹配字符串起始；$匹配字符串末尾，以及字符串末尾换
+     行符（如果有）前。
+
+     使用此标记后：^匹配匹配字符串起始和紧跟换行符后的位置；$匹配字符
+     串末尾和换行符前。
+
+     *？* ：好像只是改变了^的行为。
+
+**** re. *S*
+**** re. *DOTALL*
+     默认情况下“.”匹配除换行符以外的任意字符。使用此标记后也可匹配换行
+     符。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.findall('.', '\n')
+       re.findall('.', '\n', re.DOTALL)
+     #+END_SRC
+
+     #+RESULTS[8fde86e5ae455a6ace3e19b674dfea011737c287]:
+     :
+     : >>> []
+     : ['\n']
+
+**** re. *X*
+**** re. *VERBOSE*
+     允许多行书写正则表达式，且可添加注释。
+     
+     规则：
+     
+     1. 除字符类，和前面有非转义的反斜杠外，所有空格字符都会被忽视。
+     2. 除在字符类，以及前面有非转义反斜杠外的“#”，后面的内容会被作为
+        注释。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       a = re.compile(r"""\d +         # 整数部分
+       \.                              # 小数点
+       \d *                            # 小数部分
+       """, re.VERBOSE)
+
+       b = re.compile(r'\d+\.\d*')
+
+       a.findall('1.23 1.2 1')
+       b.findall('1.23 1.2 1')
+     #+END_SRC
+
+     #+RESULTS[8375df4dd1724dfe2e11fdcb380e6a9e83fd025b]:
+     :
+     : >>> ... ... ... >>> >>> >>> >>> ['1.23', '1.2']
+     : ['1.23', '1.2']
+
+*** 函数
+**** re. *compile* (pattern,flags=0)
+     将正则表达式编译为正则对象，以使用下一节介绍的match()和search()等
+     方法。
+
+     可使用上一节介绍的标记修改正则对象，如需使用多个标记，需使用二进
+     制运算符“|”结合。
+
+     #+BEGIN_SRC python :eval never
+       import re
+       prog = re.compile(pattern)
+       result = prog.match(string)
+     #+END_SRC
+
+     等价于：
+
+     #+BEGIN_SRC python :eval never
+       import re
+       result = re.match(pattern, string)
+     #+END_SRC
+
+     但如果但单个程序中多次复用一个正则，使用re.compile()方法编译后效
+     率更高。
+
+**** re. *search* (pattern,string,flags=0)
+**** re. *match* (pattern,string,flags=0)
+**** re. *fullmatch* (pattern,string,flags=0)
+**** re. *split* (pattern,string,maxsplit=0,flags=0)
+**** re. *findall* (pattern,string,flags=0)
+**** re. *finditer* (pattern,string,flags)
+**** re. *sub* (pattern,repl,string,count=0,flags=0)
+**** re. *subn* (pattern,repl,string,count=0,flags=0)
+**** re. *escape* (siring)
+**** re. *purge* ()
+*** Exception
+**** exception re. *error* (msg,pattern=None,pos=None )
+***** *msg*
+***** *pattern*
+***** *pos*
+***** *lineno*
+***** *colno*
 ** 正则表达式对象
 ** 正则匹配对象
+   
 ** 使用举例
 * difflib
 * textwrap
