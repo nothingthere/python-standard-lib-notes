@@ -1487,15 +1487,15 @@
 
      可使用上一节介绍的标记修改正则对象，如需使用多个标记，需使用二进
      制运算符“|”结合。
-
+     
      #+BEGIN_SRC python :eval never
        import re
        prog = re.compile(pattern)
        result = prog.match(string)
      #+END_SRC
-
+     
      等价于：
-
+     
      #+BEGIN_SRC python :eval never
        import re
        result = re.match(pattern, string)
@@ -1523,7 +1523,340 @@
 ***** *colno*
 ** 正则表达式对象
 ** 正则匹配对象
+   匹配对象总是具有布尔值True。由于当match()和search()匹配失败后会返回
+   None，可使用此特性判断是否匹配成功：
    
+   #+BEGIN_SRC python :eval never
+     match = re.search(pattern, string)
+     if match:
+         process(match)
+   #+END_SRC
+   
+   匹配对象支持下列方法和熟悉：
+*** 方法
+**** match. *expand* (template)
+     在模板字符串TEMPLATE中使用反向索引获取正则中匹配的分组。TEMPLATE
+     中可使用数字反向索引，如\1和\2，和命名分组，如\反向索引替换匹配内
+     容。
+     
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.match(r'(?P<first>\w+) (\w+)', 'hello world!')
+       m.expand(r'\g<2> \1 \g<first>')
+     #+END_SRC
+     
+     #+RESULTS[3f50ae1a7a1abe547ca4977b5259200def7b165e]:
+     :
+     : >>> >>> 'world hello hello'
+     
+**** match. *group* ([group1,...])
+     返回分组匹配内容。
+
+     - 参数默认为0，即整个匹配对象。
+     - 如果有多个参数，则是匹配结果组成的元组。
+     - 如果是1-99间的数字，则对应正则的各个分组。
+     - 如果参数值大于正则的分组数量，则抛出IndexError错误。
+     - 如果正则中分组没匹配任何内容，对应值为None。
+     - 如果匹配多个，则返回最后一个。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.match(r'(\w+) (\w+)', 'Isaac Newton, physicist')
+       m.group(0)
+       m.group(1)
+       m.group(2)
+       m.group(1, 2)
+     #+END_SRC
+
+     #+RESULTS[4346f5c0db5d449b9c8545fff03d9c5a60740cb0]:
+     :
+     : >>> >>> 'Isaac Newton'
+     : 'Isaac'
+     : 'Newton'
+     : ('Isaac', 'Newton')
+     
+     如果使用了正则命名分组的扩展功能（(?P<name>)），参数即可使用数字，
+     也可使用NAME进行反向索引。如果参数使用的字符串没有该命名分组，则
+     返回IndexError错误：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)', 'Malcolm Reynolds')
+
+       m.group('first_name'), m.group('last_name')
+       m.group(1), m.group(2)
+     #+END_SRC
+
+     #+RESULTS[416c0faee3171c2eb53e55c82bf781785704e558]:
+     :
+     : >>> >>> >>> ('Malcolm', 'Reynolds')
+     : ('Malcolm', 'Reynolds')
+
+     如果分组匹配多次，则返回最后匹配的内容：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.match(r'(..)+', 'aab2c3')
+       m.group(1)
+       m.group(0)
+     #+END_SRC
+
+     #+RESULTS[21b4b33aa5d52bbe73c01b3e13c87ac93ecd32e3]:
+     :
+     : >>> >>> 'c3'
+     : 'aab2c3'
+
+**** match. *groups* (default=None)
+     返回元组，由所有单独分组匹配内容组成。
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.match(r'(\d+)\.(\d+)', '3.14159')
+       m.groups()
+     #+END_SRC
+
+     #+RESULTS[884d7a63d90f29c74bb4e4c5612fd0b70acf289c]:
+     :
+     : >>> ('3', '14159')
+     
+     如果正则中有分组不匹配任何内容，可使用DEFAULT参数指定其值，默认值
+     为None：
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.match(r'(\d+)\.?(\d+)?(\w+)?', '123')
+       m.groups()
+       m.groups('没有匹配')
+     #+END_SRC
+
+     #+RESULTS[af808ee7c37bcb469a1a6a66463e393253134506]:
+     :
+     : >>> ('123', None, None)
+     : ('123', '没有匹配', '没有匹配')
+
+**** match. *groupdict* (default=None)
+     返回字典对象，key为正则的命名分组名，value为匹配内容。
+
+     DEFAULT参数与groups方法相同。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m1 = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)', 'Malcolm Reynolds')
+       m1.groupdict()
+
+       m2 = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)(?P<suffex>\w)?',
+                     'Malcolm Reynolds')
+
+       m2.groupdict('Phd')
+     #+END_SRC
+
+     #+RESULTS[8a7938cf7becadb18e1ee956d6978ad48fe9e1f4]:
+     :
+     : >>> >>> {'last_name': 'Reynolds', 'first_name': 'Malcolm'}
+     : >>> ... >>> >>> {'last_name': 'Reynolds', 'first_name': 'Malcolm', 'suffex': 'Phd'}
+
+**** match. *start* ([group])
+**** match. *end* ([group])
+     返回GROUP匹配内容的首尾索引。如果正则分组存在，但不匹配任何字符串，
+     则返回-1。
+     
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.match(r'(\w+) \w+ (.)?', 'Michael Jackson ')
+       m.groups()
+       m.start(), m.end()
+       m.start(0), m.end(0)
+       m.start(1), m.end(1)
+       m.start(2), m.end(2)
+     #+END_SRC
+     
+     #+RESULTS[6359d0464ff69e38123bbdd97411c7d44e21f69a]:
+     :
+     : >>> >>> ('Michael', None)
+     : (0, 16)
+     : (0, 16)
+     : (0, 7)
+     : (-1, -1)
+     
+     对于匹配对象m，如果有正则分组g匹配有内容，则m.group(g)等价于：
+     
+     #+BEGIN_SRC python :eval never
+       m.string[m.start(g):m.end(g)]
+     #+END_SRC
+
+     *注意* ：如果分组匹配空字符串（即纯在分组，但不匹配任何内容），
+     m.start(group)会与m.end(group)相等。如下例：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.search('b(c?)', 'cba')
+       m.group(0)
+       m.group(1)
+
+       m.start(0), m.end(0)
+       m.start(1), m.end(1)
+     #+END_SRC
+
+     #+RESULTS[d00e11c23036607a93602bc2110e5fa07bd85c13]:
+     :
+     : >>> >>> 'b'
+     : ''
+     : >>> (1, 2)
+     : (2, 2)
+
+     下例为删除 /remove_this/ 的例子：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       email = '3261958605@qremove_thisq.com'
+       m = re.search('remove_this', email)
+       email[:m.start()] + email[m.end():]
+     #+END_SRC
+
+     #+RESULTS[9f7eb4ef041bb44d69fcdcd36102b0b01e2e82c9]:
+     :
+     : >>> >>> >>> '3261958605@qq.com'
+
+**** match. *span* ([group])
+     返回由m.start(group)和m.end(group)组成的2元素元组。如果GROUP不匹
+     配任何内容，则为(-1, -1)。GROUP默认值为Default。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       m = re.search('(\w+) (\w+)', 'Michael Jackson')
+       m.span(0)
+       m.span(1)
+       m.span(2)
+     #+END_SRC
+
+     #+RESULTS[32b1236ad224a15c5c8cc948695214121a86deda]:
+     :
+     : >>> >>> (0, 15)
+     : (0, 7)
+     : (8, 15)
+
+*** 属性
+**** match. *pos*
+     可能等于传递个正则对象方法search()和match()的POS参数值。即正则对
+     象开始进行查找时的位置：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       pattern = re.compile('(\w+)')
+       m = pattern.match('Michael Jackson', -1)
+       m.group(0)
+       m.pos
+     #+END_SRC
+
+     #+RESULTS[1e4714847ab10ab751f87b54553cb02020dd5605]:
+     :
+     : >>> >>> >>> 'Michael'
+     : 0
+
+**** match. *endpos*
+     即正则结束搜索的后一个位置。可能等于传递给正则对象方法search()和
+     match()的ENDPOS参数值。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       pattern = re.compile(r'(\w+)')
+       m = pattern.search('Michael Jackson', 0, 40)
+       m.group()
+       m.group(1)
+       m.endpos
+     #+END_SRC
+
+     #+RESULTS[1178e40ecf05c7f7e6e2d14e3bc8a728d3e24511]:
+     :
+     : >>> >>> >>> 'Michael'
+     : 'Michael'
+     : 15
+
+**** match. *lastindex*
+     最后一个有匹配内容的正则分组索引（从1起）。如果没有分组，或分组不
+     匹配任何内容则返回None。
+
+     #+BEGIN_SRC python :session
+       from re import match
+
+       match('(a)b', 'ab').lastindex
+       match('((a)(b))', 'ab').lastindex
+       match('((ab))', 'ab').lastindex
+
+       match('(a)(b)', 'ab').lastindex
+
+       print(match('ab', 'ab').lastindex)
+       print(match('ab(.)?', 'ab').lastindex)
+     #+END_SRC
+
+     #+RESULTS[c861e30e0bfa4b2b43ab88e13425c40bf8d7ff44]:
+     :
+     : >>> 1
+     : 1
+     : 1
+     : >>> 2
+     : >>> None
+     : None
+
+**** match. *lastgroup*
+     返回最后一个分组的名称。如果最后一个分组没有名称，或分组不匹配任
+     何内容，或没有分组，返回None。
+
+     #+BEGIN_SRC python :session
+       from re import match
+
+       match('(?P<first_name>\w+) (?P<last_name>\w+)', 'Michael Jackson').lastgroup
+       print(match('(?P<first_name>\w+) (\w+)', 'Michael Jackson').lastgroup)
+       print(match('\w+ \w+', 'Michael Jackson').lastgroup)
+     #+END_SRC
+
+     #+RESULTS[f098162debbf03907205be42587e8600c3347198]:
+     :
+     : >>> 'last_name'
+     : None
+     : None
+
+**** match. *re*
+     作为参数传递给search()和match()方法的正则参数。
+     #+BEGIN_SRC python :session
+       import re
+       pattern = re.compile('(\w+) (\w+)')
+
+       m = re.match(r'(\w+) (\w+)', 'Michael Jackson')
+       m1 = pattern.match('Michael Jackson')
+       type(m.re), m.re
+       m1.re
+     #+END_SRC
+     
+     #+RESULTS[3970cca851b2b252546d8cc572145d5ff2fc3c20]:
+     :
+     : >>> >>> >>> >>> (<class '_sre.SRE_Pattern'>, re.compile('(\\w+) (\\w+)'))
+     : re.compile('(\\w+) (\\w+)')
+     
+**** match. *string*
+     作为参数传递给search()和match()方法，用于被搜索的字符串参数。
+
+     #+BEGIN_SRC python :session
+       import re
+       m = re.match(r'(\w+) (\w+)', 'Michael Jackson')
+       m.string
+     #+END_SRC
+
+     #+RESULTS[11670b75f063bd545a9b7ec24a74ca84f21c875e]:
+     :
+     : >>> >>> 'Michael Jackson'
+
 ** 使用举例
 * difflib
 * textwrap
