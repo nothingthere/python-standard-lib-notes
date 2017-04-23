@@ -1065,7 +1065,7 @@
 **** (?P<name>...)
      在(...)的基础上为反向索引添加新名字NAME。如正常情况下可使用
      \number获取分组匹配中的内容，使用此扩展后还可使用\name获取。
-
+     
      如下面匹配单/双引号括起来的内容：
 
      #+BEGIN_SRC python :session
@@ -1098,27 +1098,27 @@
 
        re.findall('(?#不区分大小写)(?i)a', 'aA')
      #+END_SRC
-     
+
      #+RESULTS[c309dce82dee2b20693b54c1752792be11fc6cfd]:
      :
      : >>> ['a', 'A']
 
 **** (?=...)
-     当...匹配才成功。为提前假设，不消耗字符串。如"Isaac (?=Asimov)"至有当"Isaac "
-     后有字符串"Asimov"时才匹配成功。
-
+     当...匹配才成功。为提前假设，不消耗字符串。如"Isaac (?=Asimov)"只
+     有当"Isaac "后有字符串"Asimov"时才匹配成功。
+     
      #+BEGIN_SRC python :session
        import re
 
        re.findall('Isaac (?=Asimov)', 'Isaac')
        re.findall('Isaac (?=Asimov)', 'Isaac Asimov')
      #+END_SRC
-
+     
      #+RESULTS[2ce943bcbd23be1249a797c6490db4fdac85e6b3]:
      :
      : >>> []
      : ['Isaac ']
-
+     
 **** (?!...)
      当...不匹配时才成功。为提前假设，不消耗字符串。如“Isaac
      (?!Asimov)”只有当"Isaac "后不是"Asimov"才成功：
@@ -1129,7 +1129,7 @@
        re.findall('Isaac (?!Asimov)', 'Isaac Asimov')
        re.findall('Isaac (?!Asimov)', 'Isaac Asim')
      #+END_SRC
-     
+
      #+RESULTS[450299fb22f39dd6945c95f7d816e718a723ef18]:
      :
      : >>> []
@@ -1580,7 +1580,7 @@
      如果使用了正则命名分组的扩展功能（(?P<name>)），参数即可使用数字，
      也可使用NAME进行反向索引。如果参数使用的字符串没有该命名分组，则
      返回IndexError错误：
-
+     
      #+BEGIN_SRC python :session
        import re
 
@@ -1589,14 +1589,14 @@
        m.group('first_name'), m.group('last_name')
        m.group(1), m.group(2)
      #+END_SRC
-
+     
      #+RESULTS[416c0faee3171c2eb53e55c82bf781785704e558]:
      :
      : >>> >>> >>> ('Malcolm', 'Reynolds')
      : ('Malcolm', 'Reynolds')
-
+     
      如果分组匹配多次，则返回最后匹配的内容：
-
+     
      #+BEGIN_SRC python :session
        import re
 
@@ -1604,40 +1604,74 @@
        m.group(1)
        m.group(0)
      #+END_SRC
-
+     
      #+RESULTS[21b4b33aa5d52bbe73c01b3e13c87ac93ecd32e3]:
      :
      : >>> >>> 'c3'
      : 'aab2c3'
+     
+     多层嵌套情况下，消耗完一个整体后逐渐向后推移分组编号：
+     
+     #+BEGIN_SRC python :session
+       from re import match
 
+       m = match('(((a)))(b)', 'ab')
+       m.group()
+       m.group(1)
+       m.group(2)
+       m.group(3)
+       m.group(4)
+     #+END_SRC
+     
+     #+RESULTS[3e2e22877d4c80a9581570d8ad461ee7d32e0d35]:
+     :
+     : >>> >>> 'ab'
+     : 'a'
+     : 'a'
+     : 'a'
+     : 'b'
+     
 **** match. *groups* (default=None)
      返回元组，由所有单独分组匹配内容组成。
-
+     
      #+BEGIN_SRC python :session
        import re
        m = re.match(r'(\d+)\.(\d+)', '3.14159')
        m.groups()
      #+END_SRC
-
+     
      #+RESULTS[884d7a63d90f29c74bb4e4c5612fd0b70acf289c]:
      :
      : >>> ('3', '14159')
      
      如果正则中有分组不匹配任何内容，可使用DEFAULT参数指定其值，默认值
      为None：
-
+     
      #+BEGIN_SRC python :session
        import re
        m = re.match(r'(\d+)\.?(\d+)?(\w+)?', '123')
        m.groups()
        m.groups('没有匹配')
      #+END_SRC
-
+     
      #+RESULTS[af808ee7c37bcb469a1a6a66463e393253134506]:
      :
      : >>> ('123', None, None)
      : ('123', '没有匹配', '没有匹配')
+     
+     没有分组返回空字典：
+     
+     #+BEGIN_SRC python :session
+       from re import match
 
+       m = match('a', 'a')
+       m.groupdict()
+     #+END_SRC
+     
+     #+RESULTS[a6a3a4c6fdff891034f4abaea1210234894793cc]:
+     :
+     : >>> >>> {}
+     
 **** match. *groupdict* (default=None)
      返回字典对象，key为正则的命名分组名，value为匹配内容。
 
@@ -1664,7 +1698,7 @@
 **** match. *end* ([group])
      返回GROUP匹配内容的首尾索引。如果正则分组存在，但不匹配任何字符串，
      则返回-1。
-     
+
      #+BEGIN_SRC python :session
        import re
 
