@@ -7,18 +7,28 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
 * struct
 ** 写在前面 [[http://kaiyuan.me/2015/12/25/python-struct/][@kaiyun]]
+
+   #+BEGIN_SRC python :session
+     import struct
+     struct.calcsize('2I3sI')
+   #+END_SRC
+
+   #+RESULTS[154e357bb444a800f4b01e8e5abab0a0c7735bbc]:
+   :
+   : 16
+
 ** 格式字符串（Format Strings）
    格式字符串用于限定打包（packing）和解包（unpacking）时的数据排布，
    由下面2小节的“Byte顺序、大小和对齐”和“格式字符”共同控制。
    
 *** Byte顺序、大小和对齐
-
+    
     默认情况下，C语言类型内存分布，由电脑本地的格式和byte顺序决定，并
     根据需要通过“跳过”bytes位置来对齐（由C编译器决定）。
-
+    
     此外，下表中的字符可用在格式字符串第一个位置，指定数据打包时的byte
     顺序、大小和对齐。
-
+    
     | 字符 | Byte顺序             | 大小     | 对齐   |
     |------+----------------------+----------+--------|
     | @    | native               | native   | native |
@@ -26,18 +36,18 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     | <    | little-endian        | standard | none   |
     | >    | big-endian           | standard | none   |
     | \!   | network(=big-endian) | standard | none   |
-
+    
     - 本地字节序可用“sys.byteorder”获取：
-
+      
     #+BEGIN_SRC python :session
       import sys
       sys.byteorder
     #+END_SRC
-
+    
     #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
     :
     : 'little'
-
+    
     - 如果第一个字符不是上表中的任何有个，默认为“@”。
     - “native”字节序有当前主机决定。
     - “native”大小和对齐由C编译器的sizeof表达式决定。总是与本地字节序
@@ -45,39 +55,33 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     - “standard”大小仅由下一节的“格式字符串决定”。
     - “!”用于简写网络字节序（防止不能记住）。
     - 无法指定非本地字节序（强制字节序交换）；需适应“>”和“>”指定。
-
+      
     *注意* ：
-
+    
     1. 仅在结构体相邻的数据间有padding，首位无。
     2. 使用非本地字节序时，不会有padding。即使用“<”、“>”和“!”时。
     3. 如需将结构体padding到某种类型的大小，可在格式字符串最后重复该类
        型，并指定其数量为0：
-
+       
        前面的数字1和2都占4个字节，3为short型（2个字节），再使用"0i"（4
        个字节），就在后面添加了2个字节。
-
+       
        #+BEGIN_SRC python :session
          import struct
 
          x = struct.pack('iih0i', 1, 2, 3)
          len(x), x
        #+END_SRC
-
+       
        #+RESULTS[3f5a2483d97794840917fc17a3edca72f0b221d1]:
        :
        : >>> >>> (12, b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00')
-
-**** 字节序（endian）[[https://zh.wikipedia.org/wiki/%25E5%25AD%2597%25E8%258A%2582%25E5%25BA%258F][@wiki]]
-     数据在内存中排序情况。如数字“12”，如果为“小端序（little-endian）”
-     则内存中“2”在“1”之前，“大端序（bit-endian）”则“1”在“2”之前。
-
-     在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
-     同 标准的字节序。
-
+       
 *** 格式字符
     下表为所有执行数据类型的格式字符。第二列C类型可见其类型，第4列标准
-    为大小，当使用“<”、“>”、“=”或“!”时为本地大小（有当前主机决定）。
-
+    为大小。当使用“<”、“>”、“=”或“!”时为标准大小。默认值或@为本地大小
+    （由当前主机决定）。
+    
     | 格式字符 | C类型              | Python类型         | 标准大小 | 注意点  |
     |----------+--------------------+--------------------+----------+---------|
     | x        | pad type           | no value           |          |         |
@@ -100,9 +104,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     | s        | char[]             | bytes              |          |         |
     | p        | char[]             | bytes              |          |         |
     | P        | void *             | integer            |          | (6)     |
-
+    
     注意点：
-
+    
     1. “?”对应C99中的_Bool类型。如果没有此类型，则相当于字符类型。在标
        准模式下，总是用一个字节表示。
     2. 如果在本地模式下，仅当主机C编译器支持C的long long类型时才有效。
@@ -115,18 +119,18 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        binary64格式。
     6. “P”格式仅限于本地字节序模式（缺省第一个字符或为“@”）。struct模
        块不将其解释为本地字节序，所以无效？？？
-
+       
     其他注意点：
-
+    
     - 上表中的格式字符前可跟整数，指定重复数量，如“4h”等价于“hhhh”。
     - 格式字符串间的空格会被忽视，但指定重复的整数与其对应的格式字符间
       不能有空格。
     - 如果对“s”指定重复数量，指定的是byte长度。如“10s”表示单个10-byte
-      的字符串，而“10c”表示10个字符。如果不指定重复，默认为1，即长度为
-      1-byte的字符串。打包时，字符串会根据指定格式truncted或padded；解
-      包时，结果与指定的byte数相同。为与C语言保持一致，“0s”表示单个空
-      字符串（“0c”表示0个字符）。
-
+      的字符串，即有11个bytes；而“10c”表示10个字符。如果不指定重复，默
+      认为1，即长度为1-byte的字符串。打包时，字符串会根据指定格式
+      truncted或padded；解包时，结果与指定的byte数相同。为与C语言保持
+      一致，“0s”表示单个空字符串（“0c”表示0个字符）。
+      
       #+BEGIN_SRC python :session
       import struct
 
@@ -135,17 +139,17 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
       struct.unpack('3s', x)
       #+END_SRC
-
+      
       #+RESULTS[ffdf2ef6608e61a74473dca90a2c5cbf73d84377]:
       :
       : >>> >>> b'abA'
       : >>> (b'abA',)
-
+      
     - “s”与“p”的区别为：前者为C形式字符串，后者为Pascal形式字符串。
-
+      
     - 使用“?”格式字符时，打包结果只是0或1或标准布尔值，解包结果为True
       或False。
-
+      
       #+BEGIN_SRC python :session
       import struct
 
@@ -155,13 +159,13 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack('?', x)
       print(x)
       #+END_SRC
-
+      
       #+RESULTS[7cabf81697f5a2dfa9cf2e773bc9c50f5e9cd991]:
      :
      : >>> >>> b'\x01'
      : >>> (True,)
      : b'\x01'
-
+      
 ** 函数和Exceptions
 *** exception struct. *error*
     所有报错入口，其参数报错信息。
@@ -174,12 +178,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       import struct
       from array import array
 
-      struct.pack('4s4si', '一'.encode('utf-8'), bytearray(b'a'), 97)
+      buff = struct.pack('!4s4si', '一'.encode('utf-8'), bytearray(b'a'), 97)
+      print(buff)
+      print(struct.unpack('!4s4si', buff))
     #+END_SRC
     
-    #+RESULTS[142f8bd5ae0019ed3c6eda23eaf3733ebc95a762]:
+    #+RESULTS[e0674198bc76e0d25097489cc8c623b96bc54605]:
     :
-    : >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00a\x00\x00\x00'
+    : >>> >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00\x00\x00\x00a'
+    : (b'\xe4\xb8\x80\x00', b'a\x00\x00\x00', 97)
     
 *** struct. *pack_into* (fmt,buffer,offset,v1,v2)
     将V1、V2...根据FMT写入BUFFER中，必须指定开始写入位置，即OFFSET参数。
@@ -208,9 +215,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** struct. *unpack* (fmt,buffer)
     根据FMT，将BUFFER（通过pack(FMT,..)打包的结果）解包。BUFFER中的
     byte数需与FMT指定相同。
-
+    
     返回结果即使只有单个值，也为元组。
-
+    
     #+BEGIN_SRC python :session
       import struct
 
@@ -218,11 +225,11 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       b = struct.pack(fmt, b'abc', 1, 2)
       struct.unpack(fmt, b)
     #+END_SRC
-
+    
     #+RESULTS[f97b5a2b81c314ebb3c2913890eb1e23796c7437]:
     :
     : >>> >>> >>> (b'abc', 1, 2)
-
+    
 *** struct. *unpack_from* (fmt,buffer,offset=0)
     从OFFSET开始，根据FMT将BUFFER解包。即时只有一个值，返回值也为元组。
 
@@ -280,9 +287,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** class struct. *Struct* (fmt)
     返回根据FMT构建的Struct对象，永远读取二进制数据。由于创建Struct对
     象时会编译FMT字符串，调用对象上的方法较之对应的函数效率更快。
-    
+
     下面为Struct对象上的方法和属性：
-    
+
 **** *pack* (v1,v2...)
      等价于pack函数。len(result) == .size。
 
@@ -392,7 +399,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
 ** 举例
    整数基本打包和解包：
-   
+
    #+BEGIN_SRC python :session
      import struct
 
@@ -400,15 +407,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.unpack('=hhl', struct.pack('=hhl', 1, 2, 3))
      struct.calcsize('=hhl')
    #+END_SRC
-   
+
    #+RESULTS[89df059a5f59249c58b331dfee8fb2df05703867]:
    :
    : >>> b'\x01\x00\x02\x00\x03\x00\x00\x00'
    : (1, 2, 3)
    : 8
-   
+
    解包结果可赋值变量，或named元组：
-   
+
    #+BEGIN_SRC python :session
      import struct
      from collections import namedtuple
@@ -421,14 +428,14 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      Student = namedtuple('Student', 'name serialnum school gradelevel')
      Student._make(struct.unpack('<10sHHb', record))
    #+END_SRC
-   
+
    #+RESULTS[4ed9cd69c591f5d90fd668457238b325c2b93c17]:
    :
    : >>> >>> >>> >>> >>> b'raymond   ' 4658 264 8
    : >>> >>> Student(name=b'raymond   ', serialnum=4658, school=264, gradelevel=8)
-   
+
    由于需要padding，格式字符串的顺序会影响大小：
-   
+
    #+BEGIN_SRC python :session
      import struct
 
@@ -437,15 +444,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
      struct.calcsize('ci'), struct.calcsize('ic')
    #+END_SRC
-   
+
    #+RESULTS[03a0880639a62525e2c396b34d0adbe60734dbc7]:
    :
    : >>> b'*\x00\x00\x00\x15\x14\x13\x12'
    : b'\x15\x14\x13\x12*'
    : >>> (8, 5)
-   
+
    在本地大小和对齐模式下，可在可行字符前添加数字0强制对齐：
-   
+
    #+BEGIN_SRC python :session
      import struct
 
@@ -453,16 +460,16 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.pack('lll', 1, 2, 3)
      struct.pack('llh0l', 1, 2, 3)
 
-     struct.pack('=llh0l', 1, 2, 3)
+     struct.pack('=llh', 1, 2, 3)
      struct.pack('=llh0l', 1, 2, 3)
    #+END_SRC
-   
-   #+RESULTS[c21efed746843b62fb655a399bf6c517734eeb53]:
+
+   #+RESULTS[bea3faecc4652043f5ce31d5e6acdf23378e946a]:
    :
    : >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
    : b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
    : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
-   
+
 * codecs

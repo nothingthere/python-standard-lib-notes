@@ -7,6 +7,7 @@
 ** 字符串常量
 *** string. *ascii_letters*
     ascii_lowercase和ascii_uppercase的结合。不由本地决定。
+
     #+BEGIN_SRC python :session
       import string
       string.ascii_letters
@@ -18,6 +19,7 @@
 
 *** string. *ascii_lowercase*
     小写字符。不由本地决定。
+
     #+BEGIN_SRC python :session
       import string
       string.ascii_lowercase
@@ -29,15 +31,16 @@
 
 *** string. *ascii_uppercase*
     大写字母。不由本地决定。
+    
     #+BEGIN_SRC python :session
       import string
       string.ascii_uppercase
     #+END_SRC
-
+    
     #+RESULTS[3cc03248df9135f10c36b1d3ac4495c448e24ba1]:
     :
     : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
+    
 *** string. *digits*
 
     #+BEGIN_SRC python :session
@@ -98,6 +101,7 @@
 
 *** string. *whitespace*
     含空格、tab、linefeed、return、formfeed和vertical tab。
+    
     #+BEGIN_SRC python :session
       import string
       string.whitespace
@@ -134,12 +138,12 @@
 ** 字符串格式语法
    格式化字符串时，str.format()方法和Formatter类使用相同的语法。使用后
    者时，可定制格式语法。
-
+   
    格式字符串中需被替换的地方使用{}，其余文本保持原样。如需表示{}本身，
    需使用{{}}。
-
+   
    一些简单的例子：
-
+   
    #+BEGIN_SRC python :session
      import string
 
@@ -150,7 +154,7 @@
      'Units destroyed: {player[0]}'.format(player=[1, 2, 3])
      'Weight in tons {0.digits}'.format(string)
    #+END_SRC
-
+   
    #+RESULTS[ad8196a5794c94864c2ca2f0013241ca39d784a2]:
    :
    : >>> 'First, thou shalt count to 1000'
@@ -159,16 +163,16 @@
    : 'My quest is Claudio'
    : 'Units destroyed: 1'
    : 'Weight in tons 0123456789'
-
+   
    一般情况下，使用format函数时调用的是对象上的__format__()方法。不过，
    可使用下面三个标记转换：
-
+   
    | 标记 | 调用函数 |
    |------+----------|
    | !s   | str()    |
    | !r   | repr()   |
    | !a   | ascii()  |
-
+   
    #+BEGIN_SRC python :session
      '我是一个聪明的 {!s}'.format('男孩')
      '我是一个聪明的 {!r}'.format('男孩')
@@ -189,7 +193,7 @@
      | >    | 右对齐                            |
      | \=   | 仅对数字有效。在正/负号前增加间距 |
      | \^   | 居中对齐                          |
-
+     
      #+BEGIN_SRC python :session
        name = 'claudio'
 
@@ -199,7 +203,7 @@
        '{:=10}'.format(-100)
        '{:^10}'.format(name)
      #+END_SRC
-
+     
      #+RESULTS[ecf346eb362e33e9160bba6190a0a11c2410e8b8]:
      :
      : >>> 'claudio'
@@ -207,15 +211,15 @@
      : 'claudio   '
      : '-      100'
      : ' claudio  '
-
-**** 对数字正负号的标记
      
+**** 对数字正负号的标记
+
      | 标记  | 含义                         |
      |-------+------------------------------|
      | +     | 不管正负数，都在前面添加符号 |
      | -     | 仅在负数前添加符号           |
      | space | 整数前用空格，负数前用负号   |
-     
+
      #+BEGIN_SRC python :session
        '{:+}'.format(100)
        '{:+}'.format(-100)
@@ -226,7 +230,7 @@
        '{: }'.format(100)
        '{: }'.format(-100)
      #+END_SRC
-     
+
      #+RESULTS[45bf5deb6bd6ff4171aad64fd3efccb562f068fe]:
      : '+100'
      : '-100'
@@ -234,7 +238,7 @@
      : '-100'
      : >>> ' 100'
      : '-100'
-     
+
 **** 整数进制转换
 
      | 标记 | 含义                                |
@@ -261,7 +265,7 @@
        '{:n}'.format(n)
        '{:}'.format(n)
      #+END_SRC
-
+     
      #+RESULTS[29af31cdf7cc6c6480470e2f38ab32044cea119d]:
      :
      : '1010'
@@ -310,21 +314,23 @@
      : '12,334.56'
 
 **** 浮点数和整数都可用的标记
+     
      | 标记 | 含义                               |
      |------+------------------------------------|
      | e    | 科学计数法，小写e，默认精度6       |
      | E    | 同上，大写E                        |
      | f    | 固定小数点后位数为6位              |
      | F    | 同上，不过将nan变为NAN，inf变为INF |
-     | g    | 智能使用科学计数法                 |
-     | G    |                                    |
+     | g    |                                    |
+     | G    | 智能使用科学计数法                 |
      | n    | 同g，不过根据本地环境插入分割字符  |
      | %    | 百分数表示                         |
      | None | 同g，。。。                        |
 
      #+BEGIN_SRC python :session
        n = 123456789.123456789
-
+       # import math
+       # n = math.pi
        '{:e}'.format(n)
        '{:E}'.format(n)
        '{:f}'.format(n)
@@ -336,10 +342,10 @@
        '{:}'.format(n)
      #+END_SRC
 
-     #+RESULTS[44bc1c02d27f640d6b2889783f52f38bcf939153]:
+     #+RESULTS[3049f910b6f0410f5423f380d04d5552d37570ad]:
      #+begin_example
 
-     >>> '1.234568e+08'
+     ... ... '1.234568e+08'
      '1.234568E+08'
      '123456789.123457'
      '123456789.123457'
@@ -353,11 +359,11 @@
 *** 格式例子
     大多数情况下，与使用%的传统形式相同，如'%03.2f'等价于'{:03.2f}'，
     即使用冒号和大括号替换了百分号。
-
+    
     不过，此新新形式添加了一些先用法，下面例子中会体现。
-
+    
 **** 通过位置获取参数
-
+     
      #+BEGIN_SRC python :session
        '{0}, {1}, {2}'.format('a', 'b', b'c')
        '{}, {}, {}'.format('a', 'b', 'c')
@@ -365,14 +371,14 @@
        '{2}, {1}, {0}'.format(*'abc')
        '{0} and {1!r} and {0}'.format('apple', 'banana')
      #+END_SRC
-
+     
      #+RESULTS[41fdca0209912ddff3a7f23f0cf4412f661662fd]:
      : "a, b, b'c'"
      : 'a, b, c'
      : 'c, b, a'
      : 'c, b, a'
      : "apple and 'banana' and apple"
-
+     
 **** 通过名称获取参数
 
      #+BEGIN_SRC python :session
@@ -424,24 +430,24 @@
      #+END_SRC
 
      #+RESULTS[7ffd29edf6f25d4e7584bc7ea2b28592bd4228a5]:
-     : "reper()函数会显示引号：'abc'；str()函数则不会：ABC"
+     : "repr()函数会显示引号：'abc'；str()函数则不会：ABC"
 
 **** 对齐和指定宽度
      中文占两个字母宽度？？？
-
+     
      #+BEGIN_SRC python :session
        '{:<20}'.format('左对齐')
        '{:>20}'.format('右对齐')
        '{:^20}'.format('居中')
        '{:*^20}'.format('居中，用信号填补空白')
      #+END_SRC
-
+     
      #+RESULTS[324468f0b45ad342ac39828391573e69028d3c3c]:
      : '左对齐                 '
      : '                 右对齐'
      : '         居中         '
      : '*****居中，用信号填补空白*****'
-
+     
 **** 替换%+f、%-f和%f，并添加正负号
 
      #+BEGIN_SRC python :session
@@ -619,10 +625,10 @@
 **** 改造
      可以通过集成Template类，定制占位符语法，边界符（delimiter），或整
      个解析模板字符串的正则。可重置的类属性有：
-
+     
      - delimiter：占位符字符串。默认为$。不要使用正则，因为实现会根据
        需要对齐调用re.escape()方法。
-
+       
        #+BEGIN_SRC python :session
          from string import Template
 
@@ -632,14 +638,14 @@
          temp = MyTemp('hello #{name}')
          temp.substitute(name='world')
        #+END_SRC
-
+       
        #+RESULTS[fc099f2bb9ab16e7c1edf89910812ebd47ec3fae]:
        :
        : >>> >>> ... ... >>> >>> >>> 'hello world'
-
+       
      - idpattern： 在不使用大括号包裹placeholder时，会根据此正则默然添
        加大括号，默认值为[_a-z][_a-z0-9]*。
-
+       
        #+BEGIN_SRC python :session
          from string import Template
 
@@ -654,10 +660,10 @@
          mytemp.substitute(food='orange')
          mytemp1.substitute(food='orange')
        #+END_SRC
-
+       
        #+RESULTS[0374890ede19258988ff3970e5661dfbf14b2966]:
        #+begin_example
-
+       
        >>> ... ... >>> >>> >>> >>> ... '我喜欢吃orange。'
        '我喜欢吃orange。'
        Traceback (most recent call last):
@@ -668,17 +674,39 @@
            val = mapping[named]
        KeyError: 'food。'
        #+end_example
-
+       
      - flags：当编译用于识别替换的正则时使用的正则flags。默认值为
        re.IGNORECASE。
-
+       
        *注意* ：re.VERBOSE总是会添加到flags中，所以定制idpatterns属性
        时，需遵从verbose正则的规则。
+       
+       #+BEGIN_SRC python :session
+       from string import Template
+       import re
 
+       class Mytemp(Template):
+           flags = re.IGNORECASE
+
+       temp = Mytemp('我喜欢吃$food')
+
+       temp.substitute(Food='banana')
+       #+END_SRC
+       
+       #+RESULTS[5000775d8ec6b226692cd1ed152ee8be520d8ac7]:
+       :
+       : >>> >>> ... ... >>> >>> >>> Traceback (most recent call last): 
+       :   File "<stdin>", line 1, in <module>
+       :   File "/usr/lib/python3.5/string.py", line 129, in substitute
+       :     return self.pattern.sub(convert, self.template)
+       :   File "/usr/lib/python3.5/string.py", line 119, in convert
+       :     val = mapping[named]
+       : KeyError: 'food'
+       
      另外，还可重置匹配整个placeholder的属性pattern。其值需为含4组
      “named capture group”的正则。每组与上面的3条规则对应，另外还添加
      了无效placeholder规则：
-
+     
      - escaped：边界符本身的正则。如默认值$$。
      - named：不加大括号匹配placeholder名的正则。不要将边界付置于
        capturing group中。
@@ -686,7 +714,7 @@
        号置于capturing group中。
      - invalid：This group matches any other delimiter pattern
        (usually a single delimiter)？？？应出现在整个正则的最后。
-
+       
 *** format和Template的区别  [[https://segmentfault.com/q/1010000006709792][@segmentfault]]
     string.Template正如其名，适合于定义模板，如在函数和包里定义好模板，
     就可在任意时间调用，而不用担心其细节；str.format则适合于当行表达式，
@@ -933,7 +961,7 @@
       
     - 匹配字符范围，如需在其中匹配“-”本身，则需将其转义，如[a\-z]或放
       在第一个或最后一个位置。
-      
+
       #+BEGIN_SRC python :session
         import re
 
@@ -955,7 +983,11 @@
 
       re.findall('[(+*?)]', '[(+*?)]')
       #+END_SRC
-
+      
+      #+RESULTS[43e5bb75b04f9aabde5ff974e132c05d1e979b75]:
+      :
+      : >>> ['(', '+', '*', '?', ')']
+      
     - 可在第一个位置使用^字符，表示不匹配其中任何字符。除在第一个位置
       外，^失去特殊含义：
 
@@ -966,7 +998,7 @@
       re.findall('[^an]', 'banana')
       re.findall('[an^]', '^banana')
       #+END_SRC
-      
+
       #+RESULTS[8a97c7d04b2f9977933348316d9b030513f89965]:
       :
       : >>> ['a', 'n', 'a', 'n', 'a']
@@ -990,17 +1022,17 @@
 *** |
     A|B，A和B可为任意正则，匹配A或B。从A开始向右匹配，找到匹配立即停止，
     即非贪婪。如需匹配数竖线本身，可使用反斜杠转义，或置于方括号内：
-
+    
     #+BEGIN_SRC python :session
       import re
 
       re.findall('(fuck|love) you', 'fuck you')
 
       re.findall('[|]', '|')
-      re.findall(r'\|', '|')
+      re.findall('\|', '|')
     #+END_SRC
-
-    #+RESULTS[10dfcde01aa124fbd812b003f56833f389d3e5f4]:
+    
+    #+RESULTS[a3d2634face3d90eb11de3f8b3918e83349afbc1]:
     :
     : >>> ['fuck']
     : >>> ['|']
@@ -1044,12 +1076,12 @@
      
      #+BEGIN_SRC python :session
        import re
-       re.findall('(?ax)', '人')       # ???
+       re.findall('(?a)', '人')       # ???
        re.findall('(?i)a', 'aA')
        re.findall('a', 'aA')
      #+END_SRC
      
-     #+RESULTS[fbed4128058c4a06f0118e3589ca283e70d754be]:
+     #+RESULTS[3d7e5871f6df0e3d858f7913bb1e63c9196b85bb]:
      :
      : ['', '']
      : ['a', 'A']
@@ -1065,7 +1097,7 @@
 **** (?P<name>...)
      在(...)的基础上为反向索引添加新名字NAME。如正常情况下可使用
      \number获取分组匹配中的内容，使用此扩展后还可使用\name获取。
-     
+
      如下面匹配单/双引号括起来的内容：
 
      #+BEGIN_SRC python :session
@@ -1118,7 +1150,7 @@
      :
      : >>> []
      : ['Isaac ']
-     
+
 **** (?!...)
      当...不匹配时才成功。为提前假设，不消耗字符串。如“Isaac
      (?!Asimov)”只有当"Isaac "后不是"Asimov"才成功：
@@ -1139,26 +1171,26 @@
      当前位置前匹配...才成功。也为提前假设，不消耗字符串。如
      (?<=abc)def可将abcdef匹配成功。...需为固定个数的字符，如果abc或
      a|b可以，但a*或a{3,4}则不可以。
-
+     
      #+BEGIN_SRC python :session
        import re
 
        m = re.search('(?<=abc)def', 'abcdef')
        m.group(0)
      #+END_SRC
-
+     
      #+RESULTS[da583083430ea899544b1115ebd8cda5c730b752]:
      :
      : >>> >>> 'def'
-
+     
      如匹配前面有短横线的单词：
-
+     
      #+BEGIN_SRC python :session
        import re
        m = re.search('(?<=-)\w+', 'spam-egg')
        print(m.group(0))
      #+END_SRC
-
+     
      #+RESULTS[96e23d18b42112fb158ee88b04f2157b541a142a]:
      :
      : >>> egg
@@ -1181,7 +1213,7 @@
 **** (?(id/name)yes-pattern|no-pattern)
      如果给定ID/NAME指定的匹配组存在，则使用yes-pattern，否则使用
      no-pattern。如下面简化的邮箱匹配正则：
-     
+
      #+BEGIN_SRC python :session
        import re
        pattern = re.compile('^(<)?(\w+@\w+(?:\.\w+)+)(?(1)>|$)')
@@ -1189,35 +1221,35 @@
            if pattern.search(email):
                print(email)
      #+END_SRC
-     
+
      #+RESULTS[d8cf2ffb28d6b1247dd9511ad9632d8f72963db2]:
      :
      : >>> ... ... ... <user1@host.com>
      : user2@host.com
-     
+
 *** 特殊转义字符
     如果转义下面没有列出的字符，只会匹配第二个。如\$会匹配$：
-
+    
     #+BEGIN_SRC python :session
       import re
 
       re.findall('\$', '$')
     #+END_SRC
-
+    
     #+RESULTS[037ca02c2abe1c063ca7555df2a105fb87a8336a]:
     :
     : >>> ['$']
-
+    
 **** \number
      反向索引。不能使用8进制数，最大数值99。
-
+     
      #+BEGIN_SRC python :session
        import re
        m = re.search(r'(.+) \1', '55 5')
-       m.group()
+       m.group(0)
      #+END_SRC
-
-     #+RESULTS[cb0c55418b4b668d953f47d1688c9e3219a59121]:
+     
+     #+RESULTS[bb02f8e49c3e433f7fcbc6da50be404a267a4259]:
      :
      : >>> '5 5'
      
@@ -1493,9 +1525,9 @@
        prog = re.compile(pattern)
        result = prog.match(string)
      #+END_SRC
-     
+
      等价于：
-     
+
      #+BEGIN_SRC python :eval never
        import re
        result = re.match(pattern, string)
@@ -1532,12 +1564,12 @@
          process(match)
    #+END_SRC
    
-   匹配对象支持下列方法和熟悉：
+   匹配对象支持下列方法和属性：
 *** 方法
 **** match. *expand* (template)
      在模板字符串TEMPLATE中使用反向索引获取正则中匹配的分组。TEMPLATE
-     中可使用数字反向索引，如\1和\2，和命名分组，如\反向索引替换匹配内
-     容。
+     中可使用数字反向索引，如\1和\2，和命名分组，如\name，反向索引替换
+     匹配内容。
      
      #+BEGIN_SRC python :session
        import re
@@ -1576,7 +1608,7 @@
      : 'Isaac'
      : 'Newton'
      : ('Isaac', 'Newton')
-     
+
      如果使用了正则命名分组的扩展功能（(?P<name>)），参数即可使用数字，
      也可使用NAME进行反向索引。如果参数使用的字符串没有该命名分组，则
      返回IndexError错误：
@@ -1646,59 +1678,61 @@
      
      如果正则中有分组不匹配任何内容，可使用DEFAULT参数指定其值，默认值
      为None：
-     
+
      #+BEGIN_SRC python :session
        import re
        m = re.match(r'(\d+)\.?(\d+)?(\w+)?', '123')
        m.groups()
        m.groups('没有匹配')
      #+END_SRC
-     
+
      #+RESULTS[af808ee7c37bcb469a1a6a66463e393253134506]:
      :
      : >>> ('123', None, None)
      : ('123', '没有匹配', '没有匹配')
-     
+
      没有分组返回空字典：
-     
+
      #+BEGIN_SRC python :session
        from re import match
 
        m = match('a', 'a')
        m.groupdict()
      #+END_SRC
-     
+
      #+RESULTS[a6a3a4c6fdff891034f4abaea1210234894793cc]:
      :
      : >>> >>> {}
-     
+
 **** match. *groupdict* (default=None)
      返回字典对象，key为正则的命名分组名，value为匹配内容。
-
+     
      DEFAULT参数与groups方法相同。
-
+     
      #+BEGIN_SRC python :session
        import re
 
        m1 = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)', 'Malcolm Reynolds')
        m1.groupdict()
 
-       m2 = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)(?P<suffex>\w)?',
+       m2 = re.match(r'(?P<first_name>\w+) (?P<last_name>\w+)(?P<suffix>\w)?',
                      'Malcolm Reynolds')
 
        m2.groupdict('Phd')
+       m2.groupdict()
      #+END_SRC
 
-     #+RESULTS[8a7938cf7becadb18e1ee956d6978ad48fe9e1f4]:
+     #+RESULTS[cefbee6e52e6402fd05abf9908d384e597f493b8]:
      :
-     : >>> >>> {'last_name': 'Reynolds', 'first_name': 'Malcolm'}
-     : >>> ... >>> >>> {'last_name': 'Reynolds', 'first_name': 'Malcolm', 'suffex': 'Phd'}
+     : >>> >>> {'first_name': 'Malcolm', 'last_name': 'Reynolds'}
+     : >>> ... >>> >>> {'first_name': 'Malcolm', 'suffix': 'Phd', 'last_name': 'Reynolds'}
+     : {'first_name': 'Malcolm', 'suffix': None, 'last_name': 'Reynolds'}
 
 **** match. *start* ([group])
 **** match. *end* ([group])
      返回GROUP匹配内容的首尾索引。如果正则分组存在，但不匹配任何字符串，
      则返回-1。
-
+     
      #+BEGIN_SRC python :session
        import re
 
@@ -1723,10 +1757,10 @@
      #+BEGIN_SRC python :eval never
        m.string[m.start(g):m.end(g)]
      #+END_SRC
-
-     *注意* ：如果分组匹配空字符串（即纯在分组，但不匹配任何内容），
+     
+     *注意* ：如果分组匹配空字符串（即存在分组，但不匹配任何内容），
      m.start(group)会与m.end(group)相等。如下例：
-
+     
      #+BEGIN_SRC python :session
        import re
 
@@ -1737,16 +1771,16 @@
        m.start(0), m.end(0)
        m.start(1), m.end(1)
      #+END_SRC
-
+     
      #+RESULTS[d00e11c23036607a93602bc2110e5fa07bd85c13]:
      :
      : >>> >>> 'b'
      : ''
      : >>> (1, 2)
      : (2, 2)
-
+     
      下例为删除 /remove_this/ 的例子：
-
+     
      #+BEGIN_SRC python :session
        import re
 
@@ -1754,11 +1788,11 @@
        m = re.search('remove_this', email)
        email[:m.start()] + email[m.end():]
      #+END_SRC
-
+     
      #+RESULTS[9f7eb4ef041bb44d69fcdcd36102b0b01e2e82c9]:
      :
      : >>> >>> >>> '3261958605@qq.com'
-
+     
 **** match. *span* ([group])
      返回由m.start(group)和m.end(group)组成的2元素元组。如果GROUP不匹
      配任何内容，则为(-1, -1)。GROUP默认值为Default。

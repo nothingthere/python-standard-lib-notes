@@ -18,9 +18,9 @@
 *** @contextlib. *contextmanager*
     此函数为装饰器，可用作为with声明的上下文管理器定义工厂函数，无需创
     建新类或单独的__enter__()和__exit__()方法。
-
+    
     下面为一个简单例子（不建议使用此方法生成HTML！）：
-
+    
     #+BEGIN_SRC python :session
       from contextlib import contextmanager
 
@@ -34,7 +34,7 @@
           with tag('h1'):
               print('一级标题')
     #+END_SRC
-
+    
     #+RESULTS[7c9aa81b61a00dd106848f459ba6f048884b9b62]:
     :
     : >>> ... ... ... ... ... >>> ... ... ... <div>
@@ -42,19 +42,19 @@
     : 一级标题
     : </h1>
     : </div>
-
+    
     被装饰的函数被调用时需返回一个“生成器迭代器”。此迭代器需只yield一
     个值，用于赋值with表达式中as后的变量。
-
+    
     包含在with语句中时，执行顺序为：yield语句前的代码, with语句中的表
     达式，yield后的代码。即相当于将with语句中的表达式嵌套在了yield处。
     所以，可使用try-except-finally表达式捕捉错误（如果有），或者保证一
     些清空行为（如关闭文件对象）。
-
+    
     contextmanager()使用ContextDecorator创建，所以其创建的上下文管理器
     可用作装饰器，及在with语句中使用。当被用作装饰器时，函数每次调用都
     会创建一个新的生成器对象。
-
+    
 *** contextlib. *closing* (thing)
     执行完代码块后，返回一个关闭THING的上下文管理器。基本上相当于：
 
@@ -91,13 +91,13 @@
 *** contextlib. *suppress* (*exceptions)
     返回一个上下文管理器，抑制with中语句执行时包含在EXCEPTIONS中的所有
     错误。
-    
+
     如其他完全抑制错误抛出的机制一样，此上下文管理器应仅用在确定的错误
     抛出上，并知晓不抛出该错误程序也能正确执行。
-    
+
     如：
-    
-    #+BEGIN_SRC python :session
+
+    #+BEGIN_SRC python :eval never
       from contextlib import suppress
       import os
 
@@ -108,17 +108,17 @@
       os.remove('files/emma1.txt')
       print('done')
     #+END_SRC
-    
+
     #+RESULTS[95c51607ce9100cfc9354f801abdca45f778bc2d]:
     :
-    : >>> >>> ... ... ... >>> Traceback (most recent call last): 
+    : >>> >>> ... ... ... >>> Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
     : FileNotFoundError: [Errno 2] No such file or directory: 'files/emma1.txt'
     : done
-    
+
     相当于：
-    
-    #+BEGIN_SRC python :session
+
+    #+BEGIN_SRC python :eval never
       import os
 
       try:
@@ -126,9 +126,7 @@
       except FileNotFoundError:
           pass
     #+END_SRC
-    
-    #+RESULTS[1be90d94bb5cbb36ca0d3bb32ca4829a8f3c2d1e]:
-    
+
 *** contextlib. *redirect_stdout* (new_target)
     将sys.stdout暂时重定向到另一个文件或另一个“类文件”对象。
 
@@ -144,6 +142,8 @@
 
       with redirect_stdout(f):
           help(pow)
+
+      f.getvalue()
     #+END_SRC
 
     #+RESULTS[ef889b9e6da3fe52a5692d5e2ad527c9af259477]:
@@ -227,10 +227,9 @@
 
     也只是语法糖，下面两种方式实质一样：
 
-    #+BEGIN_SRC python :session
+    #+BEGIN_SRC python :eval never
       def f():
           with cm():
-
               # 语句
 
       @cm()
@@ -241,7 +240,7 @@
     如需将已有的，具备基础类的上下文管理器用作装饰器，可在其基础上添加
     ContextDecorator作为父类：
 
-    #+BEGIN_SRC python
+    #+BEGIN_SRC python :eval never
       from contextlib import ContextDecorator
 
       class Mycontext(ContextBaseClass, ContextDecorator):
@@ -250,6 +249,8 @@
           def __exit__(self, *exc):
               return False
     #+END_SRC
+
+    #+RESULTS[0e15daa437e7f945d43927b4e572e92a12df8c91]:
 
     *注意* ：
 
@@ -301,7 +302,7 @@
       对于没有错误抛出机制的语言，可通过特殊返回值确定是否有错误发生，
       如C和Go：
 
-      #+BEGIN_SRC c :session
+      #+BEGIN_SRC c :eval never
         res1 = aquirce_resource_one();
         if (res == -1) {
           retval = -1;
@@ -332,7 +333,7 @@
 
       Python中可使用with减少上面的部分缺点：
 
-      #+BEGIN_SRC python
+      #+BEGIN_SRC python :eval never
         from contextlib import contextmanager
 
         @contextmanager
@@ -358,7 +359,7 @@
       Go语言虽然没有错误抛出机制，单可使用defer声明。被defer声明的资源
       “返回”后此调用defer声明：
 
-      #+BEGIN_SRC go
+      #+BEGIN_SRC go :eval never
         package main
 
         func main() {
@@ -386,7 +387,7 @@
 
       1. 加载和释放资源的代码可放在一起，无需缩进和跳转。
       2. 可转换为循环体，实现动态数目的资源加载和释放。
-         
+
       但也存在以下缺点：
 
       1. 当一组资源释放时，要实现对每个资源的控制需获取每个资源对应的
@@ -400,13 +401,13 @@
       ExitStack是由释放/清除函数组成的Stack。添加回调函数相当于Go中的
       defer声明。但是，释放函数并不是在资源函数“返回”后就执行，而是离
       开with语句块后执行，即直到with语句执行完后才释放。
-      
+
       释放函数本身可能抛出错误，但不影响其他释放函数的执行。即使是多个
       释放函数抛出错误，也可获取有用的stacktrace？？？。
-      
+
       获取多个资源：
-      
-      #+BEGIN_SRC python
+
+      #+BEGIN_SRC python :eval never
         from contextlib import ExitStack
 
         with ExitStack() as cm:
@@ -417,16 +418,16 @@
             cm.callback(release_resource, res2)
             # do stuff with res2
       #+END_SRC
-      
+
       可见：
-      
+
       1. 加载和释放代码可写在一起。
       2. 无需额外缩进。
       3. 可实现动态数目的资源加载和释放。
-         
+
       如果资源本身有上下文管理器，可简写：
-      
-      #+BEGIN_SRC python
+
+      #+BEGIN_SRC python :eval never
         from contextlib import ExitStack
 
         with ExitStack() as cm:
@@ -435,9 +436,9 @@
             res2 = cm.enter_context(open('second_file', 'r'))
             # do stuff with res1 and res2
       #+END_SRC
-      
+
       同时加载多个文件：
-      
+
       #+BEGIN_SRC python :session
         from contextlib import ExitStack, suppress
 
@@ -457,14 +458,14 @@
 
       #+RESULTS[f535119c105c51209db6684a610d8454b01f2f5f]:
       :
-      : >>> >>> ... ... ... ... ... ... ... ... >>> >>> >>> [<_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>, <_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>]
-      : <bound method ExitStack.close of <contextlib.ExitStack object at 0x7fb8fb580c18>>
+      : >>> >>> ... ... ... ... ... ... ... ... >>> >>> >>> []
+      : None
 
 **** *enter_context* (cm)
      将上下文管理器CM的__exit__()函数添加到回调函数Stack上，返回值为CM
      的__enter__()方法的返回值。
 
-     也可如普通上下文管理器一样一致错误抛出：
+     也可如普通上下文管理器一样抑制错误抛出：
 
      #+BEGIN_SRC python :session
        from contextlib import ExitStack, suppress
@@ -482,12 +483,12 @@
 **** *push* (exit)
      将上下文管理器的__exit__()方法添加到回调Stack中。返回值为上下文管
      理器__enter__()方法的返回值。
-     
+
      由于只获取__enter__()方法的返回值，不执行其中代码，可用于重
      置__enter__方法的行为。
-     
+
      ...？？？
-     
+
      #+BEGIN_SRC python :session
        from contextlib import ExitStack, ContextDecorator
 
@@ -511,7 +512,7 @@
            print('<div>')
            tag.print_body('BODY')
      #+END_SRC
-     
+
      #+RESULTS[26ea4cbb7f25d9eff67007c85f39b8f65f88c380]:
      :
      : >>> >>> ... ... ... ... ... ... ... ... ... ... >>> >>> ... ... ... <div>
@@ -520,7 +521,7 @@
      : ... ... ... ... <div>
      : BODY
      : </DIV>
-     
+
 **** *callback* (callback,*args,**kwds)
      将带任意参数的任意函数添加到回调函数Stack中。
 
@@ -539,7 +540,7 @@
            stack.callback(hello, 'claudio')
            print(1)
      #+END_SRC
-     
+
      #+RESULTS[290bf9a9507f8a1a9a4498a3dcdf40dd99c67213]:
      :
      : >>> ... ... >>> ... ... ... <function hello at 0x7fb8fb585c80>
@@ -550,8 +551,8 @@
      将回调函数组成的Stack赋值给一个新的ExitStack对象。在with语句中，
      如果有资源加载抛出错误，所有已加载的资源自动关闭；如果全部加载成
      功，不会执行回调函数，而是需在with语句外手动关闭。
-
-     #+BEGIN_SRC python :session
+     
+     #+BEGIN_SRC python :eval never
        from contextlib import ExitStack, suppress
 
        with ExitStack() as stack:
@@ -568,7 +569,7 @@
        close_files()
        opened_files[0].closed
      #+END_SRC
-
+     
      #+RESULTS[690e19b74a19b2e16b7c600c625957b68cfa1065]:
      :
      : >>> ... ... ... ... >>> [<_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>, <_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>]
@@ -576,7 +577,7 @@
      : >>> False
      : 'Help on built-in function pow in module builtins:\n'
      : >>> >>> True
-
+     
 **** *close* ()
      立即释放回调函数Stack，反向执行其中的所有回调函数。
 ** 例子和指点 ？？？
@@ -623,6 +624,5 @@
 * __future__ - 将要实现的语句定义
 * gc - 垃圾回收器接口
 * inspect - 检查正在活动的对象
-
 * sit - Site专用配置钩子
 * fpectl - 浮点数错误抛出控制

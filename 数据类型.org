@@ -36,9 +36,9 @@
 ** 此模块定义的类型有
 *** class array. *array* (typecode[,initializer])
     INITIALIZER参数可选，须为“类bytes对象”，或类型合适的iterable对象。
-
+    
     如果数组元素类型与第一个参数（类型参数）不一致，则报错：
-
+    
     #+BEGIN_SRC python :session
       import array
       a = array.array('l')
@@ -48,17 +48,17 @@
 
       c = array.array('i', [1.2])
     #+END_SRC
-
+    
     #+RESULTS[94793e0efba0c83ed00e446f38859d540df4a914]:
     :
     : >>> >>> array('l')
     : array('i', [123, 456, 789])
-    : >>> Traceback (most recent call last):
+    : >>> Traceback (most recent call last): 
     :   File "<stdin>", line 1, in <module>
     : TypeError: integer argument expected, got float
-
+    
     INITIALIZER为“类bytes”对象：
-
+    
     #+BEGIN_SRC python :session
       from array import array
 
@@ -76,15 +76,15 @@
 
       # memoryview
     #+END_SRC
-
+    
     #+RESULTS[02efac5a2e7f225059f0f115b1dfe21f902c233c]:
     :
     : >>> ... >>> array('b', [97, 98, 99])
     : >>> ... >>> array('b', [97, 98, 99])
     : >>> ... >>> array('b', [97, 98, 99])
-
+    
     为类型合适的iterable对象：
-
+    
     #+BEGIN_SRC python :session
       from array import array
 
@@ -112,7 +112,7 @@
       a = array('u', 'abc')
       print(a)
     #+END_SRC
-
+    
     #+RESULTS[dad6d297885c927c88adc5725b3471b0d32a7ea2]:
     :
     : >>> ... >>> array('i', [0, 1, 2])
@@ -121,12 +121,12 @@
     : >>> ... >>> array('i', [1, 2, 3])
     : >>> ... >>> array('i', [1, 2, 3])
     : >>> ... >>> array('u', 'abc')
-
+    
     如果INITIALIZER为链表，或字符串（'u'类型代码），实际上是调用了
     array的fromlist()、frombytes()或fromunicode()方法将新元素添加到数
     组中；如其它情况则是使用extend()方法将INITIALIZER中的元素添加到数
     组中。
-
+    
 ** 此模块定义的方法有
 *** array. *typecodes*
     返回所有可用的类型代码。
@@ -222,7 +222,7 @@
 
 *** array. *byteswap* () ？？？
     对数组中内个元素进行byte交换。即最低位byte与最高位交换，倒数第2位
-    byte与第二位交换...。
+    byte与第二位交换。？？？
 
     #+BEGIN_SRC python :session
       from array import array
@@ -287,14 +287,14 @@
 
     #+BEGIN_SRC python :session
       from array import array
-      a = array('B')
-      a.fromstring('abcdef一')
+      a = array('B', [100])
+      a.frombytes(b'abcdef')
       print(a)
     #+END_SRC
 
-    #+RESULTS[44c840e0e043d0095bd97433646911d37488b942]:
+    #+RESULTS[223335b300fd03f97c3effc5bc9ebaf207010103]:
     :
-    : >>> >>> array('B', [97, 98, 99, 100, 101, 102, 228, 184, 128])
+    : >>> >>> array('B', [100, 97, 98, 99, 100, 101, 102])
 
 *** array. *fromfile* (f, n)
     从文件对象F中逐个读取N个数组中元素大小一样的对象，添加到数组后。
@@ -305,10 +305,10 @@
     *注意* ：F须以二进制形式访问。F须为真实的内置文件对象。
 
     #+BEGIN_EXAMPLE emma.txt
-    a b c d e f g h i j k l m n o p q r s t u v w x y z
+      a b c d e f g h i j k l m n o p q r s t u v w x y z
     #+END_EXAMPLE
 
-    #+BEGIN_SRC python :session
+    #+BEGIN_SRC python :eval never
       from array import array
 
       a = array('b')
@@ -322,9 +322,9 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[e15fa97b39006f87611567713225ac1b4e6ffd7f]:
+    #+RESULTS[7af48a1472c863a83cdb5b275acc03185a4b0bcb]:
     :
-    : >>> >>> >>> ... ... ... ... ... array('b', [97, 32, 98, 32, 99, 32, 100, 32, 101, 32])
+    : >>> >>> >>> >>> ... ... ... ... ... array('b', [97, 32, 98, 32, 99, 32, 100, 32, 101, 32])
     : Traceback (most recent call last):
     :   File "<stdin>", line 4, in <module>
     : EOFError: read() didn't return enough bytes
@@ -333,7 +333,7 @@
 *** array. *fromlist* (list)
     将链表LIST中的元素逐个添加到ARRAY末尾。相当于：
 
-    #+BEGIN_SRC python
+    #+BEGIN_SRC python :eval never
       for x in list:
           a.append(x)
     #+END_SRC
@@ -415,15 +415,15 @@
       print(a)
 
       # 负数
-      a.insert(-1, -1)
+      a.insert(-1, -100)              # ？？？
       print(a)
     #+END_SRC
 
-    #+RESULTS[6564376c693bbd71df7dce2800dee714b94964f9]:
+    #+RESULTS[d91f3cdb32ed3e5944c67b53aa72648a8809aa5b]:
     :
     : >>> >>> >>> array('i', [100, 1, 2, 3])
-    : >>> >>> array('i', [100, 1, 2, 3, 0])
-    : >>> >>> array('i', [100, 1, 2, 3, -1, 0])
+    : >>> ... >>> array('i', [100, 1, 2, 3, 0])
+    : >>> ... >>> array('i', [100, 1, 2, 3, -100, 0])
 
 *** array. *pop* ([i])
     索引为I的元素从数组中移除，并返回被移除的元素。I默认为-1，即移除最
@@ -496,18 +496,18 @@
     #+BEGIN_SRC python :session
       from array import array
 
-      a = array('b', b'abc')
+      a = array('b', [1, 2, 3])
       a.tobytes()
     #+END_SRC
 
-    #+RESULTS[d4989066b60c3172edaa8eed0da52edb9e2ab8f0]:
+    #+RESULTS[7fcd7c92b5bd912518119b9963e019d026bc794d]:
     :
-    : >>> >>> b'abc'
+    : >>> >>> b'\x01\x02\x03'
 
 *** array. *tofile* ()
     与tobytes方法相似，只是将内容写入文件。
-
-    #+BEGIN_SRC python :session
+    
+    #+BEGIN_SRC python :eval never
       from array import array
 
       a = array('b', b'abcd\ne\n')
@@ -515,7 +515,7 @@
       with open('files/emma.txt', 'wb') as fp:
           a.tofile(fp)
     #+END_SRC
-
+    
 *** array. *tolist* ()
     将数组转换为普通链表。
 
@@ -546,14 +546,13 @@
 *** array. *tounicode* ()
     将数组转换为Unicode字符串，数组的类型代码须为'u'，否则返回
     ValueError错误。
-
+    
     #+BEGIN_SRC python :session
       from array import array
-
       a = array('u', '我有一个梦想！')
       a.tounicode()
     #+END_SRC
-
-    #+RESULTS[bad025bc9fc8783610f892471d66e555a8fe1f74]:
+    
+    #+RESULTS[e076b0712dd1e1f45dab4cc89d7782d2c3f0311c]:
     :
-    : >>> >>> '我有一个梦想！'
+    : >>> '我有一个梦想！'

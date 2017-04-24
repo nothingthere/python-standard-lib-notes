@@ -280,8 +280,7 @@
 
 ** 浮点型的额外方法
 *** float. *as_integer_ratio* ()
-    返回两个整数组成的元素，这两个整数的比率与原浮点数完全相同。如果为
-    负数，则分母为负数。
+    返回两个整数组成的元素，这两个整数的比率与原浮点数完全相同。
 
     #+BEGIN_SRC python :session
       (-0.2).as_integer_ratio()
@@ -304,6 +303,14 @@
     : False
 
 *** float. *hex* ()
+    
+    #+BEGIN_SRC python :session
+      (1.2).hex()
+    #+END_SRC
+    
+    #+RESULTS[e7a3ff14a7741db43734b976b8425a9dabc240a5]:
+    : '0x1.3333333333333p+0'
+
 *** classmethod float. *fromhex* (s)
 ** numeric类型哈希计算（Hashing）
 * Iterator类型
@@ -328,10 +335,10 @@
 ** 常用的Sequence操作符
    下表的操作对mutable和immutable都有效。其中s和t都是类型相同的
    Sequence，n、i和j都是整数索引，x？
-
+   
    整个表中的优先级递增。in和not in具有相同的优先级，+和*的优先级同用
    于数字运算一样。
-
+   
    | 操作符               | 结果                               | 注意点 |
    |----------------------+------------------------------------+--------|
    | x in s               | 如果x与s中某个元素equal，返回True  | (1)    |
@@ -342,56 +349,56 @@
    | s[i:j]               | 截取s中第i到j的元素                | (3)(4) |
    | s[i:j:k]             | 截取s中第i到j的元素，跨度为k       | (3)(5) |
    | len(s)               | s的元素个数                        |        |
-   | min(s)               | s中最下的元素                      |        |
+   | min(s)               | s中最小的元素                      |        |
    | max(s)               | s中最大的元素                      |        |
    | s.index[x[, i[, j]]] | s中第一个x的索引（索引i后，j前）   | (8)    |
    | s.count(x)           | s中x的个数                         |        |
-
+   
    同类型的sequence可做比较。比如链表和元组，为逐个比较其中的元素。即
    两个Sequence相等，则需对应位置的元素相等，且类型相同，长度相等：
-
+   
    #+BEGIN_SRC python :session
      [1, 2, 3] == [1, 2, 3]
      [1, 2, 3] == (1, 2, 3)
    #+END_SRC
-
+   
    #+RESULTS[53ca1bdf37af220736955e12a718c6509d8f0c06]:
    : True
    : False
-
+   
    注意点：
-
+   
 	1. in和not in通常用来判断是否包含某元素，不过一些特殊的Sequence，
        如str、bytes和bytearray也可同样使用：
-
+       
     #+BEGIN_SRC python :session
       'gg' in 'egg'
       b'a' in b'abc'
       'a' in b'abc'
     #+END_SRC
-
+    
     #+RESULTS[14b5f1634155ec3e15feeb4aebda2079e4a135fb]:
     : True
     : True
-    : Traceback (most recent call last):
+    : Traceback (most recent call last): 
     :   File "<stdin>", line 1, in <module>
     : TypeError: a bytes-like object is required, not 'str'
-
+    
 	2. n如果小于0，则作为0对待，即返回相同类型的Sequence，但其中无元素。
-
+       
        #+BEGIN_SRC python :session
           l = [1, 2, 3]
           l * 0
           l * -1
        #+END_SRC
-
+       
        #+RESULTS[a7f3ebdeb4c93a76e0799a5c836d2cb5619ed431]:
        :
        : []
        : []
-
+       
     *注意* ：复制s本身并不是正真复制，而是多次引用原来的元素：
-
+    
     #+BEGIN_SRC python :session
       lists = [[]] * 3
       print(lists)
@@ -403,7 +410,7 @@
      :
      : [[], [], []]
      : >>> [[3], [3], [3]]
-
+    
 	3. 如果i或j为负数，则相当于les(s)+i和len(s)+j。
 
 	4. 截取s时，如果没有i，则i相当于0；如果没有j，则j相当于len(s)。如
@@ -429,36 +436,36 @@
 
 	7. 如range这样的对象，不支持拼接和复制。
 
-	8. 如果s中无元素x，则返回Valueerror错误。如果有i和j参数，则相当于
+	8. 如果s中无元素x，则返回ValueError错误。如果有i和j参数，则相当于
        s[i:j].index(x)，只是没有数据复制，且返回索引值相对于sequence的
        起始位置，而非截断的起始位置。
 
 ** Immutable Sequence类型
    immutable类型中有，而mutable类型中没有实现的唯一操作是hash()。
-
-   此特性可使immutable类型，如元组，可作为字典(dict)的key值，或另存为
-   set或frozenset。
-
+   
+   此特性可使immutable类型，如元组，可作为字典(dict)的key值，或作为
+   set或frozenset的元素。
+   
    #+BEGIN_SRC python :session
      hash((1, 2, 3))
    #+END_SRC
-
-   如果尝试hash含unhashable元素的immutable类型，则返回Typeerror错误。
+   
+   如果尝试hash含unhashable元素的immutable类型，则返回TypeError错误。
    如：
-
+   
    #+BEGIN_SRC python :session
      hash(([1, 2], 3))
    #+END_SRC
-
+   
    #+RESULTS[6a128c1614b208c615c076ac9b4fdc89231aa315]:
-   : Traceback (most recent call last):
+   : Traceback (most recent call last): 
    :   File "<stdin>", line 1, in <module>
    : TypeError: unhashable type: 'list'
-
+   
 ** Mutable Sequence类型
    下表为只有mutable类型才有的操作。其中s为mutable类型的实例，t为任何
    可迭代的对象，x?
-
+   
    | 操作              | 结果                                                 | 注意点 |
    |-------------------+------------------------------------------------------+--------|
    | s[i]=x            | 使用x替换s中索引为i的元素                            |        |
@@ -475,11 +482,11 @@
    | s.pop([i])        | 返回s中第i个元素，并将其删除                         | (2)    |
    | s.remove(x)       | 将s中出现的第一个x删除                               | (3)    |
    | s.reverse()       | 将s自身逆序。                                        | (4)    |
-
+   
    注意点：
-
+   
 	1. t需与截断的长度相等。
-
+       
        #+BEGIN_SRC python :session
           s = [1, 2, 3, 4]
           print(s[0::2])
@@ -487,17 +494,17 @@
           print(s)
           s[0::2] = ['a', 'b', 'c']
        #+END_SRC
-
+       
        #+RESULTS[1e58544f13894e154d7091d122d872093f579d6d]:
         :
         : [1, 3]
         : >>> ['a', 2, 'b', 4]
-        : Traceback (most recent call last):
+        : Traceback (most recent call last): 
         :   File "<stdin>", line 1, in <module>
         : ValueError: attempt to assign sequence of size 3 to extended slice of size 2
 
 	2. 可选参数i默认值为-1，即默认删除最后一个元素。
-	3. 如果s中不存在元素x，则返回Valueerror错误。
+	3. 如果s中不存在元素x，则返回ValueError错误。
 	4. 为逆序大型sequence时的效率考虑，reverse()方法直接将该sequence逆
        序。为提醒使用者，故意不返回逆序后的sequence。
 	5. clear()和copy()方法是为了兼容不支持截断的mutable序列类型接口，
@@ -520,20 +527,20 @@
 
 ** 链表（List）
    链表为mutable类型的sequence，一般用来存储相同类型的元素。
-
+   
 *** class *list* ([iterable])
 	构建链表有下面方法：
-
+    
 	 - 使用方括号构建空链表。
 	 - 使用方括号，指定其中元素4用逗号隔开。如[a]、[a,b,c]。
 	 - 或者为[x for x in iterable]的形式。
 	 - 或者使用类型构造器：list()或list(iterable)。
-
+       
 	 使用最后一种方法，list构造链表时，新生成的链表中元素顺序同原来的
 	 iterable相同。iterable可以是sequence、支持迭代的容器、或者是
-	 iterator对象。 如果iterable本身就是链表，则是复制其reference。如
-	 果没有参数，则返回空链表：
-
+	 iterator对象。 如果iterable本身就是链表，则是复制其指针，即“浅层
+	 复制”。如果没有参数，则返回空链表：
+     
      #+BEGIN_SRC python :session
        a = [[1], [2]]
        b = list(a)
@@ -544,17 +551,19 @@
        print(a)
        print(b)
      #+END_SRC
-
+     
      #+RESULTS[17f994bc42b7147fa28aa69158de0314e9f754a3]:
      :
      : >>> [[1], [2]]
      : [[1], [2]]
      : >>> >>> [[1, 1000], [2]]
      : [[1, 1000], [2]]
-
+     
 	 有许多其他操作符可生成链表，如sorted()。
-
-	 除上面第一节Sequence通用和第二节mutable类型支持的操作符外，链表还支持sort方法：
+     
+	 除上面第一节Sequence通用和第二节mutable类型支持的操作符外，链表还
+	 支持sort方法：
+     
 **** *sort* (*, key=None,reverse=None)
 	  元素见比较时，仅能使用“<”比较。如果比较过程中出现语义错误，如“1
 	  < 'a'”，则整个排序过程终止（可能将原链表部分排序）。
@@ -587,20 +596,20 @@
    : (1, 2)
    : (2, 3)
    : end
-
+   
 *** class *tuple* ([iterable])
 	构造元组有下面方法：
-
+    
 	 - 一对小括号表示空元组：()。
 	 - 在原始后面加逗号表示一元素元组，可无小括号：a,或(a,)。
 	 - 多个元素间用逗号隔开，可无小括号：a,b,c或(a,b,c)。
 	 - 使用内置tuple构造器函数：tuple或tuple(iterable)。
-
+       
 	 最后一种方法构造的元组，其元素的顺序与参数iterable中的顺序相同。
 	 iterable可为Sequence、支持迭代的容器或iterator对象。如果iterable
 	 本来就是元组，则同链表一样，也是复制其reference，如果无参数则生成
 	 空元组：
-
+     
      #+BEGIN_SRC python :session
        l = [[1], [2], [3]]
        t = tuple(l)
@@ -611,23 +620,23 @@
        print(l)
        print(t)
      #+END_SRC
-
+     
      #+RESULTS[24c4e8175a011b7d25226ccf417569e120f5af04]:
      :
      : >>> [[1], [2], [3]]
      : ([1], [2], [3])
      : >>> >>> [[1, 100], [2], [3]]
      : ([1, 100], [2], [3])
-
+     
 	 *注意* ：实际上是逗号，而非小括号构成的元组。小括号基本可省略，但
 	 在造成语义混淆的地方不可少，如f(a,b,c)为函数调用3个参数，二
 	 f((a,b,c))则是调用了一个3元素元组参数。
-
+     
 	 元组支持前面第一节中，所有Sequence通用操作符。
-
-	 对于不同类型元素的元组，可使用collections.namedtuple()类型实现通
-	 过字符串名称获取索引，比纯数字索引更合适。
-
+     
+	 对于不同类型元素组成的元组，可使用collections.namedtuple()类型实
+	 现通过字符串名称获取索引，比纯数字索引更合适。
+     
 ** 范围（Range）
    range类型为immutable的数字Sequence，常与for语句搭配表示循环次数。
 *** class *range* (stop)
@@ -668,19 +677,19 @@
       print(r.stop)
       print(r.step)
     #+END_SRC
-
+    
     #+RESULTS[f9fc1c5f14e3ac7337647f34fb759a95de1b6673]:
     :
     : 1
     : 1000
     : 10
-
+    
 	较之链表和元组，range占用内存更小。无论表示序列个数多少，所占内存
 	固定：只存储start、stop和step3个值，各元素需要时才计算。
-
+    
 	range实现了collections.abc.Sequence ABC，支持元素包含测试，索引查
 	找，截断和负截断：
-
+    
     #+BEGIN_SRC python :session
       r = range(1, 10)
       2 in r
@@ -704,6 +713,13 @@
 	否逐个相等。两个相等的range可有不同的start、stop和step值，如
 	range(0) == range(2, 1, 3)。
 
+    #+BEGIN_SRC python :session
+      range(0) == range(2, 1, 3)
+    #+END_SRC
+
+    #+RESULTS[df3bed9f7e4ec99cbe485b71ad1306ebd36a9b35]:
+    : True
+
 * 文本Sequence类型-str
   Python中文本数据使用字符串(str/strings)对象存储。字符串对象为
   immutable类型的Sequence，其中元素为"Unicode code point"。字符串对象
@@ -715,8 +731,15 @@
      
    三引号表示的字符串可跨行书写，且保留换行符。
    
-   在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam"
+   在同一个表达式中，如果字符串间只有空格，则自动拼接：("spam "
    "eggs") == "spam eggs"。
+   
+   #+BEGIN_SRC python :session
+     'eggs ' 'spam' == 'eggs spam'
+   #+END_SRC
+   
+   #+RESULTS[c9d1e6b60697d25e6d5e76a889515f3cb8acaa1e]:
+   : True
    
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
    值为长度为1的字符串。所以，对于非空字符s，有s[0] == s[0:1]。
@@ -737,9 +760,16 @@
      （bytes或bytearray）。此时，str(bytes, encoding, errors)相当于
      bytes.decode(encoding, errors)。
      
-	 将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
-     正式"字符串：
-     
+   #+BEGIN_SRC python :session
+     str(b'abc', 'utf-8') == b'abc'.decode('utf-8')
+   #+END_SRC
+   
+   #+RESULTS[32d4659c20465d044aab338a803a844a420378fc]:
+   : True
+   
+   将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
+   正式"字符串：
+   
    #+BEGIN_SRC python :session
      str(b'Zoot')
      str(b'Zoot', encoding='utf-8')
@@ -1642,7 +1672,7 @@
 
     符串s分别使用utf-8和gb2312编码转换为了Bytes对象a和c。由于
 	编码不同，长度也不同：
-
+    
     #+BEGIN_SRC python :session
        s = 'a1一'
        a = bytes(s, 'utf-8')
@@ -1651,15 +1681,15 @@
        print(a, b, c)
        print(len(a), len(b), len(c))
     #+END_SRC
-
+    
     #+RESULTS[848498726a295116d76664340e1ed999657f16dc]:
     :
     : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
     : 5 5 4
-
+    
 	使用Bytes对象的decode方法就可实现解码，如果编码参数与编码时相同，
 	就会与原来相同的字符，否则就可能返回UnicodeDecodeError错误：
-
+    
     #+BEGIN_SRC python :session
       bytes('a1一', 'utf-8').decode('utf-8')
       bytes('a1一', 'gb2312').decode('gb2312')
@@ -1667,27 +1697,27 @@
       bytes('a1一', 'gb2312').decode('utf-8')
       bytes('a1一', 'utf-8').decode('gb2312')
     #+END_SRC
-
+    
     #+RESULTS[9753a73ca632282e558aa0120784aff49e2df5e0]:
     : 'a1一'
     : 'a1一'
     : >>> 'a1һ'
-    : Traceback (most recent call last):
+    : Traceback (most recent call last): 
     :   File "<stdin>", line 1, in <module>
     : UnicodeDecodeError: 'gb2312' codec can't decode byte 0x80 in position 4: incomplete multibyte sequence
-
+    
 	可通过字面量形式创建Bytes对象，不过仅限于ASCII范围内的字符：
-
+    
     #+BEGIN_SRC python :session
-      a = b'1abc'
-      a = b'1a一'
+      b'1abc'
+      b'1a一'
     #+END_SRC
-
-    #+RESULTS[1f2b8f954aac91264f856f9dde063d0afbb1273c]:
-    :
+    
+    #+RESULTS[baab11aded68f79c518a30e0adb803a53c2928d3]:
+    : b'1abc'
     : File "<stdin>", line 1
     : SyntaxError: bytes can only contain ASCII literal characters.
-
+    
 ** Bytes对象
    bytes对象是由单个bytes元素组成的immutable类型的Sequence。由于主要
    的二进制协议都基于ASCII文本编码，bytes对象中有几个方法只在处理
@@ -1785,49 +1815,48 @@
     #+BEGIN_SRC python :session
       list(b'abc')
     #+END_SRC
-
+    
     #+RESULTS[18d791e2473a4717b786bc3ec7c9ab399fbd556d]:
     : [97, 98, 99]
-
+    
 ** Bytearray对象
    bytearray对象相当于immutable形式的bytes对象。不过没有相应的字面量
    表示方法，只可用构造器函数构造：
-
+   
 	- 创建空实例：bytearray()
 	- 指定长度，使用0填充每个元素：bytearray(10)
 	- 使用只含整型iterable类型：bytearray(range(20))
 	- 通过buffer protocol复制二进制数据：bytearray(b'Hi!')
-
+      
 	bytearray支持所有前面中所有mutable类型Sequence支持的操作，以
 	及后面将介绍的bytes和bytearray常见的操作。
-
+    
 	与bytes一样，bytearray也有类方法fromhex()和方法hex()：
-
+    
     #+BEGIN_SRC python :session
       bytearray.fromhex('FF2E F0 F1F1')
       bytearray(b'abc').hex()
     #+END_SRC
-
+    
     #+RESULTS[f25622bd6cc957b56ae34802575eb18049982278]:
     : bytearray(b'\xff.\xf0\xf1\xf1')
     : '616263'
-
+    
 	同样也可使用list函数转换为整数链表：
-
+    
     #+BEGIN_SRC python :session
       list(bytearray(b'abc'))
     #+END_SRC
-
+    
     #+RESULTS[17a60f9a3af17d02d885f04e2644ef32bf104a98]:
     : [97, 98, 99]
-
+    
 ** Bytes和bytearray操作符
-
    bytes和bytearray对象都具备上面提到的Sequence通用的操作符。此外，二
    者使用上面的通用操作符号时，可混合使用，还可同“类bytes对
    象”（bytes-like object，bytes、bytearray和许多常见的memoryview对象）
    一起使用，返回结果由出现顺序而定（为先出现类型）：
-
+   
    #+BEGIN_SRC python :session
      b = b'abc'
      ba = bytearray(b'123')
@@ -1835,14 +1864,14 @@
      b + ba
      ba + a
    #+END_SRC
-
+   
    #+RESULTS[8c1fb8db2985fe0e751c7c9bfb11c2025f1c9f24]:
    :
    : >>> >>> b'abc123'
    : bytearray(b'1231abc')
-
+   
    但bytes和bytearray的方法不接受字符串作为参数，反之亦然：
-
+   
    #+BEGIN_SRC python :session
      s = 'abc'
      b = b'abc'
@@ -1852,15 +1881,15 @@
 
      b.replace(b'a', 'A')
    #+END_SRC
-
+   
    #+RESULTS[ffe67e7436899e0ccfed8472285792bdb49df2bf]:
    :
    : >>> >>> 'Abc'
    : b'Abc'
-   : >>> Traceback (most recent call last):
+   : >>> Traceback (most recent call last): 
    :   File "<stdin>", line 1, in <module>
    : TypeError: a bytes-like object is required, not 'str'
-
+   
 *** bytes. *count* (sub[,start[,end]])
 *** bytearray. *count* (sub[,start[,end]])
     返回SUB的出现次数，可通过START和END参数指定截断。
@@ -2462,7 +2491,7 @@
 *** bytes. *upper* ()
 *** bytearray. *upper* ()
     将所有ASCII字母转换为大写：
-
+    
     #+BEGIN_SRC python :session
       b'Hello, World'.upper()
     #+END_SRC
@@ -2473,7 +2502,7 @@
 *** bytes. *zfill* (width)
 *** bytearray. *zfill* (width)
     扩展到WIDTH宽度，左边使用b'0'填充。
-
+    
     如果WIDTH小于或等于原来宽度，bytes返回自己本身，bytearray仍然返回
     新对象。
 
@@ -2500,32 +2529,31 @@
 ** Memory Views
    memoryview对象的作用是：不复制就可获取支持buffer protocol对象的内存
    地址。
-
+   
 *** 写在前面 [[https://segmentfault.com/q/1010000007137721][@segmentfault]] （还是没懂）
-
     str和bytearray切片时会复制数据，生成新的数据；bytes和memoryview切
     片时不会：
-
+    
     不使用memoryview：
-
+    
     #+BEGIN_SRC python :session
       a = 'abcdefg'
       b = a[:2]                       # 会生成新的字符串
 
       a = bytearray('abcdefg', 'utf-8')  # 会生成新的bytearray
       b = a[:2]
-      b[:2] = b'bb'                   # 对b的改动不影响b
+      b[:2] = b'bb'                   # 对b的改动不影响a
       a
       b
     #+END_SRC
-
+    
     #+RESULTS[c1c892b196daf3801846c0ca2fd6da47f3e7131b]:
     :
     : >>> >>> >>> >>> >>> bytearray(b'abcdefg')
     : bytearray(b'bb')
-
+    
     使用memoryview：
-
+    
     #+BEGIN_SRC python :session
       a = b'abcdefg'
       ma = memoryview(a)
@@ -2536,33 +2564,32 @@
       ma = memoryview(a)
       ma.readonly                     # 不为只读
       mb = ma[:2]
-      mb[:2] = b'AA'                  # 对mb的改动会影响ma
+      mb[:2] = b'AA'                  # 对mb的改动会影响a
       ma.tobytes()
       mb.tobytes()
     #+END_SRC
-
+    
     #+RESULTS[ca75b35e9866dc79fe404515b992d4ef4e83b03f]:
     :
     : >>> True
     : >>> >>> >>> >>> >>> False
     : >>> >>> b'AAcdefg'
     : b'AA'
-
+    
     使用struct进行unpack解析时可直接接受memoryview对象，避免解析大字符
     串时大量切片：（没懂！！！）
-
+    
     #+BEGIN_SRC python :session
       import struct
 
-      mv = memoryview(bytes(20))
-      type, len = struct.unpack('!BI', mv[:5])
-      type, len
+      mv = memoryview(bytes(b'123456'))
+      struct.unpack('!BB', mv[:2])
     #+END_SRC
-
-    #+RESULTS[9ccffb54d4a9a9f2c3c17d7bf809f6ee90606531]:
+    
+    #+RESULTS[371c79b6ad01428e2c5e7985bd6945a93cc30230]:
     :
-    : >>> >>> >>> (0, 0)
-
+    : >>> >>> (49, 50)
+    
 *** class *memoryview* (obj)
     创建指向OBJ的memoryview对象。OBJ须支持buffer protocol，包含bytes和
     bytearray对象，及array.array对象。
@@ -2675,35 +2702,35 @@
 
 **** *tobytes* ()
      转换为bytes对象：
-
+     
      #+BEGIN_SRC python :session
        m = memoryview(b'abc')
        m.tobytes()
        bytes(m)
      #+END_SRC
-
+     
      #+RESULTS[3418f9e79a7f31e2c0f4c168ac4d4e0daf664fba]:
      :
      : b'abc'
      : b'abc'
-
+     
 **** *hex* ()
      返回字符串，用16进制数表示每个byte：
-
+     
      #+BEGIN_SRC python :session
        m = memoryview(b'abc')
        m.hex()
        bytes.fromhex(m.hex())
      #+END_SRC
-
+     
      #+RESULTS[20295c723328fd3f5c60059475ba93b4e505c964]:
      :
      : '616263'
      : b'abc'
-
+     
 **** *tolist* ()
-     返回每个元素组成的数组：
-
+     返回每个元素组成的数组，相当于调用list函数：
+     
      #+BEGIN_SRC python :session
        from array import array
 
@@ -2713,16 +2740,16 @@
        m = memoryview(a)
        m.tolist()
      #+END_SRC
-
+     
      #+RESULTS[56e4a91855c5afff65fb1cfb0cd6d71ae7f63bd4]:
      :
      : >>> [97, 98, 99]
      : >>> >>> >>> [1.1, 2.2, 3.3]
-
+     
 **** *release* ()
      释放view，被传入memoryview的对象在释放前不能进行mute操作（如
-     bytearray不能改变元素个数），所有需使用此方法取消限制：
-
+     bytearray不能改变元素个数），所以需使用此方法取消限制：
+     
      #+BEGIN_SRC python :session
        b = bytearray(b'abc')
 
@@ -2735,16 +2762,16 @@
        b.append(ord('e'))
        print(b)
      #+END_SRC
-
+     
      #+RESULTS[b893fab646a87a1269b4555431d20c3a06b27694]:
      :
-     : >>> ... >>> Traceback (most recent call last):
+     : >>> ... >>> Traceback (most recent call last): 
      :   File "<stdin>", line 1, in <module>
      : BufferError: Existing exports of data: object cannot be re-sized
      : >>> ... >>> >>> bytearray(b'abce')
-
+     
      memoryview对象被释放后，不能进一步操作：
-
+     
      #+BEGIN_SRC python :session
        m = memoryview(b'abc')
        m[0]
@@ -2752,31 +2779,31 @@
        m.release()
        m[0]
      #+END_SRC
-
+     
      #+RESULTS[7c4a8ae52af4353ab2b74c136ff665998c69cc84]:
      :
      : 97
-     : >>> >>> Traceback (most recent call last):
+     : >>> >>> Traceback (most recent call last): 
      :   File "<stdin>", line 1, in <module>
      : ValueError: operation forbidden on released memoryview object
-
-     使用context management protocol可得到相同效果，即操作完成后自动释
-     放：
-
+     
+     使用context management protocol可得到相同效果，即操作完成后自动冻
+     结：
+     
      #+BEGIN_SRC python :session
        with memoryview(b'abc') as m:
            m[0]
 
        m[0]
      #+END_SRC
-
+     
      #+RESULTS[6ae2b69926c4549141d0dd69f4eb917f046b7445]:
      :
      : ... 97
-     : Traceback (most recent call last):
+     : Traceback (most recent call last): 
      :   File "<stdin>", line 1, in <module>
      : ValueError: operation forbidden on released memoryview object
-
+     
 **** *cast* (fromat[,shape]) ？？？
      改变memoryview的单个元素内存大小，或形状（维度），返回新的
      memoryview对象，但仍指原来的对象。
@@ -2821,11 +2848,11 @@
        m1[0] = b'X'
        print(b)
      #+END_SRC
-
+     
      #+RESULTS[0ce2002c9c7e4fa8a31f24a1ee2b8986f1c96034]:
      :
      : >>> ... >>> >>> >>> bytearray(b'Xbc')
-
+     
      一维byte -> 三维int -> 一维signed char
      #+BEGIN_SRC python :session
       import struct
@@ -2840,35 +2867,35 @@
       m.tolist()
       m.format, m.itemsize, m.ndim, len(m), m.nbytes
      #+END_SRC
-
+     
      #+RESULTS[801de728b7c0b43f5c7dd7636579f21eebd8e9ac]:
     :
     : >>> >>> >>> >>> [[[0, 1, 2], [3, 4, 5]], [[6, 7, 8], [9, 10, 11]]]
     : ('i', 4, 3, 2, 48)
     : >>> >>> [0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 7, 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 10, 0, 0, 0, 11, 0, 0, 0]
     : ('b', 1, 1, 48, 48)
-
+     
      一维byte -> 二维unsigned long：
-
+     
      #+BEGIN_SRC python :session
-      import struct
-      buf = struct.pack('L' * 6, *list(range(6)))
-      m = memoryview(buf)
-      m.tolist()
-      len(m), m.ndim, m.nbytes
+       import struct
+       buf = struct.pack('i' * 6, *list(range(6)))
+       m = memoryview(buf)
+       m.tolist()
+       m.ndim, m.nbytes
 
-      m = m.cast('L', shape=[2, 3])
-      m.tolist()
-      len(m), m.ndim, m.nbytes
+       m = m.cast('i', shape=[2, 3])
+       m.tolist()
+       m.ndim, m.nbytes
      #+END_SRC
-
-     #+RESULTS[082c13753ffb19c0ceec21b682d475f160264311]:
-    :
-    : >>> >>> [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0]
-    : (48, 1, 48)
-    : >>> >>> [[0, 1, 2], [3, 4, 5]]
-    : (2, 2, 48)
-
+     
+     #+RESULTS[7ef5493f0b91c7a0a24e88065645686aa9804589]:
+     :
+     : >>> >>> [0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0]
+     : (1, 24)
+     : >>> >>> [[0, 1, 2], [3, 4, 5]]
+     : (2, 24)
+     
 *** 属性
 **** *obj*
      返回被memoryview获取的对象：
@@ -2943,7 +2970,7 @@
 
        a.readonly, b.readonly, c.readonly
      #+END_SRC
-
+     
      #+RESULTS[752b0e677dec3793eb7a3352b0f483d29a6f8454]:
      :
      : >>> >>> >>> >>> >>> (True, False, False)
@@ -2972,21 +2999,27 @@
      : >>> >>> 'i'
 
 **** *itemsize*
-     单个元素所在内存大小。
-
+     单个元素所在内存大小（不管是否为多维）。
+     
      #+BEGIN_SRC python :session
        import array
        import struct
        m = memoryview(array.array('H', [1000, 2000, 3000]))
        m.itemsize, m[0]
        struct.calcsize('H') == m.itemsize
-     #+END_SRC
 
-     #+RESULTS[b03bc69847a105273e4595e1ec952dbb6fbcccd0]:
+       # 多维
+       m = memoryview(struct.pack('H' * 6, *range(6)))
+       m = m.cast('H', shape=[2, 3])
+       m.itemsize
+     #+END_SRC
+     
+     #+RESULTS[404c722aa9a5df86c9e2e10611586818aba3f465]:
      :
      : >>> >>> (2, 1000)
      : True
-
+     : >>> ... >>> >>> 2
+     
 **** *ndim*
      返回整数，表示内存表示多维数组的维度。
 
@@ -3356,58 +3389,58 @@
     : {5, 6, 7, 8, 9}
 
 *** *copy* ()
-
+    
     #+BEGIN_SRC python :session
       s = set([1, 2, 3, (4, 5, 6)])
       s1 = s.copy()
 
       s1, s1 is s
     #+END_SRC
-
+    
     #+RESULTS[4e5a92d18bebd6d69460a738698ae96f238884aa]:
     :
     : >>> >>> ({1, 2, 3, (4, 5, 6)}, False)
-
-    *注意* ：
-
+    
+*** *注意*
+    
     - union、intersection、difference、symmetric_difference、issubset
       和issupperset方法的参数只要是iterable类型即可。但对应的简写形式
       则需也为set类型。尽量避免使用简写形式，如set('abc') & 'abc'；使
       用更易读的全写形式，set('abc').intersection('abc')。
     - set/frozenset支持相互比较。两个set互为子集则相等，A为B的超集则
       A>B，A为B的子集则A<B。
-
+      
       #+BEGIN_SRC python :session
         set([1, 2, 3]) == set([3, 2, 1])
         set([1, 2, 3]) > set([1, 2])
       #+END_SRC
-
+      
       #+RESULTS[b404bbafe937d8a38e47bdbef40fec0f32ec3790]:
       : True
       : True
-
+      
     - set与frozenset间的比较只考虑各自的元素。
-
+      
       #+BEGIN_SRC python :session
          set('abc') == frozenset('abc')
          set('abc') in set([frozenset('abc')])
       #+END_SRC
-
+      
       #+RESULTS[89677d60a682dc2b1aa99bc0ef7d803459e38172]:
       : True
       : True
-
+      
     - 如果两个非空set交集为空集，则a<b、a==b、a>b都会返回False。
-
+      
       #+BEGIN_SRC python :session
          s1 = set([1, 2, 3])
          s2 = set([4, 5, 6])
          s1 < s2, s1 == s2, s1 > s2
       #+END_SRC
-
+      
     - 由于set只定义了集合关系，不能使用list.sort()方法操作set链表获得
       正确值。
-
+      
       #+BEGIN_SRC python :session
         l = [3, 2, 1]
         l.sort()
@@ -3567,61 +3600,61 @@
     : Traceback (most recent call last):
     :   File "<stdin>", line 2, in <module>
     : KeyError: 'pop from an empty set'
-
+    
 *** *clear* ()
     清空set。
-
+    
     #+BEGIN_SRC python :session
       s = set([1, 2, 3])
       s.clear()
       print(s)
     #+END_SRC
-
+    
     #+RESULTS[adfb057e204c950a4bc0c63dab9c0d41ef46dd7c]:
     :
     : >>> set()
-
+    
     *注意* ：
-
+    
     - update、intersection_update、difference_update和
       symmetric_difference_update方法可接受任意iterable类型作为参数。
-
+      
     - __contains__()、remove()和discard()的参数可以是frozenset对象。为
       做比较，在搜索和重置过程中ELEM为mutable形式。在搜索过程中不要读
       取或改变此元素。
-
+      
 * 映射类型（Mapping）-dict
   映射对象可将“可哈希值”映射到任意对象上。映射对象为mutable类型。目前
   为止，Python只有一个标准的映射类型-字典（dict）。
-
+  
   除“不可哈希”类型，即含链表，字典或其他mutable类型（比较时使用值比较，
   而不是内存比较）外，都可用作字典的key值。当使用数数字作为key值时，使
   用值比较，如1和1.0都可映射到同一值。（由于计算机存储浮点数实际上是存
   储的近似值，所以最好不要用浮点数作为key值。）
-
+  
   除dict构造器外，可使用使用字面量形式创建字典：
-
+  
   #+BEGIN_SRC python :session
     d = {'name': 'claudio', 'age': 18, 'gender': 'male'}
   #+END_SRC
-
+  
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)
-** class b*dict* (iterable,**kwarg)
+** class *dict* (iterable,**kwarg)
    根据可选参数和关键字参数返回新的字典对象。
-
+   
    - 如果没有参数，返回空字典。
    - 如果只有一个参数：
      - 如果为映射对象，则新生成字典与其有相同的键值对。
      - 否则须为iterable类型，其每个元素须为有2个元素的iterable类型，第
        一个元素成为key值，第二个元素成为value值。如果key值重复，则后面
        出现的value值为最终值。
-   - 如果有关键字参数，则各个关键字参数成为字典的键值对。如果不是第一
+   - 如果有关键字参数，则各个关键字参数成为字典的键值对。如果不只第一
      个参数，则添加到第一个参数生成的字典后；如果key值有重复。则关键字
      参数的值成为最终值。
-
+     
    为演示不同构建方法，下面每种方法都会生成相同的字典：
-
+   
    #+BEGIN_SRC python :session
      a = dict(one=1, two=2, three=3)
      b = {'one': 1, 'two': 2, 'three': 3}
@@ -3631,11 +3664,11 @@
 
      a == b == c == d == e
    #+END_SRC
-
+   
    #+RESULTS[6e9e0b8dd1d9e321b87fc3c7593b320b1bf16d46]:
    :
    : >>> >>> >>> >>> >>> True
-
+   
 ** Dict类型支持的操作
    下面为Dict类型支持的操作。（自定义映射类型也用该支持下面的操作）。
 
@@ -4155,11 +4188,11 @@
    : within with
    : 100
    : exit
-
+   
 ** contextmanager. *__exit__* (exc_type,exc_val,exc_tb)：
    离开运行时上下文执行，即在with语句结束后执行，返回Boolean值指定是否
    抑制错误抛出：
-
+   
    #+BEGIN_SRC python :session
      class Test:
          def __init__(self, flag):
@@ -4179,10 +4212,10 @@
          print('within with')
          1 / 0
    #+END_SRC
-
+   
    #+RESULTS[3102b035beb49a1d816cd396b3f479674785eed1]:
    #+begin_example
-
+   
    ... ... ... ... ... ... ... ... >>> >>> ... ... ... enter
    within with
    exit
@@ -4193,10 +4226,10 @@
      File "<stdin>", line 3, in <module>
    ZeroDivisionError: division by zero
    #+end_example
-
+   
    如果执行with内代码时有错误抛出，其参宿EXC_TYPE、EXC_VAL和EXC_TB分别
-   对应该错误的exception类型、值和traceback信息，否则都为None：
-
+   对应该错误的exception类型、value和traceback信息，否则都为None：
+   
    #+BEGIN_SRC python :session
      class Test:
          def __init__(self, flag):
@@ -4222,10 +4255,10 @@
      with Test(False):
          1 / 0
    #+END_SRC
-
+   
    #+RESULTS[cb05f44472c83f8ac1e23b63b358bf357938efe7]:
    #+begin_example
-
+   
    ... ... ... ... ... ... ... ... ... >>> >>> ... ... 1.0
    None
    None
@@ -4242,13 +4275,13 @@
      File "<stdin>", line 2, in <module>
    ZeroDivisionError: division by zero
    #+end_example
-
+   
    如果此方法返回True，即使with语句中有错误抛出，也会执行后面的代码；
    如果有错误抛出且返回False，则抛出错误向上传播（propagation）：
-
+   
    *注意* ：下面的例子只能在脚本中测试，org中测试会失败：
-
-   #+BEGIN_SRC python :session
+   
+   #+BEGIN_SRC python :eval never
      class Test:
          def __init__(self, flag):
              self.flag = flag
@@ -4270,9 +4303,9 @@
      msg = 'i am here, help...'
      print(msg)
    #+END_SRC
-
+   
    此方法中任何的错误抛出，会替换掉with语句中的错误抛出？？？：
-
+   
    #+BEGIN_SRC python :session
      class Test:
          def __enter__(self):
@@ -4288,7 +4321,7 @@
      with Test():
          1 / 0
    #+END_SRC
-
+   
    #+RESULTS[46fd8c34e5daf36d3cce74cb1e4a6892df5643fa]:
    #+begin_example
 

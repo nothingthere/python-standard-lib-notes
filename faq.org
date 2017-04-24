@@ -42,11 +42,11 @@
    不管是primitive类型，还是对象，都创建新的对象。B上面的对象与A上面的
    对象相互独立。
 
-   可见，深层复制效率耕地。
+   可见，深层复制效率更低。
 * 映射（Mapping）
   映射（Mapping）类型为支持任意键值对查询的对象容器，具备Mapping或
   MutableMapping abstract base类的方法。支持此功能的类型有：
-
+  
   - dict
   - collections.defaultdict
   - collections.OrderDict
@@ -81,3 +81,11 @@
   
   每一个yield语句会暂停函数进程，记住当前代码执行的位置(含局部变量和未
   解决的try语句)。当yield语句执行完后，再次回到原来位置。？？？
+  
+**** 字节序（endian）[[https://zh.wikipedia.org/wiki/%25E5%25AD%2597%25E8%258A%2582%25E5%25BA%258F][@wiki]]
+     
+     数据在内存中排序情况。如数字“12”，如果为“小端序（little-endian）”
+     则内存中“2”在“1”之前，“大端序（bit-endian）”则“1”在“2”之前。
+     
+     在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
+     同 标准的字节序。

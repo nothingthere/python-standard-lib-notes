@@ -88,14 +88,14 @@
         def __index__(self):
             return self.num
 
-    t = Test(2**10)
+    t = Test(-2**10)
     bin(t.num)
     bin(-1024)
-  #+END_SR
-
-  #+RESULTS[80c2c0951ac7490de33c293a4c1e8584250590a0]:
+  #+END_SRC
+  
+  #+RESULTS[d20d6d1f87077212f2f56c7207b919753bb92d16]:
   :
-  : ... ... ... ... >>> >>> >>> '0b10000000000'
+  : ... ... ... ... >>> >>> >>> '-0b10000000000'
   : '-0b10000000000'
 
 * class *bool* ([x])
@@ -111,7 +111,7 @@
     bool({})
     bool(())
   #+END_SRC
-  
+
   #+RESULTS[8e8b067dc176e346ddca2b7ea81a3c30504a6503]:
   : False
   : False
@@ -130,39 +130,39 @@
   
    - 如果为字符串，必须添加ENCODING参数（ERRORS参数可选）；然后使用
      str.encoding()函数将字符串转换为bytes对象。
-
+     
 	 #+BEGIN_SRC python :session
        bytearray('i have a dream!哈哈！', encoding='utf-8')
 	 #+END_SRC
-
+     
    #+RESULTS[f7abc713c11ce2e797e870ce7d0bfa7a44817d21]:
   : bytearray(b'i have a dream!\xe5\x93\x88\xe5\x93\x88\xef\xbc\x81')
-
+   
    - 如果为整数，表示元素个数，且每个元素初始值为空byte。
-
+     
 	 #+BEGIN_SRC python :session
        bytearray(10)
 	 #+END_SRC
-
+     
    #+RESULTS[e3dd426f475b1e54dde45b38751b9d2aba8076d9]:
   : bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-
+   
    - 如果是buffer接口返回的对象，则使用buffer内容初始化。
    - 如果为iterable，其中元素须为0<=x<256的整数，用这些元素初始化。
-
+     
 	 #+BEGIN_SRC python :session
        bytearray([1, 2, 3, 3])
        bytearray([255])
        bytearray([256])
 	 #+END_SRC
-
+     
    #+RESULTS[38bf58a5ee10ad654785a83db1a7652e1e0d8a65]:
   : bytearray(b'\x01\x02\x03\x03')
   : bytearray(b'\xff')
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : ValueError: byte must be in range(0, 256)
-
+   
 * class *bytes* ([source,[encoding[,errors]]])
   返回一个全新的byes对象，元素为取值范围为0<=x<256的immutable序列。
   bytes是immutable版本的bytearray，具备非mutable类型序列相同的方法，
@@ -288,13 +288,13 @@
   果与(a // b, a % b)相同；如果有浮点数，结果为(q, a % b)，其中值通常
   为math.floor(a / b)，也有可能会小1，任何情况下，q * b + a % b的结果
   都非常难接近a。
-  
+
   #+BEGIN_SRC python :session
     10 // 3, 10 % 3
     divmod(10, 3)
     divmod(10.4, 3)
   #+END_SRC
-  
+
   #+RESULTS[5708e0a49580a5907a4389a75b1d02e79ee42b53]:
   : (3, 1)
   : (3, 1)
@@ -304,7 +304,7 @@
   返回enumerate对象。参数ITERABLE必须为sequence，或iterator，或其他支
   持迭代的对象。enumerate返回对象的__next__()方法返回tuple，第一个元素
   为索引（默认从0开始），第二个元素为原来对象的元素。
-
+  
   #+BEGIN_SRC python
     sessons = ['Spring', 'Summer', 'Fall', 'Wintwer']
     print(list(enumerate(sessons)))
@@ -323,9 +323,9 @@
   : (103, 'Wintwer')
   : nothing
   : nothing
-
+  
   其实现相当于：
-
+  
   #+BEGIN_SRC python
     def enumarate(sequence, start=0):
         n = start
@@ -365,41 +365,43 @@
 
 * class *float* ([x])
   返回X表示的浮点数，X可为数值或字符串。如果无参数，则返回0.0。
-
+  
   如果X为字符串，前后可有空格，前面可带正负号，但必须是有效的数值组成
   的字符串。此外，还可使用'nan'和'inf'(或'infinity')表示非数值和无限数，
   且可不区分大小写。
-
+  
   #+BEGIN_SRC python :session
     float()
+    float(1)
     float('+1.23')
     float('   -12345\n')
     float('1e-003')
     float('-infinity')
     float('12三')
   #+END_SRC
-
-  #+RESULTS[287662aad028fad578fd4cb6a022eee608a78a66]:
+  
+  #+RESULTS[1e2a8277e39db2f346d7316daa76c257106afa36]:
   : 0.0
+  : 1.0
   : 1.23
   : -12345.0
   : 0.001
   : -inf
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : ValueError: could not convert string to float: '12三'
-
+  
 * *format* (value[,format_spec])
   按照FORMAT_SPEC将VALUE格式转换为字符串。如果FORMAT_SPEC为空字符串，
   则相当于str(value)：
-  
+
   #+BEGIN_SRC python :session
     format('me', '<30')
     format('me', '>30')
     format('me', '30')
     format('me', '')
   #+END_SRC
-  
+
   #+RESULTS[7d9f7695a2bcff1a8a6e257ea0de60fee4d33af3]:
   : 'me                            '
   : '                            me'
@@ -435,11 +437,11 @@
   在命令行查看帮助文档。如果不带参数，则进入帮助文档交互模式。如果为字
   符串，则显示对应的module、函数、类、方法、关键字或相关文档。如果参数
   为对象，则显示对应文档，如help(1)显示整型对应的帮助文档。
-  
+
   #+BEGIN_SRC python :session
      help('None')
   #+END_SRC
-  
+
   #+RESULTS[03660dd42543bc8ef9a78feadea965279d7ead6b]:
   #+begin_example python
   Help on NoneType object:
@@ -456,13 +458,13 @@
    |  __repr__(self, /)
    |      Return repr(self).
   #+end_example
-  
+
 * *hash* (object)
-  返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找是快速比
+  返回object的Hash值（如果有）。Hash值通常用在字典（dict）查找时快速比
   较key值。数值相同的数，即使类型不同，也具有相同的返回结果（如1和1.0）。
-
+  
   object只能为immutable类型。
-
+  
   #+BEGIN_SRC python :session
     hash(1)
     hash(1.0)
@@ -472,7 +474,7 @@
     hash(('a', 'b'))
     hash(['a'])
   #+END_SRC
-
+  
   #+RESULTS[6807fe7f1728ede1ce8089f99b270ada6c1760f8]:
   : 1
   : 1
@@ -480,10 +482,10 @@
   : 244014917210466474
   : 244014917210466474
   : 8532064262518639778
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : TypeError: unhashable type: 'list'
-
+  
 * *hex* (x)
   将整数转换为小写的16进制字符串。
 
@@ -496,7 +498,7 @@
   #+RESULTS[fbfef14bc4a0f7b843a2e503a80dcf79f29a24c8]:
   : '0xff'
   : '-0x18'
-  : Traceback (most recent call last): 
+  : Traceback (most recent call last):
   :   File "<stdin>", line 1, in <module>
   : TypeError: 'str' object cannot be interpreted as an integer
 
@@ -619,40 +621,54 @@
 
 * *iter* (object[,sentinel])
   返回一个iterator对象。第二个参数决定第一个参数的解释方式：
-
+  
   - 如果无第二个参数：object须为一个支持迭代协议（__iter__()方法）的
     collection对象；或者须支持sequence协议（__getitem__()，整数参数以0
     开始）。如果两种协议都不支持，则返回TypeError错误。
-
+    
     #+BEGIN_SRC python :session
       i = iter((1, 2, 3))
       print(i)
       print(list(i))
     #+END_SRC
-
+    
     #+RESULTS[51867de2f96685c28c2b35c7422210526e483ae2]:
     :
     : <tuple_iterator object at 0x7f99da84fb00>
     : [1, 2, 3]
-
+    
   - 如果有第二个参数sentinel：object须为可调用对象（即函数）。所返回的
     iterator的生成过程为不带参数调用object的__next__()方法。如果返回值
     等于sentinel则返回StopIteration错误，否则返回__next__()方法的返回
     值。
-
+    
 	第二种形式适合于读取文本，直到指定行。如下例直到readline()方法返回
     空字符串：
 
-	#+BEGIN_SRC python
-      with open('mydate.txt') as fp:
+	#+BEGIN_SRC python :eval never
+      with open('files/emma.txt') as fp:
           for line in iter(fp.readline, ''):
-              process_line(line)
+              print(line)
 	#+END_SRC
+
+  #+RESULTS[eb6a3284d9b8e2228cb10991f44ced9e32ba4b56]:
+  #+begin_example
+  Help on built-in function pow in module builtins:
+
+  pow(x, y, z=None, /)
+
+     Equivalent to x**y (with two arguments) or x**y % z (with three arguments)
+
+     Some types, such as ints, are able to use a more efficient algorithm when
+
+     invoked using the three argument form.
+
+  #+end_example
 
 * *len* (s)
   返回对象s中的元素个数。s可为sequence（如string、bytes、tuple、list或
   range），也可为collection（如dictionary、set或frozen set）。
-
+  
   #+BEGIN_SRC python :session
     from array import array
 
@@ -666,9 +682,10 @@
     len({1, 2, 3})
     len(memoryview(b'abc'))
     len(array('i', [1, 2, 3]))
+    len(iter([1, 2, 3]))
   #+END_SRC
 
-  #+RESULTS[291e26aaa1cda66e75509b8aed662d6abc153dc2]:
+  #+RESULTS[05abc697beb9a1c3c6398932ae03d65b3dcb32a9]:
   #+begin_example
 
   >>> 3
@@ -681,28 +698,48 @@
   3
   3
   3
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: object of type 'list_iterator' has no len()
   #+end_example
 
 * class *list* ([iterable])
   list实际上是一个mutable sequence类型。
-
+  
   #+BEGIN_SRC python :session
+    from array import array
+
     list(1, 2, 3)
     list([1, 2, 3])
     list((1, 2, 3))
     list({1, 2, 3})
     list({'a': 1, 'b': 2, 'c': 3})
+    list(array('i', [1, 2, 3]))
+    list(bytes(b'123'))
+    list(bytearray(b'123'))
+    list(memoryview(b'123'))
+    list(range(3))
+    list(iter([1, 2, 3]))
   #+END_SRC
-
-  #+RESULTS[76d37e907008d8c7eb8e01f490c7ce870354b485]:
-  : Traceback (most recent call last):
-  :   File "<stdin>", line 1, in <module>
-  : TypeError: list() takes at most 1 argument (3 given)
-  : [1, 2, 3]
-  : [1, 2, 3]
-  : [1, 2, 3]
-  : ['c', 'b', 'a']
-
+  
+  #+RESULTS[116e36b9c91df73f580e5a9d6cd0f1e2705ccda7]:
+  #+begin_example
+  
+  >>> Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: list() takes at most 1 argument (3 given)
+  [1, 2, 3]
+  [1, 2, 3]
+  [1, 2, 3]
+  ['c', 'a', 'b']
+  [1, 2, 3]
+  [49, 50, 51]
+  [49, 50, 51]
+  [49, 50, 51]
+  [0, 1, 2]
+  [1, 2, 3]
+  #+end_example
+  
 * *locals* ()
   在全局作用域内返回值与globals()相同，都是全局作用域内变量组成的dict
   数据。如果在函数内调用，则返回该函数内部作用域内变量组成的dict，但在
@@ -732,12 +769,12 @@
 * *max* (iterable, *[,key,default])
 * *max* (arg1,arg2,*args[,key])
   返回iterable中，或者是2个或以上参数中最大的一个。
-
+  
   - 如果只有一个普通参数，则须为iterable类型。可使default关键字参数，
     指定该iterable中无参数时的返回值。如果ietrable参数为空，且无
     default参数，则返回ValueError错误。
   - 如果有多普通参数，不能使用default关键字参数。
-
+    
   两种情况都能使用key关键字参数（与list.sort()函数的用法相同）。
 
   [[http://www.oschina.net/code/snippet_111708_16478][@优雅先生]]
@@ -755,20 +792,20 @@
     max('ah', 'bf', key=lambda x: x[1])
 
     def cmp(x):
-        return x[0]
+        return x[1]
 
     max('ah', 'bf', key=cmp)
 
   #+END_SRC
 
-  #+RESULTS[8c83bc51d236d6c9aaf260aaa29107fd094466ef]:
+  #+RESULTS[5194b9b15be8784b7abf148ae3a52161db39bd52]:
   :
   : 2
   : 'b'
   : >>> ... 2
   : 2
   : >>> ... 'ah'
-  : >>> ... ... >>> 'bf'
+  : >>> ... ... >>> 'ah'
 
 * *momeryview* (obj)
 * *min* (iterable, *[,key,default])
@@ -777,7 +814,7 @@
 
 * *next* (iterator[,default])
   通过调用iterator的__next__()方法返回“下一个”值。如果没有“下一个”，
-  且如果无default参数，则返回StopIteration错误，否则返回defualt参数的
+  且如果无DEFAULT参数，则返回StopIteration错误，否则返回DEFAULT参数的
   值。
 
   #+BEGIN_SRC python :session
@@ -801,11 +838,11 @@
   : TypeError: 'tuple' object is not an iterator
 
 * class *object*
-  返回最基础类object的一个实例。此实例具有所有Python实例的方法。此函数
-  不接受任何参数。
-
+  返回最基础类object的一个实例。Python实例都具有此实例的方法。此函数不
+  接受任何参数。
+  
   *注意* ：基础类object无__dict__方法，所以不能为其实例添加任何属性。
-
+  
   #+BEGIN_SRC python :session
     o = object()
     print(o)
@@ -814,18 +851,18 @@
     o.__doc__ = '最基础的对象'
     o.abc = 123
   #+END_SRC
-
+  
   #+RESULTS[ddcad1f4c19fe1fa5a42e561f36cf0ef9ac1b35c]:
   :
   : <object object at 0x7f99db111120>
   : >>> 'The most base type'
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : AttributeError: 'object' object attribute '__doc__' is read-only
-  : Traceback (most recent call last):
+  : Traceback (most recent call last): 
   :   File "<stdin>", line 1, in <module>
   : AttributeError: 'object' object has no attribute 'abc'
-
+  
 * *oct* (x)
   返回数字x的8进制字符串。如果x不为int对象，则需有__index__()方法，且
   返回一个整数。
@@ -853,17 +890,17 @@
 * *open* (file,
   mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
   打开文件file，返回file对象。
-
+  
   第一个参数file：
-
+  
   可为指定绝对路径或相对路径的字符串或bytes对象，或者是该文件
   "file descriptor"对应的整数。（如果指定了file descriptor，当其返回
   的I/O对象关闭后，该文件也随之关闭，除非closefd参数值为False。）
-
+  
   第二个参数mode：
-
+  
   指定打开文件后的操作，取值可为：
-
+  
   | 字符 | 含义                                   |
   |------+----------------------------------------|
   | 'r'  | 只读（默认）                           |
@@ -874,48 +911,48 @@
   | 't'  | 文本文件模式（默认）                   |
   | '+'  | 可读可写                               |
   | 'U'  | (deprecated)                           |
-
+  
   默认模式为'r'（即'rt'），'w+b'为以二进制模式读写，'r+b'为以二进制模
   式只读，但不先清空文件。
-
+  
   第三个参数buffering：？？？
-
+  
   指定buffering policy。0为关闭buffering（只能用于二进制模式）;1为选
   择line buffering（只能用于文本模式）,>1表示“ the size in bytes of a
   fixed-size chunk buffer”。如果无此参数，则：？？？
-
+  
   第四个参数encoding：
-
+  
   当以文本文件模式打开时，如果不指定此参
   数，encoding值由系统决定，使用local.getpreferredencoding(False)?可
   获取当前值。
-
+  
   #+BEGIN_SRC python :session
-     import locale
-     locale.getpreferredencoding(False)
+    import locale
+    locale.getpreferredencoding(False)
   #+END_SRC
-
+  
   #+RESULTS[098e93eeabbb2fafc338a9f83673978ac421243e]:
    :
    : 'UTF-8'
-
+  
   对以二进制模式（'b'）和文本模式（'t'）打开的文件指针，Python会区别
   对待。以二进制模式打开时，返回的bytes内容不经过任何decoding返回；以
   文本模式打开时，则需根据本地系统（或指定的encoding参数）进行解码。
-
+  
   *注意* ：Python不依靠本地系统对文本文件的描述解码；全依靠Python本身，
   所以platform-independent。
-
+  
   第五个参数errors：
-
+  
   指定当encoding和decoding发生错误时的处理方法（不能用于二进制模式）。
-
+  
   第六个参数newline：
-
+  
   第七个参数closefd：
-
+  
   第八个参数opener：
-
+  
 * *ord* (c)
   接受单个Unicode字符组成的字符串，返回对应的Unicode值。比如ord('a')
   返回97。对应的函数为chr()。
@@ -1109,9 +1146,9 @@
   : >>> "'claudio'"
 
 * *reversed* (seq)
-  返回一个将seq逆序后的iterator。seq需有__reversed__()方法，或支持
+  返回一个将SEQ逆序后的iterator。SEQ需有__reversed__()方法，或支持
   sequence协议（__len__()方法和__getitem()__整数参数以0开始）。
-
+  
   #+BEGIN_SRC python :session
     l = [1, 2, 3]
     print((list(reversed(l))))
@@ -1120,14 +1157,14 @@
     print(l.reverse())
     print(l)
   #+END_SRC
-
+  
   #+RESULTS[e129d07e07278b83053e5d57435fdfcef398cf52]:
   :
   : [3, 2, 1]
   : [1, 2, 3]
   : >>> None
   : [3, 2, 1]
-
+  
 * *round* (number[,ndigits])
   返回小数点后有ndigits个数的浮点数。如果无ndigits参数或为None，则返
   回最近的整数。
@@ -1247,8 +1284,8 @@
 
   具体用法参考[[file:%E5%86%85%E7%BD%AE%E7%B1%BB%E5%9E%8B.org][ 内置类型]] 中字符串的专门章节。
 * *sum* (iterable[,start])
-  将start与iterable中的每个元素从左到右相加，返回总和。iterable中的元
-  素通常为数字，start的值不允许为字符串。
+  将START与ITERABLE中的每个元素从左到右相加，返回总和。ITERABLE中的元
+  素通常为数字，START的值不允许为字符串。
   
   #+BEGIN_SRC python :session
     sum([1, 2, 3])
@@ -1271,9 +1308,9 @@
    #+RESULTS[76a1ced480bffb460fe5a86dd76b78447b151bde]:
    :
    : 'a|b|c'
-   
+
    - math.fsum()：求浮点数和，且保留精度。
-     
+
    #+BEGIN_SRC python :session
      floats = [10 / 3, 10 / 7, 10 / 9]
      sum(floats)
@@ -1281,14 +1318,14 @@
      import math
      math.fsum(floats)
    #+END_SRC
-   
+
    #+RESULTS[ccbb2dc630f640f9a1073f19ab9cd8a18d4e7191]:
    :
    : 5.8730158730158735
    : >>> >>> 5.8730158730158735
-   
+
    - itertools.chain()：拼接多个iterable。
-     
+
 * *super* ([type[,object-or-type]])
 
   #+BEGIN_SRC python :session
@@ -1301,25 +1338,40 @@
   实际上是tuple类构造函数。
 
   #+BEGIN_SRC python :session
-    tuple([1, 2, 3, 4])
+    from array import array
+
+    tuple([1, 2, 3])
+    tuple((1, 2, 3))
+    tuple(set([1, 2, 3]))
+    tuple(array('i', [1, 2, 3]))
+    tuple(bytes(b'123'))
+    tuple(bytearray(b'123'))
+    tuple(memoryview(b'123'))
   #+END_SRC
 
-  #+RESULTS[be2d2aa00f3b18ace9c1500aae9dfafc3cc727e3]:
-  : (1, 2, 3, 4)
+  #+RESULTS[68d64999e9e21765bd861df93306487e92500cb5]:
+  :
+  : >>> (1, 2, 3)
+  : (1, 2, 3)
+  : (1, 2, 3)
+  : (1, 2, 3)
+  : (49, 50, 51)
+  : (49, 50, 51)
+  : (49, 50, 51)
 
 * class *type* (object)
 * class *type* (name,bases,dict)
   如果只有一个参数object，返回其类型。返回值为type对象，通畅与
   object.__class__属性值相同。
-
-  *注意* ：测试对象类型时，最好使用isinstance()函数，因为其将子类型考
-  虑其中。
-
+  
+  *注意* ：测试对象类型时，最好使用isinstance()函数，因为其将父类考虑
+  其中。
+  
   如果有3个参数，则返回一个新的type对象。相当于动态的class声明。字
   符串name参数变为__name__属性，tuple类型bases转变为新类型的基础类，
   并变为__bases__属性，dict字典转换为__dict__属性。如下2个语句实际上
   生成的为相同类：
-
+  
   #+BEGIN_SRC python :session
     class X:
         x = []
@@ -1334,16 +1386,16 @@
     print(a.x)
     print(b.x)
   #+END_SRC
-
+  
   #+RESULTS[34695b1f8c0502d2419b6d4239f5a43b389a6e64]:
   :
   : ... >>> >>> >>> >>> >>> >>> []
   : []
   : >>> >>> [100]
   : [100]
-
+  
   下面使用type函数创建一个和上面相同的类：
-
+  
   #+BEGIN_SRC python :session
     X = type('X', (object,), dict(x=[]))
     a = X()
