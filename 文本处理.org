@@ -1353,7 +1353,7 @@
 **** \S
      与\s相反。
 **** \w
-
+     
      #+BEGIN_SRC python :session
        import re
        re.findall('\w', '我有一个梦想！')
@@ -1413,7 +1413,7 @@
        re.findall(b'\w', bytes('a一', 'utf-8'))
        re.findall(b'\w', bytes('a一', 'utf-8'), re.ASCII)
      #+END_SRC
-
+     
      #+RESULTS[ed4d0f18798a1a874b7a6f50735b63e6d7bc0399]:
      :
      : ['a', '一']
@@ -1424,12 +1424,12 @@
      
 **** re. *DEBUG*
      显示编译正则的Debug信息。
-
+     
      #+BEGIN_SRC python :session
        import re
        re.compile('\w', re.DEBUG)
      #+END_SRC
-
+     
      #+RESULTS[ada664fa569b3f8ea09eeaf17f5b73a3dabfe1a1]:
      :
      : IN
@@ -1486,9 +1486,9 @@
 **** re. *X*
 **** re. *VERBOSE*
      允许多行书写正则表达式，且可添加注释。
-     
+
      规则：
-     
+
      1. 除字符类，和前面有非转义的反斜杠外，所有空格字符都会被忽视。
      2. 除在字符类，以及前面有非转义反斜杠外的“#”，后面的内容会被作为
         注释。
@@ -1512,14 +1512,14 @@
      : >>> ... ... ... >>> >>> >>> >>> ['1.23', '1.2']
      : ['1.23', '1.2']
 
-*** 函数
+*** 方法
 **** re. *compile* (pattern,flags=0)
      将正则表达式编译为正则对象，以使用下一节介绍的match()和search()等
      方法。
 
      可使用上一节介绍的标记修改正则对象，如需使用多个标记，需使用二进
      制运算符“|”结合。
-     
+
      #+BEGIN_SRC python :eval never
        import re
        prog = re.compile(pattern)
@@ -1536,52 +1536,538 @@
      但如果但单个程序中多次复用一个正则，使用re.compile()方法编译后效
      率更高。
 
+     #+BEGIN_QUOTE
+     由于传递给re.compile()方法和模块层级的匹配函数会缓存正则，所以单
+     次使用少量正则时，可不必考虑使用编译版本的正则方法。
+     #+END_QUOTE
+
 **** re. *search* (pattern,string,flags=0)
+     整体扫描字符串STRING，查看第一个满足PATTERN的位置，返回对应匹配对
+     象；如果没有匹配成功，返回None；匹配成功，但不匹配任何文本，还是
+     会返回只含空字符串的匹配对象。
+
+     #+BEGIN_SRC python :session
+       from re import search
+
+       search('d*', 'a').group()
+       print(search('d', ''))
+     #+END_SRC
+
+     #+RESULTS[739420a5d3d71d5135e9a2d8506ddcc37fae58dc]:
+     :
+     : >>> ''
+     : None
+
 **** re. *match* (pattern,string,flags=0)
+     如果从字符串STRING起始位置开始有0个或多个字符可匹配PATTERN，则返
+     回匹配对象；如果没有匹配成功，则返回None；；匹配成功，但不匹配任
+     何文本，还是会返回只含空字符串的匹配对象。
+     
+     #+BEGIN_SRC python :session
+       from re import match
+
+       print(match('[0-9]', 'a1b'))
+       match('[0-9]', '1ab')
+     #+END_SRC
+     
+     #+RESULTS[6d0fb76f8682d44df1d2a29a67b7457bc76c6941]:
+     :
+     : >>> None
+     : <_sre.SRE_Match object; span=(0, 1), match='1'>
+     
+     *注意* ：
+     
+     1. 即时使用了re.MULTILINE模式，re.match()也是从整个字符串起始位置
+        开始查找匹配，而不是从每个新行起始处开始。
+        
+     2. 如果要查看任何位置，而不是起始位置是否匹配，使用search()方法：
+        
+        #+BEGIN_SRC python :session
+           from re import match, search
+
+           print(match('[a-z]', '!abc'))
+           search('[a-z]', '!abc').group()
+        #+END_SRC
+        
+        #+RESULTS[8c5c87466b3ef0098a4731abc4a4607048da84ba]:
+        :
+        : >>> None
+        : 'a'
+        
 **** re. *fullmatch* (pattern,string,flags=0)
-**** re. *split* (pattern,string,maxsplit=0,flags=0)
+     查看整个STRING是否匹配PATTERN，返回匹配对象；如果不匹配，则返回
+     None；匹配成功，但不匹配任何文本，还是会返回只含空字符串的匹配对
+     象。     
+
+
+     #+BEGIN_SRC python :session
+       from re import search, fullmatch
+
+       search('a', 'cba').group()
+       print(fullmatch('a', 'cba'))
+       fullmatch('a', 'a').group()
+     #+END_SRC
+     
+     #+RESULTS[0792b3de015de249698e7ea50ea20a59d951ed48]:
+     :
+     : >>> 'a'
+     : None
+     : 'a'
+     
+**** Re. *split* (pattern,string,maxsplit=0,flags=0)
+     在出现PATTERN处分割STRING，返回链表。如果使用了捕捉模式的正则分组，
+     则所有分组的匹配内容也包含在结果中。如果有maxsplit参数，则最多分
+     割MAXSPLIT次，剩余字符串作为结果的最后一个元素。
+
+     #+BEGIN_SRC python :session
+       from re import split, IGNORECASE
+
+       split('\W+', 'Words, words, words.')
+       split('(\W+)', 'Words, words, words.')
+       split('[a-f]+', '0a3B9', flags=IGNORECASE)
+     #+END_SRC
+
+     #+RESULTS[1a2a60181eba4721fb53739497cc6f3d000e7f14]:
+     :
+     : >>> ['Words', 'words', 'words', '']
+     : ['Words', ', ', 'words', ', ', 'words', '.', '']
+     : ['0', '3', '9']
+
+     如果STRING首末匹配正则中的捕获分组，则会在结果中包含空字符串：
+
+     #+BEGIN_SRC python :session
+       from re import split
+
+       split('(\W+)', '...words,words...')
+     #+END_SRC
+     
+     #+RESULTS[8d886d4efb87f92ab50d6f499c6c5d24ac8a2628]:
+     :
+     : >>> ['', '...', 'words', ',', 'words', '...', '']
+
+     #+BEGIN_QUOTE
+     *注意* ：split()方法目前并不在在自身可为空字符串处进行分割。如下
+     例，“x*”在a前匹配0个x，则b和c间匹配1个，c后匹配0个，正确的结果应
+     该是['', 'a', 'x', 'b', 'c', '']。但为向后兼容，会生成如下结果，
+     且抛出FutureWarning。
+
+     #+BEGIN_SRC python :session
+       from re import split
+
+       split('(x*)', 'axbc')
+     #+END_SRC
+
+     #+RESULTS[e6bd9937ea0b77ed2084f1b11bcb9d8a734ab15f]:
+     :
+     : >>> /usr/lib/python3.5/re.py:203: FutureWarning: split() requires a non-empty pattern match.
+     :   return _compile(pattern, flags).split(string, maxsplit)
+     : ['a', 'x', 'bc']
+
+     只匹配空字符串的正则已被禁用：
+
+     #+BEGIN_SRC python :session
+       from re import split, MULTILINE
+
+       split('^$', 'a\nb', MULTILINE)
+     #+END_SRC
+
+     #+RESULTS[f35b990abfeb4946ab2cd6287d3f8085fcb05fd5]:
+     :
+     : >>> Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     :   File "/usr/lib/python3.5/re.py", line 203, in split
+     :     return _compile(pattern, flags).split(string, maxsplit)
+     : ValueError: split() requires a non-empty pattern match.
+
+     #+END_QUOTE
+
 **** re. *findall* (pattern,string,flags=0)
+     返回链表，由非重叠匹配内容组成。从左到右扫描，返回结果链表中的元
+     素的顺序为匹配顺序。
+
+     #+BEGIN_SRC python :session
+       from re import findall
+
+       findall('\w', 'abc')
+     #+END_SRC
+
+     #+RESULTS[059d17b0aa79b42f3bd511a488c2ddd1b85d5e67]:
+     :
+     : >>> ['a', 'b', 'c']
+
+     如果PATTERN中有捕获分组，则链表中内容为对应分组匹配的内容；如果有
+     多个分组，则每个元素为对应分组匹配内容组成的元组。
+
+     #+BEGIN_SRC python :session
+       from re import findall
+
+       findall(r'[0-9][a-z]', '1a23c')
+       findall(r'([0-9])[a-z]', '1a23c')
+       findall(r'([0-9])([a-z])', '1a23c')
+     #+END_SRC
+
+     #+RESULTS[91ca12f5f1f88c36de389821111d994d0508ec15]:
+     :
+     : >>> ['1a', '3c']
+     : ['1', '3']
+     : [('1', 'a'), ('3', 'c')]
+
+     Empty matches are included in the result unless they touch the
+     beginning of another match.
+
 **** re. *finditer* (pattern,string,flags)
+     与findall的区别为：结果为iterator对象，其中元素为匹配对象；不管是
+     否有捕获分组，各元素始终对应整个匹配内容。
+
+     #+BEGIN_SRC python :session
+       from re import finditer
+
+       i = finditer('([a-z])[0-9]', 'a1b2c3')
+       for x in i:
+           print(x.group())
+     #+END_SRC
+
+     #+RESULTS[65b077efefe1b5d50fe85795c6d056a4d2e23516]:
+     :
+     : >>> >>> ... ... a1
+     : b2
+     : c3
+
 **** re. *sub* (pattern,repl,string,count=0,flags=0)
+     使用REPL作为模板，使用PATTERN匹配STRING的内容。如果没有匹配内容，
+     则REPL按原样返回。REPL可为函数或字符串，如果为字符串，则会处理其
+     中的转义字符，如\n会转换为换行符，\r会转换为Carriage return等。无
+     含义的转义字符，如\&保持原样。使用\number形式进行反向索引。
+     
+     #+BEGIN_SRC python :session
+       import re
+
+       re.sub(r'def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(\s*\):',
+              r'static PyObject*\npy_\1(void)\n{',
+              'def myfunc():'
+              )
+     #+END_SRC
+     
+     #+RESULTS[764048d33624b807dd33f4e152202944946051a8]:
+     :
+     : >>> ... ... ... 'static PyObject*\npy_myfunc(void)\n{'
+     
+     如果REPL为函数，则会处理所有非重叠PATTERN匹配。参数为匹配对象，返
+     回值为需替换的内容。如：
+     
+     #+BEGIN_SRC python :session
+       import re
+
+       def dash2camal(matchobj):
+           return matchobj.group(0)[1].upper()
+
+       re.sub('_\w', dash2camal, 'this_is_variable_name')
+     #+END_SRC
+     
+     #+RESULTS[2e24d96cd099c0474bf8d26e9f503720817f953e]:
+     :
+     : >>> ... ... >>> 'thisIsVariableName'
+     
+     COUNT为最多的替换个数，需为非负数。如果缺省或为0，表示替换所有。
+     如果没有匹配内容，当只有前面没有匹配内容时才替换？？？：
+     
+     #+BEGIN_SRC python :session
+       import re
+       re.sub('x*', '-', 'abc')
+     #+END_SRC
+     
+     #+RESULTS[0be01624da5b15701f8f2438cfd7885918671069]:
+     :
+     : '-a-b-c-'
+     
+     当REPL为字符串时，可使用反向索引。\g<name>或\g<number>表示
+     (?P<name>...)匹配的捕获分组内容。也可使用数字反向索引，\g<2>等价
+     于\2。\20为反向索引第20个分组，而不是第2个分组后添加字符串“0”。
+     \g<0>表示表示整个匹配内容。
+     
 **** re. *subn* (pattern,repl,string,count=0,flags=0)
+     与sub方法用法一样，只是返回结果为元组：第一个元素与sub方法的返回
+     值相同，第二个元素为替换个数。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       def dash2camel(matchobj):
+           return matchobj.group(0)[1].upper()
+
+       re.subn('_\w', dash2camel, 'this_is_variable')
+       re.subn('_\w', dash2camel, 'this_is_variable', count=1)
+       re.subn('_\w', dash2camel, 'this-is-variable', count=1)
+     #+END_SRC
+
+     #+RESULTS[69ef37e9683a9a9784ac7848e9273af37de00978]:
+     :
+     : >>> >>> ... ... >>> >>> ('thisIsVariable', 2)
+     : ('thisIs_variable', 1)
+     : ('this-is-variable', 0)
+
 **** re. *escape* (siring)
-**** re. *purge* ()
+     转义除所有ASCII字母数字和下划线外的所有字符。如果要使用正则去匹配
+     含正则的字符串，此方法很有用。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.escape('abc_12')
+       re.escape('\w\n\\')
+     #+END_SRC
+
+     #+RESULTS[698dd0925515baa613f4d25202185bb3bd2bdda8]:
+     :
+     : >>> 'abc_12'
+     : '\\\\w\\\n\\\\'
+
+**** re. *purge* () ？？？
+     清空所有正则表达式缓存。
+     
 *** Exception
 **** exception re. *error* (msg,pattern=None,pos=None )
-***** *msg*
-***** *pattern*
-***** *pos*
-***** *lineno*
-***** *colno*
+     当传递个上面方法的正则表达式解析不成功时抛出的错误，如括号不匹配；
+     或当编译或匹配正则时发生错误。It is never an error if a string
+     contains no match for a pattern. 此错误对象有下面4个属性：
+
+     - *msg* ：错误信息。
+     - *pattern* ：正则。
+     - *pos* ：正则编译失败开始的位置。
+     - *lineno* ：pos属性对应的行数。
+     - *colno* ：pos对应的列数。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       try:
+           re.match('(', 'abc')
+       except re.error as error:
+           print(error.msg)
+           print(error.pattern)
+           print(error.pos)
+           print(error.lineno)
+           print(error.colno)
+     #+END_SRC
+
+     #+RESULTS[64af38ff971caa6dee8d046004b59e8dff79aafc]:
+     :
+     : >>> ... ... ... ... ... ... ... ... missing ), unterminated subpattern
+     : (
+     : 0
+     : 1
+     : 1
+
 ** 正则表达式对象
+   被编译的正则表达式有下面方法和属性。
+   
+*** 方法
+    较之模块级别对应的方法，可指定开始匹配和结束匹配的位置，即POS和
+    ENDPOS参数；由于编译时添加了flag标记，所有没有此参数。
+    
+**** regex. *search* (string[,pos[,endpos]])
+     扫描整个STRING，查找第一个满足匹配的文本，返回正则表达式；如果没
+     匹配成功，返回None，不同于匹配成功；匹配成功，但不匹配任何文本，
+     还是会返回只含空字符串的匹配对象。
+     
+     #+BEGIN_SRC python :session
+       import re
+       pattern = re.compile('d')
+       pattern1 = re.compile('d*')
+
+       pattern.search('dog')
+       print(pattern.search('dog', 1))
+
+       # 匹配成功，但不匹配任何内容
+       pattern1.search('dog', 1)
+     #+END_SRC
+     
+     #+RESULTS[595d50894e9c421eac77b3159caae7c78ec4aed0]:
+     :
+     : >>> >>> >>> <_sre.SRE_Match object; span=(0, 1), match='d'>
+     : None
+     : >>> ... <_sre.SRE_Match object; span=(1, 1), match=''>
+
+     可选参数POS为STRING中开始搜索的索引位置，默认为0。并不完全等价于
+     截断STRING，“^”匹配正真的字符串起始位置或换行符后的位置，并不是
+     POS参数所指定开始搜索的位置：
+
+     #+BEGIN_SRC python :session
+       import re
+
+       pattern = re.compile('^d', re.MULTILINE)
+       pattern.search('dog')
+       print(pattern.search('o\ndg', pos=1))
+       print(pattern.search('odg', pos=1))
+     #+END_SRC
+
+     #+RESULTS[b928866c52db5ee66503fbe86b7443cb94a5589c]:
+     :
+     : >>> >>> <_sre.SRE_Match object; span=(0, 1), match='d'>
+     : <_sre.SRE_Match object; span=(2, 3), match='d'>
+     : None
+
+     第三个可选参数为匹配结束的位置，即匹配最多计算到ENDPOS-1处。如果
+     ENDPOS小于POS，则不会有任何结果。假设rx为被编译的正则，则有：
+
+     #+BEGIN_SRC python :eval never
+       rx.search(string, 0, 50) == rx.search(string[:50], 0)
+     #+END_SRC
+
+**** regex. *match* (string[,pos[,endpos]])
+     如果STRING起始位置有0个或多个字符匹配，则返回匹配对象；如果没有匹
+     配成功，则返回None；匹配成功，但不匹配任何文本，还是会返回只含
+     空字符串的匹配对象。
+     
+     POS和ENDPOS参数的用法同search()方法。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       pattern = re.compile('o')
+       print(pattern.match('dog'))     # o不是第一个字符
+       pattern.match('dog', 1)
+     #+END_SRC
+
+     #+RESULTS[b58c49636e6b96083dc4a4526edc8c6c82d93e8d]:
+     :
+     : >>> >>> None
+     : <_sre.SRE_Match object; span=(1, 2), match='o'>
+
+**** regex. *fullmatch* (string[,pos[,endpos]])
+     如果整个STRING匹配，则返回匹配对象。如果比匹配则返回None；匹配
+     成功，但不匹配任何文本，还是会返回只含空字符串的匹配对象。
+
+     POS和ENDPOS的用法同search()方法。
+
+     #+BEGIN_SRC python :session
+       import re
+       pattern = re.compile('o[gh]')
+
+       pattern.fullmatch('dog'), pattern.fullmatch('oge'), pattern.fullmatch('ogre')
+       pattern.fullmatch('dogge', 1, 3)
+     #+END_SRC
+
+     #+RESULTS[29ee1adb973e308f26b87107aa1df74690ba267d]:
+     :
+     : >>> >>> >>> (None, None, None)
+     : <_sre.SRE_Match object; span=(1, 3), match='og'>
+
+**** regex. *split* (string, maxsplit=0)
+     同模块级别的split方法用法相同。
+**** regex. *findall* (string[,pos[,endpos]])
+     同模块级别的findall方法用法相同，但可使用POS和ENDPOS参数限制搜索
+     范围。
+
+**** regex. *finditer* (string[,pos[,endpos]])
+     同模块级别的finditer方法用法相同，但可使用POS和ENDPOS参数限制搜索
+     范围。
+     
+**** regex. *sub* (repl,string,count=0)
+     同模块级别的sub方法用法相同。
+
+**** regex. *subn* (repl,string,count=0)
+     同模块级别的subn方法用法相同。
+
+*** 属性
+**** regex. *flags*
+     含传递给re.compile()方法，以及(?...)内联的flag标记。如果为Unicode
+     形式的正则，则自动添加re.UNIOCDE标记。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.compile('').flags, re.UNICODE
+       re.compile(b'').flags
+       re.compile('(?Li)', re.VERBOSE).flags
+     #+END_SRC
+
+     #+RESULTS[2772b6142f4a3d587f7365088b88c29b15e6e5f4]:
+     :
+     : >>> (32, 32)
+     : 0
+     : 102
+
+**** regex. *groups*
+     捕获分组数量。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.compile('').groups
+       re.compile('()').groups
+       re.compile('()(?P<name>)').groups
+       re.compile('(?:)').groups
+     #+END_SRC
+
+     #+RESULTS[943d3bbaed042dde09adf7343c77498f273f80ff]:
+     :
+     : >>> 0
+     : 1
+     : 2
+     : 0
+
+**** regex. *groupindex*
+     返回正则中命名捕获分组组成的字典映射对象。key值为命名分组名称，
+     value值为命名分组的数字反向引用值。
+
+     #+BEGIN_SRC python :session
+       import re
+
+       re.compile('').groupindex
+       re.compile('()').groupindex
+       re.compile('(?P<name>)(?P<age>)').groupindex
+     #+END_SRC
+
+     #+RESULTS[a85ca27866874f160a0df3330a672f5cb16ca48e]:
+     :
+     : >>> mappingproxy({})
+     : mappingproxy({})
+     : 2
+
+**** regex. *pattern*
+     传递给compile()方法的正则字符串。
+     
+     #+BEGIN_SRC python :session
+       import re
+
+       re.compile(b'xyz()').pattern
+       re.compile('xyz()').pattern
+     #+END_SRC
+     
+     #+RESULTS[6013ac05a3b508213048d8d3a713e7d962a6656c]:
+     :
+     : >>> b'xyz()'
+     : 'xyz()'
+     
 ** 正则匹配对象
    匹配对象总是具有布尔值True。由于当match()和search()匹配失败后会返回
    None，可使用此特性判断是否匹配成功：
-   
+
    #+BEGIN_SRC python :eval never
      match = re.search(pattern, string)
      if match:
          process(match)
    #+END_SRC
-   
+
    匹配对象支持下列方法和属性：
 *** 方法
 **** match. *expand* (template)
      在模板字符串TEMPLATE中使用反向索引获取正则中匹配的分组。TEMPLATE
      中可使用数字反向索引，如\1和\2，和命名分组，如\name，反向索引替换
      匹配内容。
-     
+
      #+BEGIN_SRC python :session
        import re
 
        m = re.match(r'(?P<first>\w+) (\w+)', 'hello world!')
        m.expand(r'\g<2> \1 \g<first>')
      #+END_SRC
-     
+
      #+RESULTS[3f50ae1a7a1abe547ca4977b5259200def7b165e]:
      :
      : >>> >>> 'world hello hello'
-     
+
 **** match. *group* ([group1,...])
      返回分组匹配内容。
 
@@ -1894,7 +2380,7 @@
      : >>> 'last_name'
      : None
      : None
-
+     
 **** match. *re*
      作为参数传递给search()和match()方法的正则参数。
      #+BEGIN_SRC python :session
@@ -1906,12 +2392,12 @@
        type(m.re), m.re
        m1.re
      #+END_SRC
-     
+
      #+RESULTS[3970cca851b2b252546d8cc572145d5ff2fc3c20]:
      :
      : >>> >>> >>> >>> (<class '_sre.SRE_Pattern'>, re.compile('(\\w+) (\\w+)'))
      : re.compile('(\\w+) (\\w+)')
-     
+
 **** match. *string*
      作为参数传递给search()和match()方法，用于被搜索的字符串参数。
 
@@ -1924,9 +2410,347 @@
      #+RESULTS[11670b75f063bd545a9b7ec24a74ca84f21c875e]:
      :
      : >>> >>> 'Michael Jackson'
-
+     
 ** 使用举例
+*** 配对检查
+    下面的例子中将使用此帮助函数打印匹配对象：
+    
+    #+BEGIN_SRC python :session
+      def displaymatch(match):
+          if match is None:
+              print(None)
+          else:
+              print('<Match: {}, groups={}>'.format(match.group(), match.groups()))
+    #+END_SRC
+    
+    #+RESULTS[816acc52ed86904f3cb4c7f9122ec16bfc5dc22e]:
+    
+    假设编写一个扑克程序，每个玩家手中有5张牌，“a”代表Ace，“k”代表King，
+    “q”代表queen，“j”代表Jack，“t”代表10，2-9分别代表其他牌。则可使用
+    正则检查玩家手中牌的数量和值是否正确：
+    
+    #+BEGIN_SRC python :session
+      import re
+      valid = re.compile(r'^[a2-9tjqk]{5}$')
+      displaymatch(valid.match('aktq'))
+      displaymatch(valid.match('ajt5e'))
+      displaymatch(valid.match('akt'))
+      displaymatch(valid.match('727ak'))
+    #+END_SRC
+
+    #+RESULTS[5cc6723551093a93dbe49fe376b7448b733868c4]:
+    :
+    : >>> None
+    : None
+    : None
+    : <Match:  727ak, groups=()>
+
+    使用反向引用查看是否有“对子”：
+
+    #+BEGIN_SRC python :session
+      import re
+      pair = re.compile(r'.*(.).*\1')
+      displaymatch(pair.match('717ak'))
+      displaymatch(pair.match('718ak'))
+      displaymatch(pair.match('354aa'))
+    #+END_SRC
+
+    #+RESULTS[666c51b269209024d7a98fe9deafb5fa91c79730]:
+    :
+    : >>> <Match: 717, groups=('7',)>
+    : None
+    : <Match:  354aa, groups=('a',)>
+
+    以及使用group方法查看“对子”时什么：
+
+    #+BEGIN_SRC python :session
+      pair.match('354aa').group(1)
+    #+END_SRC
+
+    #+RESULTS[c66a65d33f2b050da5633b9273b338949000d9de]:
+    : 'a'
+
+*** 模仿scanf()
+    下表为scanf()函数中占位符对应的正则（基本合适）：
+
+    | scanf占位符 | 正则                                        |
+    |-------------+---------------------------------------------|
+    | %c          | .                                           |
+    | %5c         | .{5}                                        |
+    | %d          | [+-]?\d+                                    |
+    | %e,%E,%f,%g | [+-]?(\d+(\.\d*)?\vert\.\d+)([eE][+-]\d+)?  |
+    | %i          | [+-]?(0[xX][\dA-Fa-f]+\vert0[0-7]*\vert\d+) |
+    | %o          | [+-]?[0-7]+                                 |
+    | %s          | \S+                                         |
+    | %u          | \d+                                         |
+    | %x,%X       | [+-]?(0[xX])?[\dA-F-f]+                     |
+    |             |                                             |
+
+    如读取文本：
+
+    #+BEGIN_EXAMPLE
+      /usr/sbin/sendmail - 0 errors, 4 warnings
+    #+END_EXAMPLE
+
+    scanf()的格式为：
+
+    #+BEGIN_SRC python :session
+      %s - %d errors, % d warnings
+    #+END_SRC
+
+    对应的Python正则为：
+
+    #+BEGIN_SRC python :session
+      (\S +) - (\d+) errors, (\d+) warnings
+    #+END_SRC
+
+*** search() vs. match()
+    search()方法为扫描整个字符串匹配，而match()方法则是只在起始位置开
+    始匹配。
+
+    使用“^”可强制search()方法只从起始位置开始匹配：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      print(re.match('c', 'abcdef'))
+      print(re.match('^c', 'abcdef'))
+      print(re.match('^a', 'abcdef'))
+    #+END_SRC
+
+    #+RESULTS[d9d142fd36515bb2d5e8c296d132d47b9fc6f1c3]:
+    :
+    : >>> None
+    : None
+    : <_sre.SRE_Match object; span=(0, 1), match='a'>
+
+    当在re.MULTIPLE模式下，match()方法只是会从字符串正真的其实位置开始
+    匹配；而使用了“^”正则的search()方法会匹配所有换行符前的位置：
+
+    #+BEGIN_SRC python :session
+      import re
+
+      print(re.match('X', 'A\nB\nX', re.MULTILINE))
+      print(re.search('^X', 'A\nB\nX', re.MULTILINE))
+    #+END_SRC
+
+    #+RESULTS[3a2fa92e9bd7a25851bf1cd63bdbe1c1ca100267]:
+    :
+    : >>> None
+    : <_sre.SRE_Match object; span=(4, 5), match='X'>
+    
+*** 制作电话薄
+    split()方法可根据正则分割字符串。利用此方法可将文本数据转换为
+    Python中的数据结果。如下面生成电话本的例子：
+    
+    下面为文本（一般在文本文件中）：
+    
+    #+BEGIN_SRC python :session
+      text = '''小张：192.168.3.4 155 北京
+
+      小王：192.145.2.5 436 上海
+      小明：182.122.12.122 广州
+
+      小黄：122.312.232.12 深圳'''
+    #+END_SRC
+
+    每条信息间可能有多个空行，利用split()方法将每条项目转换为链表元素：
+
+    #+BEGIN_SRC python :session
+      import re
+      entries = re.split('\n+', text)
+      entries
+    #+END_SRC
+
+    #+RESULTS[40f95cdd94740721d4691df79f83064f0387c982]:
+    :
+    : >>> ['小张：192.168.3.4 155 北京', '小王：192.145.2.5 436 上海', '小明：182.122.12.122 广州', '小黄：122.312.232.12 深圳']
+
+    再使用split()方法将每个元素进一步分割：
+
+    #+BEGIN_SRC python :session
+      import re
+      [re.split('：? ', entry, 3) for entry in entries]
+    #+END_SRC
+
+    #+RESULTS[9112cc05a7ae4023f3fe483288d4f47983182cfc]:
+    :
+    : >>> [['小张：192.168.3.4', '155', '北京'], ['小王：192.145.2.5', '436', '上海'], ['小明：182.122.12.122', '广州'], ['小黄：122.312.232.12', '深圳']]
+
+    增加分割数目：
+    
+    #+BEGIN_SRC python :session
+      import re
+      [re.split('：? ', entry, 4) for entry in entries]
+    #+END_SRC
+
+    #+RESULTS[2a6d33cd22881070c69bc69c64648541543a5ae3]:
+    :
+    : >>> [['小张：192.168.3.4', '155', '北京'], ['小王：192.145.2.5', '436', '上海'], ['小明：182.122.12.122', '广州'], ['小黄：122.312.232.12', '深圳']]
+
+*** 文本修改
+    sub()方法能用单个字符串或函数返回值替换所有匹配内容。下例使用此方
+    法打乱所有单词除首位字母外的顺序：
+
+    #+BEGIN_SRC python :session
+      import random
+      import re
+
+      def shuffle(m):
+          innter_word = list(m.group(2))
+          random.shuffle(innter_word)
+          return m.group(1) + ''.join(innter_word) + m.group(2)
+
+      text = 'Professor Abdolmalek, please report your absences promptly.'
+      re.sub(r'(\w)(\w+)(\w)', shuffle, text)
+      re.sub(r'(\w)(\w+)(\w)', shuffle, text)
+    #+END_SRC
+
+    #+RESULTS[e2e9b145cff48df9b9031232ef1ed1a181e137ab]:
+    :
+    : >>> >>> >>> ... ... ... ... >>> >>> 'Poefrossrofesso Aaoellbmdbdolmale, pselaleas rrpeoepor yuoou anescebbsence pptmolrromptl.'
+    : 'Peosrfosrofesso Abaolmldebdolmale, psaelleas rrpeoepor yuoou anbcseebsence proltmpromptl.'
+
+*** 查找所有英语副词
+    不同于search()方法，findall()方法可获取所以出现的文本。利用此特点
+    可查找所有文本中的副词：
+
+    #+BEGIN_SRC python :session
+      import re
+      text = 'gently, do not run so quickly.'
+      re.findall(r'\w+ly', text)
+    #+END_SRC
+
+    #+RESULTS[148712671095c8e264137a763068b12355885de5]:
+    :
+    : >>> ['gently', 'quickly']
+
+*** 查找所有英语副词，及其在字符串中的位置
+    不同于findall()方法，finditer()方法中的各个元素为匹配对象，可用此
+    特点获取关于匹配文本在文本中的具体位置：
+
+    #+BEGIN_SRC python :session
+      import re
+      text = 'gently, do not run so quickly!'
+      for m in re.finditer(r'\w+ly', text):
+          print('{}-{}: {}'.format(m.start(), m.end(), m.group(0)))
+    #+END_SRC
+
+    #+RESULTS[4ef7fc9b3983475658f8fed723d8f52c6d11a9b9]:
+    :
+    : >>> ... ... 0-6: gently
+    : 22-29:   quickly
+    
+*** 原始字符串
+    使用原始值字符串（r'abc'）可使正则表达式简洁易读。如果不使用原始字
+    符串，所有反斜杠转义都需再使用另外一个反斜杠转义。下面两例等价：
+
+    #+BEGIN_SRC python :session
+      import re
+      re.match(r'\W(.)\1\W', ' ff ')
+      re.match('\\W(.)\\1\\W', ' ff ')
+    #+END_SRC
+
+    #+RESULTS[f87ad450a30bd52afa406cd837f586372d272cff]:
+    :
+    : <_sre.SRE_Match object; span=(0, 4), match=' ff '>
+    : <_sre.SRE_Match object; span=(0, 4), match=' ff '>
+
+    如需匹配反斜杠本身，需对其转义。原始字符串中只需两个反斜杠，而普通
+    字符串中则需4个。
+
+    #+BEGIN_SRC python :session
+      import re
+      re.match(r'\\', r'\\')
+      re.match('\\\\', r'\\')
+    #+END_SRC
+
+    #+RESULTS[2b58d4d52cda60cffeafef4bf50e7516c02ef15c]:
+    :
+    : <_sre.SRE_Match object; span=(0, 1), match='\\'>
+    : <_sre.SRE_Match object; span=(0, 1), match='\\'>
+
+*** 制作分词器
+    分词器是将字符串分类。编写解释器或编译器的第一步就是利用分词器分词。
+    
+    文本分类为单个正则，将他们所有结合在一个总正则中然后历遍匹配。
+    
+    #+BEGIN_SRC python :session
+      import collections
+      import re
+
+      Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column'])
+
+
+      def tokenize(code):
+          keywords = {'IF', 'THEN', 'ENDIF', 'FOR', 'NEXT', 'GOSUB', 'RETURN'}
+          token_specification = [
+              ('NUMBER', r'\d+(\.\d*)?'),  # 整数或浮点数
+              ('ASSIGN', r':='),        # 赋值操作符
+              ('END', r';'),            # 语句结束标识
+              ('ID', r'[A-Za-z]+'),     # Identifier
+              ('OP', r'[-+*/]'),        # 数学运算符
+              ('NEWLINE', r'\n'),       # 换行
+              ('SKIP', r'[ \t]'),       # 跳过空格和tab
+              ('MISMATCH', r'.')        # 其他
+          ]
+          tok_regex = '|'.join('(?P<{0[0]}>{0[1]})'.format(pair)
+                               for pair in token_specification)
+          line_num = 1
+          line_start = 0
+          for mo in re.finditer(tok_regex, code):
+              kind = mo.lastgroup
+              value = mo.group(kind)
+              if kind == 'NEWLINE':
+                  line_start = mo.end()
+                  line_num += 1
+              elif kind == 'SKIP':
+                  pass
+              elif kind == 'MISMATCH':
+                  raise RuntimeError(
+                      '{} unexpected on line {}'.format(value, line_num))
+              else:
+                  if kind == 'ID' and value in keywords:
+                      kind = value
+                  column = mo.start() - line_start
+                  yield Token(kind, value, line_num, column)
+
+      statements = ''' IF quantity THEN
+              total := total + price * quantity;
+              tax := price * 0.05;
+      ENDIF;
+      '''
+
+      for token in tokenize(statements):
+          print(token)
+    #+END_SRC
+
+    #+RESULTS[34edca470cd7177c40d3aff00d84a96d059feae1]:
+    #+begin_example
+
+    >>> >>> >>> >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> ... ... ... ... >>> >>> ... ... Token(typ='IF', value='IF', line=1, column=1)
+    Token(typ='ID', value='quantity', line=1, column=4)
+    Token(typ='THEN', value='THEN', line=1, column=13)
+    Token(typ='ID', value='total', line=2, column=8)
+    Token(typ='ASSIGN', value=':=', line=2, column=14)
+    Token(typ='ID', value='total', line=2, column=17)
+    Token(typ='OP', value='+', line=2, column=23)
+    Token(typ='ID', value='price', line=2, column=25)
+    Token(typ='OP', value='*', line=2, column=31)
+    Token(typ='ID', value='quantity', line=2, column=33)
+    Token(typ='END', value=';', line=2, column=41)
+    Token(typ='ID', value='tax', line=3, column=8)
+    Token(typ='ASSIGN', value=':=', line=3, column=12)
+    Token(typ='ID', value='price', line=3, column=15)
+    Token(typ='OP', value='*', line=3, column=21)
+    Token(typ='NUMBER', value='0.05', line=3, column=23)
+    Token(typ='END', value=';', line=3, column=27)
+    Token(typ='ENDIF', value='ENDIF', line=4, column=0)
+    Token(typ='END', value=';', line=4, column=5)
+    #+end_example
+
 * difflib
+  
 * textwrap
 * unicodedate
 * stringprep
