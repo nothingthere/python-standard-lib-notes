@@ -46,7 +46,7 @@
 * 映射（Mapping）
   映射（Mapping）类型为支持任意键值对查询的对象容器，具备Mapping或
   MutableMapping abstract base类的方法。支持此功能的类型有：
-  
+
   - dict
   - collections.defaultdict
   - collections.OrderDict
@@ -78,14 +78,333 @@
 
 * 生成器迭代器（generator iterator）
   由生成器创建的对象。
-  
+
   每一个yield语句会暂停函数进程，记住当前代码执行的位置(含局部变量和未
   解决的try语句)。当yield语句执行完后，再次回到原来位置。？？？
-  
+
 **** 字节序（endian）[[https://zh.wikipedia.org/wiki/%25E5%25AD%2597%25E8%258A%2582%25E5%25BA%258F][@wiki]]
-     
+
      数据在内存中排序情况。如数字“12”，如果为“小端序（little-endian）”
      则内存中“2”在“1”之前，“大端序（bit-endian）”则“1”在“2”之前。
-     
+
      在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
      同 标准的字节序。
+* Gestalt匹配 [[http://www.drdobbs.com/database/pattern-matching-the-gestalt-approach/184407970?pgno%3D5][参考地址]]
+  
+  [[http://blog.csdn.net/sunboyiris/article/details/18264311][Gestalt视觉理论]]
+  
+  [[https://zh.wikipedia.org/wiki/%25E6%25A0%25BC%25E5%25BC%258F%25E5%25A1%2594%25E5%25AD%25A6%25E6%25B4%25BE][@zh.wikipedia]] ：
+  
+  #+BEGIN_QUOTE
+  格式塔学派主张人脑的运作原理是整体的，“整體不同於其部件的總和”。例如，
+  我們對一朵花的感知，並非純粹單單從對花的形狀、顏色、大小等感官資訊而
+  來，還包括我們對花過去的經驗和印象，加起來才是我們對一朵花的感知
+  #+END_QUOTE
+  
+  What is the gestalt approach to pattern matching? Gestalt is a word
+  that describes how people can recognize a pattern as a functional unit
+  that has properties not derivable by summation of its parts. For
+  example, a person can recognize a picture in a connect-the-dots puzzle
+  before finishing or even beginning it. This process of filling in the
+  missing parts by comparing what is known to previous observations is
+  called gestalt.
+  
+  The Ratcliff/Obershelp pattern-matching algorithm uses this same
+  process to decide how similar two one-dimensional patterns are. Since
+  text strings are one dimensional, this algorithm returns a value that
+  you can use as a confidence factor, or percentage, showing how alike
+  any two strings are.
+  
+  Because this pattern-matching algorithm can recognize matches in
+  substrings quickly and easily, there are many applications for it. For
+  example, a compiler using this algorithm would be able to determine
+  what variable, keyword, or procedure name the programmer meant, even
+  when the compiler encounters a spelling error. Educational software
+  that can recognize a correct answer contextually (even when the answer
+  contains a typing error) is another natural application. A command
+  shell could finally recognize that SYMPONY doesn't exist---and do
+  something intelligent with that information, such as pop up a menu of
+  close alternatives like SYMPHONY. Text adventure games with their
+  powerful parsers are an ideal application for this algorithm: the
+  games could make broad assumptions in assimilating user input.
+  
+  The Ratcliff/Obershelp pattern-matching algorithm was developed by
+  John W. Ratcliff and John A. Obershelp in 1983 to address concerns
+  about educational software. Often, educational software has consisted
+  of multiple-choice questions only because the existing algorithms
+  required an exact character-for-character match. The algorithm
+  presented in this article is both forgiving and understanding of
+  simple typing mistakes, and allows intelligent responses to erroneous
+  input. To date, this algorithm has been implemented in a commercial
+  spelling checker, a database search program, and a compiler.
+  
+  Adding this algorithm to a compiler had some dramatic results. When
+  this algorithm was implemented in a primitive C compiler, the compiler
+  was able to make accurate assumptions when it encountered misspelled
+  procedure names, keywords, and variables. When it couldn't find an
+  identifier, it examined all of the currently defined names and
+  collated the best matches. If the compiler could find no match better
+  than 60 percent, then it produced a normal error message. The most
+  common case, however, resulted in an accurate and unambiguous match:
+  the compiler was able to continue with this assumption while producing
+  both a warning message that indicated the assumption made and the line
+  number that it occurred on. The result was that rather than getting a
+  cascade of 50 warning messages because of one typing mistake the
+  programmer now got a simple warning message and a successful
+  compilation. After finding several strong matches, the compiler
+  prompted the programmer for confirmation in apop-up window. The
+  compiler could even go so far as to ask the programmer if it should
+  automatically correct the source code as well. On the occasions when
+  the compiler made a false assumption, it almost always generated
+  errors due to mismatched arguments being passed to an assumed
+  procedure. Even if an erroneous assumption results in a successful
+  compilation, the programmer is still warned and knows not to run the
+  executable that the compiler produced.
+  
+** How the Algorithm Works
+   
+   The best way to describe the Ratcliff/Obershelp pattern-matching
+   algorithm, in using conventional computer terminology, is as a
+   wild-card search that doesn't require wild cards. Instead, the
+   algorithm creates its own wildcards, based on the closest matches
+   found between the strings. Specifically, the algorithm works by
+   examining two strings passed to it and locating the largest group of
+   characters in common. The algorithm uses this group of characters as
+   an anchor between the two strings. The algorithm then places any group
+   of characters found to the left or the right of this anchor on a stack
+   for further examination. This procedure is repeated for all substrings
+   on the stack until there is nothing left to examine. The algorithm
+   calculates the score returned as twice the number of characters found
+   in common divided by the total number of characters in the two
+   strings; the score is returned as an integer, reflecting a percentage
+   match.
+   
+   For example, suppose you want to compare the similarity between the
+   word `Pennsylvania' and a mangled spelling as `Pencilvaneya.' The
+   largest common group of characters that the algorithm would find is
+   `lvan.' The two sub-groups remaining to the left are `Pennsy' and
+   `Penci,' and to the right are `ia' and`eya.' The algorithm places both
+   of these string sections on the stack to be examined, and advances the
+   current score to eight, two times the number of characters found in
+   common. The substrings `ia' and `eya' are next to come off of the
+   stack and are then examined. The algorithm finds one character in
+   common: a. The score is advanced to ten. The substrings to the
+   left---'i' and `ey'---are placed on the stack, but then are
+   immediately removed and determined to contain no character in
+   common. Next, the algorithm pulls `Pennsy' and `Penci' off of the
+   stack. The largest common substring found is `Pen.' The algorithm
+   advances the score by 6 so that it is now 16. There is nothing to the
+   left of `Pen,' but to the right are the substrings `nsy' and `ci,'
+   which are pushed onto the stack. When the algorithm pulls off `nsy'
+   and `ci' next, it finds no characters in common. The stack is now
+   empty and the algorith ready to return the similarity value
+   found. There was a score of 16 out of a total of 24. This result means
+   that the two strings were 67 percent alike.
+   
+** Inside the Code
+   
+   Now that you know how the algorithm works, you're ready to look at the
+   code. This article includes an assembly language routine that is
+   accessible as a function call for C programs. This assembly language
+   routine has been optimized using techniques such as register
+   optimization, algorithmic analysis, branch optimization, and
+   instruction-cycle counts. Therefore, you may very well find this
+   routine fast enough to be used as a basic string-companion function in
+   your software. In that regard you should note that the variables in
+   this routine are declared as static, rather than dynamic, to make the
+   source code easier to follow.Example 1.
+   
+   #+BEGIN_SRC c :session
+     #include <stdio.h>
+     #include <stdlib.h>
+     #include <string.h>
+     /***********************************************************************/
+     /*                         GESTALT.C                                   */
+     /*          written by John W. Ratcliff and David E. Metzener          */
+     /*                       November 10, 1987                             */
+     /*                                                                     */
+     /*  Demonstrates the Ratcliff/Obershelp Pattern Recognition Algorithm  */
+     /*  Link this with SIMIL.OBJ created from the SIMIL.ASM source file    */
+     /*  The actual similiarity function is called as:                      */
+     /*  int simil(char *str1,char *str2)                                   */
+     /*  where str1 and str2 are the two strings you wish to know their     */
+     /*  similarly value. simil returns a percentage match between         */
+     /*  0 and 100 percent.                                                 */
+     /***********************************************************************/
+     int simil(char *stl1, char *str2);
+     void ucase(char *str);
+
+     main() {
+       char str1[80];
+       char str2[80];
+       int prcnt;
+
+       printf("This program demonstrates the Ratcliff/Obershelp pattern\n");
+       printf("recognition algorithm. Enter series of word pairs to\n");
+       printf("discover their similarity values.\n");
+       printf("Enter strings of 'END' and 'END' to exit.\n\n");
+       do {
+         printf("Enter the two strings separated by a space: ");
+         scanf("%s %s" str1, str2);
+         ucase(str1);
+         ucase(str2);
+         prcnt = simil(str1, str2);
+         printf("%s and %s are %d\% alike.\n\n", str1, str2, prcnt);
+       } while (strcmp(str1, "END"));
+     }
+
+     void ucase(str) char *str;
+     {
+       while (*str) {
+         *str - toupper(*str);
+         str++;
+       }
+     }
+   #+END_SRC
+   
+   It should be clear from the earlier discussion that the time-critical
+   portion of the code is in the section that determines the maximum
+   number of characters in common between two substrings. The worstcase
+   scenario is when absolutely no characters are found in common between
+   the two strings. When this happens, N x M number of comparisons are
+   required, where N is the number of characters in the first string and
+   M is the number of characters in the second string.
+   
+   The comparison procedure is composed of two loops: an inner loop for
+   string two and an outer loop for string one. At each character in the
+   two strings the procedure checks to see how many characters are
+   equal. Whenever any characters are found that are equal, the procedure
+   then checks to see if this number is greater than the previous maximum
+   number of characters found. If it is, then the procedure updates the
+   variable maxchars and updates the substring to be returned. Whenever a
+   new maxchars occurs you can shorten the search by the difference
+   between the new maxchars and add that value. The reason for this is
+   simply that once you have found for example, a five-character match,
+   you do not need to waste time looking more than five characters from
+   the ends of the two substrings because there is clearly no chance of
+   finding more than five characters. Inside the inner loop, whenever the
+   procedure finds any characters in common, whether they form a new
+   maxchars or not, the procedure advances the inner loop past these
+   characters. On exit from this procedure, the DX register contains the
+   number of characters found in common, and the variables CLI, CRI, CL2,
+   and CR2 are pointing to the left and the right of the character string
+   found in common between the two source strings.
+   
+   The main procedure, SIMIL, which calls the compare routine, "realizes"
+   there is nothing to place on the stack if no characters were found in
+   common. If there are no characters to the left of either of the two
+   substrings, then you don't need to push anything to the left. If there
+   is exactly one character to the left of both substrings, you don't
+   need to push the characters on the stack because they cannot be equal
+   (or the first character would have been included in the maxchars
+   substring). These same rules apply to the right of the substring as
+   well.
+   
+** Performance Aspects
+   
+   To evaluate the performance of the routines, the following tests were
+   performed. First, a series of strings were created from 1 to 20
+   characters in length. Then 10,000 calls were made to the
+   pattern-matching procedure for each of these 20 strings on an 8 MHz
+   IBM AT. The time for each iteration was recorded in hundredths of
+   seconds. Strings were created that were exactly equal, totally
+   different, matching halfway at the beginning, matching halfway at the
+   end, or matching hallway in the middle. The results of these tests are
+   reported in Figure 1, page 50, as the number of comparisons performed
+   per second. As you can see in the figure for exactly equal strings,
+   the procedure found virtually no change as the strings became
+   longer. For this case, the pattern-matching procedure acted as an
+   ordinary string comparison function and performed approximately 8,000
+   comparisons per second. Totally different strings act as predicted,
+   showing a quadratic curve in the form of N2 (from 8,000
+   comparisons/second for one character to 200 comparisons/second for two
+   20-character strings).
+   
+   Strings that match at the beginning can exit quickly and those that
+   match in the middle divide their search problem in half. (455
+   comparisons/second for 20-character strings.) Strings that match at
+   the end model those that are totally unalike since nearly the entire
+   strings are searched before the matching substring is located. (270
+   comparisons/second.)
+   
+   Next, two 12-character strings were analyzed for every percentage that
+   the procedure could return. At each percentage, a wide variety of
+   combinations of substring matches were tried. These varieties included
+   matches at the beginning, in the middle, and at the end, and those
+   spread differently throughout the two strings. Figure 2, page 51,
+   displays the average time for these tests at each percentage.
+   
+   Figure 1: Effects of timing during different compare types
+   
+** Final Thoughts
+   
+   Implementing this algorithm in your application can dramatically
+   improve your software, but it does require some judgment based on the
+   environment. The first step in interpreting the ambiguous data should
+   be by compiling a list of the most likely alternatives. Your program's
+   action after this should be based on both how strong and how closely
+   grouped the candidates are. For example, if the best match found is
+   only a 50-percent match but all the other candidates are under
+   20-percent, the 50-percent match is quite likely the users' original
+   intent. However, if there are six 90-percent matches or better, it
+   would be best to provide the user with these matches in order of
+   similarity, along with a convenient and rapid method of confirmation,
+   such as a pop-up menu.
+   
+   We hope this article has sparked some interest in the programming
+   community, and we'd appreciate hearing about your applications of the
+   algorithm. Adding pattern recognition to software has tremendous
+   potential for improving all our lived programmers and users alike. We
+   might finally make "user-friendly" something more than a marketing
+   cliche.
+   
+   Figure 2: Average timing for every percentage of a 12- to 12-character
+   string match
+   
+   #+BEGIN_SRC c :session
+     #include <stdio.h>
+     #include <stdlib.h>
+     #include <string.h>
+     /*************************************************************************/
+     /*                            GESTALT.C                                  */
+     /*        written by John W. Ratcliff and David E. Metzener              */
+     /*                         November 10, 1987                             */
+     /*                                                                       */
+     /* Demonstrates the Ratcliff/Obershelp Pattern Recognition Algorithm     */
+     /* Link this with SIMIL.OBJ created from the SIMIL.ASM source file       */
+     /* The actual similiarity function is called as:                         */
+     /* int simil(char *str1,char *str2)                                      */
+     /* where str1 and str2 are the two strings you wish to know their        */
+     /* similiarity value.  simil returns a percentage match between          */
+     /* 0 and 100 percent.                                                    */
+     /*************************************************************************/
+     int simil(char *str1, char *str2);
+     void ucase(char *str);
+
+     main() {
+       char str1[80];
+       char str2[80];
+       int prcnt;
+
+       printf("This program demonstrates the Ratcliff/Obershelp pattern\n");
+       printf("recognition algorithm.  Enter series of word pairs to\n");
+       printf("discover their similarity values.\n");
+       printf("Enter strings of 'END' and 'END' to exit.\n\n");
+       do {
+         printf("Enter the two strings seperated by a space: ");
+         scanf("%s %s", str1, str2);
+         ucase(str1);
+         ucase(str2);
+         prcnt = simil(str1, str2);
+         printf("%s and %s are %d\% alike.\n\n", str1, str2, prcnt);
+       } while (strcmp(str1, "END"));
+     }
+
+     void ucase(str) char *str;
+     {
+       while (*str) {
+         ,*str = toupper(*str);
+         str++;
+       }
+     }
+   #+END_SRC

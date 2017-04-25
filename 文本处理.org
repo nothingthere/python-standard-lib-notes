@@ -2749,8 +2749,54 @@
     Token(typ='END', value=';', line=4, column=5)
     #+end_example
 
-* difflib
+* difflib - 文本对比
+  此模块提供对比序列（Sequence）的类和函数。可用于对比文件，生成对比不
+  同形式的信息（含HTML、context和unified diffs）。如需对比文件夹和文件，
+  参考filecmp模块。
   
+** class difflib. *SequenceMatcher*
+   
+   #+BEGIN_SRC python :session
+     import difflib
+     difflib.SequenceMatcher
+   #+END_SRC
+   
+   #+RESULTS[89f7bb5fd93979bb842d279ec25234530a4a4882]:
+   :
+   : <class 'difflib.SequenceMatcher'>
+   
+** class difflib. *Differ*
+** class difflib. *HtmlDiff*
+*** *__init__* (tabsize=8,wrapcolumn=None,linejunk=None,charjunk=IS_CHARACTER_JUNK)
+*** *make_file* (fromalines,tolines,fromedesc="",todesc="",context=False,nunlines=5,*,charset='utf-8')
+*** *make_table* (fromlines,tolines,fromdesc="",todesc="",context=False,numlines=5)
+** difflib. *context_diff* (a,b,fromfile="",tofile="",fromfiledate="",tofiledate="",n=3,lineterm="\n")
+** difflib. *get_close_matches (word,possibilities,n=3,cutoff=0.6)
+** difflib. *ndiff* (a,b,linejunk=None,charchunk=IS_CHARACTER_JUNK)
+** difflib. *restore* (sequence,which)
+** difflib. *unifies_diff* (a,b,fromfile="",tofile="",fromfiledate="",tofiledate="",n=3,lineterm="\n")
+** difflib. *diff_bytes* (dfunc,a,b,fromfile=b"",tofile=b"",fromfiledate=b"",tofiledate=b"",n=3,lineterm=b"\n")
+** difflib. *is_line_junk* (line)
+** difflib. *is_character_junk* (ch)
+** SequenceMatcher对象
+*** class difflib. *SequenceMatcher* (jsjunk=None,a="",b="",autojunk=True)
+**** *set_seqs* (a,b)
+**** *set_seq1* (a)
+**** *set_seq2* (b)
+**** *find_longest_match* (alo,ahi,blo,bhi)
+**** *get_matching_blocks* ()
+**** *get_opcodes* ()
+**** *get_grouped_opcodes* (n=3)
+**** *ratio* ()
+**** *quick_ratio* ()
+**** *real_quick_ratio* ()
+** SequenceMatcher 举例
+** Differ对象
+*** class difflib. *Differ* (linejunk=None,charjunk=None)
+**** *compare* (a,b)
+
+** Differ举例
+** difflib命令行接口实现
 * textwrap
 * unicodedate
 * stringprep
