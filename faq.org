@@ -89,7 +89,7 @@
 
      在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
      同 标准的字节序。
-* Gestalt匹配 [[http://www.drdobbs.com/database/pattern-matching-the-gestalt-approach/184407970?pgno%3D5][参考地址]]
+* Gestalt匹配 [[http://www.drdobbs.com/database/pattern-matching-the-gestalt-approach/184407970?pgno%3D5][参考地址]] [[http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/DDJ/1988/8807/8807c/8807c.htm][打开更快的网页]]
   
   [[http://blog.csdn.net/sunboyiris/article/details/18264311][Gestalt视觉理论]]
   
@@ -101,206 +101,70 @@
   來，還包括我們對花過去的經驗和印象，加起來才是我們對一朵花的感知
   #+END_QUOTE
   
-  What is the gestalt approach to pattern matching? Gestalt is a word
-  that describes how people can recognize a pattern as a functional unit
-  that has properties not derivable by summation of its parts. For
-  example, a person can recognize a picture in a connect-the-dots puzzle
-  before finishing or even beginning it. This process of filling in the
-  missing parts by comparing what is known to previous observations is
-  called gestalt.
+  何为Gestalt匹配？Gestalt是用于描述人们认知局部特性模型时，并不是根据
+  所有特性总和特性作为判断依据。比如“连线拼图游戏”，可能还没连完，或刚
+  开始就能认出最终图形。将已知填充图形的过程就称之为Gestalt。
   
-  The Ratcliff/Obershelp pattern-matching algorithm uses this same
-  process to decide how similar two one-dimensional patterns are. Since
-  text strings are one dimensional, this algorithm returns a value that
-  you can use as a confidence factor, or percentage, showing how alike
-  any two strings are.
+  Ratcliff/Obershelp匹配算法就是利用这一特点计算一维模型的相似度。由于
+  文本字符串为一维，此算法可求得两个字符串的相似率，或百分百。
   
-  Because this pattern-matching algorithm can recognize matches in
-  substrings quickly and easily, there are many applications for it. For
-  example, a compiler using this algorithm would be able to determine
-  what variable, keyword, or procedure name the programmer meant, even
-  when the compiler encounters a spelling error. Educational software
-  that can recognize a correct answer contextually (even when the answer
-  contains a typing error) is another natural application. A command
-  shell could finally recognize that SYMPONY doesn't exist---and do
-  something intelligent with that information, such as pop up a menu of
-  close alternatives like SYMPHONY. Text adventure games with their
-  powerful parsers are an ideal application for this algorithm: the
-  games could make broad assumptions in assimilating user input.
+  由于此算法可即快又轻松子字符串是否匹配，可用在很多场景。如编译器识别
+  变量、关键字或函数名时，即时有拼写错误也可识别；教育软件中识别答案时，
+  即时有拼写错误也可识别；shell命令中有部分参数或选项拼写错误，也能智
+  能识别，执行预想命令，或提供正确选项供修改；文本冒险游戏时此算法的最
+  佳应用场景：根据用户输入生成大量假设。
   
-  The Ratcliff/Obershelp pattern-matching algorithm was developed by
-  John W. Ratcliff and John A. Obershelp in 1983 to address concerns
-  about educational software. Often, educational software has consisted
-  of multiple-choice questions only because the existing algorithms
-  required an exact character-for-character match. The algorithm
-  presented in this article is both forgiving and understanding of
-  simple typing mistakes, and allows intelligent responses to erroneous
-  input. To date, this algorithm has been implemented in a commercial
-  spelling checker, a database search program, and a compiler.
+  Ratcliff/Obershelp匹配算法由John W. Ratcliff和John A Obershelp于1983
+  年提出，用于教育软件。通常，教育软件喜欢用多选题的主要原因为：如果转
+  变为填空题，需要逐个字符比较判断答案是否正确。而此算法可判断是否是拼
+  写错误，还是错误答案。如今，此算法已被应用在商业拼写检查软件、数据库
+  搜索程序和编译器中。
   
-  Adding this algorithm to a compiler had some dramatic results. When
-  this algorithm was implemented in a primitive C compiler, the compiler
-  was able to make accurate assumptions when it encountered misspelled
-  procedure names, keywords, and variables. When it couldn't find an
-  identifier, it examined all of the currently defined names and
-  collated the best matches. If the compiler could find no match better
-  than 60 percent, then it produced a normal error message. The most
-  common case, however, resulted in an accurate and unambiguous match:
-  the compiler was able to continue with this assumption while producing
-  both a warning message that indicated the assumption made and the line
-  number that it occurred on. The result was that rather than getting a
-  cascade of 50 warning messages because of one typing mistake the
-  programmer now got a simple warning message and a successful
-  compilation. After finding several strong matches, the compiler
-  prompted the programmer for confirmation in apop-up window. The
-  compiler could even go so far as to ask the programmer if it should
-  automatically correct the source code as well. On the occasions when
-  the compiler made a false assumption, it almost always generated
-  errors due to mismatched arguments being passed to an assumed
-  procedure. Even if an erroneous assumption results in a successful
-  compilation, the programmer is still warned and knows not to run the
-  executable that the compiler produced.
+  比如将此算法应用到C编译器中。当碰到拼写错误的函数、关键字和变量名时，
+  可根据所有已经定义的identifiers进行匹配，如果与某个identifier匹配率
+  超过60%，则可做出正确的猜测，否则正常抛出错误。这样，编译器即可正常
+  处理，也可显示做出的假设及所在行。同时，还可让程序员选择假设是否正确，
+  甚至自动修改源码。
   
-** How the Algorithm Works
+** 算法原理
    
-   The best way to describe the Ratcliff/Obershelp pattern-matching
-   algorithm, in using conventional computer terminology, is as a
-   wild-card search that doesn't require wild cards. Instead, the
-   algorithm creates its own wildcards, based on the closest matches
-   found between the strings. Specifically, the algorithm works by
-   examining two strings passed to it and locating the largest group of
-   characters in common. The algorithm uses this group of characters as
-   an anchor between the two strings. The algorithm then places any group
-   of characters found to the left or the right of this anchor on a stack
-   for further examination. This procedure is repeated for all substrings
-   on the stack until there is nothing left to examine. The algorithm
-   calculates the score returned as twice the number of characters found
-   in common divided by the total number of characters in the two
-   strings; the score is returned as an integer, reflecting a percentage
-   match.
+   抽象点说，Ratcliff/Obershelp匹配算法可认为是：匹配通配符
+   （wild-cards）时不需要通配符。此算法会根据最近的匹配，创建自己的通
+   配符。具体讲，先找到2个字符串中最多匹配的字符，然后使用此组字符作为
+   两个字符串的“锚”，然后再从此“锚”的两边再分组，放入“堆（stack）”中继
+   续比较。此过程会在“堆”中的所有子字符串总一直进行，直到耗尽。最后用
+   两个字符串中相同字符数乘以2，再除以两个字符串的总字符数，返回整数值，
+   作为匹配率。
    
-   For example, suppose you want to compare the similarity between the
-   word `Pennsylvania' and a mangled spelling as `Pencilvaneya.' The
-   largest common group of characters that the algorithm would find is
-   `lvan.' The two sub-groups remaining to the left are `Pennsy' and
-   `Penci,' and to the right are `ia' and`eya.' The algorithm places both
-   of these string sections on the stack to be examined, and advances the
-   current score to eight, two times the number of characters found in
-   common. The substrings `ia' and `eya' are next to come off of the
-   stack and are then examined. The algorithm finds one character in
-   common: a. The score is advanced to ten. The substrings to the
-   left---'i' and `ey'---are placed on the stack, but then are
-   immediately removed and determined to contain no character in
-   common. Next, the algorithm pulls `Pennsy' and `Penci' off of the
-   stack. The largest common substring found is `Pen.' The algorithm
-   advances the score by 6 so that it is now 16. There is nothing to the
-   left of `Pen,' but to the right are the substrings `nsy' and `ci,'
-   which are pushed onto the stack. When the algorithm pulls off `nsy'
-   and `ci' next, it finds no characters in common. The stack is now
-   empty and the algorith ready to return the similarity value
-   found. There was a score of 16 out of a total of 24. This result means
-   that the two strings were 67 percent alike.
+   比如，假设比较字符串“Pennsylvania”和“Pencilvaneya”。最长的相同子字
+   符串为“lvan”，他们左边的子字符串分别为“Pennsy”和“Penci”，右边的子字
+   符串分别为“ia”和“eya”，此时的得分为8（“lvan”的长度乘以2）。右边子字
+   符串只有“a”为相同子字符串，此时得分增加到10，剩下“i”和“ey”，完全无
+   相同子字符串，结束右边比较；右边相同子字符有“Pen”，的得分为6，总得
+   分增加到16，剩下右边子字符串分别为“nsy”和“ci”，无相同子字符串，到此
+   结束。最后得到匹配比率为 16 / 24 = 67%。
    
-** Inside the Code
+** 实现
    
-   Now that you know how the algorithm works, you're ready to look at the
-   code. This article includes an assembly language routine that is
-   accessible as a function call for C programs. This assembly language
-   routine has been optimized using techniques such as register
-   optimization, algorithmic analysis, branch optimization, and
-   instruction-cycle counts. Therefore, you may very well find this
-   routine fast enough to be used as a basic string-companion function in
-   your software. In that regard you should note that the variables in
-   this routine are declared as static, rather than dynamic, to make the
-   source code easier to follow.Example 1.
+   [[file:files/gestalt.c][gestalt.c]] 为C语言实现，原文使用了汇编实现其中的simil函数。
    
-   #+BEGIN_SRC c :session
-     #include <stdio.h>
-     #include <stdlib.h>
-     #include <string.h>
-     /***********************************************************************/
-     /*                         GESTALT.C                                   */
-     /*          written by John W. Ratcliff and David E. Metzener          */
-     /*                       November 10, 1987                             */
-     /*                                                                     */
-     /*  Demonstrates the Ratcliff/Obershelp Pattern Recognition Algorithm  */
-     /*  Link this with SIMIL.OBJ created from the SIMIL.ASM source file    */
-     /*  The actual similiarity function is called as:                      */
-     /*  int simil(char *str1,char *str2)                                   */
-     /*  where str1 and str2 are the two strings you wish to know their     */
-     /*  similarly value. simil returns a percentage match between         */
-     /*  0 and 100 percent.                                                 */
-     /***********************************************************************/
-     int simil(char *stl1, char *str2);
-     void ucase(char *str);
-
-     main() {
-       char str1[80];
-       char str2[80];
-       int prcnt;
-
-       printf("This program demonstrates the Ratcliff/Obershelp pattern\n");
-       printf("recognition algorithm. Enter series of word pairs to\n");
-       printf("discover their similarity values.\n");
-       printf("Enter strings of 'END' and 'END' to exit.\n\n");
-       do {
-         printf("Enter the two strings separated by a space: ");
-         scanf("%s %s" str1, str2);
-         ucase(str1);
-         ucase(str2);
-         prcnt = simil(str1, str2);
-         printf("%s and %s are %d\% alike.\n\n", str1, str2, prcnt);
-       } while (strcmp(str1, "END"));
-     }
-
-     void ucase(str) char *str;
-     {
-       while (*str) {
-         *str - toupper(*str);
-         str++;
-       }
-     }
-   #+END_SRC
+   此程序需高效，其中最耗时的部分为比较子字符串中最相同字符个数的过程。
+   最坏的情况为两个子字符串根本没有相同字符，此时需比较的次数为N X M次，
+   其中N和M分别为两个字符串中字符长度。所以原文使用了汇编实现simil函数。
    
-   It should be clear from the earlier discussion that the time-critical
-   portion of the code is in the section that determines the maximum
-   number of characters in common between two substrings. The worstcase
-   scenario is when absolutely no characters are found in common between
-   the two strings. When this happens, N x M number of comparisons are
-   required, where N is the number of characters in the first string and
-   M is the number of characters in the second string.
+   [[https://github.com/wernsey/miscsrc/blob/master/simil.c][simil函数C实现参考]]
    
-   The comparison procedure is composed of two loops: an inner loop for
-   string two and an outer loop for string one. At each character in the
-   two strings the procedure checks to see how many characters are
-   equal. Whenever any characters are found that are equal, the procedure
-   then checks to see if this number is greater than the previous maximum
-   number of characters found. If it is, then the procedure updates the
-   variable maxchars and updates the substring to be returned. Whenever a
-   new maxchars occurs you can shorten the search by the difference
-   between the new maxchars and add that value. The reason for this is
-   simply that once you have found for example, a five-character match,
-   you do not need to waste time looking more than five characters from
-   the ends of the two substrings because there is clearly no chance of
-   finding more than five characters. Inside the inner loop, whenever the
-   procedure finds any characters in common, whether they form a new
-   maxchars or not, the procedure advances the inner loop past these
-   characters. On exit from this procedure, the DX register contains the
-   number of characters found in common, and the variables CLI, CRI, CL2,
-   and CR2 are pointing to the left and the right of the character string
-   found in common between the two source strings.
+   比较过程包含两个循环：内层循环字符串1，外层循环字符串2。但发现有字
+   符相等时，检查目前位置相同字符数量是否大于已发现的最大相同字符数量。
+   如果是，跟新最大相同字符数量，跟新相同的子字符串。当更新完最大相同
+   字符数量后，可将搜索缩减到"strlen(str1)-max_chars"的长度。原因为假
+   设已经有5个字符相等，如何字符串还剩余5个字符，则不可能大于5个字符串
+   相同。
    
-   The main procedure, SIMIL, which calls the compare routine, "realizes"
-   there is nothing to place on the stack if no characters were found in
-   common. If there are no characters to the left of either of the two
-   substrings, then you don't need to push anything to the left. If there
-   is exactly one character to the left of both substrings, you don't
-   need to push the characters on the stack because they cannot be equal
-   (or the first character would have been included in the maxchars
-   substring). These same rules apply to the right of the substring as
-   well.
+   获取到最大相同字符数后，然后再在其左右分别求相同字符数，如此递归至
+   子字符串中没有字符为止。
    
-** Performance Aspects
+** 性能问题
    
    To evaluate the performance of the routines, the following tests were
    performed. First, a series of strings were created from 1 to 20
@@ -336,7 +200,7 @@
    
    Figure 1: Effects of timing during different compare types
    
-** Final Thoughts
+** 后记
    
    Implementing this algorithm in your application can dramatically
    improve your software, but it does require some judgment based on the
@@ -360,51 +224,3 @@
    
    Figure 2: Average timing for every percentage of a 12- to 12-character
    string match
-   
-   #+BEGIN_SRC c :session
-     #include <stdio.h>
-     #include <stdlib.h>
-     #include <string.h>
-     /*************************************************************************/
-     /*                            GESTALT.C                                  */
-     /*        written by John W. Ratcliff and David E. Metzener              */
-     /*                         November 10, 1987                             */
-     /*                                                                       */
-     /* Demonstrates the Ratcliff/Obershelp Pattern Recognition Algorithm     */
-     /* Link this with SIMIL.OBJ created from the SIMIL.ASM source file       */
-     /* The actual similiarity function is called as:                         */
-     /* int simil(char *str1,char *str2)                                      */
-     /* where str1 and str2 are the two strings you wish to know their        */
-     /* similiarity value.  simil returns a percentage match between          */
-     /* 0 and 100 percent.                                                    */
-     /*************************************************************************/
-     int simil(char *str1, char *str2);
-     void ucase(char *str);
-
-     main() {
-       char str1[80];
-       char str2[80];
-       int prcnt;
-
-       printf("This program demonstrates the Ratcliff/Obershelp pattern\n");
-       printf("recognition algorithm.  Enter series of word pairs to\n");
-       printf("discover their similarity values.\n");
-       printf("Enter strings of 'END' and 'END' to exit.\n\n");
-       do {
-         printf("Enter the two strings seperated by a space: ");
-         scanf("%s %s", str1, str2);
-         ucase(str1);
-         ucase(str2);
-         prcnt = simil(str1, str2);
-         printf("%s and %s are %d\% alike.\n\n", str1, str2, prcnt);
-       } while (strcmp(str1, "END"));
-     }
-
-     void ucase(str) char *str;
-     {
-       while (*str) {
-         ,*str = toupper(*str);
-         str++;
-       }
-     }
-   #+END_SRC
