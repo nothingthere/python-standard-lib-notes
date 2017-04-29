@@ -31,16 +31,16 @@
 
 *** string. *ascii_uppercase*
     大写字母。不由本地决定。
-    
+
     #+BEGIN_SRC python :session
       import string
       string.ascii_uppercase
     #+END_SRC
-    
+
     #+RESULTS[3cc03248df9135f10c36b1d3ac4495c448e24ba1]:
     :
     : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    
+
 *** string. *digits*
 
     #+BEGIN_SRC python :session
@@ -2755,48 +2755,672 @@
   参考filecmp模块。
   
 ** class difflib. *SequenceMatcher*
+   此类型非常灵活，只要元素为“可哈希”值，就可比较任意类型的两个序列。
+   其基础算法为“gestalt模式匹配” （[[file:faq.org][FAQ]]）。 并在此基础上提供了过滤“垃圾
+   字符”的功能，如空行和空格。
+
+   - *效率* ：
+     gestalt匹配算法最坏的情况为时间呈次方增加，正常情况为呈平方增加。
+     SequenceMatcher类中的算法，最坏情况为呈次方增加，并根据相同字符数
+     的不同变化；最坏的情况为呈线性增加。
+
+   - *自动猜想垃圾字符* ：
+     SequenceMatcher支持自动将特定序列作为垃圾。原理为：计算某个元素在
+     序列中出现的次数。当某个元素大于等于2时，如果次数占序列长度超过1%，
+     且序列至少有200个元素，则将此元素作为“受欢迎”元素，并将其作为“垃
+     圾”以进行序列匹配。？？？可在创建SequenceMatcher对象时将autojunk
+     参数赋值False取消此功能。
+
+   #+BEGIN_SRC python :session
+     from difflib import SequenceMatcher
+
+     diff = SequenceMatcher(a='b111ac', b='v111ca')
+     diff.get_matching_blocks()
+   #+END_SRC
+
+   #+RESULTS[6409e370845694dd9b45e0d29ebbdc6bfe6386f5]:
+   :
+   : >>> >>> [Match(a=1, b=1, size=3), Match(a=4, b=5, size=1), Match(a=6, b=6, size=0)]
+
+** class difflib. *Differ*
+   此类用于比多行字符串文本，生成可读的比较结果。Differ使用
+   SequenceMatcher比较行与行的不同，以及相近行中字符的不同。
+   
+   显示结果类似与diff命令：
+   
+   | 字符 | 含义              |
+   |------+-------------------|
+   | -    | 只有序列1才有的行 |
+   | +    | 只有序列2才有的行 |
+   | ' '  | 两个序列都有的行  |
+   | ?    | 两个序列都无的行  |
    
    #+BEGIN_SRC python :session
-     import difflib
-     difflib.SequenceMatcher
+     from difflib import Differ
+     from pprint import pprint
+
+     text1 = ''' 1.a
+     2.b
+     c
+     '''
+
+     text2 = ''' 1.a
+     2.v
+     '''
+     d = Differ()
+     list(d.compare(text1, text2))
    #+END_SRC
    
-   #+RESULTS[89f7bb5fd93979bb842d279ec25234530a4a4882]:
+   #+RESULTS[6a265cdbbe4e6fc28bb4f039bed6d87aec0bd9e8]:
    :
-   : <class 'difflib.SequenceMatcher'>
+   : >>> >>> >>> ... ... ... >>> >>> ... ... >>> >>> ['   ', '  1', '  .', '  a', '  \n', '  2', '  .', '- b', '+ v', '  \n', '- c', '- \n']
    
-** class difflib. *Differ*
 ** class difflib. *HtmlDiff*
-*** *__init__* (tabsize=8,wrapcolumn=None,linejunk=None,charjunk=IS_CHARACTER_JUNK)
-*** *make_file* (fromalines,tolines,fromedesc="",todesc="",context=False,nunlines=5,*,charset='utf-8')
-*** *make_table* (fromlines,tolines,fromdesc="",todesc="",context=False,numlines=5)
+   此类可用于将比较结果生成HTML表格（或含此表格的完整HTML文件）。
+
+   #+BEGIN_SRC python :session
+     from difflib import HtmlDiff
+
+     html_diff = HtmlDiff()
+
+     html_diff.make_table(['文本', '比较'], ['文本', '比较'])
+     with open('files/test.html', 'w') as f:
+         f.write(html_diff.make_file(['abc', 'def'], [
+                 'abc', 'ddd'], fromdesc='字符串1', todesc='字符串2', context=False))
+   #+END_SRC
+   
+   #+RESULTS[c37971182bce8456d00e2f61f04c8e3d2b8ed89d]:
+   :
+   : >>> >>> >>> '\n    <table class="diff" id="difflib_chg_to23__top"\n           cellspacing="0" cellpadding="0" rules="groups" >\n        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>\n        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>\n        \n        <tbody>\n            <tr><td class="diff_next"><a href="#difflib_chg_to23__top">t</a></td><td class="diff_header" id="from23_1">1</td><td nowrap="nowrap">文本</td><td class="diff_next"><a href="#difflib_chg_to23__top">t</a></td><td class="diff_header" id="to23_1">1</td><td nowrap="nowrap">文本</td></tr>\n            <tr><td class="diff_next"></td><td class="diff_header" id="from23_2">2</td><td nowrap="nowrap">比较</td><td class="diff_next"></td><td class="diff_header" id="to23_2">2</td><td nowrap="nowrap">比较</td></tr>\n        </tbody>\n    </table>'
+   : ... ... ... 2579
+   
+*** 构造器
+**** *__init__* (tabsize=8,wrapcolumn=None,linejunk=None,charjunk=IS_CHARACTER_JUNK)
+     用于初始化HtmlDiff实例。
+
+     TABSIZE参数为可选关键字参数，用于指定tab所占空格个数，默认为8。
+
+     WRAPCOLUMN参数为可选关键字参数，用于指定行折叠的列，默认为None，
+     即不折叠。
+
+     LINEJUNK和CHARJUNK参数为传递给ndiff()方法的可选关键字参数。
+     HtmlDiff使用ndiff()生成比较差异。
+
+*** 公共方法
+**** *make_file* (fromalines,tolines,fromedesc="",todesc="",context=False,nunlines=5,*,charset='utf-8')
+     比较FROMLINES和TOLINES(字符串组成的链表)，返回字符串。此字符串为
+     一个完成HTML字符串，含比较结果组成的表格。
+     
+     FROMDESC和TODESC为表格头字符串，默认为空字符串。
+     
+     CONTEXT和NUMLINES用于空着表格样式。
+     
+**** *make_table* (fromlines,tolines,fromdesc="",todesc="",context=False,numlines=5)
+     与make_file()方法唯一不同的是：生成HTML表格，而不是完整HTML页面字
+     符串。
+
 ** difflib. *context_diff* (a,b,fromfile="",tofile="",fromfiledate="",tofiledate="",n=3,lineterm="\n")
-** difflib. *get_close_matches (word,possibilities,n=3,cutoff=0.6)
+   比较A和B（字符串链表），返回上下文差异格式的字符串组成的生成器（生
+   成比较结果字符串）。
+
+   显示修改内容，以及几行上下文行。上下文行数由参数N控制，默认为3。
+
+   默认情况下，控制行（有***和---的行），后面会自动添加换行符，可使用
+   LINETERM参数修改。
+
+   可使用FROM/TOFILE和FROM/TOFILEDATE参数指定显示时的文件名，很修改时
+   间。FROM/TOFILEDATE的格式为 [[http://baike.baidu.com/item/ISO%25208601][ISO 8601]] 时间格式。
+
+   #+BEGIN_SRC python :session
+     from difflib import context_diff
+     import sys
+     s1 = ['bacon\n', 'eggs\n', 'ham\n', 'guido\n']
+     s2 = ['python\n', 'eggy\n', 'hamster\n', 'guido\n']
+
+     sys.stdout.writelines(context_diff(
+         s1, s2, n=1, fromfile='file1', tofile='file2', fromfiledate='2007-01-02', lineterm='\n\t\t'))
+   #+END_SRC
+
+   #+RESULTS[bddce0372c7d83ed64cd0fbc8fcc56c5826fb1b7]:
+   #+begin_example
+
+   >>> >>> >>> >>> ... *** file1	2007-01-02
+           --- file2
+           ***************
+           *** 1,4 ****
+           ! bacon
+   ! eggs
+   ! ham
+     guido
+   --- 1,4 ----
+           ! python
+   ! eggy
+   ! hamster
+     guido
+   #+end_example
+
+** difflib. *get_close_matches* (word,possibilities,n=3,cutoff=0.6)
+   将WORD（一般为字符串）与POSSIBILITIES（一般为字符串链表）中的每个元
+   素比较，返回“最佳匹配”组成的链表，匹配度最高的排在前面。
+
+   可选参数N（默认值3）为返回链表中的最大个数，需大于0。
+
+   可选参数CUTOFF（默认值0.6），为0到1间的浮点数。含义为至少匹配度为此
+   值才包含在返回结果中。
+
+   #+BEGIN_SRC python :session
+     from difflib import get_close_matches
+     import keyword
+
+     get_close_matches('appel', ['ape', 'apple', 'peach', 'puppy'])
+     get_close_matches('wheel', keyword.kwlist)
+     get_close_matches('apple', keyword.kwlist)
+     get_close_matches('accept', keyword.kwlist)
+     get_close_matches('accept', keyword.kwlist, cutoff=0.3)
+     get_close_matches('accept', keyword.kwlist, cutoff=0.3, n=2)
+     get_close_matches('Pennsylvania', ['Pencilvaneya'], cutoff=0.67)
+     get_close_matches('Pennsylvania', ['Pencilvaneya'], cutoff=0.66)
+   #+END_SRC
+
+   #+RESULTS[2c26a43c3068c6c8e31c58c59f17247923b59cab]:
+   :
+   : >>> >>> ['apple', 'ape']
+   : ['while']
+   : ['False']
+   : ['except']
+   : ['except', 'assert', 'raise']
+   : ['except', 'assert']
+   : []
+   : ['Pencilvaneya']
+
 ** difflib. *ndiff* (a,b,linejunk=None,charchunk=IS_CHARACTER_JUNK)
+   比较A和B（字符串链表），返回Differ风格的delta（生成delta行的生成器）。
+
+   可选参数LINEJUNK和CHARJUNK为过滤函数（或None）。
+
+   - LINEJUNK：接受单个字符串参数，如需指定参数为垃圾行，则返回True，
+     否则返回False。默认值为None。可使用模块级别函数IS_LINE_JUNK，指定
+     过滤不含可见字符的行，except for at most one pound character
+     ('#')。背后的SequenceMatcher类会动态分析哪行出现频率高，并将其作
+     为垃圾行，所以比此函数实用。？？？
+   - CHARJUNK：接受单个字符串参数（长度为1），如需指定该字符为垃圾字符，
+     则返回True，否则返回False。默认值为模块级别函数
+     IS_CHARACTER_JUNK()，过滤空白字符（空格和tab）。最好不要实用此参
+     数过滤换行符。
+
+   #+BEGIN_SRC python :session
+     from difflib import ndiff, IS_LINE_JUNK
+     diff = ndiff('one\ntwo\nthree\n'.splitlines(keepends=True),
+                  'ore\ntree\nemu\n'.splitlines(keepends=True), linejunk=IS_LINE_JUNK)
+     print(diff)
+     print(''.join(diff), end='')
+   #+END_SRC
+   
+   #+RESULTS[2fa747cb46c39a13ef7aaa99a43526e3e2d7ded9]:
+   #+begin_example
+
+   ... >>> <generator object Differ.compare at 0x7ff8b7e45fc0>
+   - one
+   ?  ^
+   + ore
+   ?  ^
+   - two
+   - three
+   ?  -
+   + tree
+   + emu
+   #+end_example
+
 ** difflib. *restore* (sequence,which)
+   返回delta生成器中的一个。
+
+   SEQUENCE需为Differ.compare()或ndiff()的返回值，WHICH为1或2。
+
+   #+BEGIN_SRC python :session
+     from difflib import ndiff, restore
+
+     diff = ndiff('one\ntwo\nthree\n'.splitlines(keepends=True),
+                  'ore\ntree\nemu\n'.splitlines(keepends=True))
+
+     diff = list(diff)
+     print(diff)
+     ''.join(restore(diff, 1))
+     ''.join(restore(diff, 2))
+   #+END_SRC
+
+   #+RESULTS[9ab8c6616f9648959199e73fad9dae270fbe03aa]:
+   :
+   : >>> ... >>> >>> >>> ['- one\n', '?  ^\n', '+ ore\n', '?  ^\n', '- two\n', '- three\n', '?  -\n', '+ tree\n', '+ emu\n']
+   : 'one\ntwo\nthree\n'
+   : 'ore\ntree\nemu\n'
+
 ** difflib. *unifies_diff* (a,b,fromfile="",tofile="",fromfiledate="",tofiledate="",n=3,lineterm="\n")
+   与context_diff方法用法相同。只是生成unified-diff风格结果。
+
+   #+BEGIN_SRC python :session
+     from difflib import unified_diff
+     import sys
+
+     s1 = ['bacon\n', 'eggs\n', 'ham\n', 'guido\n']
+     s2 = ['python\n', 'eggy\n', 'hamster\n', 'guido\n']
+     sys.stdout.writelines(unified_diff(s1, s2, fromfile='a.txt', tofile='b.txt'))
+   #+END_SRC
+
+   #+RESULTS[37231eb023b1ece630447ccadd37ddda1e4a51f9]:
+   #+begin_example
+
+   >>> >>> >>> >>> --- a.txt
+   +++ b.txt
+   @@ -1,4 +1,4 @@
+   -bacon
+   -eggs
+   -ham
+   +python
+   +eggy
+   +hamster
+    guido
+   #+end_example
+
 ** difflib. *diff_bytes* (dfunc,a,b,fromfile=b"",tofile=b"",fromfiledate=b"",tofiledate=b"",n=3,lineterm=b"\n")
-** difflib. *is_line_junk* (line)
-** difflib. *is_character_junk* (ch)
+   使用DFUNC比较A和B（bytes链表），yield delta行序列（同样为bytes对象），
+   格式与DFUNC相同。DFUNC为unified_diff()或context_diff()。
+
+   使用此方法可比较不同编码的序列数据，除N参数外所有参数都需为bytes对
+   象。相当于：
+
+   #+BEGIN_SRC python :eval never
+     dfunc(a, b, fromfile, tofile, fromfiledate, tofiledate, n, linterm)
+   #+END_SRC
+   
+   返回结果也为bytes对象，编码不变。
+
+** difflib. *IS_LINE_JUNK* (line)
+   如果LINE为空行，或只含一个“#”，则返回True。
+
+   #+BEGIN_SRC python :session
+     from difflib import IS_LINE_JUNK
+
+     IS_LINE_JUNK('\n')
+     IS_LINE_JUNK(' #')
+     IS_LINE_JUNK('##')
+     IS_LINE_JUNK('a')
+   #+END_SRC
+
+   #+RESULTS[37421748018f71231c052c42b20d101f3583a18a]:
+   :
+   : >>> True
+   : True
+   : False
+   : False
+
+** difflib. *IS_CHARACTER_JUNK* (ch)
+   如果为空格或tab，则返回True。为ndiff()方法中charjunk参数的默认值。
+
+   #+BEGIN_SRC python :session
+     from difflib import IS_CHARACTER_JUNK
+
+     IS_CHARACTER_JUNK(' ')
+     IS_CHARACTER_JUNK('\t')
+     IS_CHARACTER_JUNK('a')
+   #+END_SRC
+
+   #+RESULTS[ba6edd275fddb49712484d5ab37e40c55b1c559d]:
+   :
+   : >>> True
+   : True
+   : False
+
 ** SequenceMatcher对象
+   构造器：
+   
 *** class difflib. *SequenceMatcher* (jsjunk=None,a="",b="",autojunk=True)
+    可选参数ISJUNK需为None（默认值）或接受一个参数的函数，参数对应序列
+    元素，如果将其指定为“垃圾字符”，则返回True。None为不将任何字符作为
+    垃圾字符，相当于“lambda: x:0”。比如将tab和空格作为垃圾字符：
+
+    #+BEGIN_SRC python :eval never
+      lambda x: x in ' \t'
+    #+END_SRC
+
+    可选参数A和B为被比较的两个序列，默认值为空字符串。两个序列元素都须
+    为可哈希对象。
+
+    可选参数AUTOJUNK可设置为False，关闭自动猜想垃圾字符功能。
+
+    SequenceMatcher对象有下面3个熟悉：
+
+    - bjunk：序列B中的“垃圾”字符组成的集合。
+    - bpopular：序列B中被自动猜想为“受欢迎”的的字符集合（如果autojunk
+      参数不为None）。
+    - b2j：序列B中除上面两个属包含的字符外，各元素及对应其索引构成的字
+      典。
+      
+    当调用set_seqs()和set_seq2()后，上面3个属性都会相应变化。
+    
+    #+BEGIN_SRC python :session
+      from difflib import SequenceMatcher
+
+      sm = SequenceMatcher(a='abc', b='12 \t', isjunk=lambda x: x in ' \t')
+      sm.bjunk
+      sm.bpopular
+      sm.b2j
+
+      sm.set_seq2('abca')
+      sm.bjunk
+      sm.bpopular
+      sm.b2j
+    #+END_SRC
+    
+    #+RESULTS[d058ba3647002bd19d4fe15aaa70473eac99bbe3]:
+    :
+    : >>> >>> {'\t', ' '}
+    : set()
+    : {'1':    [0], '2': [1]}
+    : >>> >>> set()
+    : set()
+    : {'c':    [2], 'a': [0, 3], 'b': [1]}
+    
+    SequenceMatcher对象有下列方法：
+    
 **** *set_seqs* (a,b)
+     同时设置被比较的两个序列。
+     
+     SequenceMatcher会计算缓存序列B的信息。所以，当需将一个序列与多个
+     序列比较时，可使用set_seq2固定序列B，再使用set_seq1()不断重复声明
+     序列A进行比较。
+     
 **** *set_seq1* (a)
 **** *set_seq2* (b)
+     分别设置序列A和B。
+     
 **** *find_longest_match* (alo,ahi,blo,bhi)
-**** *get_matching_blocks* ()
-**** *get_opcodes* ()
-**** *get_grouped_opcodes* (n=3)
-**** *ratio* ()
-**** *quick_ratio* ()
-**** *real_quick_ratio* ()
-** SequenceMatcher 举例
-** Differ对象
-*** class difflib. *Differ* (linejunk=None,charjunk=None)
-**** *compare* (a,b)
+     返回A[alo:ahi]与B[blo:bhi]两个截断中最长的匹配序列。返回值为命名
+     元组：Match(a, b, size)。
+     
+     - 如果isjunk参数为None：如果有多个匹配长度相同，则返回A和B中最前
+       面开始匹配的索引，及最长长度。
+       
+     - 如果isjunk不为None：如下面第二例，序列A中的“ abcd”并不会与序列B
+       中的“ abcd”匹配，而是将序列A中的“abcd”与序列B中最左边的“abcd”想
+       匹配。
+       
+     - 如果没有匹配：返回(alo, blo, 0)
+       
+     #+BEGIN_SRC python :session
+       from difflib import SequenceMatcher
 
+       # isjunk == None
+       sm = SequenceMatcher(a=' abcd', b='abcd abcd')
+       match = sm.find_longest_match(0, 5, 0, 9)
+       print(match)
+       print(match.a, match.b, match.size)
+
+       # isjunk != None
+       sm1 = SequenceMatcher(a=' abcd', b='abcd abcd', isjunk=(lambda x: x == ' '))
+       sm1.find_longest_match(0, 5, 0, 9)
+
+       # 没有匹配
+       sm2 = SequenceMatcher(a='aaa', b='bbb')
+       sm2.find_longest_match(0, 3, 0, 3)
+     #+END_SRC
+     
+     #+RESULTS[29ed74fed75af62e2493de5e39508c118446538a]:
+     :
+     : >>> ... >>> >>> Match(a=0, b=4, size=5)
+     : 0 4 5
+     : >>> ... >>> Match(a=1, b=0, size=4)
+     : >>> ... >>> Match(a=0, b=0, size=0)
+     
+**** *get_matching_blocks* ()
+     返回由三元素命名元组组成的链表。其中每个元素为(i, j, n)，含义为
+     A[i:i+n]==B[j:j+n]。每个命名元组中i和j单调递增。
+     
+     最后一个元素无实际含义，总是(len(A), len(B), 0)。
+     
+     #+BEGIN_SRC python :session
+       from difflib import SequenceMatcher
+
+       sm = SequenceMatcher(isjunk=None, a='abxcd', b='abcd')
+
+       sm.get_matching_blocks()
+     #+END_SRC
+     
+     #+RESULTS[64e7862d2ec759a2f832ef883c54f782007fe1cf]:
+     :
+     : >>> >>> >>> [Match(a=0, b=0, size=2), Match(a=3, b=2, size=2), Match(a=5, b=4, size=0)]
+     
+**** *get_opcodes* ()
+     返回5元素元组组成的链表。每个元组的形式为(tag,i1,i2,j2,j2)。第一
+     个元组中有i1==j2==0，后续的元组中有当前i2等于上一个元组的i1，当权
+     j2等于上一个元素的j2。
+
+     元组中tag的值及其含义为：
+
+     | 值        | 含义                                 |
+     |-----------+--------------------------------------|
+     | 'replace' | a[i1:i2]应被b[j2:j2]替代             |
+     | 'delete'  | a[i1:i2]应被删除。此时有j2==j2       |
+     | 'insert'  | b[j1:j2]应插入到a[i1:i2]。此时i1==i2 |
+     | 'equal'   | a[i1:i2] == b[j1:j2]，即两个截断相等 |
+
+     #+BEGIN_SRC python :session
+       from difflib import SequenceMatcher
+       a = 'qabxcd'
+       b = 'abycdf'
+
+       s = SequenceMatcher(None, a, b)
+       for tag, i1, i2, j1, j2 in s.get_opcodes():
+           print('{:7} a[{}:{}] --> b[{}:{}]]  {!r:>8} --> {!r}'.format(tag, i1, i2, j1, j2, a[i1:i2], b[j1:j2]))
+     #+END_SRC
+
+     #+RESULTS[518af92d7c59a279ef670ee485e72bd2f8af51a0]:
+     :
+     : >>> >>> >>> >>> ... ... delete  a[0:1] --> b[0:0]]       'q' --> ''
+     : equal   a[1:3] --> b[0:2]]      'ab' --> 'ab'
+     : replace a[3:4] --> b[2:3]]       'x' --> 'y'
+     : equal   a[4:6] --> b[3:5]]      'cd' --> 'cd'
+     : insert  a[6:6] --> b[5:6]]        '' --> 'f'
+
+**** *get_grouped_opcodes* (n=3)
+     与get_opcodes()方法基本相同。N参数为上下文的行数。
+
+     只是返回值为生成器，每个元素对应的元组与get_opcodes()返回值的元素。
+
+**** *ratio* ()
+     返回A和B的相似度，0.0-1.0。假设A和B的字符总数为T，按照gestalt算法
+     得出的匹配度字符数为M，则其值为： M * 2.0 / T。如果完全相同，返回
+     值为1.0；如果没有一个字符匹配，返回值为0.0。
+
+     #+BEGIN_SRC python :session
+       from difflib import SequenceMatcher
+
+       sm = SequenceMatcher(None, 'Pennsylvania', 'Pencilvaneya')
+       sm.ratio()
+     #+END_SRC
+
+     #+RESULTS[70b0b192032da5460b990a8288a1a811668a4fc5]:
+     :
+     : >>> >>> 0.6666666666666666
+
+     如果之前没有调用过get_matching_blacks()和get_opcodes()方法，调用
+     此方法很奢侈，此时可使用quick_ration()或real_quick_ratio()方法，
+     获取只大不小的近似值。
+
+**** *quick_ratio* ()
+     相对ratio()较快的方法，获取近似值。
+**** *real_quick_ratio* ()
+     最快获取近似值的方法。
+
+     上面3个方法的值可能会根据快慢不同而不同。后两种方法的返回值不会小
+     于ratio()方法的返回值：
+
+     #+BEGIN_SRC python :session
+       from difflib import SequenceMatcher
+       sm = SequenceMatcher(None, 'Pencilvaneya', 'Pennsylvania')
+
+       sm.ratio()
+       sm.quick_ratio()
+       sm.real_quick_ratio()
+     #+END_SRC
+
+     #+RESULTS[5e3d4404fd22e67afa621b6ead0fce85c18d400a]:
+     :
+     : >>> >>> 0.6666666666666666
+     : 0.8333333333333334
+     : 1.0
+
+** SequenceMatcher举例
+   下面将空格作为垃圾字符，进行两个字符串比较：
+   
+   #+BEGIN_SRC python :session
+     from difflib import SequenceMatcher
+
+     sm = SequenceMatcher(lambda x: x == ' ', 'private Thread correntThread;',
+                          'private volatile Thread currentThread;')
+   #+END_SRC
+   
+   使用ratio()方法查看相似度。一般相似度为0.6表示接近：
+   
+   #+BEGIN_SRC python :session
+     print(round(sm.ratio(), 3))
+   #+END_SRC
+   
+   #+RESULTS[fcb93acff806b9e3a68b9fd8772aa205ab1ca0ce]:
+   : 0.836
+   
+   如果只关心是否有匹配，可使用get_matching_blocks()：
+
+   #+BEGIN_SRC python :session
+     for block in sm.get_matching_blocks():
+         print('a[{}] and b[{}] match for {} elements'.format(
+             block.a, block.b, block.size))
+
+     SequenceMatcher(None, '', '').get_matching_blocks()
+   #+END_SRC
+   
+   #+RESULTS[88f0739b36b32bc72aac669b80392bcfbf2aa3c9]:
+   :
+   : ... ... a[0] and b[0] match for 8 elements
+   : a[8] and b[17] match for 8 elements
+   : a[17] and b[26] match for 12 elements
+   : a[29] and b[38] match for 0 elements
+   : >>> [Match(a=0, b=0, size=0)]
+
+   如果只关心如果将第一个序列改变为第二个序列，可使用get_opcodes()方法：
+
+   #+BEGIN_SRC python :session
+     for opcode in sm.get_opcodes():
+         print('{:8} a[{}:{}] b[{}:{}]'.format(*opcode))
+   #+END_SRC
+
+   #+RESULTS[7a72b1be51e63927b589c4c6369449251d4fd791]:
+   :
+   : ... equal    a[0:8] b[0:8]
+   : insert   a[8:8] b[8:17]
+   : equal    a[8:16] b[17:25]
+   : replace  a[16:17] b[25:26]
+   : equal    a[17:29] b[26:38]
+
+** Differ对象
+   Note that Differ-generated deltas make no claim to be minimal
+   diffs. To the contrary, minimal diffs are often counter-intuitive,
+   because they synch up anywhere possible, sometimes accidental
+   matches 100 pages apart. Restricting synch points to contiguous
+   matches preserves some notion of locality, at the occasional cost
+   of producing a longer diff.
+   
+   构造器：
+   
+*** class difflib. *Differ* (linejunk=None,charjunk=None)
+    可选参数LINEJUNK和CHARJUNK为过滤函数（默认值为None）：
+    
+    - LINEJUNK：接受单个字符串参数，如果将其作为垃圾行，则返回True。默
+      认值为None，即不将任何行作为垃圾行。
+    - CHARJUNK：接受单个字符字符串参数，如果将该字符作为垃圾字符，则返
+      回True。默认值为None，即将不将任何字符作为垃圾字符。
+      
+    此两个过滤函数的原来与find_longest_match()方法的isjunk参数机制一样，
+    即只是提高比较速度，但不会忽视已被过滤的行和字符。
+    
+    唯一的方法：
+    
+**** *compare* (a,b)
+     比较两个由文本行（末尾有换行符的字符串）组成的序列，生成delta（文
+     本行序列）。
+     
+     A和B中的每个元素需为末尾有换行符的字符串。A和B序列可由readlines()
+     方法从“类文件”对象中获取，生成的delta是由末尾有换行符的字符串组成
+     的序列，可用writelines()方法输出。
+     
 ** Differ举例
+   先声明两个由文本行（末尾有换行符的字符串）组成的序列：
+   
+   #+BEGIN_SRC python :session
+     text1 = '''1. Beautiful is better than ugly.
+     2. Explicit is better than implicit.
+     3. Simple is better than complex.
+     4. Complex is better than complicated.
+     '''.splitlines(keepends=True)
+
+     text2 = '''1. Beautiful is better than ugly.
+     3. Simple is better than complex.
+     4. Complicated is better than complex.
+     5. Flat is better than nested.
+     '''.splitlines(keepends=True)
+   #+END_SRC
+   
+   再声明Differ对象：
+   
+   #+BEGIN_SRC python :session
+     from difflib import Differ
+     d = Differ()
+   #+END_SRC
+   
+   使用compare比较者两个字符串，并转换为链表美化输出：
+   
+   #+BEGIN_SRC python :session
+     from pprint import pprint
+
+     d.compare(text1, text2)
+     result = list(d.compare(text1, text2))
+     pprint(result)
+   #+END_SRC
+
+   #+RESULTS[8e6e2df29dfedc1b9237435b472f5b30f89191ed]:
+   #+begin_example
+
+   >>> <generator object Differ.compare at 0x7ff8b7de8360>
+   >>> ['  1. Beautiful is better than ugly.\n',
+    '- 2. Explicit is better than implicit.\n',
+    '  3. Simple is better than complex.\n',
+    '- 4. Complex is better than complicated.\n',
+    '?          ^                     ---- ^\n',
+    '+ 4. Complicated is better than complex.\n',
+    '?         ++++ ^                      ^\n',
+    '+ 5. Flat is better than nested.\n']
+   #+end_example
+
+   或使用writelines()方法直接输出：
+
+   #+BEGIN_SRC python :session
+     import sys
+     sys.stdout.writelines(result)
+   #+END_SRC
+
+   #+RESULTS[92400f416f77f13268b50845eb908bde18393cbd]:
+   :
+   : 1. Beautiful is better than ugly.
+   : - 2. Explicit is better than implicit.
+   :   3. Simple is better than complex.
+   : - 4. Complex is better than complicated.
+   : ?          ^                     ---- ^
+   : + 4. Complicated is better than complex.
+   : ?         ++++ ^                      ^
+   : + 5. Flat is better than nested.
+
 ** difflib命令行接口实现
+   [[file:files/diff.py]] 使用了difflib模块实现类似diff命令行工具的实现。
+   
 * textwrap
 * unicodedate
 * stringprep

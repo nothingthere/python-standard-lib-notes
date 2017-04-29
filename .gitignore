@@ -1,3 +1,4 @@
 *.html
 *org_archive
 files/gestalt
+files/*.txt
