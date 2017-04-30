@@ -2578,7 +2578,7 @@
     : >>> [['小张：192.168.3.4', '155', '北京'], ['小王：192.145.2.5', '436', '上海'], ['小明：182.122.12.122', '广州'], ['小黄：122.312.232.12', '深圳']]
 
     增加分割数目：
-    
+
     #+BEGIN_SRC python :session
       import re
       [re.split('：? ', entry, 4) for entry in entries]
@@ -2591,26 +2591,26 @@
 *** 文本修改
     sub()方法能用单个字符串或函数返回值替换所有匹配内容。下例使用此方
     法打乱所有单词除首位字母外的顺序：
-
+    
     #+BEGIN_SRC python :session
       import random
       import re
 
       def shuffle(m):
-          innter_word = list(m.group(2))
-          random.shuffle(innter_word)
-          return m.group(1) + ''.join(innter_word) + m.group(2)
+          inner_word = list(m.group(2))
+          random.shuffle(inner_word)
+          return m.group(1) + ''.join(inner_word) + m.group(3)
 
       text = 'Professor Abdolmalek, please report your absences promptly.'
       re.sub(r'(\w)(\w+)(\w)', shuffle, text)
-      re.sub(r'(\w)(\w+)(\w)', shuffle, text)
+      re.subn(r'(\w)(\w+)(\w)', shuffle, text)
     #+END_SRC
-
-    #+RESULTS[e2e9b145cff48df9b9031232ef1ed1a181e137ab]:
+    
+    #+RESULTS[aecb6e6d114fb71671056d19329b6a2dddc8e44b]:
     :
-    : >>> >>> >>> ... ... ... ... >>> >>> 'Poefrossrofesso Aaoellbmdbdolmale, pselaleas rrpeoepor yuoou anescebbsence pptmolrromptl.'
-    : 'Peosrfosrofesso Abaolmldebdolmale, psaelleas rrpeoepor yuoou anbcseebsence proltmpromptl.'
-
+    : >>> >>> ... ... ... ... >>> >>> 'Psoersofr Aebmlladok, paelse rproet yuor acbesens ptromlpy.'
+    : ('Psoersofr Aamlelbdok, pasele rproet yuor aebescns polmrpty.', 7)
+    
 *** 查找所有英语副词
     不同于search()方法，findall()方法可获取所以出现的文本。利用此特点
     可查找所有文本中的副词：
@@ -2640,7 +2640,7 @@
     :
     : >>> ... ... 0-6: gently
     : 22-29:   quickly
-    
+
 *** 原始字符串
     使用原始值字符串（r'abc'）可使正则表达式简洁易读。如果不使用原始字
     符串，所有反斜杠转义都需再使用另外一个反斜杠转义。下面两例等价：
@@ -3420,8 +3420,360 @@
 
 ** difflib命令行接口实现
    [[file:files/diff.py]] 使用了difflib模块实现类似diff命令行工具的实现。
+
+* textwrap - 文本折叠和填充
+  textwrap模块提供文本折叠的帮助函数，以及对应的类TextWrapper。如果只是折
+  叠或填充少量文本字符串，使用帮助函数即可；否则最好使用TextWrapper类，
+  使效率更高。
+  
+** textwrap. *wrap* (text,width=70,**kwargs)
+   折叠单个文本段落TEXT（字符串），使每行字符数不超过WIDTH。返回折叠后
+   的字符串链表，不含末尾换行符。
+
+   关键字参数与TextWrapper对象属性相同，见下文。WIDTH默认值为70。
+
+   详细用法见TextWrapper.wrap()方法。
+
+   #+BEGIN_SRC python :session
+     from textwrap import wrap
+     wrap('a' * 23, width=10)
+   #+END_SRC
+
+   #+RESULTS[276e5e95eb70e0cacd79102a6504f33d8d2c2c3a]:
+   :
+   : ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaa']
+
+** textwrap. *fill* (text,width=70,**kwargs)
+   折叠单个文本段落，返回折叠后的段落字符串。等价于：
+
+   #+BEGIN_SRC python :eval never
+     '\n'.join(wrap(text, ...))
+   #+END_SRC
+
+   参数用法与wrap()完全相同。
+
+   #+BEGIN_SRC python :session
+     from textwrap import wrap, fill
+     fill('a' * 23, width=10)
+   #+END_SRC
+
+   #+RESULTS[56bfb65e85fa58e885da861c8a8fd26fef0c8f06]:
+   :
+   : 'aaaaaaaaaa\naaaaaaaaaa\naaa'
+
+** textwrap. *shorten* (text,width,**kwargs)
+   将TEXT删减为WIDTH长度。
+
+   首先将相邻的空格替换为单个空格。如果结果 <= WIDTH，则返回；否则删减
+   末尾“单词”，使剩余字符加上PLACEHOLDER <= WIDTH。
+
+   #+BEGIN_SRC python :session
+     from textwrap import shorten
+     shorten('hello  world!', width=120)
+     shorten('hello  world!', width=11)
+     shorten('hello  world!', width=10, placeholder='...')
+   #+END_SRC
+
+   #+RESULTS[533090a9329d615f49b6f23d3a18f573da9647a0]:
+   :
+   : 'hello world!'
+   : 'hello [...]'
+   : 'hello...'
+
+   可选关键字参数与TextWrapper对象属性相对应，见下文。
+
+   *注意* ：多余空格在调用TextWrapper.fill()方法前执行，所以修改
+   tabsize、expand_tabs、drop_whitespace和replace_whitespace并不会有任
+   何效果。
+
+** textwrap. *dedent* (text)
+   删除TEXT中每行行首相同的tab或空格。
+
+   *注意* ：空格和tab都被看做whitespace，但两者不相等：“ hello”与
+   “\thello”不含相同的行首whitespace。
+
+   #+BEGIN_SRC python :session
+     from textwrap import dedent
+     text = '''\
+             hello
+             world
+     '''
+     print(repr(text))
+     print(repr(dedent(text)))
+   #+END_SRC
+
+   #+RESULTS[f6a8a9c9b479742b369afd24cc3638e84f926be7]:
+   :
+   : ... ... ... >>> '        hello\n        world\n'
+   : 'hello\nworld\n'
+
+** textwrap. *indent* (text,prefix,predict=None)
+   在TEXT中指定的行首添加PREFIX。
    
-* textwrap
+   每行使用TEXT.splitelines(True)分割获得。
+   
+   默认情况下，PREFIX添加到除只有whitespace的的行首：
+   
+   #+BEGIN_SRC python :session
+     from textwrap import indent
+     s = 'hello\n\n \nworld'
+     indent(s, ' ')
+   #+END_SRC
+   
+   #+RESULTS[b7affb53a05e91db1a56cd635f07660095b4b01d]:
+   :
+   : >>> ' hello\n\n \n world'
+   
+   可选参数PREDICT为函数对象，控制添加PREFIX的行。如对每行都都添加
+   PREFIX：
+   
+   #+BEGIN_SRC python :session
+     print(indent(s, '+', lambda line: True))
+   #+END_SRC
+   
+   #+RESULTS[640c0451f755ecc09aa5ee372fcc9b6d9a79bbdd]:
+   : +hello
+   : +
+   : +
+   : +world
+   
+   wrap()、fill()和shorten()的原理为创建一个全新的TextWrapper实例，再
+   调用对应方法。此实例不能被重用，所以对于频繁使用wrap()和fill()的应
+   用，先创建TextWrapper对象效率更高。
+   
+   文本一般在空格或连字符后折叠。如果TextWrapper.break_long_words为
+   False，则不折叠“长单词”。
+   
+** class textwrap. *TexWrapper* (**kwargs)
+   TextWrapper类的构造器有许多可选关键字参数。每个关键字参数都对应其实
+   例属性，所以：
+   
+   #+BEGIN_SRC python :eval never
+     wrapper = TextWrapper(initial_indent='* ')
+   #+END_SRC
+   
+   等价于：
+   
+   #+BEGIN_SRC python :eval never
+     wrapper = TextWrapper()
+     wrapper.initial_indent = '* '
+   #+END_SRC
+   
+   可多次复用TextWrapper对象，期间可更改任意属性。
+   
+   TextWrapper实例的属性（对应构造器的关键字参数）如下：
+   
+*** *width*
+    默认值：70。折叠后文本行的最大长度。只要TEXT没有单词长度超过
+    WIDTH，TextWrapper就能保证折叠后的每行不会超过WIDTH个字符。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(width=70)
+      wrapper.width
+    #+END_SRC
+
+    #+RESULTS[6449049f98dc5f73de92ca7c052a64470f533434]:
+    :
+    : >>> 70
+    
+*** *expand_tabs*
+    默认值：True。如果为True，则将TEXT中所有tab都转换为空格。使用
+    TEXT的expandtabs()方法。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(expand_tabs=False)
+      wrapper.fill('a\tb')
+      wrapper.expand_tabs = True
+      wrapper.fill('a\tb')
+    #+END_SRC
+
+    #+RESULTS[77064e68aa563820d86343c9cffc58ac27b66e4c]:
+    :
+    : >>> 'a b'
+    : >>> 'a       b'
+
+*** *tabsize*
+    默认值：8。如果expand_tabs参数为True，则将根据所在列和TABSIZE参
+    数将tab替换为0个或多个空格。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper()
+      wrapper.fill('a\tb')
+      wrapper.tabsize = 4
+      wrapper.fill('a\tb')
+    #+END_SRC
+
+    #+RESULTS[98cc79254ca41f3dd8bf9df7bc345ec81bbda9c5]:
+    :
+    : >>> 'a       b'
+    : >>> 'a   b'
+
+*** *replace_whitespace*
+    默认值：True。在tab替换为空格后，折叠前，将“\t\n\v\f\r”（不含
+    空格）替换为单个空格。
+
+    *注意* ：如果expand_tabs为False，且replace_whitespace为True，每个
+    tab都会被替换为空格，应区别于tab扩张。
+    
+    *注意* ：如果replace_whitespace为False，且换行符在文本中间。可能会
+    根据WIDTH，使用str.splitlines()将文本转换为多个段落再折叠。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper()
+      wrapper.fill('a\tb\n\nc d\f\v\t\ne')
+      wrapper.replace_whitespace = False
+      wrapper.fill('a\tb\n\nc d\f\v\t\ne')
+    #+END_SRC
+
+    #+RESULTS[900e408d75283070867d645e9d566f48f5c27ffb]:
+    :
+    : >>> 'a       b  c d      e'
+    : >>> 'a       b\n\nc d\x0c\x0b   \ne'
+
+*** *drop_whitespace*
+    默认值：True。折叠后，indent前，删除在每行首末的whitespace（含
+    空格）。Whitespace at the beginning of the paragraph, however, is
+    not dropped if non-whitespace follows it. 如果整行都由whitespace组
+    成，则整行都删除。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(width=2)
+      wrapper.wrap('ab\n \tcd')
+      wrapper.drop_whitespace = False
+      wrapper.wrap('ab\n \tcd')
+      wrapper.wrap('ab\n \ncd')
+    #+END_SRC
+
+    #+RESULTS[e0d138003aba17cd984268e6eec50e614266763e]:
+    :
+    : >>> ['ab', 'cd']
+    : >>> ['ab', '  ', '  ', '  ', '  ', ' ', 'cd']
+    : ['ab', '  ', ' ', 'cd']
+
+*** *initial_indent*
+    折叠后第一行添加的内容。如果整个字符串为空，则不添加。Counts
+    towards the length of the first line.
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(initial_indent='++++', width=1)
+      print(wrapper.fill('abcd'))
+      print(wrapper.fill(''))
+    #+END_SRC
+
+    #+RESULTS[7b000c72a4eb0fba0eb240d8f00f8edf87f41e00]:
+    :
+    : >>> ++++a
+    : b
+    : c
+    : d
+
+*** *subsequent_indent*
+    除第一行外，在折叠后的每行前添加的内容。 Counts towards the length
+    of each line except the first.
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(subsequent_indent='', width=2)
+      wrapper.fill('abcd')
+      wrapper.subsequent_indent = '+++'
+      wrapper.fill('abcd')
+    #+END_SRC
+
+    #+RESULTS[bbadce9c8385ad51dd2e0b5d36a39d7c26813400]:
+    :
+    : >>> 'ab\ncd'
+    : >>> 'ab\n+++c\n+++d'
+
+*** *fix_sentence_endings* ？？？
+*** *break_long_words*
+    默认值：True。是否折叠长度大于WIDTH的单词。如果为False，长度大
+    于WIDTH的单词会放在单独一行。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+
+      wrapper = TextWrapper(width=3)
+      wrapper.fill('abcd')
+      wrapper.break_long_words = False
+      wrapper.fill('abcd')
+    #+END_SRC
+
+    #+RESULTS[16b316b0b313cd614858ac3b5f639f0b609c0491]:
+    :
+    : >>> >>> 'abc\nd'
+    : >>> 'abcd'
+
+*** *break_on_hyphens*
+    默认值：True。如果为True，可能在whitespace和连字符后换行，否则只在
+    whitespace处换行。如需将连字符连接的单词放在一行，需声明
+    break_long_words为False。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(width=3)
+      wrapper.fill('ab-d')
+      wrapper.break_on_hyphens = False
+      wrapper.fill('ab-d')
+      wrapper.break_long_words = False
+      wrapper.fill('ab-d')
+    #+END_SRC
+
+    #+RESULTS[8ec7a4c7e028cff567c6f78e001dfb3bfe0d8b9f]:
+    :
+    : >>> 'ab-\nd'
+    : >>> 'ab-\nd'
+    : >>> 'ab-d'
+
+*** *max_lines*
+    默认值：None。如果不为None，则结果最多含MAX_LINES行，其他行用
+    placeholder表示。
+    
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(width=2)
+      wrapper.fill('abcdefg')
+      wrapper.max_lines = 3
+      wrapper.placeholder = '..'
+      wrapper.fill('abcdefg')
+    #+END_SRC
+
+    #+RESULTS[1529d1243e154533fc73a77d9675f611529378e9]:
+    :
+    : >>> 'ab\ncd\nef\ng'
+    : >>> >>> 'ab\ncd\n..'
+
+*** *placeholder*
+    默认值：“[...]”。如果折叠后的文本末尾有内容被删除，则使用此变量值
+    代替。
+
+    #+BEGIN_SRC python :session
+      from textwrap import TextWrapper
+      wrapper = TextWrapper(width=5, max_lines=2)
+      wrapper.fill('abc' * 10)
+      wrapper.placeholder = '...'
+      wrapper.fill('abc' * 10)
+    #+END_SRC
+
+    #+RESULTS[3714850c2fcd10c80dc7ab4f94f56e40575d5d34]:
+    :
+    : >>> 'abcab\n[...]'
+    : >>> 'abcab\n...'
+
+*** 方法
+**** *wrap* (text)
+     折叠单个段落TEXT，使每行最多有WIDTH个字符。所有选择都从
+     TextWrapper实例的的属性中获取。返回字符串链表，每个字符串元素不含
+     换行符。如果没有任何内容，返回空链表。
+
+**** *fill* (text)
+     折叠单个段落TEXT，返回折叠后的字符串。
+     
 * unicodedate
 * stringprep
 * readline
