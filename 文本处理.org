@@ -3773,8 +3773,189 @@
 
 **** *fill* (text)
      折叠单个段落TEXT，返回折叠后的字符串。
-     
-* unicodedate
+
+* unicodedate - Unicode数据库
+  ASCII、Unicode和UTF-8的简介，参考 [[http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html][阮一峰的博客]] 。
+** 函数
+*** unicodedate. *lookup* (name)
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+
+      unicodedata.lookup('END OF TEXT')
+      unicodedata.lookup('ETX')
+
+    #+END_SRC
+
+    #+RESULTS[16d6ad1354145377fe97fdd5378a9cca94d7a500]:
+    :
+    : >>> '\x03'
+    : '\x03'
+
+*** unicodedate. *name* (chr[,default])
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.name('a')
+      unicodedata.name('一')
+    #+END_SRC
+
+    #+RESULTS[b07ba84b9e1bb0b18e9214a1071b0ec6790bbdd9]:
+    :
+    : 'LATIN SMALL LETTER A'
+    : 'CJK UNIFIED IDEOGRAPH-4E00'
+
+*** unicodedate. *decimal* (chr[,default])
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.decimal('1')
+      unicodedata.decimal('一', 1)
+    #+END_SRC
+
+    #+RESULTS[d27ddbfa90bc790d69f1c3c4f99ef952188e1644]:
+    :
+    : 1
+    : 1
+
+*** unicodedate. *digit* (char[,default])
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.digit('1')
+      unicodedata.digit('柒',7)
+    #+END_SRC
+    
+    #+RESULTS[8e225a07a0bccf9e1a3df7221a49a1c57a91d50f]:
+    :
+    : 1
+    : 7
+
+*** unicodedate. *numeric* (chr[,default])
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.numeric('1')
+      unicodedata.numeric('叁')
+    #+END_SRC
+    
+    #+RESULTS[d638aad5a39cf92b36eede2bbbe8317c6a05df87]:
+    :
+    : 1.0
+    : >>> 3.0
+
+*** unicodedate. *category* (chr)
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.category('一')
+      unicodedata.category('1')
+      unicodedata.category('。')
+    #+END_SRC
+
+    #+RESULTS[fea1962fdb42ce8c90be6d7c7b4b9f305fd4339b]:
+    :
+    : 'Lo'
+    : 'Nd'
+    : 'Po'
+
+*** unicodedate. *bidirectional* (chr)
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.bidirectional('1')
+      unicodedata.bidirectional('a')
+      unicodedata.bidirectional('一')
+    #+END_SRC
+
+    #+RESULTS[4d6a93b44d930e8dd0ce23ca05c54bfb49b4f349]:
+    :
+    : 'EN'
+    : 'L'
+    : 'L'
+
+*** unicodedate. *combining* (chr)
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.combining('一')
+      unicodedata.combining('1')
+    #+END_SRC
+
+    #+RESULTS[2ab4aab7afb75b673ca3c8347be616b8f677d097]:
+    :
+    : 0
+    : 0
+
+*** unicodedate. *east_asian_width* (chr)
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.east_asian_width('一')
+      unicodedata.east_asian_width('。')
+    #+END_SRC
+
+    #+RESULTS[ded65a7d1c9bf497ebe3cb2e7e173eb2968adaab]:
+    :
+    : 'W'
+    : 'W'
+
+*** unicodedate. *mirrored* (chr)
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.mirrored('一')
+      unicodedata.mirrored('1')
+    #+END_SRC
+
+    #+RESULTS[f5c3eff46272211b2618fbf99ccfc70441cb3607]:
+    :
+    : 0
+    : 0
+
+*** unicodedate. *decomposition* (chr)
+*** unicodedate. *normalize* (from,unistr)
+** 属性
+*** unicodedate. *unidate_version*
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.unidata_version
+    #+END_SRC
+
+    #+RESULTS[9b28c6f2cc967234744d96f87ef8944df9bec5a6]:
+    :
+    : '8.0.0'
+
+*** unicodedate. *ucd_3_2_0*
+
+    #+BEGIN_SRC python :session
+      import unicodedata
+      unicodedata.ucd_3_2_0
+    #+END_SRC
+
+    #+RESULTS[beb6d74e7387eff7d42791c5464a931e584b227d]:
+    :
+    : <unicodedata.UCD object at 0x7f945959e968>
+
+** 举例
+   
+   #+BEGIN_EXAMPLE python
+     >>> import unicodedata
+     >>> unicodedata.lookup('LEFT CURLY BRACKET')
+     '{'
+     >>> unicodedata.name('/')
+     'SOLIDUS'
+     >>> unicodedata.decimal('9')
+     9
+     >>> unicodedata.decimal('a')
+     Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+     ValueError: not a decimal
+     >>> unicodedata.category('A')
+     'Lu'
+     >>> unicodedata.category('\u0660')
+     'Nd'
+   #+END_EXAMPLE
+   
 * stringprep
 * readline
 * rlconpleter
