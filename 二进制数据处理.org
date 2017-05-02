@@ -20,15 +20,15 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 ** 格式字符串（Format Strings）
    格式字符串用于限定打包（packing）和解包（unpacking）时的数据排布，
    由下面2小节的“Byte顺序、大小和对齐”和“格式字符”共同控制。
-   
+
 *** Byte顺序、大小和对齐
-    
+
     默认情况下，C语言类型内存分布，由电脑本地的格式和byte顺序决定，并
     根据需要通过“跳过”bytes位置来对齐（由C编译器决定）。
-    
+
     此外，下表中的字符可用在格式字符串第一个位置，指定数据打包时的byte
     顺序、大小和对齐。
-    
+
     | 字符 | Byte顺序             | 大小     | 对齐   |
     |------+----------------------+----------+--------|
     | @    | native               | native   | native |
@@ -36,18 +36,18 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     | <    | little-endian        | standard | none   |
     | >    | big-endian           | standard | none   |
     | \!   | network(=big-endian) | standard | none   |
-    
+
     - 本地字节序可用“sys.byteorder”获取：
-      
+
     #+BEGIN_SRC python :session
       import sys
       sys.byteorder
     #+END_SRC
-    
+
     #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
     :
     : 'little'
-    
+
     - 如果第一个字符不是上表中的任何有个，默认为“@”。
     - “native”字节序有当前主机决定。
     - “native”大小和对齐由C编译器的sizeof表达式决定。总是与本地字节序
@@ -55,33 +55,33 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     - “standard”大小仅由下一节的“格式字符串决定”。
     - “!”用于简写网络字节序（防止不能记住）。
     - 无法指定非本地字节序（强制字节序交换）；需适应“>”和“>”指定。
-      
+
     *注意* ：
-    
+
     1. 仅在结构体相邻的数据间有padding，首位无。
     2. 使用非本地字节序时，不会有padding。即使用“<”、“>”和“!”时。
     3. 如需将结构体padding到某种类型的大小，可在格式字符串最后重复该类
        型，并指定其数量为0：
-       
+
        前面的数字1和2都占4个字节，3为short型（2个字节），再使用"0i"（4
        个字节），就在后面添加了2个字节。
-       
+
        #+BEGIN_SRC python :session
          import struct
 
          x = struct.pack('iih0i', 1, 2, 3)
          len(x), x
        #+END_SRC
-       
+
        #+RESULTS[3f5a2483d97794840917fc17a3edca72f0b221d1]:
        :
        : >>> >>> (12, b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00')
-       
+
 *** 格式字符
     下表为所有执行数据类型的格式字符。第二列C类型可见其类型，第4列标准
     为大小。当使用“<”、“>”、“=”或“!”时为标准大小。默认值或@为本地大小
     （由当前主机决定）。
-    
+
     | 格式字符 | C类型              | Python类型         | 标准大小 | 注意点  |
     |----------+--------------------+--------------------+----------+---------|
     | x        | pad type           | no value           |          |         |
@@ -104,9 +104,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
     | s        | char[]             | bytes              |          |         |
     | p        | char[]             | bytes              |          |         |
     | P        | void *             | integer            |          | (6)     |
-    
+
     注意点：
-    
+
     1. “?”对应C99中的_Bool类型。如果没有此类型，则相当于字符类型。在标
        准模式下，总是用一个字节表示。
     2. 如果在本地模式下，仅当主机C编译器支持C的long long类型时才有效。
@@ -119,9 +119,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        binary64格式。
     6. “P”格式仅限于本地字节序模式（缺省第一个字符或为“@”）。struct模
        块不将其解释为本地字节序，所以无效？？？
-       
+
     其他注意点：
-    
+
     - 上表中的格式字符前可跟整数，指定重复数量，如“4h”等价于“hhhh”。
     - 格式字符串间的空格会被忽视，但指定重复的整数与其对应的格式字符间
       不能有空格。
@@ -130,7 +130,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       认为1，即长度为1-byte的字符串。打包时，字符串会根据指定格式
       truncted或padded；解包时，结果与指定的byte数相同。为与C语言保持
       一致，“0s”表示单个空字符串（“0c”表示0个字符）。
-      
+
       #+BEGIN_SRC python :session
       import struct
 
@@ -139,17 +139,17 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
       struct.unpack('3s', x)
       #+END_SRC
-      
+
       #+RESULTS[ffdf2ef6608e61a74473dca90a2c5cbf73d84377]:
       :
       : >>> >>> b'abA'
       : >>> (b'abA',)
-      
+
     - “s”与“p”的区别为：前者为C形式字符串，后者为Pascal形式字符串。
-      
+
     - 使用“?”格式字符时，打包结果只是0或1或标准布尔值，解包结果为True
       或False。
-      
+
       #+BEGIN_SRC python :session
       import struct
 
@@ -159,13 +159,13 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack('?', x)
       print(x)
       #+END_SRC
-      
+
       #+RESULTS[7cabf81697f5a2dfa9cf2e773bc9c50f5e9cd991]:
      :
      : >>> >>> b'\x01'
      : >>> (True,)
      : b'\x01'
-      
+
 ** 函数和Exceptions
 *** exception struct. *error*
     所有报错入口，其参数报错信息。
@@ -173,7 +173,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** struct. *pack* (fmt,v1,v2...)
     返回bytes对象，包含所有V1、V2...根据FMT打包后的结果。所有参数需满
     足FMT指定形式。
-    
+
     #+BEGIN_SRC python :session
       import struct
       from array import array
@@ -182,12 +182,12 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(buff)
       print(struct.unpack('!4s4si', buff))
     #+END_SRC
-    
+
     #+RESULTS[e0674198bc76e0d25097489cc8c623b96bc54605]:
     :
     : >>> >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00\x00\x00\x00a'
     : (b'\xe4\xb8\x80\x00', b'a\x00\x00\x00', 97)
-    
+
 *** struct. *pack_into* (fmt,buffer,offset,v1,v2)
     将V1、V2...根据FMT写入BUFFER中，必须指定开始写入位置，即OFFSET参数。
 
@@ -215,9 +215,9 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** struct. *unpack* (fmt,buffer)
     根据FMT，将BUFFER（通过pack(FMT,..)打包的结果）解包。BUFFER中的
     byte数需与FMT指定相同。
-    
+
     返回结果即使只有单个值，也为元组。
-    
+
     #+BEGIN_SRC python :session
       import struct
 
@@ -225,11 +225,11 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       b = struct.pack(fmt, b'abc', 1, 2)
       struct.unpack(fmt, b)
     #+END_SRC
-    
+
     #+RESULTS[f97b5a2b81c314ebb3c2913890eb1e23796c7437]:
     :
     : >>> >>> >>> (b'abc', 1, 2)
-    
+
 *** struct. *unpack_from* (fmt,buffer,offset=0)
     从OFFSET开始，根据FMT将BUFFER解包。即时只有一个值，返回值也为元组。
 
@@ -472,4 +472,228 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
    : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
 
-* codecs
+* codecs - 译码注册和基础类 ？？？
+  此模块为标准Python“译码器（codecs，含编码器encoder和解码器decoders）”提
+  高基础类，并提高Python内部“译码注册（codec registry，处理解码器和查
+  询过程中的错误）”。大多数标准译码都是针对文本，即将文本编码为bytes对
+  象，但也有译码器可将文本编码为文本，将bytes编码为bytes。通过定制，可
+  使译码器实现任意类型间的编码和解码，但此模块的一些特性使得只适用于文
+  本编码和解码，或将文本编码为bytes。？？？
+  
+** 模块内容
+*** 函数
+    此模块提供下列函数来编码和解码任意“译码器”：
+**** codecs. *encode* (obj,encoding='utf-8',errors='strict')
+     使用ENCODING的译码器编码OBJ。
+
+     ERRORS用于指定错误处理策略。默认为“strict”，即编码时如果发生错误，
+     则抛出ValueError错误（或更具体的子类，如UnicodeEncodeError）。具
+     体可选值见后文。
+
+     #+BEGIN_SRC python :session
+       import codecs
+       codecs.encode('ab一')
+       codecs.encode('ab一', 'gb2312')
+     #+END_SRC
+
+     #+RESULTS[05a82eed7b61e35f8bfe65116be63b66c7520105]:
+     :
+     : b'ab\xe4\xb8\x80'
+     : b'ab\xd2\xbb'
+
+**** codecs. *decode* (obj,encoding='utf-8',errors='strict')
+     使用ENCODING的译码器解码OBJ。
+
+     ERRORS参数同codecs.encode函数。
+
+     #+BEGIN_SRC python :session
+       import codecs
+       x = codecs.encode('ab一')
+       codecs.decode(x)
+     #+END_SRC
+
+     #+RESULTS[19faa436d310b9ad7730c338dc8dc7e923d00ee4]:
+     :
+     : >>> 'ab一'
+
+**** codecs. *lookup* (encoding)
+     根据ENCODING在Python的译码器注册中查找译码器，如果找到则返回
+     CodecInfo对象。
+
+     现在译码器注册缓存中查找，不能找到再扫描已注册的搜索函数。如果不
+     能找到CodecInfo对象，抛出LookupError错误；如果能找到，则将
+     CodecInfo对象存储到注册缓存中，并返回。
+
+     #+BEGIN_SRC python :session
+       import codecs
+       codecs.lookup('utf-8')
+       codecs.lookup('不存在')
+     #+END_SRC
+
+     #+RESULTS[952bb37f890731b66892109abeaa85071c20f841]:
+     :
+     : <codecs.CodecInfo object for encoding utf-8 at 0x7f9459e13588>
+     : Traceback (most recent call last):
+     :   File "<stdin>", line 1, in <module>
+     : LookupError: unknown encoding: 不存在
+
+**** class codecs. *CodecInfo* (encode,decode,streamreader=None,streamwriter=None,incrementalencoder=None,incrementaldecoder=None,name=None)
+     查找译码器注册时译码器的详细信息。构造器的参数对应译码器对象的属
+     性：
+
+***** *name*
+      编码名称。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        encoder = codecs.lookup('utf-8')
+        encoder.name
+      #+END_SRC
+
+      #+RESULTS[d4ead6089bb1f9edc97f3b766b86467c8ff04c8d]:
+      :
+      : >>> 'utf-8'
+
+***** *encode*
+***** *decode*
+      “无状态（stateless）”编码和解码函数。须为与译码器的encode()和
+      decode()方法有相同接口的函数或方法，且需以“无状态”形象实现。？？？
+
+      #+BEGIN_SRC python :session
+        import codecs
+        codecs.lookup('utf-8').encode
+        codecs.lookup('utf-8').decode
+      #+END_SRC
+
+      #+RESULTS[4b88049d6cbcb8aba6fb949f002f51bcadbfb4a3]:
+      :
+      : <built-in function utf_8_encode>
+      : <function decode at 0x7f75c97ba1e0>
+
+***** *incrementalencoder*
+***** *incrementaldecoder*
+      “增量式（incremental）”编码和解码类或工厂函数。需分别与基础类
+      IncrementalEncoder和IncrementalDecoder有相同接口。增量式译码器可
+      保存状态。？？？
+
+      #+BEGIN_SRC python :session
+        import codecs
+        utf8_codec = codecs.lookup('utf-8')
+        utf8_codec.incrementalencoder
+        utf8_codec.incrementaldecoder
+      #+END_SRC
+
+      #+RESULTS[8391e38e5c37eacbb028470c5e687fa12975eeba]:
+      :
+      : >>> <class 'encodings.utf_8.IncrementalEncoder'>
+      : <class 'encodings.utf_8.IncrementalDecoder'>
+
+***** *streamwriter*
+***** *streamreader*
+      “流（stream）”读写类或工厂函数。需分别与基础类Streamwriter和
+      Streamreader有相同接口。流式译码器可保存状态。
+
+**** 查询简化函数
+     为方便获取译码器不同属性，提供下面函数。其实质还是调用了lookup()
+     函数进行查找：
+
+***** codecs. *getencoder* (encoding)
+      查找ENCODING对应译码器，返回其编码函数。如果不能找到ENCODING的译
+      码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        utf8_encoder = codecs.getencoder('utf-8')
+        x = utf8_encoder('ab一')
+        print(x)
+        codecs.decode(x[0])
+      #+END_SRC
+
+      #+RESULTS[d489aebecd96a0ebc69128d9cee2c60db195145d]:
+      :
+      : >>> >>> (b'ab\xe4\xb8\x80', 3)
+      : 'ab一'
+
+***** codecs. *getdecoder* (encoding)
+      查找ENCODING对应的译码器，返回其解码函数。如果不能找到ENCODING的
+      译码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        utf8_decode = codecs.getdecoder('utf-8')
+        utf8_decode(bytes('一二三', 'utf-8'))
+      #+END_SRC
+
+      #+RESULTS[eadf6c7d282bde562a1c226a6e5a56f45b4c0c62]:
+      :
+      : >>> ('一二三', 9)
+
+***** codecs. *getincrementalencoder* (encoding)
+      查找ENCODING对应译码器的增量式编码函数或类。如果不能找到ENCODING
+      对应的译码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        utf8_incrementalencoder = codecs.getincrementalencoder('utf-8')
+        utf8_incrementalencoder
+      #+END_SRC
+
+      #+RESULTS[d968b3da24704235b943d8847c9f04cc0c08aead]:
+      :
+      : >>> <class 'encodings.utf_8.IncrementalEncoder'>
+
+***** codecs. *getincrementaldecoder* (encoding)
+      查询ENCODING对应译码器的增量式解码函数或类。如果不能找打ENCODING
+      对应的译码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        codecs.getincrementaldecoder('utf-8')
+      #+END_SRC
+
+      #+RESULTS[ffdb16df8d4776132cec17064385083a058cd5d8]:
+      :
+      : <class 'encodings.utf_8.IncrementalDecoder'>
+
+***** codecs. *getreader* (encoding)
+      查找ENCODING对应译码器的StreamReader函数或类。如果不能找到
+      ENCODING对应的译码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        codecs.getreader('utf-8')
+      #+END_SRC
+
+      #+RESULTS[ef4a738cb8a3175761cdc18e1a0bb46a7e733bb8]:
+      :
+      : <class 'encodings.utf_8.StreamReader'>
+
+***** codecs. *getwriter* (encoding)
+      查找ENCODING对应译码器的StreamWriter函数或类。如果不能找到
+      ENCODING对应的译码器，则抛出LookupError错误。
+
+      #+BEGIN_SRC python :session
+        import codecs
+        codecs.getwriter('utf-8')
+      #+END_SRC
+
+      #+RESULTS[ad7685f5ddc8462c949530613d886fd36218c82b]:
+      :
+      : <class 'encodings.utf_8.StreamWriter'>
+
+**** codecs. *register* (search_function)
+
+**** codecs. *open* (filename,mode='r',encoding=None,errors='strict',buffering=1)
+**** codecs. *EncodeFile* (file,data_encoding,file_encoding=None,errors='strict')
+**** codecs. *iterencode* (iterator,encoding,errors='strict',**kwargs)
+*** 常量
+** 译码器基础类
+** 编码和解码
+** 标准编码
+** Python特定编码
+*** 文本编码
+*** 二进制转换
+*** 文本转换
+** encodings.idna - 国际化域名
+** encodings.mbcs - Windows ANSI codepage
+** encodings.utf_8_sig - UTF-8 codec with BOM signature
