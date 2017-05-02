@@ -13,7 +13,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.calcsize('2I3sI')
    #+END_SRC
 
-   #+RESULTS[154e357bb444a800f4b01e8e5abab0a0c7735bbc]:
+   #+RESULTS:
    :
    : 16
 
@@ -44,7 +44,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       sys.byteorder
     #+END_SRC
 
-    #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
+    #+RESULTS:
     :
     : 'little'
 
@@ -73,7 +73,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
          len(x), x
        #+END_SRC
 
-       #+RESULTS[3f5a2483d97794840917fc17a3edca72f0b221d1]:
+       #+RESULTS:
        :
        : >>> >>> (12, b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00')
 
@@ -140,7 +140,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack('3s', x)
       #+END_SRC
 
-      #+RESULTS[ffdf2ef6608e61a74473dca90a2c5cbf73d84377]:
+      #+RESULTS:
       :
       : >>> >>> b'abA'
       : >>> (b'abA',)
@@ -160,7 +160,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(x)
       #+END_SRC
 
-      #+RESULTS[7cabf81697f5a2dfa9cf2e773bc9c50f5e9cd991]:
+      #+RESULTS:
      :
      : >>> >>> b'\x01'
      : >>> (True,)
@@ -183,7 +183,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(struct.unpack('!4s4si', buff))
     #+END_SRC
 
-    #+RESULTS[e0674198bc76e0d25097489cc8c623b96bc54605]:
+    #+RESULTS:
     :
     : >>> >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00\x00\x00\x00a'
     : (b'\xe4\xb8\x80\x00', b'a\x00\x00\x00', 97)
@@ -207,7 +207,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(a)
     #+END_SRC
 
-    #+RESULTS[2bc82b6bca91fbc18daebf8b85d78f8fa01304da]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> >>> >>> >>> >>> bytearray(b'\x00\x00\x00abc\x00')
     : array('b', [97, 98, 99])
@@ -226,7 +226,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack(fmt, b)
     #+END_SRC
 
-    #+RESULTS[f97b5a2b81c314ebb3c2913890eb1e23796c7437]:
+    #+RESULTS:
     :
     : >>> >>> >>> (b'abc', 1, 2)
 
@@ -243,7 +243,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack_from('2i', b, 4)
     #+END_SRC
 
-    #+RESULTS[e89ae04c0a016610c35203529dc29585978b4556]:
+    #+RESULTS:
     :
     : >>> >>> b'abc\x00\x01\x00\x00\x00\x02\x00\x00\x00'
     : (1, 2)
@@ -262,7 +262,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
           print(x)
     #+END_SRC
 
-    #+RESULTS[aa2d5b758701f132340e7eca03b5303f1d63944f]:
+    #+RESULTS:
     :
     : >>> >>> ... ... (1,)
     : (2,)
@@ -278,7 +278,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.calcsize('=l')
     #+END_SRC
 
-    #+RESULTS[42a5d996453be8e2a1d1fe030314e57898587b32]:
+    #+RESULTS:
     :
     : >>> 8
     : 4
@@ -302,7 +302,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        len(b) == s.size
      #+END_SRC
 
-     #+RESULTS[bc8f876784beaff3b30c21bfeb91305d53f6e8fe]:
+     #+RESULTS:
      :
      : >>> >>> >>> b'abc\x00\x01\x00\x00\x00\x02\x00\x00\x00'
      : True
@@ -320,7 +320,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        print(ba)
      #+END_SRC
 
-     #+RESULTS[cea1ac6651adfc2d897777716f278ed34dc56858]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> >>> bytearray(b'XYZ\x00\x03\x00\x00\x00\x07\x00\x00\x00')
 
@@ -333,7 +333,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        s.unpack(b)
      #+END_SRC
 
-     #+RESULTS[7d337156510e3cc11ca3c89be5178daa651b0f44]:
+     #+RESULTS:
      :
      : >>> >>> (b'abc', 1, 2)
 
@@ -347,7 +347,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        s.unpack_from(b, 0)
      #+END_SRC
 
-     #+RESULTS[e6fc692fa31c44cbb5f3da7d62ec7f7aa098eb2d]:
+     #+RESULTS:
      :
      : >>> >>> >>> (b'XYZ', 3, 7)
 
@@ -363,7 +363,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
            print(x)
      #+END_SRC
 
-     #+RESULTS[4b7f84c46db82d5129616af5ea3bce347d070b47]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> ... ... (1,)
      : (2,)
@@ -379,7 +379,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        s.format
      #+END_SRC
 
-     #+RESULTS[527dd7247d1fc2a71049cc01f03398ce69d5887b]:
+     #+RESULTS:
      :
      : >>> >>> b'3s2i'
 
@@ -393,7 +393,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        s.size
      #+END_SRC
 
-     #+RESULTS[084fba739a667b43b0f15c172512fe0266510193]:
+     #+RESULTS:
      :
      : >>> >>> 12
 
@@ -408,7 +408,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.calcsize('=hhl')
    #+END_SRC
 
-   #+RESULTS[89df059a5f59249c58b331dfee8fb2df05703867]:
+   #+RESULTS:
    :
    : >>> b'\x01\x00\x02\x00\x03\x00\x00\x00'
    : (1, 2, 3)
@@ -429,7 +429,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      Student._make(struct.unpack('<10sHHb', record))
    #+END_SRC
 
-   #+RESULTS[4ed9cd69c591f5d90fd668457238b325c2b93c17]:
+   #+RESULTS:
    :
    : >>> >>> >>> >>> >>> b'raymond   ' 4658 264 8
    : >>> >>> Student(name=b'raymond   ', serialnum=4658, school=264, gradelevel=8)
@@ -445,7 +445,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.calcsize('ci'), struct.calcsize('ic')
    #+END_SRC
 
-   #+RESULTS[03a0880639a62525e2c396b34d0adbe60734dbc7]:
+   #+RESULTS:
    :
    : >>> b'*\x00\x00\x00\x15\x14\x13\x12'
    : b'\x15\x14\x13\x12*'
@@ -464,7 +464,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
      struct.pack('=llh0l', 1, 2, 3)
    #+END_SRC
 
-   #+RESULTS[bea3faecc4652043f5ce31d5e6acdf23378e946a]:
+   #+RESULTS:
    :
    : >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
@@ -496,7 +496,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        codecs.encode('ab一', 'gb2312')
      #+END_SRC
 
-     #+RESULTS[05a82eed7b61e35f8bfe65116be63b66c7520105]:
+     #+RESULTS:
      :
      : b'ab\xe4\xb8\x80'
      : b'ab\xd2\xbb'
@@ -512,7 +512,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        codecs.decode(x)
      #+END_SRC
 
-     #+RESULTS[19faa436d310b9ad7730c338dc8dc7e923d00ee4]:
+     #+RESULTS:
      :
      : >>> 'ab一'
 
@@ -530,7 +530,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
        codecs.lookup('不存在')
      #+END_SRC
 
-     #+RESULTS[952bb37f890731b66892109abeaa85071c20f841]:
+     #+RESULTS:
      :
      : <codecs.CodecInfo object for encoding utf-8 at 0x7f9459e13588>
      : Traceback (most recent call last):
@@ -550,7 +550,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         encoder.name
       #+END_SRC
 
-      #+RESULTS[d4ead6089bb1f9edc97f3b766b86467c8ff04c8d]:
+      #+RESULTS:
       :
       : >>> 'utf-8'
 
@@ -565,7 +565,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         codecs.lookup('utf-8').decode
       #+END_SRC
 
-      #+RESULTS[4b88049d6cbcb8aba6fb949f002f51bcadbfb4a3]:
+      #+RESULTS:
       :
       : <built-in function utf_8_encode>
       : <function decode at 0x7f75c97ba1e0>
@@ -583,7 +583,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         utf8_codec.incrementaldecoder
       #+END_SRC
 
-      #+RESULTS[8391e38e5c37eacbb028470c5e687fa12975eeba]:
+      #+RESULTS:
       :
       : >>> <class 'encodings.utf_8.IncrementalEncoder'>
       : <class 'encodings.utf_8.IncrementalDecoder'>
@@ -609,7 +609,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         codecs.decode(x[0])
       #+END_SRC
 
-      #+RESULTS[d489aebecd96a0ebc69128d9cee2c60db195145d]:
+      #+RESULTS:
       :
       : >>> >>> (b'ab\xe4\xb8\x80', 3)
       : 'ab一'
@@ -624,7 +624,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         utf8_decode(bytes('一二三', 'utf-8'))
       #+END_SRC
 
-      #+RESULTS[eadf6c7d282bde562a1c226a6e5a56f45b4c0c62]:
+      #+RESULTS:
       :
       : >>> ('一二三', 9)
 
@@ -638,7 +638,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         utf8_incrementalencoder
       #+END_SRC
 
-      #+RESULTS[d968b3da24704235b943d8847c9f04cc0c08aead]:
+      #+RESULTS:
       :
       : >>> <class 'encodings.utf_8.IncrementalEncoder'>
 
@@ -651,7 +651,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         codecs.getincrementaldecoder('utf-8')
       #+END_SRC
 
-      #+RESULTS[ffdb16df8d4776132cec17064385083a058cd5d8]:
+      #+RESULTS:
       :
       : <class 'encodings.utf_8.IncrementalDecoder'>
 
@@ -664,7 +664,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         codecs.getreader('utf-8')
       #+END_SRC
 
-      #+RESULTS[ef4a738cb8a3175761cdc18e1a0bb46a7e733bb8]:
+      #+RESULTS:
       :
       : <class 'encodings.utf_8.StreamReader'>
 
@@ -677,7 +677,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
         codecs.getwriter('utf-8')
       #+END_SRC
 
-      #+RESULTS[ad7685f5ddc8462c949530613d886fd36218c82b]:
+      #+RESULTS:
       :
       : <class 'encodings.utf_8.StreamWriter'>
 

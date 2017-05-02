@@ -24,7 +24,7 @@
     any([f1])
   #+END_SRC
 
-  #+RESULTS[0137abfc43ce548b5c7c5a908abfd134c19ec952]:
+  #+RESULTS:
   :
   : ... ... ... ... >>> >>> >>> >>> >>> >>> False
   : True
@@ -91,7 +91,7 @@
     sys.float_info
   #+END_SRC
 
-  #+RESULTS[a67a42ba1e272f9459d008ec6d22f6d99c5e35e2]:
+  #+RESULTS:
   :
   : sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
 
@@ -186,7 +186,7 @@
        n.bit_length()
     #+END_SRC
 
-    #+RESULTS[8810302f5722bb340d6945ff9942a8590dbc799f]:
+    #+RESULTS:
      :
      : '-0b100101'
      : 6
@@ -213,7 +213,7 @@
       sys.byteorder
     #+END_SRC
 
-    #+RESULTS[3d5fd94153b3a2263424e14fd58558248a9ae9ca]:
+    #+RESULTS:
     :
     : 'little'
 
@@ -227,7 +227,7 @@
       (-1).to_bytes(2, byteorder='big', signed=False)
     #+END_SRC
 
-    #+RESULTS[f8e57b85a7bd068e03b704747c88c41d79387e1a]:
+    #+RESULTS:
     : b'\xff'
     : b'\xff\xff'
     : Traceback (most recent call last):
@@ -244,7 +244,7 @@
       (256).to_bytes(1, byteorder='big')
     #+END_SRC
 
-    #+RESULTS[3480bdad73607250c656f9be770a4630bcacd447]:
+    #+RESULTS:
     : b'\x00\x04'
     : b'\x04\x00'
     : b'\x00\x00\x00\x00\x00\x00\x04\x00'
@@ -271,7 +271,7 @@
       int.from_bytes(b, byteorder='big', signed=False)
     #+END_SRC
 
-    #+RESULTS[3fff88f467c24f0fb6eae00705d87950ba57e95a]:
+    #+RESULTS:
     :
     : >>> 16
     : (4096, 4096)
@@ -287,7 +287,7 @@
       (1.0).as_integer_ratio()
     #+END_SRC
 
-    #+RESULTS[f517333064b3617d1033e12581eab9467fed88f8]:
+    #+RESULTS:
     : (-3602879701896397, 18014398509481984)
     : (1, 1)
 
@@ -298,7 +298,7 @@
       (3.2).is_integer()
     #+END_SRC
 
-    #+RESULTS[18894a74b9b2eb36d7fe9951b2c9a4e0ebec73f5]:
+    #+RESULTS:
     : True
     : False
 
@@ -308,7 +308,7 @@
       (1.2).hex()
     #+END_SRC
     
-    #+RESULTS[e7a3ff14a7741db43734b976b8425a9dabc240a5]:
+    #+RESULTS:
     : '0x1.3333333333333p+0'
 
 *** classmethod float. *fromhex* (s)
@@ -362,7 +362,7 @@
      [1, 2, 3] == (1, 2, 3)
    #+END_SRC
    
-   #+RESULTS[53ca1bdf37af220736955e12a718c6509d8f0c06]:
+   #+RESULTS:
    : True
    : False
    
@@ -377,7 +377,7 @@
       'a' in b'abc'
     #+END_SRC
     
-    #+RESULTS[14b5f1634155ec3e15feeb4aebda2079e4a135fb]:
+    #+RESULTS:
     : True
     : True
     : Traceback (most recent call last): 
@@ -392,7 +392,7 @@
           l * -1
        #+END_SRC
        
-       #+RESULTS[a7f3ebdeb4c93a76e0799a5c836d2cb5619ed431]:
+       #+RESULTS:
        :
        : []
        : []
@@ -406,7 +406,7 @@
       print(lists)
     #+END_SRC
 
-    #+RESULTS[d58102302c25ac67990798dc71a99e9ec03ae85e]:
+    #+RESULTS:
      :
      : [[], [], []]
      : >>> [[3], [3], [3]]
@@ -457,7 +457,7 @@
      hash(([1, 2], 3))
    #+END_SRC
    
-   #+RESULTS[6a128c1614b208c615c076ac9b4fdc89231aa315]:
+   #+RESULTS:
    : Traceback (most recent call last): 
    :   File "<stdin>", line 1, in <module>
    : TypeError: unhashable type: 'list'
@@ -495,7 +495,7 @@
           s[0::2] = ['a', 'b', 'c']
        #+END_SRC
        
-       #+RESULTS[1e58544f13894e154d7091d122d872093f579d6d]:
+       #+RESULTS:
         :
         : [1, 3]
         : >>> ['a', 2, 'b', 4]
@@ -520,7 +520,7 @@
           print(t)
        #+END_SRC
 
-       #+RESULTS[ef737dbf67d1269a29a39f6bc2426bd90792ec54]:
+       #+RESULTS:
        :
        : >>> [[1], [2], [1], [2]]
        : >>> [[1, 1000], [2], [1, 1000], [2]]
@@ -552,7 +552,7 @@
        print(b)
      #+END_SRC
      
-     #+RESULTS[17f994bc42b7147fa28aa69158de0314e9f754a3]:
+     #+RESULTS:
      :
      : >>> [[1], [2]]
      : [[1], [2]]
@@ -590,7 +590,7 @@
          print(next(e, 'end'))
    #+END_SRC
 
-   #+RESULTS[a2bde2e71d838787de06a4c6aa1d60a37029e796]:
+   #+RESULTS:
    :
    : ... ... (0, 1)
    : (1, 2)
@@ -621,7 +621,7 @@
        print(t)
      #+END_SRC
      
-     #+RESULTS[24c4e8175a011b7d25226ccf417569e120f5af04]:
+     #+RESULTS:
      :
      : >>> [[1], [2], [3]]
      : ([1], [2], [3])
@@ -656,7 +656,7 @@
        list(range(1, 0))
     #+END_SRC
 
-    #+RESULTS[b8870d8540cdec15e1316a334965df02944ffc11]:
+    #+RESULTS:
      : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
      : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
      : [0, 5, 10, 15, 20, 25]
@@ -678,7 +678,7 @@
       print(r.step)
     #+END_SRC
     
-    #+RESULTS[f9fc1c5f14e3ac7337647f34fb759a95de1b6673]:
+    #+RESULTS:
     :
     : 1
     : 1000
@@ -700,7 +700,7 @@
       r[-1]
     #+END_SRC
 
-    #+RESULTS[4b45307c89036dddea5d4fb032b6b58603e9644d]:
+    #+RESULTS:
     :
     : True
     : False
@@ -717,7 +717,7 @@
       range(0) == range(2, 1, 3)
     #+END_SRC
 
-    #+RESULTS[df3bed9f7e4ec99cbe485b71ad1306ebd36a9b35]:
+    #+RESULTS:
     : True
 
 * 文本Sequence类型-str
@@ -738,7 +738,7 @@
      'eggs ' 'spam' == 'eggs spam'
    #+END_SRC
    
-   #+RESULTS[c9d1e6b60697d25e6d5e76a889515f3cb8acaa1e]:
+   #+RESULTS:
    : True
    
    由于Python并没有字符类型，所以使用索引获得字符串的某个元素时，返回
@@ -764,7 +764,7 @@
      str(b'abc', 'utf-8') == b'abc'.decode('utf-8')
    #+END_SRC
    
-   #+RESULTS[32d4659c20465d044aab338a803a844a420378fc]:
+   #+RESULTS:
    : True
    
    将bytes对象传递给str()函数，且不带encoding和errors参数时，返回"非
@@ -775,7 +775,7 @@
      str(b'Zoot', encoding='utf-8')
    #+END_SRC
    
-   #+RESULTS[32fd73df225dae34bf6399b38f6dc51ac3e9a583]:
+   #+RESULTS:
    : "b'Zoot'"
    : 'Zoot'
    
@@ -791,7 +791,7 @@
       'claudio'.capitalize()
     #+END_SRC
 
-    #+RESULTS[d5f95c7fff1851f22a9d61bf878206b0b5f4ca80]:
+    #+RESULTS:
     : 'Claudio'
 
 *** str. *casefold* ()
@@ -806,7 +806,7 @@
       s.casefold()
     #+END_SRC
 
-    #+RESULTS[0697c4ef3a8e1439fb26555eec81d54e4f776435]:
+    #+RESULTS:
     :
     : 'ß'
     : 'ss'
@@ -823,7 +823,7 @@
       s.center(1)
     #+END_SRC
 
-    #+RESULTS[b34234826f548cd7dc3ae6e917ea372e112a11ea]:
+    #+RESULTS:
     :
     : ' claudio  '
     : '|claudio||'
@@ -839,7 +839,7 @@
       s.count('an', 3)
     #+END_SRC
 
-    #+RESULTS[c6e9c6f7614c91601f8268bce67cb034ccde5ff6]:
+    #+RESULTS:
     :
     : 2
     : 1
@@ -856,7 +856,7 @@
       '学习'.encode()
     #+END_SRC
 
-    #+RESULTS[90b9e4e1f2822bcabab7dffa1fe415529f2845b9]:
+    #+RESULTS:
     : b'claudio'
     : b'\xe5\xad\xa6\xe4\xb9\xa0'
 
@@ -870,7 +870,7 @@
       '香蕉'.endswith('蕉')
     #+END_SRC
 
-    #+RESULTS[fdedc626806beab522f616fa23bce60945428848]:
+    #+RESULTS:
     : True
     : False
     : True
@@ -884,7 +884,7 @@
       '01\t012\t0123\t01234'.expandtabs(4)
     #+END_SRC
 
-    #+RESULTS[5c811a8cf738b66e5eb6517da4244e1c7ca2f24f]:
+    #+RESULTS:
     : '01      012     0123    01234'
     : '01  012 0123    01234'
 
@@ -898,7 +898,7 @@
       'banana'.find('a', 19)
     #+END_SRC
 
-    #+RESULTS[d9397cf5feceb92c9230f86b913e32c0fc27863a]:
+    #+RESULTS:
     : 1
     : 5
     : -1
@@ -911,7 +911,7 @@
       'py' in 'Python'
     #+END_SRC
 
-    #+RESULTS[f0de536f15e64dbeacaf66261e8059886f0fb0da]:
+    #+RESULTS:
     : True
     : False
 
@@ -928,7 +928,7 @@
       'format中使用{{{{}}}}表示{{}}本身.'.format()
     #+END_SRC
 
-    #+RESULTS[b5afbc7c13efc2e8d2869e68a97d0b0879f36beb]:
+    #+RESULTS:
     : 'the sum of 1 + 2 is 3'
     : 'the sum of 1 + 2 is 3'
     : 'format中使用{{}}表示{}本身.'
@@ -950,7 +950,7 @@
       '{name} was born in ?'.format_map(Default(name='Claudio'))
     #+END_SRC
 
-    #+RESULTS[5660bc8c376ff0e2df9a65871e66b07b291471ea]:
+    #+RESULTS:
     :
     : 'Claudio was born in ?'
     : 'Claudio was born in ?'
@@ -966,7 +966,7 @@
       'banana'.index('A')
     #+END_SRC
 
-    #+RESULTS[d1f99aec023cad1e2df83201b6c18bb4b9be277e]:
+    #+RESULTS:
     : 1
     : Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
@@ -982,7 +982,7 @@
       '11#'.isalnum()
     #+END_SRC
 
-    #+RESULTS[64c759e1c39d76d3bf059fa4eae875f0dc58e9ba]:
+    #+RESULTS:
     : True
     : True
     : False
@@ -1002,7 +1002,7 @@
       '一'.isalpha()
     #+END_SRC
 
-    #+RESULTS[a642291f6b8b9de18b3c7270c3edee58f4829289]:
+    #+RESULTS:
     : True
     : True
 
@@ -1015,7 +1015,7 @@
       '12.2'.isdecimal()
     #+END_SRC
 
-    #+RESULTS[43583aa61fbd503d3184e8ee9697cc11352fcbce]:
+    #+RESULTS:
     : True
     : False
 
@@ -1034,7 +1034,7 @@
       'is_identifier?'.isidentifier()
     #+END_SRC
 
-    #+RESULTS[47ec6e8c215cd5da97416a61af5045e47c381b40]:
+    #+RESULTS:
     : True
     : True
     : False
@@ -1063,7 +1063,7 @@
       keyword.iskeyword('__init__')
     #+END_SRC
 
-    #+RESULTS[41997db43a0fe4c570c41715ad478f071347bd36]:
+    #+RESULTS:
     :
     : True
     : True
@@ -1080,7 +1080,7 @@
       'ab3'.islower()
     #+END_SRC
 
-    #+RESULTS[b9478b3115cb34d7665feff76ec18f68d49a7c2e]:
+    #+RESULTS:
     : True
     : False
     : True
@@ -1096,7 +1096,7 @@
       '0X12'.isdigit()
     #+END_SRC
 
-    #+RESULTS[59a1298bfa65b97c02eba9800d8d6cb7bdefcd21]:
+    #+RESULTS:
     : True
     : False
     : False
@@ -1113,7 +1113,7 @@
       '\n\t'.isprintable()
     #+END_SRC
 
-    #+RESULTS[bb1ef90eea86f098a2d903594e3096f10108cc38]:
+    #+RESULTS:
     : True
     : True
     : True
@@ -1129,7 +1129,7 @@
       '\b\v'.isspace()
     #+END_SRC
 
-    #+RESULTS[9699c54afdb2f683e2a23a886401e3966bfc80aa]:
+    #+RESULTS:
     : False
     : True
     : True
@@ -1146,7 +1146,7 @@
       '我是标题'.istitle()
     #+END_SRC
 
-    #+RESULTS[eb48c8706d34a6b053e0eae5b5c72c6c0b133fe5]:
+    #+RESULTS:
     : False
     : True
     : False
@@ -1165,7 +1165,7 @@
       '|'.join(['a', 'b', 3])
     #+END_SRC
 
-    #+RESULTS[c075e66eb2c17aeda663059c9b16d4a34b15ca31]:
+    #+RESULTS:
     : 'a|b|c'
     : ''
     : Traceback (most recent call last):
@@ -1182,7 +1182,7 @@
       'claudio'.ljust(1, '|')
     #+END_SRC
 
-    #+RESULTS[dcb9657934abdb6a91649b27b950df16f0730db4]:
+    #+RESULTS:
     : 'claudio   '
     : 'claudio|||'
     : 'claudio'
@@ -1200,7 +1200,7 @@
       'www.google.com'.lstrip('w.com')
     #+END_SRC
 
-    #+RESULTS[a8e1dc00f6da29a29748f54e695f3b1dc4aa4642]:
+    #+RESULTS:
     : 'i have a dream   '
     : 'google.com'
 
@@ -1224,7 +1224,7 @@
       str.maketrans("123456789", '一二三四五六七八九', '0')
     #+END_SRC
 
-    #+RESULTS[75c947fec4f31fd9ba3d5798910f73edebc9a61e]:
+    #+RESULTS:
     : {49:     '一'}
     : {49:     19968, 50: 20108, 51: 19977, 52: 22235, 53: 20116, 54: 20845, 55: 19971, 56: 20843, 57: 20061}
     : {48:     None, 49: 19968, 50: 20108, 51: 19977, 52: 22235, 53: 20116, 54: 20845, 55: 19971, 56: 20843, 57: 20061}
@@ -1242,7 +1242,7 @@
       s.partition('X')
     #+END_SRC
 
-    #+RESULTS[167d06c51b698a164715738c32e400adbc15d635]:
+    #+RESULTS:
     :
     : ('b', 'a', 'nana')
     : ('b', 'an', 'ana')
@@ -1260,7 +1260,7 @@
        s.replace('an', 'AN', 0)
     #+END_SRC
 
-    #+RESULTS[638d9f173428bafc184b40e255e33fde7cf72077]:
+    #+RESULTS:
      :
      : 'bANANa'
      : 'bANana'
@@ -1278,7 +1278,7 @@
       s.rfind('a', -4, -2)
     #+END_SRC
 
-    #+RESULTS[244605f9cd087cc3b50276e9fd7b0e389a508043]:
+    #+RESULTS:
     :
     : 5
     : -1
@@ -1293,7 +1293,7 @@
       s.rindex('A')
     #+END_SRC
 
-    #+RESULTS[3146c25983573041bac9396b8d16a24c7c4cae69]:
+    #+RESULTS:
     :
     : 5
     : Traceback (most recent call last):
@@ -1310,7 +1310,7 @@
       'claudio'.rjust(1, '|')
     #+END_SRC
 
-    #+RESULTS[f74fdefa345dac22326797229bc1683b3b9045bd]:
+    #+RESULTS:
     : '   claudio'
     : '|||claudio'
     : 'claudio'
@@ -1326,7 +1326,7 @@
       s.rpartition('X')
     #+END_SRC
 
-    #+RESULTS[081c08918c8c300c6a508ed2e25de9758e5599a9]:
+    #+RESULTS:
     :
     : ('banan', 'a', '')
     : ('ban', 'an', 'a')
@@ -1345,7 +1345,7 @@
       'www.google.com'.rstrip('w.com')
     #+END_SRC
 
-    #+RESULTS[e67751d5c79e1b962dd63d291734c8fd606097e6]:
+    #+RESULTS:
     : 'www.google'
 
 *** str. *split* (sep=None,maxsplit=-1)
@@ -1359,7 +1359,7 @@
       s.split('a', 1)
     #+END_SRC
 
-    #+RESULTS[eda13b345172dbe1d5b067936e4df63fb00f45c9]:
+    #+RESULTS:
     :
     : ['b', 'n', 'n', '']
     : ['b', 'nana']
@@ -1370,7 +1370,7 @@
       'a,,b'.split(',')
     #+END_SRC
 
-    #+RESULTS[b6d18eea0ed928ab07637d86a78168b7b73cae9d]:
+    #+RESULTS:
     : ['a', '', 'b']
 
 	分割字符串可为多个字符：
@@ -1379,7 +1379,7 @@
       'a<>b<>c'.split('<>')
     #+END_SRC
 
-    #+RESULTS[33b33bada493f7de1ed6647d21ee3c836d9e798a]:
+    #+RESULTS:
     : ['a', 'b', 'c']
 
 	如果指定sep参数，且字符串为空，则生成的链表只含一个空字符串；如果
@@ -1391,7 +1391,7 @@
       '  '.split()
     #+END_SRC
 
-    #+RESULTS[b85162feb08832b6c28a97bf67574d339a3ee9d8]:
+    #+RESULTS:
     : ['']
     : []
     : []
@@ -1408,7 +1408,7 @@
       '   1 2     3    '.split()
     #+END_SRC
 
-    #+RESULTS[d65caf767d58fa5c6226de706eca5a30559a7337]:
+    #+RESULTS:
     : ['1', '2', '3']
     : ['1', '2', '3']
     : ['1', '2 3']
@@ -1436,7 +1436,7 @@
       'ab c\n\rde fd\rkl\r\n'.splitlines()
     #+END_SRC
 
-    #+RESULTS[1c42d82d7f2c0863a3bfeb487066a2c2a0903cf4]:
+    #+RESULTS:
     : ['ab c', '', 'de fd', 'kl']
 
 	结果中如需包含各种换行符，可指定keppends：
@@ -1445,7 +1445,7 @@
       'ab c\n\rde fd\rkl\r\n'.splitlines(keepends=True)
     #+END_SRC
 
-    #+RESULTS[2d930a038874c7e68af164c122f10b1486d4341c]:
+    #+RESULTS:
     : ['ab c\n', '\r', 'de fd\r', 'kl\r\n']
 
 	不同于split()函数，如果指定sep参数，且原字符串为空，此函数返回空
@@ -1463,7 +1463,7 @@
       'One line\n'.splitlines()
     #+END_SRC
 
-    #+RESULTS[0fd7f2dcd3174d0153de510519a398d0e8bb1957]:
+    #+RESULTS:
     : []
     : ['One line']
 
@@ -1474,7 +1474,7 @@
       'One line\n'.split('\n')
     #+END_SRC
 
-    #+RESULTS[6acf371cf5b13cd57288971494c8aa7ec2578147]:
+    #+RESULTS:
     : ['']
     : ['One line', '']
 
@@ -1502,7 +1502,7 @@
       'www.google.com'.strip('w.com')
     #+END_SRC
 
-    #+RESULTS[b3c40593f07df6cabd71d2d402b00fe15408a6db]:
+    #+RESULTS:
     : 'google'
 
 *** str. *swapcase* ()
@@ -1525,7 +1525,7 @@
       s.swapcase().swapcase()
     #+END_SRC
 
-    #+RESULTS[9ef42a90cca670dcf9c3a8cc8bde065df5272eef]:
+    #+RESULTS:
     :
     : 'bANANA'
     : 'Banana'
@@ -1542,7 +1542,7 @@
       '我有一个梦想'.title()
     #+END_SRC
 
-    #+RESULTS[7d7209d1da419540555d154a16ff9b599355fb7c]:
+    #+RESULTS:
     : 'I Have A Dream'
     : '我有一个梦想'
 
@@ -1552,7 +1552,7 @@
       "they'are bill's friends from the UK".title()
     #+END_SRC
 
-    #+RESULTS[753ae2da13d282b4be40c7994280c574508a5b86]:
+    #+RESULTS:
     : "They'Are Bill'S Friends From The Uk"
 
 	可使用正则勉强解决：
@@ -1568,7 +1568,7 @@
       titlecase("they're bill's friends from UK")
     #+END_SRC
 
-    #+RESULTS[43e1ab81788234d1ee6c74f232252744b80b458d]:
+    #+RESULTS:
     :
     : >>> ... ... ... ... >>> "They're Bill's Friends From Uk"
 
@@ -1587,7 +1587,7 @@
       'this is a string example...wow!!!'.translate(tabtab)
     #+END_SRC
 
-    #+RESULTS[30a74361585819b3a712fbad0367d850c2f1723f]:
+    #+RESULTS:
     :
     : >>> >>> >>> {97: 49, 111: 52, 117: 53, 101: 50, 105: 51}
     : 'th3s 3s 1 str3ng 2x1mpl2...w4w!!!'
@@ -1605,7 +1605,7 @@
       s.translate({97: 1234})
     #+END_SRC
 
-    #+RESULTS[a3422bd0f199a8a6f2d5c42f92efeb5fc77d9f7f]:
+    #+RESULTS:
     :
     : 'A A'
     : 'a a'
@@ -1625,7 +1625,7 @@
       '测试'.upper().isupper()
     #+END_SRC
 
-    #+RESULTS[22cba8cf8d5aaa810d1aa66a8fc466f989b73b80]:
+    #+RESULTS:
     : False
     : True
     : False
@@ -1640,7 +1640,7 @@
       'claudio'.zfill(10)
     #+END_SRC
 
-    #+RESULTS[fdb203cebd9fb9bde71be632a5bc43a4d1fc46bb]:
+    #+RESULTS:
     : '00042'
     : '-0042'
     : '000claudio'
@@ -1682,7 +1682,7 @@
        print(len(a), len(b), len(c))
     #+END_SRC
     
-    #+RESULTS[848498726a295116d76664340e1ed999657f16dc]:
+    #+RESULTS:
     :
     : >>> >>> >>> b'a1\xe4\xb8\x80' bytearray(b'a1\xe4\xb8\x80') b'a1\xd2\xbb'
     : 5 5 4
@@ -1698,7 +1698,7 @@
       bytes('a1一', 'utf-8').decode('gb2312')
     #+END_SRC
     
-    #+RESULTS[9753a73ca632282e558aa0120784aff49e2df5e0]:
+    #+RESULTS:
     : 'a1一'
     : 'a1一'
     : >>> 'a1һ'
@@ -1713,7 +1713,7 @@
       b'1a一'
     #+END_SRC
     
-    #+RESULTS[baab11aded68f79c518a30e0adb803a53c2928d3]:
+    #+RESULTS:
     : b'1abc'
     : File "<stdin>", line 1
     : SyntaxError: bytes can only contain ASCII literal characters.
@@ -1742,7 +1742,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[d946bf1d3966287b06650151aadb692a02453eec]:
+    #+RESULTS:
     :
     : a\nb
     : >>> >>> a
@@ -1756,7 +1756,7 @@
       print(b)
     #+END_SRC
 
-    #+RESULTS[ce0d74ddc6eb34f89a941c2e7297926c3c7a3f09]:
+    #+RESULTS:
     :
     : b'a\\nb'
     : >>> >>> b'a\nb'
@@ -1783,7 +1783,7 @@
       chr(2 * 16 + 14)                # 16进制2e代表的字符
     #+END_SRC
 
-    #+RESULTS[f0a6caace8150a90d746b011cbf87001a3293549]:
+    #+RESULTS:
     : b''
     : b'\xff.\xf0\xf1\xf1'
     : '.'
@@ -1794,7 +1794,7 @@
       b'\x2e\xff'.hex()
     #+END_SRC
 
-    #+RESULTS[b887eb86a961598c396ed5555de416ada934079d]:
+    #+RESULTS:
     : '2eff'
 
 	与字符串对象不同的是，如果b为bytes对象，b[0]会返回整数，b[0:1]会返
@@ -1805,7 +1805,7 @@
       b'abc1'[0:1]
     #+END_SRC
 
-    #+RESULTS[e456ea1a3e4a4b020f60f330f1ed5028529be3a0]:
+    #+RESULTS:
     : 97
     : b'a'
 
@@ -1816,7 +1816,7 @@
       list(b'abc')
     #+END_SRC
     
-    #+RESULTS[18d791e2473a4717b786bc3ec7c9ab399fbd556d]:
+    #+RESULTS:
     : [97, 98, 99]
     
 ** Bytearray对象
@@ -1838,7 +1838,7 @@
       bytearray(b'abc').hex()
     #+END_SRC
     
-    #+RESULTS[f25622bd6cc957b56ae34802575eb18049982278]:
+    #+RESULTS:
     : bytearray(b'\xff.\xf0\xf1\xf1')
     : '616263'
     
@@ -1848,7 +1848,7 @@
       list(bytearray(b'abc'))
     #+END_SRC
     
-    #+RESULTS[17a60f9a3af17d02d885f04e2644ef32bf104a98]:
+    #+RESULTS:
     : [97, 98, 99]
     
 ** Bytes和bytearray操作符
@@ -1865,7 +1865,7 @@
      ba + a
    #+END_SRC
    
-   #+RESULTS[8c1fb8db2985fe0e751c7c9bfb11c2025f1c9f24]:
+   #+RESULTS:
    :
    : >>> >>> b'abc123'
    : bytearray(b'1231abc')
@@ -1882,7 +1882,7 @@
      b.replace(b'a', 'A')
    #+END_SRC
    
-   #+RESULTS[ffe67e7436899e0ccfed8472285792bdb49df2bf]:
+   #+RESULTS:
    :
    : >>> >>> 'Abc'
    : b'Abc'
@@ -1906,7 +1906,7 @@
       b.count(bytearray(b'a'))
     #+END_SRC
 
-    #+RESULTS[0c38d602277518715a68da77ce9edd4d1e05b338]:
+    #+RESULTS:
     :
     : >>> 3
     : 2
@@ -1928,7 +1928,7 @@
       b.decode('gb2312', 'strict')
     #+END_SRC
 
-    #+RESULTS[5da449004438bd4e775c5a74683cb697176aec86]:
+    #+RESULTS:
     :
     : b'\xe6\x88\x91\xe6\x98\xafclaudio'
     : '我是claudio'
@@ -1950,7 +1950,7 @@
       b.endswith((b'a', b'c', bytearray(b'1')))
     #+END_SRC
 
-    #+RESULTS[be33bec035e4781038ecf1fbbb02cba3ffe14602]:
+    #+RESULTS:
     :
     : True
     : False
@@ -1972,7 +1972,7 @@
       b.find(b'z')
     #+END_SRC
 
-    #+RESULTS[fd1b81f517aec1b80d4ae1024839cff1950bb0f8]:
+    #+RESULTS:
     :
     : 1
     : 1
@@ -1991,7 +1991,7 @@
       b.index(b'z')
     #+END_SRC
 
-    #+RESULTS[f46b03ac06bdb29074c197ab78d142cde261d91b]:
+    #+RESULTS:
     :
     : 1
     : 1
@@ -2012,7 +2012,7 @@
       b'a'.join([b'1', bytearray(b'2')])
     #+END_SRC
 
-    #+RESULTS[ce770386874acea807e03cd827b71dc2977f8c00]:
+    #+RESULTS:
     : b'1a2'
     : bytearray(b'1a2')
     : b'1a2'
@@ -2032,7 +2032,7 @@
       # print(outtab)
     #+END_SRC
 
-    #+RESULTS[52d5d800d6e22bbcc88f3454132132f8a4c9f568]:
+    #+RESULTS:
     :
     : ... ... >>> b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !"#$%&\'()*+,-./0abc456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff'
 
@@ -2051,7 +2051,7 @@
       b.partition('n')
     #+END_SRC
 
-    #+RESULTS[f66c939f804e036b68c4b452ef96b9ac075f6419]:
+    #+RESULTS:
     :
     : (b'ba', b'n', b'ana')
     : (b'banana', b'', b'')
@@ -2074,7 +2074,7 @@
       b.replace(b'a', b'A', 2)
     #+END_SRC
 
-    #+RESULTS[631503ec53cc6ddcd1ae2e2287c509b568bdc372]:
+    #+RESULTS:
     :
     : >>> >>> b'bAnAnA'
     : b'bAnAna'
@@ -2089,7 +2089,7 @@
       b'banana'.rfind(b'a')
     #+END_SRC
 
-    #+RESULTS[ab1d9b092390515e042f96800fbffd3b12acae48]:
+    #+RESULTS:
     : 5
 
 *** bytes. *rindex* (sub[,start[,end]])
@@ -2100,7 +2100,7 @@
       b'banana'.rindex(b'a')
     #+END_SRC
 
-    #+RESULTS[8981fe48ac5ebbf00c56e92434a754d28b93554f]:
+    #+RESULTS:
     : 5
 
 *** bytes. *rpartition* (sep)
@@ -2113,7 +2113,7 @@
       b'banana'.rpartition(b'z')
     #+END_SRC
 
-    #+RESULTS[64620ca198eebd551388a74cdef95aec1f9cca73]:
+    #+RESULTS:
     : (b'bana', b'n', b'a')
     : (b'', b'', b'banana')
 
@@ -2129,7 +2129,7 @@
       b'banana'.startswith((b'ba', b'baz'))
     #+END_SRC
 
-    #+RESULTS[eb8cc1fa898041d657807a4eeecc86375054bb5a]:
+    #+RESULTS:
     : True
     : True
 
@@ -2144,7 +2144,7 @@
       b'i have a dream!'.translate(bytes.maketrans(b'aeiou', b'AEIOU'))
     #+END_SRC
 
-    #+RESULTS[147409ce4bdc449e383c36dd4ab4e01d6f938891]:
+    #+RESULTS:
     : b'I hAvE A drEAm!'
 
     如果TABLE为None，则是仅删除元素：
@@ -2153,7 +2153,7 @@
       b'i have a dream!'.translate(None, b'aeiou')
     #+END_SRC
 
-    #+RESULTS[8b9ab85c12c61eded385c6461e3c55e2d34ac6e7]:
+    #+RESULTS:
     : b' hv  drm!'
 
 *** bytes. *center* (width[,fillbyte])
@@ -2172,7 +2172,7 @@
       b'banana'.center(0)
     #+END_SRC
 
-    #+RESULTS[bae3733368575798d333e733f8252d73e02ffc41]:
+    #+RESULTS:
     : b'  banana  '
     : b'||banana||'
     : b'banana'
@@ -2189,7 +2189,7 @@
       b'banana'.ljust(1)
     #+END_SRC
 
-    #+RESULTS[c200c11d607fcc058d5dc751551914d2c9edc6c6]:
+    #+RESULTS:
     : b'banana    '
     : b'banana||||'
     : b'banana'
@@ -2206,7 +2206,7 @@
       b'www.google.com'.lstrip(b'.wcom')
     #+END_SRC
 
-    #+RESULTS[5e9957d13da552d9e6351c4b81cbcb892654d374]:
+    #+RESULTS:
     : b'banana   '
     : b'google.com'
 
@@ -2220,7 +2220,7 @@
        b'banana'.rjust(1)
     #+END_SRC
 
-    #+RESULTS[a15af7d169fedb54b8067eb14f2067da25621e4f]:
+    #+RESULTS:
     : b'    banana'
     : b'||||banana'
     : b'banana'
@@ -2237,7 +2237,7 @@
       b'www.google.com'.rstrip(b'.wcom')
     #+END_SRC
 
-    #+RESULTS[a7f653d1aa116ea26971d32c6643cf95541aab72]:
+    #+RESULTS:
     : b'   banana'
     : b'www.google'
 
@@ -2253,7 +2253,7 @@
       b'www.google.com'.strip(b'.wcom')
     #+END_SRC
 
-    #+RESULTS[e323b44045a00507996b484308651ac380c01adf]:
+    #+RESULTS:
     : b'banana'
     : b'google'
 
@@ -2270,7 +2270,7 @@
       b'i have a dream!'.capitalize()
     #+END_SRC
 
-    #+RESULTS[067de7929dd22c6c491c51c02fb8dc21e8617fff]:
+    #+RESULTS:
     : b'I have a dream!'
 
 *** bytes. *expandtabs* (tabsize=8)
@@ -2282,7 +2282,7 @@
       b'01\t012\t0123\t01234'.expandtabs(4)
     #+END_SRC
 
-    #+RESULTS[1f9699cff994f739841006814d08f3243d007d7d]:
+    #+RESULTS:
     : b'01      012     0123    01234'
     : b'01  012 0123    01234'
 
@@ -2308,7 +2308,7 @@
       b''.isalnum()
     #+END_SRC
 
-    #+RESULTS[03d4840e58522c3ff9c5d618a9c8dd96ecd013e2]:
+    #+RESULTS:
     : True
     : False
     : False
@@ -2322,7 +2322,7 @@
       b'ABCabc1'.isalpha()
     #+END_SRC
 
-    #+RESULTS[63e061228b23e4fdf96024183a58b7892ddb6345]:
+    #+RESULTS:
     : True
     : False
 
@@ -2335,7 +2335,7 @@
       b'12.3'.isdigit()
     #+END_SRC
 
-    #+RESULTS[7f2b3ee224a4c398aeaa268cd96b8107b5b630e6]:
+    #+RESULTS:
     : True
     : False
 
@@ -2349,7 +2349,7 @@
       b'.'.islower()
     #+END_SRC
 
-    #+RESULTS[68627e842332f7c742bb5c6d8b4b8064dbb45bc1]:
+    #+RESULTS:
     : True
     : False
     : False
@@ -2368,7 +2368,7 @@
       b'Hello world'.istitle()
     #+END_SRC
 
-    #+RESULTS[92e0462ad3e3a897497c25b30eecc2563405ac9d]:
+    #+RESULTS:
     : True
     : False
 
@@ -2383,7 +2383,7 @@
       b'.'.isupper()
     #+END_SRC
 
-    #+RESULTS[e458e84ca2055831ef7d45b9f7edd805e53a30d2]:
+    #+RESULTS:
     : True
     : False
     : False
@@ -2397,7 +2397,7 @@
       b'Hello World'.lower()
     #+END_SRC
 
-    #+RESULTS[4c6f6c591b99ce338524ccd6a30b80244ce99cf5]:
+    #+RESULTS:
     : b'hello world'
 
 *** bytes. *splitlines* (keepends=False)
@@ -2409,7 +2409,7 @@
       b'ab c\n\nde fg\rkl\r\nmn'.splitlines()
     #+END_SRC
 
-    #+RESULTS[7e0f5845314c3277d769ecd0e71369821e467715]:
+    #+RESULTS:
     : [b'ab c', b'', b'de fg', b'kl', b'mn']
 
     如果要保留换行符，可指定KEEPENDS参数为True：
@@ -2418,7 +2418,7 @@
       b'ab c\n\nde fg\rkl\r\nmn'.splitlines(keepends=True)
     #+END_SRC
 
-    #+RESULTS[702b6db16629067811004483252cf49ff98e4c80]:
+    #+RESULTS:
     : [b'ab c\n', b'\n', b'de fg\r', b'kl\r\n', b'mn']
 
     与split方法不同，对于空字符串此方法返回空链表：
@@ -2428,7 +2428,7 @@
       b''.splitlines(), b'One line\n'.splitlines()
     #+END_SRC
 
-    #+RESULTS[2bf40baae7050e181ee5681642a516314ae440eb]:
+    #+RESULTS:
     : ([b''], [b'Two lines', b''])
     : ([], [b'One line'])
 
@@ -2440,7 +2440,7 @@
       b'Hello World'.swapcase()
     #+END_SRC
 
-    #+RESULTS[1a6dd25caeb08f03c9a65704892ebce94a9e31c7]:
+    #+RESULTS:
     : b'hELLO wORLD'
 
     *注意* ：不同于str.swapcase()：
@@ -2458,7 +2458,7 @@
       b'hello world'.title()
     #+END_SRC
 
-    #+RESULTS[bdafb952ad15cceb90d15bc96703872af5b1f15c]:
+    #+RESULTS:
     : b'Hello World'
 
     此方法的算法仅是将连续字母作为单词，不能通用，如：
@@ -2467,7 +2467,7 @@
       b"they're bill's firends from the UK".title()
     #+END_SRC
 
-    #+RESULTS[1e881816ebb27eedcac3e49c467698de5fa2d6b5]:
+    #+RESULTS:
     : b"They'Re Bill'S Firends From The Uk"
 
     可使用正则大致修复：
@@ -2484,7 +2484,7 @@
       titlecase(b"they'are bill's friends from UK.")
     #+END_SRC
 
-    #+RESULTS[853b00c6a51a260ebf749297803170f9d503bb8b]:
+    #+RESULTS:
     :
     : >>> >>> ... ... ... ... ... >>> >>> b"They'are Bill's Friends From Uk."
 
@@ -2496,7 +2496,7 @@
       b'Hello, World'.upper()
     #+END_SRC
 
-    #+RESULTS[ea1adac72e687af6f2bf119cf97fdcd0c240d0b3]:
+    #+RESULTS:
     : b'HELLO, WORLD'
 
 *** bytes. *zfill* (width)
@@ -2511,7 +2511,7 @@
       b'-42'.zfill(6)
     #+END_SRC
 
-    #+RESULTS[b172afe84921d69bd78fad3e8fdc26e6c7d9f52b]:
+    #+RESULTS:
     : b'000042'
     : b'-00042'
 
@@ -2522,7 +2522,7 @@
            {b'language': b'Python', b'number': 2})
    #+END_SRC
 
-   #+RESULTS[6a760f6a28f9065b3d9105090c3f3acc3e6358b1]:
+   #+RESULTS:
    :
    : b'Python hash 002 quete types.'
 
@@ -2547,7 +2547,7 @@
       b
     #+END_SRC
     
-    #+RESULTS[c1c892b196daf3801846c0ca2fd6da47f3e7131b]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> >>> bytearray(b'abcdefg')
     : bytearray(b'bb')
@@ -2569,7 +2569,7 @@
       mb.tobytes()
     #+END_SRC
     
-    #+RESULTS[ca75b35e9866dc79fe404515b992d4ef4e83b03f]:
+    #+RESULTS:
     :
     : >>> True
     : >>> >>> >>> >>> >>> False
@@ -2586,7 +2586,7 @@
       struct.unpack('!BB', mv[:2])
     #+END_SRC
     
-    #+RESULTS[371c79b6ad01428e2c5e7985bd6945a93cc30230]:
+    #+RESULTS:
     :
     : >>> >>> (49, 50)
     
@@ -2612,7 +2612,7 @@
       len(m), m.itemsize
     #+END_SRC
 
-    #+RESULTS[5082e229bae9ad245ec196b3f40f7fc12f9b713d]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> 1
     : []
@@ -2628,7 +2628,7 @@
       bytes(v[1:4])
     #+END_SRC
 
-    #+RESULTS[a9028679c859d0e4f647abc666e156e9e2e5eef0]:
+    #+RESULTS:
     :
     : 98
     : 103
@@ -2650,7 +2650,7 @@
       data, v.tobytes()
     #+END_SRC
 
-    #+RESULTS[81d60fdf8bdaedfc8122daf23dc1516f8ef43bfc]:
+    #+RESULTS:
     :
     : >>> >>> False
     : >>> (bytearray(b'zbcdefg'), b'zbcdefg')
@@ -2671,7 +2671,7 @@
        x == y
      #+END_SRC
 
-     #+RESULTS[2313e696f45e3e734b389337ef559f77d3e13595]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> >>> >>> True
 
@@ -2692,7 +2692,7 @@
        a == a
      #+END_SRC
 
-     #+RESULTS[5ae769c5841bbfc419f8612abf6b2dd8abe3311c]:
+     #+RESULTS:
      :
      : >>> >>> ... ... >>> >>> >>> >>> >>> False
      : False
@@ -2709,7 +2709,7 @@
        bytes(m)
      #+END_SRC
      
-     #+RESULTS[3418f9e79a7f31e2c0f4c168ac4d4e0daf664fba]:
+     #+RESULTS:
      :
      : b'abc'
      : b'abc'
@@ -2723,7 +2723,7 @@
        bytes.fromhex(m.hex())
      #+END_SRC
      
-     #+RESULTS[20295c723328fd3f5c60059475ba93b4e505c964]:
+     #+RESULTS:
      :
      : '616263'
      : b'abc'
@@ -2741,7 +2741,7 @@
        m.tolist()
      #+END_SRC
      
-     #+RESULTS[56e4a91855c5afff65fb1cfb0cd6d71ae7f63bd4]:
+     #+RESULTS:
      :
      : >>> [97, 98, 99]
      : >>> >>> >>> [1.1, 2.2, 3.3]
@@ -2763,7 +2763,7 @@
        print(b)
      #+END_SRC
      
-     #+RESULTS[b893fab646a87a1269b4555431d20c3a06b27694]:
+     #+RESULTS:
      :
      : >>> ... >>> Traceback (most recent call last): 
      :   File "<stdin>", line 1, in <module>
@@ -2780,7 +2780,7 @@
        m[0]
      #+END_SRC
      
-     #+RESULTS[7c4a8ae52af4353ab2b74c136ff665998c69cc84]:
+     #+RESULTS:
      :
      : 97
      : >>> >>> Traceback (most recent call last): 
@@ -2797,7 +2797,7 @@
        m[0]
      #+END_SRC
      
-     #+RESULTS[6ae2b69926c4549141d0dd69f4eb917f046b7445]:
+     #+RESULTS:
      :
      : ... 97
      : Traceback (most recent call last): 
@@ -2830,7 +2830,7 @@
       m1.format, m1.itemsize, len(m1), m1.nbytes
      #+END_SRC
 
-     #+RESULTS[113bede3effa1e93792a64dc9da6056cf7eced99]:
+     #+RESULTS:
     :
     : >>> >>> >>> b'\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
     : ('l', 8, 3, 24)
@@ -2849,7 +2849,7 @@
        print(b)
      #+END_SRC
      
-     #+RESULTS[0ce2002c9c7e4fa8a31f24a1ee2b8986f1c96034]:
+     #+RESULTS:
      :
      : >>> ... >>> >>> >>> bytearray(b'Xbc')
      
@@ -2868,7 +2868,7 @@
       m.format, m.itemsize, m.ndim, len(m), m.nbytes
      #+END_SRC
      
-     #+RESULTS[801de728b7c0b43f5c7dd7636579f21eebd8e9ac]:
+     #+RESULTS:
     :
     : >>> >>> >>> >>> [[[0, 1, 2], [3, 4, 5]], [[6, 7, 8], [9, 10, 11]]]
     : ('i', 4, 3, 2, 48)
@@ -2889,7 +2889,7 @@
        m.ndim, m.nbytes
      #+END_SRC
      
-     #+RESULTS[7ef5493f0b91c7a0a24e88065645686aa9804589]:
+     #+RESULTS:
      :
      : >>> >>> [0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0]
      : (1, 24)
@@ -2908,7 +2908,7 @@
        memoryview(b'xyz').obj
      #+END_SRC
 
-     #+RESULTS[e8e145a1eb99573865f7dcca4614b94265dbfb3a]:
+     #+RESULTS:
      :
      : >>> True
      : >>> b'xyz'
@@ -2930,7 +2930,7 @@
        y.tobytes()
      #+END_SRC
 
-     #+RESULTS[dcf44f7928f8ff2f83b659d50546e86360dc0cb6]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> (5, 20)
      : >>> >>> (3, 12)
@@ -2951,7 +2951,7 @@
        len(y), y.nbytes
      #+END_SRC
 
-     #+RESULTS[fda5df420e910818a3e668615bf721ef294c26d7]:
+     #+RESULTS:
      :
      : >>> >>> b'abcdefghijkl'
      : >>> >>> >>> [[97, 98, 99, 100], [101, 102, 103, 104], [105, 106, 107, 108]]
@@ -2971,7 +2971,7 @@
        a.readonly, b.readonly, c.readonly
      #+END_SRC
      
-     #+RESULTS[752b0e677dec3793eb7a3352b0f483d29a6f8454]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> >>> (True, False, False)
 
@@ -2992,7 +2992,7 @@
        m.format
      #+END_SRC
 
-     #+RESULTS[35cae04c64fec21b827ea057a0483ff5346fd42e]:
+     #+RESULTS:
      :
      : >>> >>> >>> 'B'
      : >>> >>> 'B'
@@ -3014,7 +3014,7 @@
        m.itemsize
      #+END_SRC
      
-     #+RESULTS[404c722aa9a5df86c9e2e10611586818aba3f465]:
+     #+RESULTS:
      :
      : >>> >>> (2, 1000)
      : True
@@ -3038,7 +3038,7 @@
        m.ndim
      #+END_SRC
 
-     #+RESULTS[ebd0e1ca3e2f93f1274acebb5c00e03a413fc89d]:
+     #+RESULTS:
      :
      : >>> >>> >>> 1
      : >>> >>> 1
@@ -3066,7 +3066,7 @@
        m.shape
      #+END_SRC
 
-     #+RESULTS[c033c0c23dc254ebcc51e2002a25c82a4622bd05]:
+     #+RESULTS:
      :
      : >>> >>> >>> (3,)
      : >>> >>> (0,)
@@ -3091,7 +3091,7 @@
        m.strides
      #+END_SRC
 
-     #+RESULTS[ffd9ac7405caddf578da59410de45268d6155b97]:
+     #+RESULTS:
      :
      : >>> >>> >>> (4,)
      : >>> >>> >>> >>> [[0, 1, 2], [3, 4, 5]]
@@ -3111,7 +3111,7 @@
        m.suboffsets
      #+END_SRC
 
-     #+RESULTS[39e91b8f6c0aded9dbc4ed2cab8f323e2d8a42fd]:
+     #+RESULTS:
      :
      : >>> >>> >>> ()
      : >>> >>> >>> ()
@@ -3135,7 +3135,7 @@
        m.contiguous
      #+END_SRC
 
-     #+RESULTS[94c1df69a64fe2d11466a46f29ecee366e449d30]:
+     #+RESULTS:
      :
      : >>> >>> True
      : >>> >>> ... >>> >>> True
@@ -3147,7 +3147,7 @@
        memoryview(b'abc').c_contiguous
      #+END_SRC
 
-     #+RESULTS[d79b6ffa0d3f6e8fe1693e045559bc51e725c5c2]:
+     #+RESULTS:
      : True
 
 **** *f_contiguous*
@@ -3164,7 +3164,7 @@
        memoryview(s).f_contiguous
      #+END_SRC
 
-     #+RESULTS[ffddbd152879d78363c97c65f769b866a8fe5dab]:
+     #+RESULTS:
      :
      : >>> True
      : >>> >>> True
@@ -3201,7 +3201,7 @@
      set(), frozenset()
    #+END_SRC
 
-   #+RESULTS[63de2b9bfd88afbfff1170d3cb9f2aa4308cfaa8]:
+   #+RESULTS:
    :
    : ({1, 2}, frozenset({1, 2}))
    : (set(), frozenset())
@@ -3214,7 +3214,7 @@
       len(set([1, 2, 3, 1, 2]))
     #+END_SRC
 
-    #+RESULTS[9613d60a78f5e5028ae3966f175a3ab4b8d231bd]:
+    #+RESULTS:
     : 3
 
 *** *x in s*
@@ -3225,7 +3225,7 @@
       10 in set([1, 2, 1, 2])
     #+END_SRC
 
-    #+RESULTS[b9f55b0f64d4f744b27372a48ad374dd2f90d489]:
+    #+RESULTS:
     : True
     : False
 
@@ -3237,7 +3237,7 @@
       10 not in set([1, 2, 1, 2])
     #+END_SRC
 
-    #+RESULTS[4fc9fa3c0766cb1ae25cb33b06e48e2c04171d83]:
+    #+RESULTS:
     : False
     : True
 
@@ -3251,7 +3251,7 @@
       s.isdisjoint(range(3, 10))
     #+END_SRC
 
-    #+RESULTS[42a977d90f9d7485cdaaba926734b0b5d5d3f995]:
+    #+RESULTS:
     :
     : True
     : False
@@ -3269,7 +3269,7 @@
       s <= set(range(2))
     #+END_SRC
 
-    #+RESULTS[c5412fb90efe18e7f10db9b4f09e32ec3f6dcea7]:
+    #+RESULTS:
     :
     : True
     : True
@@ -3283,7 +3283,7 @@
       set(range(2)) < set(range(2))
     #+END_SRC
 
-    #+RESULTS[8d773d302f84fe8e78a9d3e8e6e3a2ee6adac4bd]:
+    #+RESULTS:
     : True
     : False
 
@@ -3300,7 +3300,7 @@
       s >= set(range(3))
     #+END_SRC
 
-    #+RESULTS[97353492929c65f232551911b3c6a5dec72082dc]:
+    #+RESULTS:
     :
     : True
     : True
@@ -3315,7 +3315,7 @@
       set([1, 2, 3]) > set([1, 2])
     #+END_SRC
 
-    #+RESULTS[e01dcbef4f65620914ccf3c7252bddbc66534c7f]:
+    #+RESULTS:
     : False
     : True
 
@@ -3331,7 +3331,7 @@
       s | s1 | s2
     #+END_SRC
 
-    #+RESULTS[1b782b943963bc7111700919974022dccbd63327]:
+    #+RESULTS:
     :
     : >>> >>> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
     : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -3348,7 +3348,7 @@
       s & s1 & s2
     #+END_SRC
 
-    #+RESULTS[49ae4ce78b4cbf10dc184cd20bab4b5037e19ed6]:
+    #+RESULTS:
     :
     : >>> >>> {2}
     : {2}
@@ -3366,7 +3366,7 @@
       s - s1 - s2
     #+END_SRC
 
-    #+RESULTS[c65fb9e62f01e71da0050bc1b84203c021d1bdb4]:
+    #+RESULTS:
     :
     : >>> >>> >>> {0}
     : {0}
@@ -3383,7 +3383,7 @@
       s1 ^ s2
     #+END_SRC
 
-    #+RESULTS[c3b212af11caa3361aa98501f02ceaed52bb3b4b]:
+    #+RESULTS:
     :
     : >>> >>> {5, 6, 7, 8, 9}
     : {5, 6, 7, 8, 9}
@@ -3397,7 +3397,7 @@
       s1, s1 is s
     #+END_SRC
     
-    #+RESULTS[4e5a92d18bebd6d69460a738698ae96f238884aa]:
+    #+RESULTS:
     :
     : >>> >>> ({1, 2, 3, (4, 5, 6)}, False)
     
@@ -3415,7 +3415,7 @@
         set([1, 2, 3]) > set([1, 2])
       #+END_SRC
       
-      #+RESULTS[b404bbafe937d8a38e47bdbef40fec0f32ec3790]:
+      #+RESULTS:
       : True
       : True
       
@@ -3426,7 +3426,7 @@
          set('abc') in set([frozenset('abc')])
       #+END_SRC
       
-      #+RESULTS[89677d60a682dc2b1aa99bc0ef7d803459e38172]:
+      #+RESULTS:
       : True
       : True
       
@@ -3451,7 +3451,7 @@
         print(l)
       #+END_SRC
 
-      #+RESULTS[a49c1f4784f0e33df5da49ac5645f14471d91358]:
+      #+RESULTS:
       :
       : >>> [1, 2, 3]
       : >>> >>> >>> [{1, 2}, {3, 4}, {4, 5}]
@@ -3464,7 +3464,7 @@
         frozenset('ab') | set('bc')
       #+END_SRC
 
-      #+RESULTS[2a165e4c07c3b514b14519f53e203de0296f27ab]:
+      #+RESULTS:
       : {'a', 'b', 'c'}
       : frozenset({'a', 'b', 'c'})
 
@@ -3483,7 +3483,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[f2edb8a066b7e961c8638a70c4cc9d0f7963e40d]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> ... {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
@@ -3499,7 +3499,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[0108a6063f146cd253e6fbd143e80ac87bcb82da]:
+    #+RESULTS:
     :
     : >>> >>> ... {2}
 
@@ -3515,7 +3515,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[254712a38f7ae21a3530e68b8f1972a869840d3f]:
+    #+RESULTS:
     :
     : >>> >>> ... {0, 1}
 
@@ -3531,7 +3531,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[ebeff3199e76d1e178cf1be9cf008ebb8037df5d]:
+    #+RESULTS:
     :
     : >>> ... >>> {3}
 
@@ -3544,7 +3544,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[164d55787c9b6c38edeed4f9c86079add8772c2e]:
+    #+RESULTS:
     :
     : >>> {1, 2, 3, 4}
 
@@ -3558,7 +3558,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[6c3012fb765127ce811241d0e9b21aa040430c08]:
+    #+RESULTS:
     :
     : >>> {2, 3}
     : Traceback (most recent call last):
@@ -3577,7 +3577,7 @@
       print(s)
     #+END_SRC
 
-    #+RESULTS[84cd8f9a6f002576bb1e6f6adebe66c814c46c7c]:
+    #+RESULTS:
     :
     : >>> {2, 3}
     : >>> {2, 3}
@@ -3592,7 +3592,7 @@
           print(s.pop(), s)
     #+END_SRC
 
-    #+RESULTS[5163984fb033f12492031e8f59c87773ac113ed9]:
+    #+RESULTS:
     :
     : ... ... 1 {2, 3}
     : 2 {3}
@@ -3610,7 +3610,7 @@
       print(s)
     #+END_SRC
     
-    #+RESULTS[adfb057e204c950a4bc0c63dab9c0d41ef46dd7c]:
+    #+RESULTS:
     :
     : >>> set()
     
@@ -3665,7 +3665,7 @@
      a == b == c == d == e
    #+END_SRC
    
-   #+RESULTS[6e9e0b8dd1d9e321b87fc3c7593b320b1bf16d46]:
+   #+RESULTS:
    :
    : >>> >>> >>> >>> >>> True
    
@@ -3680,7 +3680,7 @@
       len(d)
     #+END_SRC
 
-    #+RESULTS[2dd6e204a93d6a4c18875d24a72496b1993f0b53]:
+    #+RESULTS:
     :
     : 3
 
@@ -3694,7 +3694,7 @@
       d['A']
     #+END_SRC
 
-    #+RESULTS[45733b4152773b1781074b5e8ee2879873763b2d]:
+    #+RESULTS:
     :
     : >>> 1
     : Traceback (most recent call last):
@@ -3716,7 +3716,7 @@
       c['blue']
     #+END_SRC
 
-    #+RESULTS[c032d9a3f092881b927acf8f4059538bae2dd136]:
+    #+RESULTS:
     :
     : ... ... >>> >>> >>> 0
     : >>> >>> 1
@@ -3734,7 +3734,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[44b9c50878a2e79a1caa96b4789ef906f885fb4f]:
+    #+RESULTS:
     :
     : >>> >>> {'a': 10, 'b': 2, 'c': 3}
     : >>> >>> {'a': 10, 'd': 4, 'b': 2, 'c': 3}
@@ -3751,7 +3751,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[4a45e5f23fbd8a16de7b0cf40a4344995a3df46b]:
+    #+RESULTS:
     :
     : >>> {'b': 2, 'c': 3}
     : >>> Traceback (most recent call last):
@@ -3767,7 +3767,7 @@
       'a' in d, 'A' in d
     #+END_SRC
 
-    #+RESULTS[25b6e0424eaf0dadeb034be74b0fe99793b3b262]:
+    #+RESULTS:
     :
     : (True, False)
 
@@ -3787,7 +3787,7 @@
       list(i1), list(i2)
     #+END_SRC
 
-    #+RESULTS[d6188383cf7c13b8d003ace4ba2911f37c751ebd]:
+    #+RESULTS:
     :
     : >>> >>> >>> <dict_keyiterator object at 0x7f22c154b818>
     : <dict_keyiterator object at 0x7f22c1544098>
@@ -3803,7 +3803,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[a3a855600237f696408dde8bdde97452266395c3]:
+    #+RESULTS:
     :
     : >>> >>> {}
 
@@ -3820,7 +3820,7 @@
       print(d1)
     #+END_SRC
 
-    #+RESULTS[9ae101171c8349407999491bea80a1453e3641a4]:
+    #+RESULTS:
     :
     : >>> {'a': [1, 2, 3], 'b': (4, 5, 6)}
     : >>> >>> {'a': [1, 2, 3, 4], 'b': (4, 5, 6)}
@@ -3836,7 +3836,7 @@
       dict.fromkeys('abc', [1, 2])
     #+END_SRC
 
-    #+RESULTS[588fce7b98136278796dcb8a785a7460f8ae95b5]:
+    #+RESULTS:
     : {'a':    None, 'b': None, 'c': None}
     : {'a':    [1, 2], 'b': [1, 2], 'c': [1, 2]}
 
@@ -3852,7 +3852,7 @@
       print(d.get('A'))
     #+END_SRC
 
-    #+RESULTS[a363d6b5554bbe048ab78a5eac4d82fddae856a4]:
+    #+RESULTS:
     :
     : >>> 1
     : 100
@@ -3869,7 +3869,7 @@
       type(x)
     #+END_SRC
 
-    #+RESULTS[9791e75308de1b93862e8f11df090906cdde07ae]:
+    #+RESULTS:
     :
     : >>> >>> dict_items([('a', 1), ('b', 2), ('c', 3)])
     : <class 'dict_items'>
@@ -3884,7 +3884,7 @@
       type(x)
     #+END_SRC
 
-    #+RESULTS[b568db3a6e2e98d1cefbb8ef59e351d3cb697144]:
+    #+RESULTS:
     :
     : >>> dict_keys(['a', 'b', 'c'])
     : <class 'dict_keys'>
@@ -3904,7 +3904,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[465a7cbdc4bde64f6c33e8e49a840c4a204f3746]:
+    #+RESULTS:
     :
     : >>> 1
     : 100
@@ -3924,7 +3924,7 @@
       d.popitem()
     #+END_SRC
 
-    #+RESULTS[62eb195a939bab78d6c9e38f9730c3a8a3c24821]:
+    #+RESULTS:
     :
     : ('a', 1)
     : ('b', 2)
@@ -3951,7 +3951,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[0b9d472cbcc5ca4b8ee81ecb674aae0ea3627983]:
+    #+RESULTS:
     :
     : >>> 1
     : {'a': 1, 'b': 2, 'c': 3}
@@ -3987,7 +3987,7 @@
       print(d)
     #+END_SRC
 
-    #+RESULTS[ab0db07d040c5d35425024ada5dfb2f01947d60f]:
+    #+RESULTS:
     :
     : >>> ... >>> {'a': 100, 'b': 2, 'c': 3}
     : ... >>> {'e': 4, 'a': 100, 'f': 5, 'b': 2, 'c': 3}
@@ -4003,7 +4003,7 @@
       d.values()
     #+END_SRC
 
-    #+RESULTS[d819a119acea0fea8e041e5ef92f63edf875f5fe]:
+    #+RESULTS:
     :
     : >>> dict_values([1, 2, 3])
 
@@ -4021,7 +4021,7 @@
       len(d.keys()), len(d)
     #+END_SRC
 
-    #+RESULTS[1c52c1299998cc326111eacbc9812cc38278d5c9]:
+    #+RESULTS:
     :
     : (3, 3)
 
@@ -4047,7 +4047,7 @@
           print(item)
     #+END_SRC
 
-    #+RESULTS[0f20d8d0266efcb8e933b2dc9205c2802325ed76]:
+    #+RESULTS:
     #+begin_example
 
     >>> >>> >>> >>> (<class 'dict_keyiterator'>, <class 'dict_valueiterator'>, <class 'dict_itemiterator'>)
@@ -4074,7 +4074,7 @@
       print(pairs2)
     #+END_SRC
 
-    #+RESULTS[2bb1c2257851e413af4bb218c48ad49af77b7657]:
+    #+RESULTS:
     :
     : >>> >>> [(1, 'a'), (2, 'b'), (3, 'c')]
     : [('a', 1), ('b', 2), ('c', 3)]
@@ -4094,7 +4094,7 @@
       ('a', 1) in d.items()
     #+END_SRC
 
-    #+RESULTS[f88f0a059db876d9d14d7c767177772d4dcdf878]:
+    #+RESULTS:
     :
     : >>> True
     : True
@@ -4115,7 +4115,7 @@
      d1.items() | d2.items()
     #+END_SRC
 
-    #+RESULTS[6a6001bf76540a0898f4747c1cc87430addf38db]:
+    #+RESULTS:
    :
    : >>> >>> {'b'}
    : {'a', 'b', 'e', 'c', 'f'}
@@ -4150,7 +4150,7 @@
       keys ^ {'sausage', 'juice'}
     #+END_SRC
 
-    #+RESULTS[71beae3d361bc0a7947a9b2e6c22dd4274f544f8]:
+    #+RESULTS:
     :
     : >>> >>> >>> ... >>> ... ... >>> 504
     : >>> ... ['sausage', 'eggs', 'bacon', 'spam']
@@ -4182,7 +4182,7 @@
          print(x)
    #+END_SRC
 
-   #+RESULTS[fd634b03f7cf2878cc80b10f83746dbb5f059e3c]:
+   #+RESULTS:
    :
    : ... ... ... ... ... >>> >>> ... ... ... enter
    : within with
@@ -4213,7 +4213,7 @@
          1 / 0
    #+END_SRC
    
-   #+RESULTS[3102b035beb49a1d816cd396b3f479674785eed1]:
+   #+RESULTS:
    #+begin_example
    
    ... ... ... ... ... ... ... ... >>> >>> ... ... ... enter
@@ -4256,7 +4256,7 @@
          1 / 0
    #+END_SRC
    
-   #+RESULTS[cb05f44472c83f8ac1e23b63b358bf357938efe7]:
+   #+RESULTS:
    #+begin_example
    
    ... ... ... ... ... ... ... ... ... >>> >>> ... ... 1.0
@@ -4322,7 +4322,7 @@
          1 / 0
    #+END_SRC
    
-   #+RESULTS[46fd8c34e5daf36d3cce74cb1e4a6892df5643fa]:
+   #+RESULTS:
    #+begin_example
 
    ... ... ... ... ... ... ... ... ... >>> >>> ... ... Traceback (most recent call last):
@@ -4354,7 +4354,7 @@
      print(int.x)
    #+END_SRC
 
-   #+RESULTS[0f50cb3dba0c21eef13efafbad49581600ebabb2]:
+   #+RESULTS:
    :
    : >>> >>> 1
    : >>> Traceback (most recent call last):
@@ -4377,7 +4377,7 @@
      int.__dict__ = {}
    #+END_SRC
 
-   #+RESULTS[8d4c8d38b65e71c19368b98f09d1d28db694aef1]:
+   #+RESULTS:
    #+begin_example
    {'__xor__': <slot wrapper '__xor__' of 'int' objects>, '__float__': <slot wrapper '__float__' of 'int' objects>, '__mul__': <slot wrapper '__mul__' of 'int' objects>, '__or__': <slot wrapper '__or__' of 'int' objects>, '__format__': <method '__format__' of 'int' objects>, '__index__': <slot wrapper '__index__' of 'int' objects>, '__bool__': <slot wrapper '__bool__' of 'int' objects>, 'real': <attribute 'real' of 'int' objects>, 'numerator': <attribute 'numerator' of 'int' objects>, '__pos__': <slot wrapper '__pos__' of 'int' objects>, 'bit_length': <method 'bit_length' of 'int' objects>, '__rxor__': <slot wrapper '__rxor__' of 'int' objects>, '__rsub__': <slot wrapper '__rsub__' of 'int' objects>, 'denominator': <attribute 'denominator' of 'int' objects>, '__lt__': <slot wrapper '__lt__' of 'int' objects>, '__int__': <slot wrapper '__int__' of 'int' objects>, 'conjugate': <method 'conjugate' of 'int' objects>, '__new__': <built-in method __new__ of type object at 0x5601af4729a0>, '__round__': <method '__round__' of 'int' objects>, '__rfloordiv__': <slot wrapper '__rfloordiv__' of 'int' objects>, '__rand__': <slot wrapper '__rand__' of 'int' objects>, '__eq__': <slot wrapper '__eq__' of 'int' objects>, '__rmod__': <slot wrapper '__rmod__' of 'int' objects>, '__hash__': <slot wrapper '__hash__' of 'int' objects>, '__rtruediv__': <slot wrapper '__rtruediv__' of 'int' objects>, '__le__': <slot wrapper '__le__' of 'int' objects>, '__floordiv__': <slot wrapper '__floordiv__' of 'int' objects>, '__and__': <slot wrapper '__and__' of 'int' objects>, '__abs__': <slot wrapper '__abs__' of 'int' objects>, '__rdivmod__': <slot wrapper '__rdivmod__' of 'int' objects>, '__divmod__': <slot wrapper '__divmod__' of 'int' objects>, '__radd__': <slot wrapper '__radd__' of 'int' objects>, '__floor__': <method '__floor__' of 'int' objects>, '__trunc__': <method '__trunc__' of 'int' objects>, '__ror__': <slot wrapper '__ror__' of 'int' objects>, '__repr__': <slot wrapper '__repr__' of 'int' objects>, '__mod__': <slot wrapper '__mod__' of 'int' objects>, '__ge__': <slot wrapper '__ge__' of 'int' objects>, '__add__': <slot wrapper '__add__' of 'int' objects>, '__rmul__': <slot wrapper '__rmul__' of 'int' objects>, '__getnewargs__': <method '__getnewargs__' of 'int' objects>, '__str__': <slot wrapper '__str__' of 'int' objects>, '__gt__': <slot wrapper '__gt__' of 'int' objects>, '__ne__': <slot wrapper '__ne__' of 'int' objects>, '__sub__': <slot wrapper '__sub__' of 'int' objects>, '__doc__': "int(x=0) -> integer\nint(x, base=10) -> integer\n\nConvert a number or string to an integer, or return 0 if no arguments\nare given.  If x is a number, return x.__int__().  For floating point\nnumbers, this truncates towards zero.\n\nIf x is not a number or if base is given, then x must be a string,\nbytes, or bytearray instance representing an integer literal in the\ngiven base.  The literal can be preceded by '+' or '-' and be surrounded\nby whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\nBase 0 means to interpret the base from the string as an integer literal.\n>>> int('0b100', base=0)\n4", 'from_bytes': <method 'from_bytes' of 'int' objects>, '__truediv__': <slot wrapper '__truediv__' of 'int' objects>, '__pow__': <slot wrapper '__pow__' of 'int' objects>, '__ceil__': <method '__ceil__' of 'int' objects>, '__getattribute__': <slot wrapper '__getattribute__' of 'int' objects>, 'imag': <attribute 'imag' of 'int' objects>, '__invert__': <slot wrapper '__invert__' of 'int' objects>, '__lshift__': <slot wrapper '__lshift__' of 'int' objects>, 'to_bytes': <method 'to_bytes' of 'int' objects>, '__rrshift__': <slot wrapper '__rrshift__' of 'int' objects>, '__rpow__': <slot wrapper '__rpow__' of 'int' objects>, '__rshift__': <slot wrapper '__rshift__' of 'int' objects>, '__sizeof__': <method '__sizeof__' of 'int' objects>, '__rlshift__': <slot wrapper '__rlshift__' of 'int' objects>, '__neg__': <slot wrapper '__neg__' of 'int' objects>}
    Traceback (most recent call last):
@@ -4399,7 +4399,7 @@
      print(int)
    #+END_SRC
 
-   #+RESULTS[3facface457b44f2d19c1d2ea6884535081ff798]:
+   #+RESULTS:
    :
    : <module 'contextlib' from '/usr/lib/python3.5/contextlib.py'>
    : <class 'int'>
@@ -4428,7 +4428,7 @@
      b.upper.__self__ is b
      #+END_SRC
      
-     #+RESULTS[884f4cc8fa51ebbaa531416d8e74d0c25eb919fe]:
+     #+RESULTS:
      :
      : >>> True
      
@@ -4454,7 +4454,7 @@
        t.hello.__func__(t.hello.__self__)
      #+END_SRC
 
-     #+RESULTS[ae42fecf6027c54b26beb98e4674a9c3a8263031]:
+     #+RESULTS:
      :
      : <built-in method upper of bytes object at 0x7f0c785f9fd0>
      : >>> Traceback (most recent call last):
@@ -4480,7 +4480,7 @@
      c.method.whoami
    #+END_SRC
 
-   #+RESULTS[96ff08f13c7af393ba49671d0806aacaf63e4d17]:
+   #+RESULTS:
    :
    : ... ... >>> >>> >>> Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -4502,7 +4502,7 @@
      type(c)
    #+END_SRC
 
-   #+RESULTS[8276cd3ce13c3d82d2750e54c27d1797bee933f2]:
+   #+RESULTS:
    : <class 'int'>
    : >>> ... ... >>> >>> <class '__main__.C'>
 
@@ -4517,7 +4517,7 @@
      type(None)() is None
    #+END_SRC
 
-   #+RESULTS[019e5cae46f5a9bb9482d4a186ffff7f3c7b5abc]:
+   #+RESULTS:
    :
    : ... >>> >>> <class 'NoneType'>
    : True
@@ -4529,7 +4529,7 @@
      type(Ellipsis)()
    #+END_SRC
 
-   #+RESULTS[60a9cf5ed93f08a38d23eee82c39aec72082ca78]:
+   #+RESULTS:
    : Ellipsis
 
 ** 未实现对象（The Nonimplemented Objects）
@@ -4542,7 +4542,7 @@
      bool([1])
    #+END_SRC
 
-   #+RESULTS[c94d2c95563cfa191280ff23ee12b079c0946f4a]:
+   #+RESULTS:
    : False
    : True
 
@@ -4559,7 +4559,7 @@
      f.__dict__
    #+END_SRC
 
-   #+RESULTS[f706444b5d68873f956182ac1ee8ae4dcc4fb4c8]:
+   #+RESULTS:
    :
    : ... >>> >>> >>> {}
 
@@ -4571,7 +4571,7 @@
      a.__class__
    #+END_SRC
 
-   #+RESULTS[c30406889a285d02b73ad0b37f5409f6925c00c1]:
+   #+RESULTS:
    :
    : <class 'int'>
 
@@ -4588,7 +4588,7 @@
      bool.__base__
    #+END_SRC
 
-   #+RESULTS[ecdbecdfe3e5c56e0adcd9d8e0ecbb1a89af0f2d]:
+   #+RESULTS:
    :
    : >>> >>> ... ... >>> >>> (<class 'contextlib.ContextDecorator'>,)
    : <class 'int'>
@@ -4603,7 +4603,7 @@
      foo.__name__
    #+END_SRC
 
-   #+RESULTS[fcba2a23937d37d1654fb1f4d59ad8efed574537]:
+   #+RESULTS:
    :
    : ... >>> >>> 'foo'
 
@@ -4616,7 +4616,7 @@
      foo.__qualname__
    #+END_SRC
 
-   #+RESULTS[b6da4c73bb77582fdadf4a1c194f77b440d984ea]:
+   #+RESULTS:
    :
    : ... >>> >>> 'foo'
 
@@ -4628,5 +4628,5 @@
      int.__subclasses__()
    #+END_SRC
    
-   #+RESULTS[a385bf1a3ff4b20d3fa58359f361a5b978f3a16d]:
+   #+RESULTS:
    : [<class 'bool'>]

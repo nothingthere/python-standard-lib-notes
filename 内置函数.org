@@ -10,7 +10,7 @@
     abs(100)
   #+END_SRC
   
-  #+RESULTS[078ae593c13bae192d6eb3dc53b0dde37465227f]:
+  #+RESULTS:
   : 1
   : 1
   : 2.23606797749979
@@ -34,7 +34,7 @@
     all([])
   #+END_SRC
 
-  #+RESULTS[1752cf656953765867d6103361f70fdeee613d98]:
+  #+RESULTS:
   :
   : True
   : False
@@ -58,7 +58,7 @@
     any([0, '', (), [], False])
   #+END_SRC
 
-  #+RESULTS[10aabdb11b9f55ce7224db714fcbf5190d9cb726]:
+  #+RESULTS:
   : True
   : True
   : False
@@ -73,7 +73,7 @@
     ascii("我")
   #+END_SRC
 
-  #+RESULTS[1712b58999977b043b9daf21067065409083b6db]:
+  #+RESULTS:
   : "'我'"
   : "'\\u6211'"
 
@@ -93,7 +93,7 @@
     bin(-1024)
   #+END_SRC
   
-  #+RESULTS[d20d6d1f87077212f2f56c7207b919753bb92d16]:
+  #+RESULTS:
   :
   : ... ... ... ... >>> >>> >>> '-0b10000000000'
   : '-0b10000000000'
@@ -112,7 +112,7 @@
     bool(())
   #+END_SRC
 
-  #+RESULTS[8e8b067dc176e346ddca2b7ea81a3c30504a6503]:
+  #+RESULTS:
   : False
   : False
   : False
@@ -135,7 +135,7 @@
        bytearray('i have a dream!哈哈！', encoding='utf-8')
 	 #+END_SRC
      
-   #+RESULTS[f7abc713c11ce2e797e870ce7d0bfa7a44817d21]:
+   #+RESULTS:
   : bytearray(b'i have a dream!\xe5\x93\x88\xe5\x93\x88\xef\xbc\x81')
    
    - 如果为整数，表示元素个数，且每个元素初始值为空byte。
@@ -144,7 +144,7 @@
        bytearray(10)
 	 #+END_SRC
      
-   #+RESULTS[e3dd426f475b1e54dde45b38751b9d2aba8076d9]:
+   #+RESULTS:
   : bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
    
    - 如果是buffer接口返回的对象，则使用buffer内容初始化。
@@ -156,7 +156,7 @@
        bytearray([256])
 	 #+END_SRC
      
-   #+RESULTS[38bf58a5ee10ad654785a83db1a7652e1e0d8a65]:
+   #+RESULTS:
   : bytearray(b'\x01\x02\x03\x03')
   : bytearray(b'\xff')
   : Traceback (most recent call last): 
@@ -183,7 +183,7 @@
 
   #+END_SRC
 
-  #+RESULTS[e9529d996d42d3174086324d1a3e14749d5e73fc]:
+  #+RESULTS:
   :
   : ... >>> True
   : >>> False
@@ -200,7 +200,7 @@
     chr(1114112)
   #+END_SRC
 
-  #+RESULTS[4fcceee023843eeb4742beacf0c6851f914fb56e]:
+  #+RESULTS:
   : 'a'
   : 97
   : '€'
@@ -230,7 +230,7 @@
     a == b == c == d == e
   #+END_SRC
 
-  #+RESULTS[7409231ec1f5380e418f51bddef37f7283ebe43a]:
+  #+RESULTS:
   :
   : >>> >>> >>> >>> True
 
@@ -260,7 +260,7 @@
     dir(foo)
   #+END_SRC
 
-  #+RESULTS[395bb2564deb6a2db6712b05f5513b81a1c07e7b]:
+  #+RESULTS:
   :
   : ['Struct', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_clearcache', 'calcsize', 'error', 'iter_unpack', 'pack', 'pack_into', 'unpack', 'unpack_from']
   : >>> >>> ... ... ... ... ... >>> >>> ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']
@@ -295,7 +295,7 @@
     divmod(10.4, 3)
   #+END_SRC
 
-  #+RESULTS[5708e0a49580a5907a4389a75b1d02e79ee42b53]:
+  #+RESULTS:
   : (3, 1)
   : (3, 1)
   : (3.0, 1.4000000000000004)
@@ -314,7 +314,7 @@
         print(next(e, 'nothing'))
   #+END_SRC
   
-  #+RESULTS[1a5d100ebc67e86bbb239b5cc62441835a7b31be]:
+  #+RESULTS:
   : [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Wintwer')]
   : [(10, 'Spring'), (11, 'Summer'), (12, 'Fall'), (13, 'Wintwer')]
   : (100, 'Spring')
@@ -356,7 +356,7 @@
     [i for i in nums if i]
   #+END_SRC
 
-  #+RESULTS[3b3dcecd28778124fa431a5c9ca409ba3d217476]:
+  #+RESULTS:
   :
   : [1, 3, 5, 7, 9]
   : >>> ... ... >>> [0, 2, 4, 6, 8]
@@ -380,7 +380,7 @@
     float('12三')
   #+END_SRC
   
-  #+RESULTS[1e2a8277e39db2f346d7316daa76c257106afa36]:
+  #+RESULTS:
   : 0.0
   : 1.0
   : 1.23
@@ -402,7 +402,7 @@
     format('me', '')
   #+END_SRC
 
-  #+RESULTS[7d9f7695a2bcff1a8a6e257ea0de60fee4d33af3]:
+  #+RESULTS:
   : 'me                            '
   : '                            me'
   : 'me                            '
@@ -442,7 +442,7 @@
      help('None')
   #+END_SRC
 
-  #+RESULTS[03660dd42543bc8ef9a78feadea965279d7ead6b]:
+  #+RESULTS:
   #+begin_example python
   Help on NoneType object:
 
@@ -475,7 +475,7 @@
     hash(['a'])
   #+END_SRC
   
-  #+RESULTS[6807fe7f1728ede1ce8089f99b270ada6c1760f8]:
+  #+RESULTS:
   : 1
   : 1
   : 244014917210466474
@@ -495,7 +495,7 @@
     hex('12')
   #+END_SRC
 
-  #+RESULTS[fbfef14bc4a0f7b843a2e503a80dcf79f29a24c8]:
+  #+RESULTS:
   : '0xff'
   : '-0x18'
   : Traceback (most recent call last):
@@ -509,7 +509,7 @@
     hex(1.2)
   #+END_SRC
 
-  #+RESULTS[c4279ee0a38a55dca7fbd58a2b76153fe99f3dde]:
+  #+RESULTS:
   : '0x1.3333333333333p+0'
   : Traceback (most recent call last):
   :   File "<stdin>", line 1, in <module>
@@ -530,7 +530,7 @@
     id(a)
   #+END_SRC
 
-  #+RESULTS[41942b13a487f866d820bb2b080cdbf025f18660]:
+  #+RESULTS:
   : 93851494420096
   : 93851494420096
   : 93851494420128
@@ -569,7 +569,7 @@
     int('10', base=37)
   #+END_SRC
 
-  #+RESULTS[0afc1713da6abc0ba5e5af53aa4d509c4f4332f3]:
+  #+RESULTS:
   : 0
   : 10
   : 1
@@ -597,7 +597,7 @@
     isinstance(f, tuple)
   #+END_SRC
 
-  #+RESULTS[a3029c3c441ad87eb4a23dcedaf64d6ba2375560]:
+  #+RESULTS:
   :
   : ... ... >>> >>> >>> True
   : True
@@ -614,7 +614,7 @@
     issubclass(int, float)
   #+END_SRC
 
-  #+RESULTS[dbf6408828c85320e763301703b6390a5499b0df]:
+  #+RESULTS:
   : True
   : True
   : False
@@ -632,7 +632,7 @@
       print(list(i))
     #+END_SRC
     
-    #+RESULTS[51867de2f96685c28c2b35c7422210526e483ae2]:
+    #+RESULTS:
     :
     : <tuple_iterator object at 0x7f99da84fb00>
     : [1, 2, 3]
@@ -651,7 +651,7 @@
               print(line)
 	#+END_SRC
 
-  #+RESULTS[eb6a3284d9b8e2228cb10991f44ced9e32ba4b56]:
+  #+RESULTS:
   #+begin_example
   Help on built-in function pow in module builtins:
 
@@ -685,7 +685,7 @@
     len(iter([1, 2, 3]))
   #+END_SRC
 
-  #+RESULTS[05abc697beb9a1c3c6398932ae03d65b3dcb32a9]:
+  #+RESULTS:
   #+begin_example
 
   >>> 3
@@ -722,7 +722,7 @@
     list(iter([1, 2, 3]))
   #+END_SRC
   
-  #+RESULTS[116e36b9c91df73f580e5a9d6cd0f1e2705ccda7]:
+  #+RESULTS:
   #+begin_example
   
   >>> Traceback (most recent call last):
@@ -760,7 +760,7 @@
     list(tm)
   #+END_SRC
 
-  #+RESULTS[355e863c49f8fb5373cf9fa210fd4971a5145d8c]:
+  #+RESULTS:
   :
   : >>> >>> >>> <class 'map'>
   : [10, 20, 30, 40]
@@ -798,7 +798,7 @@
 
   #+END_SRC
 
-  #+RESULTS[5194b9b15be8784b7abf148ae3a52161db39bd52]:
+  #+RESULTS:
   :
   : 2
   : 'b'
@@ -827,7 +827,7 @@
 
   #+END_SRC
 
-  #+RESULTS[7b2acacf7ca1916e87eb94f58a166caae36584d9]:
+  #+RESULTS:
   :
   : 1
   : 2
@@ -852,7 +852,7 @@
     o.abc = 123
   #+END_SRC
   
-  #+RESULTS[ddcad1f4c19fe1fa5a42e561f36cf0ef9ac1b35c]:
+  #+RESULTS:
   :
   : <object object at 0x7f99db111120>
   : >>> 'The most base type'
@@ -880,7 +880,7 @@
      oct(10.0)
   #+END_SRC
 
-  #+RESULTS[a018416dd45590d63862f8434bbb4fb16fab8062]:
+  #+RESULTS:
   : '0o12'
   : >>> ... ... ... >>> >>> '0o144'
   : >>> Traceback (most recent call last):
@@ -932,7 +932,7 @@
     locale.getpreferredencoding(False)
   #+END_SRC
   
-  #+RESULTS[098e93eeabbb2fafc338a9f83673978ac421243e]:
+  #+RESULTS:
    :
    : 'UTF-8'
   
@@ -962,7 +962,7 @@
      chr(97)
   #+END_SRC
 
-  #+RESULTS[3e7e36084458d01d190a29fc3a91a09a0a3e0a9c]:
+  #+RESULTS:
   : 97
   : 'a'
 
@@ -976,7 +976,7 @@
      pow(10, 2, 3)
   #+END_SRC
 
-  #+RESULTS[d9d4e40ea5e40b17f1c21f573de5406658cc845c]:
+  #+RESULTS:
   : 100
   : 100
   : 1
@@ -990,7 +990,7 @@
     print(1, 2, sep='\t')
   #+END_SRC
 
-  #+RESULTS[bcc7686fad6af72d44d48e4fd682b1871fcff69b]:
+  #+RESULTS:
   : 1|2|3$
   : 1	2
 
@@ -1030,7 +1030,7 @@
         c1.delx()
   #+END_SRC
 
-  #+RESULTS[82aee607ce577f2685a4a888d74050de04737142]:
+  #+RESULTS:
   :
   : ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> 1
   : 2
@@ -1055,7 +1055,7 @@
     print(p.valtage)
   #+END_SRC
 
-  #+RESULTS[b4c02727563e97325c50abd4097cc5b32f1fa0f0]:
+  #+RESULTS:
   :
   : ... ... ... ... ... ... >>> >>> >>> 10000
 
@@ -1092,7 +1092,7 @@
     print(c1.x)
   #+END_SRC
 
-  #+RESULTS[feeb5fcd43940653050201154541b24e78923642]:
+  #+RESULTS:
   :
   : ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> >>> >>> >>> c1
   : c2
@@ -1110,7 +1110,7 @@
     list(range(1, 10, 2))
   #+END_SRC
 
-  #+RESULTS[aed1d47c9a0f52be42499ce349a213534b29ce12]:
+  #+RESULTS:
   :
   : [0, 1, 2, 3]
   : [1, 3, 5, 7, 9]
@@ -1139,7 +1139,7 @@
     repr(f1)
   #+END_SRC
 
-  #+RESULTS[ea7642886c55485b96f0e8b219b6e09eb8f6e919]:
+  #+RESULTS:
   : '"\'123\'"'
   : "'123'"
   : >>> >>> ... ... ... ... ... >>> >>> >>> 'claudio'
@@ -1158,7 +1158,7 @@
     print(l)
   #+END_SRC
   
-  #+RESULTS[e129d07e07278b83053e5d57435fdfcef398cf52]:
+  #+RESULTS:
   :
   : [3, 2, 1]
   : [1, 2, 3]
@@ -1176,7 +1176,7 @@
     print(round(x, 2))
   #+END_SRC
 
-  #+RESULTS[30bd98b2a6d9094ae6eb2b4b0aff1064c0afd8c6]:
+  #+RESULTS:
   :
   : 3.3333333333333335
   : 3
@@ -1190,7 +1190,7 @@
     print(set(l))
   #+END_SRC
 
-  #+RESULTS[ac36b27f6635d1c14a2c06ccd0841d1a8868284b]:
+  #+RESULTS:
   :
   : {1, 2, 3}
 
@@ -1205,7 +1205,7 @@
      print(o.foo)
    #+END_SRC
 
-   #+RESULTS[2f94b5e946597a1f83c80a2f482d834e9d37259e]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -1224,7 +1224,7 @@
     sorted(l)
   #+END_SRC
 
-  #+RESULTS[efbfd7caa673456a4bfce5d7c3d7799f3fd2f755]:
+  #+RESULTS:
   :
   : [1, 2, 3]
 
@@ -1235,7 +1235,7 @@
     sorted(l, reverse=True)
   #+END_SRC
 
-  #+RESULTS[b4c363182da1bfe3a7332faf7322636ba9247ce1]:
+  #+RESULTS:
   :
   : [3, 2, 1]
 
@@ -1247,7 +1247,7 @@
     sorted(l, key=str.lower)
   #+END_SRC
 
-  #+RESULTS[66ddfabe53e5c79530ad0225b1cf9941a7649de1]:
+  #+RESULTS:
   :
   : ['Z', 'a']
   : ['a', 'Z']
@@ -1270,7 +1270,7 @@
     c.f(1)
   #+END_SRC
 
-  #+RESULTS[443a8b3f94fdda9cdb8635a5344b3e6a6a7f5c13]:
+  #+RESULTS:
   :
   : ... ... ... >>> >>> >>> 1
   : 1
@@ -1292,7 +1292,7 @@
     sum([1, 2, 3], 100)
   #+END_SRC
   
-  #+RESULTS[4547939e97d7ecd5c2157937a72316ead272e58a]:
+  #+RESULTS:
   : 6
   : 106
   
@@ -1305,7 +1305,7 @@
      '|'.join(l)
    #+END_SRC
    
-   #+RESULTS[76a1ced480bffb460fe5a86dd76b78447b151bde]:
+   #+RESULTS:
    :
    : 'a|b|c'
 
@@ -1319,7 +1319,7 @@
      math.fsum(floats)
    #+END_SRC
 
-   #+RESULTS[ccbb2dc630f640f9a1073f19ab9cd8a18d4e7191]:
+   #+RESULTS:
    :
    : 5.8730158730158735
    : >>> >>> 5.8730158730158735
@@ -1349,7 +1349,7 @@
     tuple(memoryview(b'123'))
   #+END_SRC
 
-  #+RESULTS[68d64999e9e21765bd861df93306487e92500cb5]:
+  #+RESULTS:
   :
   : >>> (1, 2, 3)
   : (1, 2, 3)
@@ -1387,7 +1387,7 @@
     print(b.x)
   #+END_SRC
   
-  #+RESULTS[34695b1f8c0502d2419b6d4239f5a43b389a6e64]:
+  #+RESULTS:
   :
   : ... >>> >>> >>> >>> >>> >>> []
   : []
@@ -1409,7 +1409,7 @@
     print(b.x)
   #+END_SRC
 
-  #+RESULTS[597ee0748cce3d556819c79d39c9411a675ebeda]:
+  #+RESULTS:
   :
   : >>> >>> >>> []
   : []
@@ -1433,7 +1433,7 @@
     print(list(zip()))
   #+END_SRC
 
-  #+RESULTS[c8a30348b76fcbcc5bd5093685909aff2476db0c]:
+  #+RESULTS:
   :
   : >>> >>> <zip object at 0x7f1fe75acb88>
   : [(1, 'a'), (2, 'b'), (3, 'c')]

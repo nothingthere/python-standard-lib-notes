@@ -35,7 +35,7 @@
               print('一级标题')
     #+END_SRC
     
-    #+RESULTS[7c9aa81b61a00dd106848f459ba6f048884b9b62]:
+    #+RESULTS:
     :
     : >>> ... ... ... ... ... >>> ... ... ... <div>
     : <h1>
@@ -81,7 +81,7 @@
               break
     #+END_SRC
 
-    #+RESULTS[03e0b67ee8d28e26d8ad1de0f3d70f6ec0649994]:
+    #+RESULTS:
     :
     : >>> >>> ... ... ... ... b'<!doctype html>\n'
 
@@ -109,7 +109,7 @@
       print('done')
     #+END_SRC
 
-    #+RESULTS[95c51607ce9100cfc9354f801abdca45f778bc2d]:
+    #+RESULTS:
     :
     : >>> >>> ... ... ... >>> Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
@@ -146,7 +146,7 @@
       f.getvalue()
     #+END_SRC
 
-    #+RESULTS[ef889b9e6da3fe52a5692d5e2ad527c9af259477]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> ... ... >>> 'Help on built-in function pow in module builtins:\n\npow(x, y, z=None, /)\n    Equivalent to x**y (with two arguments) or x**y % z (with three arguments)\n    \n    Some types, such as ints, are able to use a more efficient algorithm when\n    invoked using the three argument form.\n\n'
 
@@ -170,7 +170,7 @@
           help(pow)
     #+END_SRC
 
-    #+RESULTS[67a84955869cd606d126d1f746e3837dc4731cc4]:
+    #+RESULTS:
     :
     : >>> >>> ... ... Help on built-in function pow in module builtins:
     :
@@ -216,7 +216,7 @@
           print('函数执行')
     #+END_SRC
 
-    #+RESULTS[d544511f3dcdcb7dc268f67131b5815fe515ed41]:
+    #+RESULTS:
     :
     : >>> ... ... ... ... ... ... ... >>> ... ... ... >>> 开始
     : 函数执行
@@ -250,7 +250,7 @@
               return False
     #+END_SRC
 
-    #+RESULTS[0e15daa437e7f945d43927b4e572e92a12df8c91]:
+    #+RESULTS:
 
     *注意* ：
 
@@ -456,7 +456,7 @@
         print(close_files)
       #+END_SRC
 
-      #+RESULTS[f535119c105c51209db6684a610d8454b01f2f5f]:
+      #+RESULTS:
       :
       : >>> >>> ... ... ... ... ... ... ... ... >>> >>> >>> []
       : None
@@ -476,7 +476,7 @@
            print(files)
      #+END_SRC
 
-     #+RESULTS[302ff38fbafebec1e8876ca960bf412d9c66ed07]:
+     #+RESULTS:
      :
      : >>> ... ... ... ... [<_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>]
 
@@ -513,7 +513,7 @@
            tag.print_body('BODY')
      #+END_SRC
 
-     #+RESULTS[26ea4cbb7f25d9eff67007c85f39b8f65f88c380]:
+     #+RESULTS:
      :
      : >>> >>> ... ... ... ... ... ... ... ... ... ... >>> >>> ... ... ... <div>
      : body
@@ -541,7 +541,7 @@
            print(1)
      #+END_SRC
 
-     #+RESULTS[290bf9a9507f8a1a9a4498a3dcdf40dd99c67213]:
+     #+RESULTS:
      :
      : >>> ... ... >>> ... ... ... <function hello at 0x7fb8fb585c80>
      : 1
@@ -570,7 +570,7 @@
        opened_files[0].closed
      #+END_SRC
      
-     #+RESULTS[690e19b74a19b2e16b7c600c625957b68cfa1065]:
+     #+RESULTS:
      :
      : >>> ... ... ... ... >>> [<_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>, <_io.TextIOWrapper name='files/emma.txt' mode='r' encoding='UTF-8'>]
      : <bound method ExitStack.close of <contextlib.ExitStack object at 0x7fb8fb580f60>>

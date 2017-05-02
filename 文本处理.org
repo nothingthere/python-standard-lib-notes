@@ -13,7 +13,7 @@
       string.ascii_letters
     #+END_SRC
 
-    #+RESULTS[dbc0c195ea9116af68a930af514a83f8927d0f88]:
+    #+RESULTS:
     :
     : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -25,7 +25,7 @@
       string.ascii_lowercase
     #+END_SRC
 
-    #+RESULTS[43fac96fdd9792434ad6a060c9837b3382fe275e]:
+    #+RESULTS:
     :
     : 'abcdefghijklmnopqrstuvwxyz'
 
@@ -37,7 +37,7 @@
       string.ascii_uppercase
     #+END_SRC
 
-    #+RESULTS[3cc03248df9135f10c36b1d3ac4495c448e24ba1]:
+    #+RESULTS:
     :
     : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -48,7 +48,7 @@
       string.digits
     #+END_SRC
 
-    #+RESULTS[e90c3f3c2fff08a17d66c41e0b63e02925b58a4a]:
+    #+RESULTS:
     :
     : '0123456789'
 
@@ -59,7 +59,7 @@
       string.hexdigits
     #+END_SRC
 
-    #+RESULTS[10cdf01fc31dcc5777ec14d860faadc68e31268e]:
+    #+RESULTS:
     :
     : '0123456789abcdefABCDEF'
 
@@ -70,7 +70,7 @@
       string.octdigits
     #+END_SRC
 
-    #+RESULTS[13332f71f3c21f481367d49f832f13393abb015f]:
+    #+RESULTS:
     :
     : '01234567'
 
@@ -83,7 +83,7 @@
       string.punctuation
     #+END_SRC
 
-    #+RESULTS[7cabb4253ee71483da078dbdd7c55d5ec8426f1b]:
+    #+RESULTS:
     :
     : '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
@@ -95,7 +95,7 @@
       string.printable
     #+END_SRC
 
-    #+RESULTS[20dbfe464a9005e43fa7130f2344ef55fcc4653b]:
+    #+RESULTS:
     :
     : '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c'
 
@@ -107,7 +107,7 @@
       string.whitespace
     #+END_SRC
 
-    #+RESULTS[7669f40dfae6126e364d36dfd57163f468b01bbb]:
+    #+RESULTS:
     :
     : ' \t\n\r\x0b\x0c'
 
@@ -124,7 +124,7 @@
        # Formatter.format(temp,'')
      #+END_SRC
 
-     #+RESULTS[0d139b494a1eddbd3eaa6ed75253b7ef0f782060]:
+     #+RESULTS:
      :
      : >>> >>> 'hello world'
 
@@ -155,7 +155,7 @@
      'Weight in tons {0.digits}'.format(string)
    #+END_SRC
    
-   #+RESULTS[ad8196a5794c94864c2ca2f0013241ca39d784a2]:
+   #+RESULTS:
    :
    : >>> 'First, thou shalt count to 1000'
    : 'Bring me a book'
@@ -179,7 +179,7 @@
      '我是一个聪明的 {!a}'.format('男孩')
    #+END_SRC
    
-   #+RESULTS[17870e409219a15570f5dad1340074afa9113f69]:
+   #+RESULTS:
    : '我是一个聪明的 男孩'
    : "我是一个聪明的 '男孩'"
    : "我是一个聪明的 '\\u7537\\u5b69'"
@@ -204,7 +204,7 @@
        '{:^10}'.format(name)
      #+END_SRC
      
-     #+RESULTS[ecf346eb362e33e9160bba6190a0a11c2410e8b8]:
+     #+RESULTS:
      :
      : >>> 'claudio'
      : '   claudio'
@@ -231,7 +231,7 @@
        '{: }'.format(-100)
      #+END_SRC
 
-     #+RESULTS[45bf5deb6bd6ff4171aad64fd3efccb562f068fe]:
+     #+RESULTS:
      : '+100'
      : '-100'
      : >>> '100'
@@ -266,7 +266,7 @@
        '{:}'.format(n)
      #+END_SRC
      
-     #+RESULTS[29af31cdf7cc6c6480470e2f38ab32044cea119d]:
+     #+RESULTS:
      :
      : '1010'
      : '\n'
@@ -291,7 +291,7 @@
        '{:#}'.format(n)
      #+END_SRC
 
-     #+RESULTS[50be5b3b00ec1a3e12e2421107e20074e88ce3f9]:
+     #+RESULTS:
      :
      : '0b1010'
      : '\n'
@@ -309,7 +309,7 @@
        '{:,}'.format(12334.56)
      #+END_SRC
 
-     #+RESULTS[c285eba7a28d863f64d13e88be34504cd77975af]:
+     #+RESULTS:
      : '1,233,456'
      : '12,334.56'
 
@@ -342,7 +342,7 @@
        '{:}'.format(n)
      #+END_SRC
 
-     #+RESULTS[3049f910b6f0410f5423f380d04d5552d37570ad]:
+     #+RESULTS:
      #+begin_example
 
      ... ... '1.234568e+08'
@@ -372,7 +372,7 @@
        '{0} and {1!r} and {0}'.format('apple', 'banana')
      #+END_SRC
      
-     #+RESULTS[41fdca0209912ddff3a7f23f0cf4412f661662fd]:
+     #+RESULTS:
      : "a, b, b'c'"
      : 'a, b, c'
      : 'c, b, a'
@@ -388,7 +388,7 @@
        '{country}的首都是{capital}'.format(**item)
      #+END_SRC
 
-     #+RESULTS[efc629a84afdde096307cff5ccf4cb4b70f4e72d]:
+     #+RESULTS:
      : '中国的首都是北京'
      : >>> >>> '中国的首都是北京'
 
@@ -407,7 +407,7 @@
        str(Point(3, 3))
      #+END_SRC
 
-     #+RESULTS[c360263864b417d4161470c009ce24f9f9910113]:
+     #+RESULTS:
      :
      : '复数(3-5j)的实部为：3.0, 虚部为：-5.0'
      : >>> ... ... ... ... ... >>> 'Point(3, 3)'
@@ -419,7 +419,7 @@
        'X: {0[0]}; Y: {0[1]}'.format(point)
      #+END_SRC
 
-     #+RESULTS[44c43572d18bbdfac83cdb06b2e9cfc67ec420bf]:
+     #+RESULTS:
      :
      : 'X:      1; Y: 2'
 
@@ -429,7 +429,7 @@
        'reper()函数会显示引号：{!r}；str()函数则不会：{!s}'.format('abc', 'ABC')
      #+END_SRC
 
-     #+RESULTS[7ffd29edf6f25d4e7584bc7ea2b28592bd4228a5]:
+     #+RESULTS:
      : "repr()函数会显示引号：'abc'；str()函数则不会：ABC"
 
 **** 对齐和指定宽度
@@ -442,7 +442,7 @@
        '{:*^20}'.format('居中，用信号填补空白')
      #+END_SRC
      
-     #+RESULTS[324468f0b45ad342ac39828391573e69028d3c3c]:
+     #+RESULTS:
      : '左对齐                 '
      : '                 右对齐'
      : '         居中         '
@@ -458,7 +458,7 @@
        '{:-f}; {:-f}'.format(pi, -pi)
      #+END_SRC
 
-     #+RESULTS[9d9709337e8bb17e10f6ea020a3ab96182c7b6a7]:
+     #+RESULTS:
      :
      : >>> '+3.141593; -3.141593'
      : ' 3.141593; -3.141593'
@@ -471,7 +471,7 @@
        '10进制：{0:d}，16进制：{0:#x}；8进制：{0:#o}; 2进制：{0:#b}'.format(42)
      #+END_SRC
 
-     #+RESULTS[2cad6a8e795f81c756462863e55fa248aaf208e2]:
+     #+RESULTS:
      : '10进制：42，16进制：2a；8进制：52; 2进制：101010'
      : '10进制：42，16进制：0x2a；8进制：0o52; 2进制：0b101010'
 
@@ -481,7 +481,7 @@
        '{:,}'.format(123456789)
      #+END_SRC
 
-     #+RESULTS[5f51ce4e908837634f9c240f8eb939d04800ccce]:
+     #+RESULTS:
      : '123,456,789'
 
 **** 添加百分号
@@ -491,7 +491,7 @@
        '{:.2%}'.format(1 / 3)
      #+END_SRC
 
-     #+RESULTS[63b0909883ed719c3d68a87ee2643a99578e3b74]:
+     #+RESULTS:
      : '33.333333%'
      : '33.33%'
 
@@ -504,7 +504,7 @@
        '{:%Y-%m-%d %H:%M:%S}'.format(d)
      #+END_SRC
 
-     #+RESULTS[3e8b8f3d61bd204b69eb01f7305b4c054293a415]:
+     #+RESULTS:
      :
      : >>> >>> '2017-04-22 21:30:55'
 
@@ -517,7 +517,7 @@
        '{:02X}{:02X}{:02X}{:02X}'.format(*[192, 168, 0, 1])
      #+END_SRC
 
-     #+RESULTS[bdca78ef7e568f0bf1fcc66ba1c40750d05be890]:
+     #+RESULTS:
      :
      : ... 'left<<<<<<<<<<<<'
      : '^^^^^center^^^^^'
@@ -531,7 +531,7 @@
            print()
      #+END_SRC
 
-     #+RESULTS[3c3b781a7a6d1d10aeae17fb2e357371278fbb5c]:
+     #+RESULTS:
      :
      : ... ... ...     5    5    5  101
      :     6    6    6  110
@@ -550,7 +550,7 @@
      s.substitute(who='world', me='claudio')
    #+END_SRC
 
-   #+RESULTS[83b02956c092b2329a4db9acc744d9719f2c191b]:
+   #+RESULTS:
    :
    : >>> >>> '你好，world。 我是claudio。'
 
@@ -578,7 +578,7 @@
        temp.substitute({'name': 'world'}, name='Claudio')
      #+END_SRC
 
-     #+RESULTS[ecb945d54827f4a43c35b4b65aee492dc6f65b28]:
+     #+RESULTS:
      :
      : >>> >>> 'hello, Claudio.'
 
@@ -596,7 +596,7 @@
        tmp.safe_substitute(who='你')
      #+END_SRC
 
-     #+RESULTS[2f2410515ff5fe0cf485a3f3225d0d54bb5bbf77]:
+     #+RESULTS:
      :
      : >>> >>> Traceback (most recent call last):
      :   File "<stdin>", line 1, in <module>
@@ -618,7 +618,7 @@
        temp.template
      #+END_SRC
 
-     #+RESULTS[2ca94bc83125482c792b8f174cffaf55e8d6535f]:
+     #+RESULTS:
      :
      : >>> >>> '${who}喜欢${what}'
 
@@ -639,7 +639,7 @@
          temp.substitute(name='world')
        #+END_SRC
        
-       #+RESULTS[fc099f2bb9ab16e7c1edf89910812ebd47ec3fae]:
+       #+RESULTS:
        :
        : >>> >>> ... ... >>> >>> >>> 'hello world'
        
@@ -661,7 +661,7 @@
          mytemp1.substitute(food='orange')
        #+END_SRC
        
-       #+RESULTS[0374890ede19258988ff3970e5661dfbf14b2966]:
+       #+RESULTS:
        #+begin_example
        
        >>> ... ... >>> >>> >>> >>> ... '我喜欢吃orange。'
@@ -693,7 +693,7 @@
        temp.substitute(Food='banana')
        #+END_SRC
        
-       #+RESULTS[5000775d8ec6b226692cd1ed152ee8be520d8ac7]:
+       #+RESULTS:
        :
        : >>> >>> ... ... >>> >>> >>> Traceback (most recent call last): 
        :   File "<stdin>", line 1, in <module>
@@ -731,7 +731,7 @@
       print(tem.substitute(name='world'))
     #+END_SRC
 
-    #+RESULTS[598b93ddce9c174f6e2fd165c9b7839f383272cd]:
+    #+RESULTS:
     :
     : >>> ... ... >>> >>> >>> hello, world
 
@@ -749,7 +749,7 @@
       capwords('banana', sep='a')
     #+END_SRC
 
-    #+RESULTS[da595ad1f2d225e97f61633a716d197a60387985]:
+    #+RESULTS:
     :
     : >>> 'I Have A Dream!'
     : 'BaNaNa'
@@ -806,7 +806,7 @@
       re.findall('$', 'foo')
     #+END_SRC
 
-    #+RESULTS[d3b2a742803383792a331777c8e27576948378ef]:
+    #+RESULTS:
     :
     : >>> ['foo2']
     : ['foo1', 'foo2']
@@ -826,7 +826,7 @@
       re.findall('ab*', 'c')
     #+END_SRC
 
-    #+RESULTS[f24e4106e8445523aed2669d9d6814b71831ec44]:
+    #+RESULTS:
     :
     : >>> ['a']
     : ['ab']
@@ -847,7 +847,7 @@
       re.findall('ab+', 'c')
     #+END_SRC
 
-    #+RESULTS[5fb2e20b51d181e1a1eb59cf40b2280cfc56a63a]:
+    #+RESULTS:
     :
     : >>> []
     : ['ab']
@@ -868,7 +868,7 @@
       re.findall('ab?', 'c')
     #+END_SRC
 
-    #+RESULTS[c67f4728c42b21dd7a18ebba57c09641183f0571]:
+    #+RESULTS:
     :
     : >>> ['a']
     : ['ab']
@@ -886,7 +886,7 @@
       re.findall('<.*?>', '<a> b <c>')
     #+END_SRC
 
-    #+RESULTS[d8cb1e2ca9816fb4636de72e5166daedb40935bd]:
+    #+RESULTS:
     :
     : >>> ['<a> b <c>']
     : ['<a>', '<c>']
@@ -902,7 +902,7 @@
       re.findall('ab{2}', 'abbbb')
     #+END_SRC
 
-    #+RESULTS[395b9b3a7c4c905e8a6191bdb95167b82be70695]:
+    #+RESULTS:
     :
     : >>> []
     : ['abb']
@@ -921,7 +921,7 @@
       re.findall(r'ab{3,5}?', 'abbbbb')
     #+END_SRC
 
-    #+RESULTS[62bec64cfe56bf86826fe0040c16cd784ac94601]:
+    #+RESULTS:
     :
     : >>> ['abbbbb']
     : ['abbb']
@@ -939,7 +939,7 @@
       re.findall(r'\\', '\\')
     #+END_SRC
 
-    #+RESULTS[1f7d469e413645a70fabb6db47137355918e50e0]:
+    #+RESULTS:
     :
     : >>> ['\\']
     : ['\\']
@@ -955,7 +955,7 @@
         re.findall('[ban]', 'banana')
       #+END_SRC
 
-      #+RESULTS[1eb9d3f2efad30bfe84ad740f5dfa3ba1e8088cb]:
+      #+RESULTS:
       :
       : >>> ['b', 'a', 'n', 'a', 'n', 'a']
       
@@ -970,7 +970,7 @@
         re.findall('[a\-z]', '-ba')
       #+END_SRC
 
-      #+RESULTS[8eae70c14173aa9e8177b05f2611134ab7d45665]:
+      #+RESULTS:
       :
       : >>> ['ba', 'na', 'na']
       : ['-', 'b', 'a']
@@ -984,7 +984,7 @@
       re.findall('[(+*?)]', '[(+*?)]')
       #+END_SRC
       
-      #+RESULTS[43e5bb75b04f9aabde5ff974e132c05d1e979b75]:
+      #+RESULTS:
       :
       : >>> ['(', '+', '*', '?', ')']
       
@@ -999,7 +999,7 @@
       re.findall('[an^]', '^banana')
       #+END_SRC
 
-      #+RESULTS[8a97c7d04b2f9977933348316d9b030513f89965]:
+      #+RESULTS:
       :
       : >>> ['a', 'n', 'a', 'n', 'a']
       : ['b']
@@ -1014,7 +1014,7 @@
         re.findall('[[\]]', '[]')
       #+END_SRC
 
-      #+RESULTS[051c649b5233f486047821138d10c7c5f1cc2402]:
+      #+RESULTS:
       :
       : >>> ['[', ']']
       : ['[', ']']
@@ -1032,7 +1032,7 @@
       re.findall('\|', '|')
     #+END_SRC
     
-    #+RESULTS[a3d2634face3d90eb11de3f8b3918e83349afbc1]:
+    #+RESULTS:
     :
     : >>> ['fuck']
     : >>> ['|']
@@ -1051,7 +1051,7 @@
       re.findall(r'(\(|\))', '()')
     #+END_SRC
 
-    #+RESULTS[7425fa45b9283a1069c689729b5674e505e9c05c]:
+    #+RESULTS:
     :
     : >>> >>> 55
     : ['(', ')']
@@ -1081,7 +1081,7 @@
        re.findall('a', 'aA')
      #+END_SRC
      
-     #+RESULTS[3d7e5871f6df0e3d858f7913bb1e63c9196b85bb]:
+     #+RESULTS:
      :
      : ['', '']
      : ['a', 'A']
@@ -1107,7 +1107,7 @@
        re.findall('(?P<letter>abc)', 'abc')
      #+END_SRC
 
-     #+RESULTS[1fd27221f28f134b95e3a61e1ee0bbb8c7338126]:
+     #+RESULTS:
      :
      : >>> name
      : ['abc']
@@ -1131,7 +1131,7 @@
        re.findall('(?#不区分大小写)(?i)a', 'aA')
      #+END_SRC
 
-     #+RESULTS[c309dce82dee2b20693b54c1752792be11fc6cfd]:
+     #+RESULTS:
      :
      : >>> ['a', 'A']
 
@@ -1146,7 +1146,7 @@
        re.findall('Isaac (?=Asimov)', 'Isaac Asimov')
      #+END_SRC
      
-     #+RESULTS[2ce943bcbd23be1249a797c6490db4fdac85e6b3]:
+     #+RESULTS:
      :
      : >>> []
      : ['Isaac ']
@@ -1162,7 +1162,7 @@
        re.findall('Isaac (?!Asimov)', 'Isaac Asim')
      #+END_SRC
 
-     #+RESULTS[450299fb22f39dd6945c95f7d816e718a723ef18]:
+     #+RESULTS:
      :
      : >>> []
      : ['Isaac ']
@@ -1179,7 +1179,7 @@
        m.group(0)
      #+END_SRC
      
-     #+RESULTS[da583083430ea899544b1115ebd8cda5c730b752]:
+     #+RESULTS:
      :
      : >>> >>> 'def'
      
@@ -1191,7 +1191,7 @@
        print(m.group(0))
      #+END_SRC
      
-     #+RESULTS[96e23d18b42112fb158ee88b04f2157b541a142a]:
+     #+RESULTS:
      :
      : >>> egg
 
@@ -1205,7 +1205,7 @@
        re.findall('(?<![a-z])\w+', 'spam-egg')
      #+END_SRC
 
-     #+RESULTS[55ae9073dd63d587979f22e512c1332d3f353168]:
+     #+RESULTS:
      :
      : ['spam']
      : ['spam', 'egg']
@@ -1222,7 +1222,7 @@
                print(email)
      #+END_SRC
 
-     #+RESULTS[d8cf2ffb28d6b1247dd9511ad9632d8f72963db2]:
+     #+RESULTS:
      :
      : >>> ... ... ... <user1@host.com>
      : user2@host.com
@@ -1236,7 +1236,7 @@
       re.findall('\$', '$')
     #+END_SRC
     
-    #+RESULTS[037ca02c2abe1c063ca7555df2a105fb87a8336a]:
+    #+RESULTS:
     :
     : >>> ['$']
     
@@ -1249,7 +1249,7 @@
        m.group(0)
      #+END_SRC
      
-     #+RESULTS[bb02f8e49c3e433f7fcbc6da50be404a267a4259]:
+     #+RESULTS:
      :
      : >>> '5 5'
      
@@ -1269,7 +1269,7 @@
                print(x)
      #+END_SRC
 
-     #+RESULTS[77147a892c8ffad8ff94d4844f21906dd6dac995]:
+     #+RESULTS:
      :
      : >>> ... ... ... foo
      : foo.
@@ -1293,7 +1293,7 @@
                print(x)
      #+END_SRC
      
-     #+RESULTS[fe1756f9e6a5f0257b3d2b3a15961439e4b889f8]:
+     #+RESULTS:
      :
      : >>> >>> >>> ... ... ... py
      : py.
@@ -1307,7 +1307,7 @@
        re.findall(r'\d', '123a')
      #+END_SRC
 
-     #+RESULTS[fae72128019acd161ee76694fbb63a86e0be412c]:
+     #+RESULTS:
      :
      : >>> ['1', '2', '3']
 
@@ -1328,7 +1328,7 @@
        re.findall(r'\D', '\X001')
      #+END_SRC
 
-     #+RESULTS[e4ad15a9cd0d2cdc7ac92b515f2b5973b31274ad]:
+     #+RESULTS:
      :
      : >>> ['\\', 'X']
 
@@ -1339,7 +1339,7 @@
        re.findall('\s', ' a\t\n\r\f\vb')
      #+END_SRC
      
-     #+RESULTS[ae98d13f622826d346f31aaa456f4c7922479de5]:
+     #+RESULTS:
      :
      : [' ', '\t', '\n', '\r', '\x0c', '\x0b']
      
@@ -1359,7 +1359,7 @@
        re.findall('\w', '我有一个梦想！')
      #+END_SRC
 
-     #+RESULTS[ecd40b71a81cbec7a0e7480cba4fdc9c5d255d7e]:
+     #+RESULTS:
      :
      : ['我', '有', '一', '个', '梦', '想']
 
@@ -1414,7 +1414,7 @@
        re.findall(b'\w', bytes('a一', 'utf-8'), re.ASCII)
      #+END_SRC
      
-     #+RESULTS[ed4d0f18798a1a874b7a6f50735b63e6d7bc0399]:
+     #+RESULTS:
      :
      : ['a', '一']
      : ['a']
@@ -1430,7 +1430,7 @@
        re.compile('\w', re.DEBUG)
      #+END_SRC
      
-     #+RESULTS[ada664fa569b3f8ea09eeaf17f5b73a3dabfe1a1]:
+     #+RESULTS:
      :
      : IN
      :   CATEGORY CATEGORY_WORD
@@ -1447,7 +1447,7 @@
        re.findall('[A-Z]', 'abc', re.IGNORECASE)
      #+END_SRC
 
-     #+RESULTS[7ad7a5fe7c5ee7a3ae88b79dabdb0c3866209e2e]:
+     #+RESULTS:
      :
      : >>> ['a', 'b', 'c']
      
@@ -1478,7 +1478,7 @@
        re.findall('.', '\n', re.DOTALL)
      #+END_SRC
 
-     #+RESULTS[8fde86e5ae455a6ace3e19b674dfea011737c287]:
+     #+RESULTS:
      :
      : >>> []
      : ['\n']
@@ -1507,7 +1507,7 @@
        b.findall('1.23 1.2 1')
      #+END_SRC
 
-     #+RESULTS[8375df4dd1724dfe2e11fdcb380e6a9e83fd025b]:
+     #+RESULTS:
      :
      : >>> ... ... ... >>> >>> >>> >>> ['1.23', '1.2']
      : ['1.23', '1.2']
@@ -1553,7 +1553,7 @@
        print(search('d', ''))
      #+END_SRC
 
-     #+RESULTS[739420a5d3d71d5135e9a2d8506ddcc37fae58dc]:
+     #+RESULTS:
      :
      : >>> ''
      : None
@@ -1570,7 +1570,7 @@
        match('[0-9]', '1ab')
      #+END_SRC
      
-     #+RESULTS[6d0fb76f8682d44df1d2a29a67b7457bc76c6941]:
+     #+RESULTS:
      :
      : >>> None
      : <_sre.SRE_Match object; span=(0, 1), match='1'>
@@ -1589,7 +1589,7 @@
            search('[a-z]', '!abc').group()
         #+END_SRC
         
-        #+RESULTS[8c5c87466b3ef0098a4731abc4a4607048da84ba]:
+        #+RESULTS:
         :
         : >>> None
         : 'a'
@@ -1608,7 +1608,7 @@
        fullmatch('a', 'a').group()
      #+END_SRC
      
-     #+RESULTS[0792b3de015de249698e7ea50ea20a59d951ed48]:
+     #+RESULTS:
      :
      : >>> 'a'
      : None
@@ -1627,7 +1627,7 @@
        split('[a-f]+', '0a3B9', flags=IGNORECASE)
      #+END_SRC
 
-     #+RESULTS[1a2a60181eba4721fb53739497cc6f3d000e7f14]:
+     #+RESULTS:
      :
      : >>> ['Words', 'words', 'words', '']
      : ['Words', ', ', 'words', ', ', 'words', '.', '']
@@ -1641,7 +1641,7 @@
        split('(\W+)', '...words,words...')
      #+END_SRC
      
-     #+RESULTS[8d886d4efb87f92ab50d6f499c6c5d24ac8a2628]:
+     #+RESULTS:
      :
      : >>> ['', '...', 'words', ',', 'words', '...', '']
 
@@ -1657,7 +1657,7 @@
        split('(x*)', 'axbc')
      #+END_SRC
 
-     #+RESULTS[e6bd9937ea0b77ed2084f1b11bcb9d8a734ab15f]:
+     #+RESULTS:
      :
      : >>> /usr/lib/python3.5/re.py:203: FutureWarning: split() requires a non-empty pattern match.
      :   return _compile(pattern, flags).split(string, maxsplit)
@@ -1671,7 +1671,7 @@
        split('^$', 'a\nb', MULTILINE)
      #+END_SRC
 
-     #+RESULTS[f35b990abfeb4946ab2cd6287d3f8085fcb05fd5]:
+     #+RESULTS:
      :
      : >>> Traceback (most recent call last):
      :   File "<stdin>", line 1, in <module>
@@ -1691,7 +1691,7 @@
        findall('\w', 'abc')
      #+END_SRC
 
-     #+RESULTS[059d17b0aa79b42f3bd511a488c2ddd1b85d5e67]:
+     #+RESULTS:
      :
      : >>> ['a', 'b', 'c']
 
@@ -1706,7 +1706,7 @@
        findall(r'([0-9])([a-z])', '1a23c')
      #+END_SRC
 
-     #+RESULTS[91ca12f5f1f88c36de389821111d994d0508ec15]:
+     #+RESULTS:
      :
      : >>> ['1a', '3c']
      : ['1', '3']
@@ -1727,7 +1727,7 @@
            print(x.group())
      #+END_SRC
 
-     #+RESULTS[65b077efefe1b5d50fe85795c6d056a4d2e23516]:
+     #+RESULTS:
      :
      : >>> >>> ... ... a1
      : b2
@@ -1748,7 +1748,7 @@
               )
      #+END_SRC
      
-     #+RESULTS[764048d33624b807dd33f4e152202944946051a8]:
+     #+RESULTS:
      :
      : >>> ... ... ... 'static PyObject*\npy_myfunc(void)\n{'
      
@@ -1764,7 +1764,7 @@
        re.sub('_\w', dash2camal, 'this_is_variable_name')
      #+END_SRC
      
-     #+RESULTS[2e24d96cd099c0474bf8d26e9f503720817f953e]:
+     #+RESULTS:
      :
      : >>> ... ... >>> 'thisIsVariableName'
      
@@ -1776,7 +1776,7 @@
        re.sub('x*', '-', 'abc')
      #+END_SRC
      
-     #+RESULTS[0be01624da5b15701f8f2438cfd7885918671069]:
+     #+RESULTS:
      :
      : '-a-b-c-'
      
@@ -1800,7 +1800,7 @@
        re.subn('_\w', dash2camel, 'this-is-variable', count=1)
      #+END_SRC
 
-     #+RESULTS[69ef37e9683a9a9784ac7848e9273af37de00978]:
+     #+RESULTS:
      :
      : >>> >>> ... ... >>> >>> ('thisIsVariable', 2)
      : ('thisIs_variable', 1)
@@ -1817,7 +1817,7 @@
        re.escape('\w\n\\')
      #+END_SRC
 
-     #+RESULTS[698dd0925515baa613f4d25202185bb3bd2bdda8]:
+     #+RESULTS:
      :
      : >>> 'abc_12'
      : '\\\\w\\\n\\\\'
@@ -1850,7 +1850,7 @@
            print(error.colno)
      #+END_SRC
 
-     #+RESULTS[64af38ff971caa6dee8d046004b59e8dff79aafc]:
+     #+RESULTS:
      :
      : >>> ... ... ... ... ... ... ... ... missing ), unterminated subpattern
      : (
@@ -1882,7 +1882,7 @@
        pattern1.search('dog', 1)
      #+END_SRC
      
-     #+RESULTS[595d50894e9c421eac77b3159caae7c78ec4aed0]:
+     #+RESULTS:
      :
      : >>> >>> >>> <_sre.SRE_Match object; span=(0, 1), match='d'>
      : None
@@ -1901,7 +1901,7 @@
        print(pattern.search('odg', pos=1))
      #+END_SRC
 
-     #+RESULTS[b928866c52db5ee66503fbe86b7443cb94a5589c]:
+     #+RESULTS:
      :
      : >>> >>> <_sre.SRE_Match object; span=(0, 1), match='d'>
      : <_sre.SRE_Match object; span=(2, 3), match='d'>
@@ -1929,7 +1929,7 @@
        pattern.match('dog', 1)
      #+END_SRC
 
-     #+RESULTS[b58c49636e6b96083dc4a4526edc8c6c82d93e8d]:
+     #+RESULTS:
      :
      : >>> >>> None
      : <_sre.SRE_Match object; span=(1, 2), match='o'>
@@ -1948,7 +1948,7 @@
        pattern.fullmatch('dogge', 1, 3)
      #+END_SRC
 
-     #+RESULTS[29ee1adb973e308f26b87107aa1df74690ba267d]:
+     #+RESULTS:
      :
      : >>> >>> >>> (None, None, None)
      : <_sre.SRE_Match object; span=(1, 3), match='og'>
@@ -1982,7 +1982,7 @@
        re.compile('(?Li)', re.VERBOSE).flags
      #+END_SRC
 
-     #+RESULTS[2772b6142f4a3d587f7365088b88c29b15e6e5f4]:
+     #+RESULTS:
      :
      : >>> (32, 32)
      : 0
@@ -2000,7 +2000,7 @@
        re.compile('(?:)').groups
      #+END_SRC
 
-     #+RESULTS[943d3bbaed042dde09adf7343c77498f273f80ff]:
+     #+RESULTS:
      :
      : >>> 0
      : 1
@@ -2019,7 +2019,7 @@
        re.compile('(?P<name>)(?P<age>)').groupindex
      #+END_SRC
 
-     #+RESULTS[a85ca27866874f160a0df3330a672f5cb16ca48e]:
+     #+RESULTS:
      :
      : >>> mappingproxy({})
      : mappingproxy({})
@@ -2035,7 +2035,7 @@
        re.compile('xyz()').pattern
      #+END_SRC
      
-     #+RESULTS[6013ac05a3b508213048d8d3a713e7d962a6656c]:
+     #+RESULTS:
      :
      : >>> b'xyz()'
      : 'xyz()'
@@ -2064,7 +2064,7 @@
        m.expand(r'\g<2> \1 \g<first>')
      #+END_SRC
 
-     #+RESULTS[3f50ae1a7a1abe547ca4977b5259200def7b165e]:
+     #+RESULTS:
      :
      : >>> >>> 'world hello hello'
 
@@ -2088,7 +2088,7 @@
        m.group(1, 2)
      #+END_SRC
 
-     #+RESULTS[4346f5c0db5d449b9c8545fff03d9c5a60740cb0]:
+     #+RESULTS:
      :
      : >>> >>> 'Isaac Newton'
      : 'Isaac'
@@ -2108,7 +2108,7 @@
        m.group(1), m.group(2)
      #+END_SRC
      
-     #+RESULTS[416c0faee3171c2eb53e55c82bf781785704e558]:
+     #+RESULTS:
      :
      : >>> >>> >>> ('Malcolm', 'Reynolds')
      : ('Malcolm', 'Reynolds')
@@ -2123,7 +2123,7 @@
        m.group(0)
      #+END_SRC
      
-     #+RESULTS[21b4b33aa5d52bbe73c01b3e13c87ac93ecd32e3]:
+     #+RESULTS:
      :
      : >>> >>> 'c3'
      : 'aab2c3'
@@ -2141,7 +2141,7 @@
        m.group(4)
      #+END_SRC
      
-     #+RESULTS[3e2e22877d4c80a9581570d8ad461ee7d32e0d35]:
+     #+RESULTS:
      :
      : >>> >>> 'ab'
      : 'a'
@@ -2158,7 +2158,7 @@
        m.groups()
      #+END_SRC
      
-     #+RESULTS[884d7a63d90f29c74bb4e4c5612fd0b70acf289c]:
+     #+RESULTS:
      :
      : >>> ('3', '14159')
      
@@ -2172,7 +2172,7 @@
        m.groups('没有匹配')
      #+END_SRC
 
-     #+RESULTS[af808ee7c37bcb469a1a6a66463e393253134506]:
+     #+RESULTS:
      :
      : >>> ('123', None, None)
      : ('123', '没有匹配', '没有匹配')
@@ -2186,7 +2186,7 @@
        m.groupdict()
      #+END_SRC
 
-     #+RESULTS[a6a3a4c6fdff891034f4abaea1210234894793cc]:
+     #+RESULTS:
      :
      : >>> >>> {}
 
@@ -2208,7 +2208,7 @@
        m2.groupdict()
      #+END_SRC
 
-     #+RESULTS[cefbee6e52e6402fd05abf9908d384e597f493b8]:
+     #+RESULTS:
      :
      : >>> >>> {'first_name': 'Malcolm', 'last_name': 'Reynolds'}
      : >>> ... >>> >>> {'first_name': 'Malcolm', 'suffix': 'Phd', 'last_name': 'Reynolds'}
@@ -2230,7 +2230,7 @@
        m.start(2), m.end(2)
      #+END_SRC
      
-     #+RESULTS[6359d0464ff69e38123bbdd97411c7d44e21f69a]:
+     #+RESULTS:
      :
      : >>> >>> ('Michael', None)
      : (0, 16)
@@ -2258,7 +2258,7 @@
        m.start(1), m.end(1)
      #+END_SRC
      
-     #+RESULTS[d00e11c23036607a93602bc2110e5fa07bd85c13]:
+     #+RESULTS:
      :
      : >>> >>> 'b'
      : ''
@@ -2275,7 +2275,7 @@
        email[:m.start()] + email[m.end():]
      #+END_SRC
      
-     #+RESULTS[9f7eb4ef041bb44d69fcdcd36102b0b01e2e82c9]:
+     #+RESULTS:
      :
      : >>> >>> >>> '3261958605@qq.com'
      
@@ -2292,7 +2292,7 @@
        m.span(2)
      #+END_SRC
 
-     #+RESULTS[32b1236ad224a15c5c8cc948695214121a86deda]:
+     #+RESULTS:
      :
      : >>> >>> (0, 15)
      : (0, 7)
@@ -2312,7 +2312,7 @@
        m.pos
      #+END_SRC
 
-     #+RESULTS[1e4714847ab10ab751f87b54553cb02020dd5605]:
+     #+RESULTS:
      :
      : >>> >>> >>> 'Michael'
      : 0
@@ -2331,7 +2331,7 @@
        m.endpos
      #+END_SRC
 
-     #+RESULTS[1178e40ecf05c7f7e6e2d14e3bc8a728d3e24511]:
+     #+RESULTS:
      :
      : >>> >>> >>> 'Michael'
      : 'Michael'
@@ -2354,7 +2354,7 @@
        print(match('ab(.)?', 'ab').lastindex)
      #+END_SRC
 
-     #+RESULTS[c861e30e0bfa4b2b43ab88e13425c40bf8d7ff44]:
+     #+RESULTS:
      :
      : >>> 1
      : 1
@@ -2375,7 +2375,7 @@
        print(match('\w+ \w+', 'Michael Jackson').lastgroup)
      #+END_SRC
 
-     #+RESULTS[f098162debbf03907205be42587e8600c3347198]:
+     #+RESULTS:
      :
      : >>> 'last_name'
      : None
@@ -2393,7 +2393,7 @@
        m1.re
      #+END_SRC
 
-     #+RESULTS[3970cca851b2b252546d8cc572145d5ff2fc3c20]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> (<class '_sre.SRE_Pattern'>, re.compile('(\\w+) (\\w+)'))
      : re.compile('(\\w+) (\\w+)')
@@ -2407,7 +2407,7 @@
        m.string
      #+END_SRC
 
-     #+RESULTS[11670b75f063bd545a9b7ec24a74ca84f21c875e]:
+     #+RESULTS:
      :
      : >>> >>> 'Michael Jackson'
      
@@ -2423,7 +2423,7 @@
               print('<Match: {}, groups={}>'.format(match.group(), match.groups()))
     #+END_SRC
     
-    #+RESULTS[816acc52ed86904f3cb4c7f9122ec16bfc5dc22e]:
+    #+RESULTS:
     
     假设编写一个扑克程序，每个玩家手中有5张牌，“a”代表Ace，“k”代表King，
     “q”代表queen，“j”代表Jack，“t”代表10，2-9分别代表其他牌。则可使用
@@ -2438,7 +2438,7 @@
       displaymatch(valid.match('727ak'))
     #+END_SRC
 
-    #+RESULTS[5cc6723551093a93dbe49fe376b7448b733868c4]:
+    #+RESULTS:
     :
     : >>> None
     : None
@@ -2455,7 +2455,7 @@
       displaymatch(pair.match('354aa'))
     #+END_SRC
 
-    #+RESULTS[666c51b269209024d7a98fe9deafb5fa91c79730]:
+    #+RESULTS:
     :
     : >>> <Match: 717, groups=('7',)>
     : None
@@ -2467,7 +2467,7 @@
       pair.match('354aa').group(1)
     #+END_SRC
 
-    #+RESULTS[c66a65d33f2b050da5633b9273b338949000d9de]:
+    #+RESULTS:
     : 'a'
 
 *** 模仿scanf()
@@ -2518,7 +2518,7 @@
       print(re.match('^a', 'abcdef'))
     #+END_SRC
 
-    #+RESULTS[d9d142fd36515bb2d5e8c296d132d47b9fc6f1c3]:
+    #+RESULTS:
     :
     : >>> None
     : None
@@ -2534,7 +2534,7 @@
       print(re.search('^X', 'A\nB\nX', re.MULTILINE))
     #+END_SRC
 
-    #+RESULTS[3a2fa92e9bd7a25851bf1cd63bdbe1c1ca100267]:
+    #+RESULTS:
     :
     : >>> None
     : <_sre.SRE_Match object; span=(4, 5), match='X'>
@@ -2562,7 +2562,7 @@
       entries
     #+END_SRC
 
-    #+RESULTS[40f95cdd94740721d4691df79f83064f0387c982]:
+    #+RESULTS:
     :
     : >>> ['小张：192.168.3.4 155 北京', '小王：192.145.2.5 436 上海', '小明：182.122.12.122 广州', '小黄：122.312.232.12 深圳']
 
@@ -2573,7 +2573,7 @@
       [re.split('：? ', entry, 3) for entry in entries]
     #+END_SRC
 
-    #+RESULTS[9112cc05a7ae4023f3fe483288d4f47983182cfc]:
+    #+RESULTS:
     :
     : >>> [['小张：192.168.3.4', '155', '北京'], ['小王：192.145.2.5', '436', '上海'], ['小明：182.122.12.122', '广州'], ['小黄：122.312.232.12', '深圳']]
 
@@ -2584,7 +2584,7 @@
       [re.split('：? ', entry, 4) for entry in entries]
     #+END_SRC
 
-    #+RESULTS[2a6d33cd22881070c69bc69c64648541543a5ae3]:
+    #+RESULTS:
     :
     : >>> [['小张：192.168.3.4', '155', '北京'], ['小王：192.145.2.5', '436', '上海'], ['小明：182.122.12.122', '广州'], ['小黄：122.312.232.12', '深圳']]
 
@@ -2606,7 +2606,7 @@
       re.subn(r'(\w)(\w+)(\w)', shuffle, text)
     #+END_SRC
     
-    #+RESULTS[aecb6e6d114fb71671056d19329b6a2dddc8e44b]:
+    #+RESULTS:
     :
     : >>> >>> ... ... ... ... >>> >>> 'Psoersofr Aebmlladok, paelse rproet yuor acbesens ptromlpy.'
     : ('Psoersofr Aamlelbdok, pasele rproet yuor aebescns polmrpty.', 7)
@@ -2621,7 +2621,7 @@
       re.findall(r'\w+ly', text)
     #+END_SRC
 
-    #+RESULTS[148712671095c8e264137a763068b12355885de5]:
+    #+RESULTS:
     :
     : >>> ['gently', 'quickly']
 
@@ -2636,7 +2636,7 @@
           print('{}-{}: {}'.format(m.start(), m.end(), m.group(0)))
     #+END_SRC
 
-    #+RESULTS[4ef7fc9b3983475658f8fed723d8f52c6d11a9b9]:
+    #+RESULTS:
     :
     : >>> ... ... 0-6: gently
     : 22-29:   quickly
@@ -2651,7 +2651,7 @@
       re.match('\\W(.)\\1\\W', ' ff ')
     #+END_SRC
 
-    #+RESULTS[f87ad450a30bd52afa406cd837f586372d272cff]:
+    #+RESULTS:
     :
     : <_sre.SRE_Match object; span=(0, 4), match=' ff '>
     : <_sre.SRE_Match object; span=(0, 4), match=' ff '>
@@ -2665,7 +2665,7 @@
       re.match('\\\\', r'\\')
     #+END_SRC
 
-    #+RESULTS[2b58d4d52cda60cffeafef4bf50e7516c02ef15c]:
+    #+RESULTS:
     :
     : <_sre.SRE_Match object; span=(0, 1), match='\\'>
     : <_sre.SRE_Match object; span=(0, 1), match='\\'>
@@ -2725,7 +2725,7 @@
           print(token)
     #+END_SRC
 
-    #+RESULTS[34edca470cd7177c40d3aff00d84a96d059feae1]:
+    #+RESULTS:
     #+begin_example
 
     >>> >>> >>> >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> ... ... ... ... >>> >>> ... ... Token(typ='IF', value='IF', line=1, column=1)
@@ -2778,7 +2778,7 @@
      diff.get_matching_blocks()
    #+END_SRC
 
-   #+RESULTS[6409e370845694dd9b45e0d29ebbdc6bfe6386f5]:
+   #+RESULTS:
    :
    : >>> >>> [Match(a=1, b=1, size=3), Match(a=4, b=5, size=1), Match(a=6, b=6, size=0)]
 
@@ -2811,7 +2811,7 @@
      list(d.compare(text1, text2))
    #+END_SRC
    
-   #+RESULTS[6a265cdbbe4e6fc28bb4f039bed6d87aec0bd9e8]:
+   #+RESULTS:
    :
    : >>> >>> >>> ... ... ... >>> >>> ... ... >>> >>> ['   ', '  1', '  .', '  a', '  \n', '  2', '  .', '- b', '+ v', '  \n', '- c', '- \n']
    
@@ -2829,7 +2829,7 @@
                  'abc', 'ddd'], fromdesc='字符串1', todesc='字符串2', context=False))
    #+END_SRC
    
-   #+RESULTS[c37971182bce8456d00e2f61f04c8e3d2b8ed89d]:
+   #+RESULTS:
    :
    : >>> >>> >>> '\n    <table class="diff" id="difflib_chg_to23__top"\n           cellspacing="0" cellpadding="0" rules="groups" >\n        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>\n        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>\n        \n        <tbody>\n            <tr><td class="diff_next"><a href="#difflib_chg_to23__top">t</a></td><td class="diff_header" id="from23_1">1</td><td nowrap="nowrap">文本</td><td class="diff_next"><a href="#difflib_chg_to23__top">t</a></td><td class="diff_header" id="to23_1">1</td><td nowrap="nowrap">文本</td></tr>\n            <tr><td class="diff_next"></td><td class="diff_header" id="from23_2">2</td><td nowrap="nowrap">比较</td><td class="diff_next"></td><td class="diff_header" id="to23_2">2</td><td nowrap="nowrap">比较</td></tr>\n        </tbody>\n    </table>'
    : ... ... ... 2579
@@ -2881,7 +2881,7 @@
          s1, s2, n=1, fromfile='file1', tofile='file2', fromfiledate='2007-01-02', lineterm='\n\t\t'))
    #+END_SRC
 
-   #+RESULTS[bddce0372c7d83ed64cd0fbc8fcc56c5826fb1b7]:
+   #+RESULTS:
    #+begin_example
 
    >>> >>> >>> >>> ... *** file1	2007-01-02
@@ -2922,7 +2922,7 @@
      get_close_matches('Pennsylvania', ['Pencilvaneya'], cutoff=0.66)
    #+END_SRC
 
-   #+RESULTS[2c26a43c3068c6c8e31c58c59f17247923b59cab]:
+   #+RESULTS:
    :
    : >>> >>> ['apple', 'ape']
    : ['while']
@@ -2956,7 +2956,7 @@
      print(''.join(diff), end='')
    #+END_SRC
    
-   #+RESULTS[2fa747cb46c39a13ef7aaa99a43526e3e2d7ded9]:
+   #+RESULTS:
    #+begin_example
 
    ... >>> <generator object Differ.compare at 0x7ff8b7e45fc0>
@@ -2988,7 +2988,7 @@
      ''.join(restore(diff, 2))
    #+END_SRC
 
-   #+RESULTS[9ab8c6616f9648959199e73fad9dae270fbe03aa]:
+   #+RESULTS:
    :
    : >>> ... >>> >>> >>> ['- one\n', '?  ^\n', '+ ore\n', '?  ^\n', '- two\n', '- three\n', '?  -\n', '+ tree\n', '+ emu\n']
    : 'one\ntwo\nthree\n'
@@ -3006,7 +3006,7 @@
      sys.stdout.writelines(unified_diff(s1, s2, fromfile='a.txt', tofile='b.txt'))
    #+END_SRC
 
-   #+RESULTS[37231eb023b1ece630447ccadd37ddda1e4a51f9]:
+   #+RESULTS:
    #+begin_example
 
    >>> >>> >>> >>> --- a.txt
@@ -3046,7 +3046,7 @@
      IS_LINE_JUNK('a')
    #+END_SRC
 
-   #+RESULTS[37421748018f71231c052c42b20d101f3583a18a]:
+   #+RESULTS:
    :
    : >>> True
    : True
@@ -3064,7 +3064,7 @@
      IS_CHARACTER_JUNK('a')
    #+END_SRC
 
-   #+RESULTS[ba6edd275fddb49712484d5ab37e40c55b1c559d]:
+   #+RESULTS:
    :
    : >>> True
    : True
@@ -3111,7 +3111,7 @@
       sm.b2j
     #+END_SRC
     
-    #+RESULTS[d058ba3647002bd19d4fe15aaa70473eac99bbe3]:
+    #+RESULTS:
     :
     : >>> >>> {'\t', ' '}
     : set()
@@ -3164,7 +3164,7 @@
        sm2.find_longest_match(0, 3, 0, 3)
      #+END_SRC
      
-     #+RESULTS[29ed74fed75af62e2493de5e39508c118446538a]:
+     #+RESULTS:
      :
      : >>> ... >>> >>> Match(a=0, b=4, size=5)
      : 0 4 5
@@ -3185,7 +3185,7 @@
        sm.get_matching_blocks()
      #+END_SRC
      
-     #+RESULTS[64e7862d2ec759a2f832ef883c54f782007fe1cf]:
+     #+RESULTS:
      :
      : >>> >>> >>> [Match(a=0, b=0, size=2), Match(a=3, b=2, size=2), Match(a=5, b=4, size=0)]
      
@@ -3213,7 +3213,7 @@
            print('{:7} a[{}:{}] --> b[{}:{}]]  {!r:>8} --> {!r}'.format(tag, i1, i2, j1, j2, a[i1:i2], b[j1:j2]))
      #+END_SRC
 
-     #+RESULTS[518af92d7c59a279ef670ee485e72bd2f8af51a0]:
+     #+RESULTS:
      :
      : >>> >>> >>> >>> ... ... delete  a[0:1] --> b[0:0]]       'q' --> ''
      : equal   a[1:3] --> b[0:2]]      'ab' --> 'ab'
@@ -3238,7 +3238,7 @@
        sm.ratio()
      #+END_SRC
 
-     #+RESULTS[70b0b192032da5460b990a8288a1a811668a4fc5]:
+     #+RESULTS:
      :
      : >>> >>> 0.6666666666666666
 
@@ -3263,7 +3263,7 @@
        sm.real_quick_ratio()
      #+END_SRC
 
-     #+RESULTS[5e3d4404fd22e67afa621b6ead0fce85c18d400a]:
+     #+RESULTS:
      :
      : >>> >>> 0.6666666666666666
      : 0.8333333333333334
@@ -3285,7 +3285,7 @@
      print(round(sm.ratio(), 3))
    #+END_SRC
    
-   #+RESULTS[fcb93acff806b9e3a68b9fd8772aa205ab1ca0ce]:
+   #+RESULTS:
    : 0.836
    
    如果只关心是否有匹配，可使用get_matching_blocks()：
@@ -3298,7 +3298,7 @@
      SequenceMatcher(None, '', '').get_matching_blocks()
    #+END_SRC
    
-   #+RESULTS[88f0739b36b32bc72aac669b80392bcfbf2aa3c9]:
+   #+RESULTS:
    :
    : ... ... a[0] and b[0] match for 8 elements
    : a[8] and b[17] match for 8 elements
@@ -3313,7 +3313,7 @@
          print('{:8} a[{}:{}] b[{}:{}]'.format(*opcode))
    #+END_SRC
 
-   #+RESULTS[7a72b1be51e63927b589c4c6369449251d4fd791]:
+   #+RESULTS:
    :
    : ... equal    a[0:8] b[0:8]
    : insert   a[8:8] b[8:17]
@@ -3386,7 +3386,7 @@
      pprint(result)
    #+END_SRC
 
-   #+RESULTS[8e6e2df29dfedc1b9237435b472f5b30f89191ed]:
+   #+RESULTS:
    #+begin_example
 
    >>> <generator object Differ.compare at 0x7ff8b7de8360>
@@ -3407,7 +3407,7 @@
      sys.stdout.writelines(result)
    #+END_SRC
 
-   #+RESULTS[92400f416f77f13268b50845eb908bde18393cbd]:
+   #+RESULTS:
    :
    : 1. Beautiful is better than ugly.
    : - 2. Explicit is better than implicit.
@@ -3439,7 +3439,7 @@
      wrap('a' * 23, width=10)
    #+END_SRC
 
-   #+RESULTS[276e5e95eb70e0cacd79102a6504f33d8d2c2c3a]:
+   #+RESULTS:
    :
    : ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaa']
 
@@ -3457,7 +3457,7 @@
      fill('a' * 23, width=10)
    #+END_SRC
 
-   #+RESULTS[56bfb65e85fa58e885da861c8a8fd26fef0c8f06]:
+   #+RESULTS:
    :
    : 'aaaaaaaaaa\naaaaaaaaaa\naaa'
 
@@ -3474,7 +3474,7 @@
      shorten('hello  world!', width=10, placeholder='...')
    #+END_SRC
 
-   #+RESULTS[533090a9329d615f49b6f23d3a18f573da9647a0]:
+   #+RESULTS:
    :
    : 'hello world!'
    : 'hello [...]'
@@ -3502,7 +3502,7 @@
      print(repr(dedent(text)))
    #+END_SRC
 
-   #+RESULTS[f6a8a9c9b479742b369afd24cc3638e84f926be7]:
+   #+RESULTS:
    :
    : ... ... ... >>> '        hello\n        world\n'
    : 'hello\nworld\n'
@@ -3520,7 +3520,7 @@
      indent(s, ' ')
    #+END_SRC
    
-   #+RESULTS[b7affb53a05e91db1a56cd635f07660095b4b01d]:
+   #+RESULTS:
    :
    : >>> ' hello\n\n \n world'
    
@@ -3531,7 +3531,7 @@
      print(indent(s, '+', lambda line: True))
    #+END_SRC
    
-   #+RESULTS[640c0451f755ecc09aa5ee372fcc9b6d9a79bbdd]:
+   #+RESULTS:
    : +hello
    : +
    : +
@@ -3573,7 +3573,7 @@
       wrapper.width
     #+END_SRC
 
-    #+RESULTS[6449049f98dc5f73de92ca7c052a64470f533434]:
+    #+RESULTS:
     :
     : >>> 70
     
@@ -3589,7 +3589,7 @@
       wrapper.fill('a\tb')
     #+END_SRC
 
-    #+RESULTS[77064e68aa563820d86343c9cffc58ac27b66e4c]:
+    #+RESULTS:
     :
     : >>> 'a b'
     : >>> 'a       b'
@@ -3606,7 +3606,7 @@
       wrapper.fill('a\tb')
     #+END_SRC
 
-    #+RESULTS[98cc79254ca41f3dd8bf9df7bc345ec81bbda9c5]:
+    #+RESULTS:
     :
     : >>> 'a       b'
     : >>> 'a   b'
@@ -3629,7 +3629,7 @@
       wrapper.fill('a\tb\n\nc d\f\v\t\ne')
     #+END_SRC
 
-    #+RESULTS[900e408d75283070867d645e9d566f48f5c27ffb]:
+    #+RESULTS:
     :
     : >>> 'a       b  c d      e'
     : >>> 'a       b\n\nc d\x0c\x0b   \ne'
@@ -3649,7 +3649,7 @@
       wrapper.wrap('ab\n \ncd')
     #+END_SRC
 
-    #+RESULTS[e0d138003aba17cd984268e6eec50e614266763e]:
+    #+RESULTS:
     :
     : >>> ['ab', 'cd']
     : >>> ['ab', '  ', '  ', '  ', '  ', ' ', 'cd']
@@ -3666,7 +3666,7 @@
       print(wrapper.fill(''))
     #+END_SRC
 
-    #+RESULTS[7b000c72a4eb0fba0eb240d8f00f8edf87f41e00]:
+    #+RESULTS:
     :
     : >>> ++++a
     : b
@@ -3685,7 +3685,7 @@
       wrapper.fill('abcd')
     #+END_SRC
 
-    #+RESULTS[bbadce9c8385ad51dd2e0b5d36a39d7c26813400]:
+    #+RESULTS:
     :
     : >>> 'ab\ncd'
     : >>> 'ab\n+++c\n+++d'
@@ -3704,7 +3704,7 @@
       wrapper.fill('abcd')
     #+END_SRC
 
-    #+RESULTS[16b316b0b313cd614858ac3b5f639f0b609c0491]:
+    #+RESULTS:
     :
     : >>> >>> 'abc\nd'
     : >>> 'abcd'
@@ -3724,7 +3724,7 @@
       wrapper.fill('ab-d')
     #+END_SRC
 
-    #+RESULTS[8ec7a4c7e028cff567c6f78e001dfb3bfe0d8b9f]:
+    #+RESULTS:
     :
     : >>> 'ab-\nd'
     : >>> 'ab-\nd'
@@ -3743,7 +3743,7 @@
       wrapper.fill('abcdefg')
     #+END_SRC
 
-    #+RESULTS[1529d1243e154533fc73a77d9675f611529378e9]:
+    #+RESULTS:
     :
     : >>> 'ab\ncd\nef\ng'
     : >>> >>> 'ab\ncd\n..'
@@ -3760,7 +3760,7 @@
       wrapper.fill('abc' * 10)
     #+END_SRC
 
-    #+RESULTS[3714850c2fcd10c80dc7ab4f94f56e40575d5d34]:
+    #+RESULTS:
     :
     : >>> 'abcab\n[...]'
     : >>> 'abcab\n...'
@@ -3787,7 +3787,7 @@
 
     #+END_SRC
 
-    #+RESULTS[16d6ad1354145377fe97fdd5378a9cca94d7a500]:
+    #+RESULTS:
     :
     : >>> '\x03'
     : '\x03'
@@ -3800,7 +3800,7 @@
       unicodedata.name('一')
     #+END_SRC
 
-    #+RESULTS[b07ba84b9e1bb0b18e9214a1071b0ec6790bbdd9]:
+    #+RESULTS:
     :
     : 'LATIN SMALL LETTER A'
     : 'CJK UNIFIED IDEOGRAPH-4E00'
@@ -3813,7 +3813,7 @@
       unicodedata.decimal('一', 1)
     #+END_SRC
 
-    #+RESULTS[d27ddbfa90bc790d69f1c3c4f99ef952188e1644]:
+    #+RESULTS:
     :
     : 1
     : 1
@@ -3826,7 +3826,7 @@
       unicodedata.digit('柒',7)
     #+END_SRC
     
-    #+RESULTS[8e225a07a0bccf9e1a3df7221a49a1c57a91d50f]:
+    #+RESULTS:
     :
     : 1
     : 7
@@ -3839,7 +3839,7 @@
       unicodedata.numeric('叁')
     #+END_SRC
     
-    #+RESULTS[d638aad5a39cf92b36eede2bbbe8317c6a05df87]:
+    #+RESULTS:
     :
     : 1.0
     : >>> 3.0
@@ -3853,7 +3853,7 @@
       unicodedata.category('。')
     #+END_SRC
 
-    #+RESULTS[fea1962fdb42ce8c90be6d7c7b4b9f305fd4339b]:
+    #+RESULTS:
     :
     : 'Lo'
     : 'Nd'
@@ -3868,7 +3868,7 @@
       unicodedata.bidirectional('一')
     #+END_SRC
 
-    #+RESULTS[4d6a93b44d930e8dd0ce23ca05c54bfb49b4f349]:
+    #+RESULTS:
     :
     : 'EN'
     : 'L'
@@ -3881,7 +3881,7 @@
       unicodedata.combining('1')
     #+END_SRC
 
-    #+RESULTS[2ab4aab7afb75b673ca3c8347be616b8f677d097]:
+    #+RESULTS:
     :
     : 0
     : 0
@@ -3894,7 +3894,7 @@
       unicodedata.east_asian_width('。')
     #+END_SRC
 
-    #+RESULTS[ded65a7d1c9bf497ebe3cb2e7e173eb2968adaab]:
+    #+RESULTS:
     :
     : 'W'
     : 'W'
@@ -3906,7 +3906,7 @@
       unicodedata.mirrored('1')
     #+END_SRC
 
-    #+RESULTS[f5c3eff46272211b2618fbf99ccfc70441cb3607]:
+    #+RESULTS:
     :
     : 0
     : 0
@@ -3921,7 +3921,7 @@
       unicodedata.unidata_version
     #+END_SRC
 
-    #+RESULTS[9b28c6f2cc967234744d96f87ef8944df9bec5a6]:
+    #+RESULTS:
     :
     : '8.0.0'
 
@@ -3932,7 +3932,7 @@
       unicodedata.ucd_3_2_0
     #+END_SRC
 
-    #+RESULTS[beb6d74e7387eff7d42791c5464a931e584b227d]:
+    #+RESULTS:
     :
     : <unicodedata.UCD object at 0x7f945959e968>
 

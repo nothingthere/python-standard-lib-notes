@@ -1,14 +1,141 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-02 15:22:30
+# Commentary:
 #+TITLE: 数据类型
 
+除Python内置的数据类型：dict、list、set、frozenset、tuple、str和
+bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于存储二进
+制数据。）。本章介绍一些特殊的数据类型，如dates和times，类型固定的数组，
+队列和集合。
+
+* datetime - 基本日期和时间类型
+
+** 模块常量
+*** datetime. *MINYEAR*
+*** datetime. *MAXYEAR*
+    date和datetime对象中允许的最大/小年数。
+
+    #+BEGIN_SRC python :session
+      import datetime
+      datetime.MINYEAR
+      datetime.MAXYEAR
+    #+END_SRC
+
+    #+RESULTS:
+    :
+    : >>> 1
+    : 9999
+
+** 可用类型
+** timedelta对象
+** date对象
+** datetime对象
+** time对象
+** tzinfo对象
+** timezone 对象
+** strftime()和strptime()
+* calendar - 日历相关函数
+* collections - 容器类型
+  此模块对内置类型dict、list、set和tuple实现了容器包装。
+
+  | namedtuple  | 命名式元组工厂函数                     |
+  | deque       | 类链表容器，可快速在两端添加和删除元素 |
+  | ChainMap    | 类字典类，利用多个映射创建单个view     |
+  | Counter     | 字典子类，计数可哈希对象               |
+  | OrderedDict | 字典子类，可记录添加元素的顺序         |
+  | defaultdict | 字典子类，调用工厂函数添加消失值       |
+  | UserDict    | 字典对象包装器，方便创建字典子类       |
+  | UserList    | 链表对象包装器，方便创建链表子类       |
+  | UserString  | 字符串对象包装器，方便创建字符串子类   |
+
+** ChainMap对象
+   将多个映射对象结合，作为单个对象。比创建新字典对象，然后使用字典的
+   update()方法快。
+
+*** class collections. *ChainMap* (*maps)
+    ChainMap将多个字典或映射对象集合到一起，创建一个新的，可更新的view。
+    如果没有MAP参数，则将空字典传递给此构建函数。
+
+    #+BEGIN_SRC python :session
+      from collections import ChainMap
+      books = {'A': 10, 'B': 11}
+      persons = {'Mike': 23, 'Lily': 27}
+      mix = ChainMap(books, persons)
+      print(mix)
+      ChainMap()
+    #+END_SRC
+
+    #+RESULTS:
+    :
+    : >>> >>> >>> ChainMap({'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
+    : ChainMap({})
+
+    ChainMap内部用链表集中各个映射对象，各元素映射对象可使用MAP的属性
+    获取或跟新。此外无其他任何状态：
+
+    #+BEGIN_SRC python :session
+      mix['Lily'] = 100
+      print(mix)
+    #+END_SRC
+
+    #+RESULTS:
+    :
+    : ChainMap({'Lily': 100, 'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
+
+    除查找外，重新赋值、跟新和删除都只在第一个映射对象中进行：
+
+    #+BEGIN_SRC python :session
+      mix['Lily']
+      mix['A']
+    #+END_SRC
+
+    #+RESULTS:
+    : 100
+    : 10
+
+    ChainMap中的元素实际上是原映射的索引，即改变原来映射，其中的元素也
+    随之改变：
+
+    #+BEGIN_SRC python :session
+      del persons['Mike']
+      print(persons)
+      print(mix)
+    #+END_SRC
+
+    #+RESULTS:
+    :
+    : {'Lily': 27}
+    : ChainMap({'Lily': 100, 'B': 11, 'A': 10}, {'Lily': 27})
+
+**** maps
+**** new_child
+**** parents
+
+*** ChainMap应用举例
+** Counter对象
+** deque对象
+*** deque应用举例
+** defaultdict对象
+*** defaultdict应用举例
+** namedtuple() - 元组工厂函数
+** OrderedDict对象
+*** OrderedDict应用举例
+** UserDict对象
+** UserList对象
+** UserString对象
+
+* collections.abc - 容器类型抽象基础类（Abstract Base Classes for Containers）
+* heapq - 堆排序算法
+* bisect - 数组二叉树搜索算法
 * array - 高效数字数组
   此模块为精简表示基本数据类型的数组：字符型、整型和浮点型。array类型
   与链表类型十分相似，只是存储其中的数据类型有约束。
-  
+
   *注意* ：适用于链表的方法也适用于array。
-  
+
   类型名以单个字母表示（与struct模块中，相同的格式字符含义相同；但最小值
   与struct中标准值不同）：
-  
+
   | 类型字符串 | 对应C类型          | Python类型        | 最小byte数 | 注意点 |
   |------------+--------------------+-------------------+------------+--------|
   | b          | signed char        | int               |          1 |        |
@@ -24,21 +151,21 @@
   | Q          | unsigned long long | int               |          8 | (2)    |
   | f          | float              | float             |          4 |        |
   | d          | double             | float             |          8 |        |
-  
+
   注意点：
-  
+
   1. 'u'类型代码将废除，不建议使用。
   2. 'q'和'Q'类型代码仅限的有效情况为：编译Python的C编译器支持C语言的
      “long long”类型，或Windows系统，或__int64。？？？
-     
+
   各类型代码表示的真实值取值范围取决于C实现，可使用itemsize属性获取。
-  
+
 ** 此模块定义的类型有
 *** class array. *array* (typecode[,initializer])
     INITIALIZER参数可选，须为“类bytes对象”，或类型合适的iterable对象。
-    
+
     如果数组元素类型与第一个参数（类型参数）不一致，则报错：
-    
+
     #+BEGIN_SRC python :session
       import array
       a = array.array('l')
@@ -48,17 +175,17 @@
 
       c = array.array('i', [1.2])
     #+END_SRC
-    
-    #+RESULTS[94793e0efba0c83ed00e446f38859d540df4a914]:
+
+    #+RESULTS:
     :
     : >>> >>> array('l')
     : array('i', [123, 456, 789])
-    : >>> Traceback (most recent call last): 
+    : >>> Traceback (most recent call last):
     :   File "<stdin>", line 1, in <module>
     : TypeError: integer argument expected, got float
-    
+
     INITIALIZER为“类bytes”对象：
-    
+
     #+BEGIN_SRC python :session
       from array import array
 
@@ -77,14 +204,14 @@
       # memoryview
     #+END_SRC
     
-    #+RESULTS[02efac5a2e7f225059f0f115b1dfe21f902c233c]:
+    #+RESULTS:
     :
     : >>> ... >>> array('b', [97, 98, 99])
     : >>> ... >>> array('b', [97, 98, 99])
     : >>> ... >>> array('b', [97, 98, 99])
-    
+
     为类型合适的iterable对象：
-    
+
     #+BEGIN_SRC python :session
       from array import array
 
@@ -112,8 +239,8 @@
       a = array('u', 'abc')
       print(a)
     #+END_SRC
-    
-    #+RESULTS[dad6d297885c927c88adc5725b3471b0d32a7ea2]:
+
+    #+RESULTS:
     :
     : >>> ... >>> array('i', [0, 1, 2])
     : >>> ... >>> array('i', [1, 2, 3])
@@ -121,12 +248,12 @@
     : >>> ... >>> array('i', [1, 2, 3])
     : >>> ... >>> array('i', [1, 2, 3])
     : >>> ... >>> array('u', 'abc')
-    
+
     如果INITIALIZER为链表，或字符串（'u'类型代码），实际上是调用了
     array的fromlist()、frombytes()或fromunicode()方法将新元素添加到数
     组中；如其它情况则是使用extend()方法将INITIALIZER中的元素添加到数
     组中。
-    
+
 ** 此模块定义的方法有
 *** array. *typecodes*
     返回所有可用的类型代码。
@@ -136,22 +263,22 @@
       array.typecodes
     #+END_SRC
 
-    #+RESULTS[7074593501113d8e9937d05a679498f45f29bbda]:
+    #+RESULTS:
     :
     : 'bBuhHiIlLqQfd'
 
 *** array. *typecode*
-
+    
     #+BEGIN_SRC python :session
       from array import array
       l = array('l')
       l.typecode
     #+END_SRC
-
-    #+RESULTS[eb39c5d86496465cd464400d9363abe0bcf7e2a1]:
+    
+    #+RESULTS:
     :
     : >>> 'l'
-
+    
 *** array. *itemsize*
 
     数组中单个元素所占byte数。
@@ -166,7 +293,7 @@
       b.itemsize
     #+END_SRC
 
-    #+RESULTS[b3de761c87e2a3d615e9ad657b2103c2eba0c31a]:
+    #+RESULTS:
     :
     : >>> >>> 1
     : >>> >>> 8
@@ -182,7 +309,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[f7833086dd3b94bd190eda019826e8d48e850c75]:
+    #+RESULTS:
     :
     : >>> >>> >>> array('i', [1, 2, 3, 4])
 
@@ -199,7 +326,7 @@
       a.buffer_info()[1] * a.itemsize
     #+END_SRC
 
-    #+RESULTS[6e71f7d6b36251fe4ab70871129d1f01d38839f1]:
+    #+RESULTS:
     :
     : >>> >>> array('d', [0.0, 1.0, 2.0])
     : (93900589887952, 3)
@@ -216,7 +343,7 @@
       len(a) * a.itemsize
     #+END_SRC
 
-    #+RESULTS[fa5139b84c7e779f9b1116ad01dd98652ec5428c]:
+    #+RESULTS:
     :
     : >>> >>> 24
 
@@ -237,7 +364,7 @@
       bin(-1677216)
     #+END_SRC
 
-    #+RESULTS[6b267cb87f1db4b94a6f062cedea9b0d3e26d03c]:
+    #+RESULTS:
     :
     : >>> >>> array('i', [255])
     : >>> >>> array('i', [-16777216])
@@ -257,7 +384,7 @@
       a.count(10)
     #+END_SRC
 
-    #+RESULTS[f1c97056afb4d3b634ac4c14c9f62e592cc13002]:
+    #+RESULTS:
     :
     : >>> 3
     : 0
@@ -276,7 +403,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[e811275fdcb3796ead201c9fe43396bcde65a162]:
+    #+RESULTS:
     :
     : >>> >>> array('i', [1, 2, 3, 4, 5, 6, 7, 8])
     : i 4
@@ -292,7 +419,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[223335b300fd03f97c3effc5bc9ebaf207010103]:
+    #+RESULTS:
     :
     : >>> >>> array('B', [100, 97, 98, 99, 100, 101, 102])
 
@@ -322,7 +449,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[7af48a1472c863a83cdb5b275acc03185a4b0bcb]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> ... ... ... ... ... array('b', [97, 32, 98, 32, 99, 32, 100, 32, 101, 32])
     : Traceback (most recent call last):
@@ -351,7 +478,7 @@
       print(b)
     #+END_SRC
 
-    #+RESULTS[ee6ff5728d7dd3ed2f1481230284520c42489b8b]:
+    #+RESULTS:
     :
     : >>> >>> >>> >>> ... ... >>> array('i', [1, 2, 3, 4, 5, 6])
     : array('i', [1, 2, 3, 4, 5, 6])
@@ -373,7 +500,7 @@
       b.fromunicode('abc')
     #+END_SRC
 
-    #+RESULTS[d6457c5ac18c4741783bab57ffb429334eea4928]:
+    #+RESULTS:
     :
     : >>> >>> array('u', 'abcdef一')
     : >>> >>> Traceback (most recent call last):
@@ -391,7 +518,7 @@
       a.index(100)
     #+END_SRC
 
-    #+RESULTS[bb9d8baefcc99d829f5a3af14533565e7a851413]:
+    #+RESULTS:
     :
     : >>> 1
     : array('b', [97, 98, 99])
@@ -419,7 +546,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[d91f3cdb32ed3e5944c67b53aa72648a8809aa5b]:
+    #+RESULTS:
     :
     : >>> >>> >>> array('i', [100, 1, 2, 3])
     : >>> ... >>> array('i', [100, 1, 2, 3, 0])
@@ -442,7 +569,7 @@
           a.pop()
     #+END_SRC
 
-    #+RESULTS[0b39d4d5c284af2cc42ec5ed4bfe237aa9efa871]:
+    #+RESULTS:
     :
     : >>> 3
     : array('i', [1, 2])
@@ -467,7 +594,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[212f24988fd8120f618e52af64fffe195b557b73]:
+    #+RESULTS:
     :
     : >>> >>> >>> array('i', [10, 1, 20])
     : >>> Traceback (most recent call last):
@@ -486,7 +613,7 @@
       print(a)
     #+END_SRC
 
-    #+RESULTS[a3ef9ffca5d7ce923173522f468e9b7a1e90c125]:
+    #+RESULTS:
     :
     : >>> >>> >>> array('i', [3, 2, 1])
 
@@ -500,13 +627,13 @@
       a.tobytes()
     #+END_SRC
 
-    #+RESULTS[7fcd7c92b5bd912518119b9963e019d026bc794d]:
+    #+RESULTS:
     :
     : >>> >>> b'\x01\x02\x03'
 
 *** array. *tofile* ()
     与tobytes方法相似，只是将内容写入文件。
-    
+
     #+BEGIN_SRC python :eval never
       from array import array
 
@@ -515,7 +642,7 @@
       with open('files/emma.txt', 'wb') as fp:
           a.tofile(fp)
     #+END_SRC
-    
+
 *** array. *tolist* ()
     将数组转换为普通链表。
 
@@ -526,7 +653,7 @@
       a.tolist()
     #+END_SRC
 
-    #+RESULTS[35127e89bdf3a9ad6716c8a97a98efbbbb398081]:
+    #+RESULTS:
     :
     : >>> >>> [1, 2, 3]
 
@@ -539,20 +666,27 @@
       a.tostring()
     #+END_SRC
 
-    #+RESULTS[d3991e96b25ff5dac6845e725808a54ad7d2dc63]:
+    #+RESULTS:
     :
     : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
 
 *** array. *tounicode* ()
     将数组转换为Unicode字符串，数组的类型代码须为'u'，否则返回
     ValueError错误。
-    
+
     #+BEGIN_SRC python :session
       from array import array
       a = array('u', '我有一个梦想！')
       a.tounicode()
     #+END_SRC
-    
-    #+RESULTS[e076b0712dd1e1f45dab4cc89d7782d2c3f0311c]:
+
+    #+RESULTS:
     :
     : >>> '我有一个梦想！'
+
+* weakref
+* types - 内置类型动态创建和命名
+* copy - 浅层复制和深层复制
+* pprint - 数据美化显示
+* reprlib - 另一个repr()实现
+* enum - 枚举支持

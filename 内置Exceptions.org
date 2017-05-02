@@ -20,7 +20,7 @@
      assert 1 == 0
    #+END_SRC
 
-   #+RESULTS[910303b204f68612c4fcdc1b06d2eedd1e752656]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -34,7 +34,7 @@
      s.x = 1
    #+END_SRC
 
-   #+RESULTS[1f59b8de4c7048a6d5f410b38ea49b6d442160b2]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -60,7 +60,7 @@
      from contextlib import xyz
    #+END_SRC
 
-   #+RESULTS[1de671e6db02b57472dc3ea7dad8b62e4f5d1187]:
+   #+RESULTS:
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
    : ImportError: No module named 'xyz'
@@ -82,7 +82,7 @@
      l['i']
    #+END_SRC
 
-   #+RESULTS[d62803316e3469facf295738158b3b1c62a162eb]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -100,7 +100,7 @@
      d['abc']
    #+END_SRC
 
-   #+RESULTS[3ab45dde06357329ebbc6d0f183f26c61f918543]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -118,7 +118,7 @@
      print(nothing)
    #+END_SRC
 
-   #+RESULTS[1bee6bdc31025c427bcc8faa0861d054e7ef5958]:
+   #+RESULTS:
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
    : NameError: name 'nothing' is not defined
@@ -141,7 +141,7 @@
      array('b', [1111111111111])
    #+END_SRC
 
-   #+RESULTS[9cf095ae4df769b3b2c43b3b3c59e3373b084ae7]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -160,7 +160,7 @@
      test()
    #+END_SRC
 
-   #+RESULTS[ef190f92a0eae7db4a0fae756f8af5d1710eabc0]:
+   #+RESULTS:
    #+begin_example
      >>> 1000
      >>> >>> ... ... >>> >>> Traceback (most recent call last):
@@ -183,7 +183,7 @@
      next(l)
    #+END_SRC
 
-   #+RESULTS[dc0cacb13f3c7bd62498b120655cb8ef0ca2009f]:
+   #+RESULTS:
    :
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -197,7 +197,7 @@
      a =
    #+END_SRC
 
-   #+RESULTS[9c0ff12f58058f438841251aaa454b3f54b60c57]:
+   #+RESULTS:
    : File "<stdin>", line 1
    :     a =
    :       ^
@@ -211,7 +211,7 @@
          b = 1
    #+END_SRC
 
-   #+RESULTS[dc8a2e99cb0beb0adb12ff94b9bae2b0dfed510b]:
+   #+RESULTS:
    :
    : File "<stdin>", line 1
    :     b = 1
@@ -231,7 +231,7 @@
      bytes('abc')
    #+END_SRC
 
-   #+RESULTS[dabe16d72ebe0f25a11acb90aa38b48695e68857]:
+   #+RESULTS:
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
    : TypeError: string argument without an encoding
@@ -258,7 +258,7 @@
      array('Z', [])
    #+END_SRC
 
-   #+RESULTS[02d496fb5043732fa5f87064a456c9b15d013830]:
+   #+RESULTS:
    :
    : >>> Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
@@ -272,7 +272,7 @@
      1 % 0
    #+END_SRC
 
-   #+RESULTS[7b21a29e9b570c5362d43b3b0c444438b40cbe5d]:
+   #+RESULTS:
    : Traceback (most recent call last):
    :   File "<stdin>", line 1, in <module>
    : ZeroDivisionError: division by zero
