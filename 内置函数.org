@@ -1386,16 +1386,16 @@
     print(a.x)
     print(b.x)
   #+END_SRC
-  
+
   #+RESULTS:
   :
   : ... >>> >>> >>> >>> >>> >>> []
   : []
   : >>> >>> [100]
   : [100]
-  
+
   下面使用type函数创建一个和上面相同的类：
-  
+
   #+BEGIN_SRC python :session
     X = type('X', (object,), dict(x=[]))
     a = X()
@@ -1416,7 +1416,35 @@
   : >>> >>> [100]
   : [100]
 
-* *vars* ([object]) ？？？
+* *vars* ([object])
+  返回模块、类或实例的__dict__属性。（dict类型没有__dict__属性。）
+  
+  #+BEGIN_SRC python :session
+    from collections import ChainMap
+    map = ChainMap({'a': 1}, {'b': 2})
+    map.__dict__
+    vars(map)
+    vars(map) == map.__dict__
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - >>> {'maps': [{'a': 1}, {'b': 2}]}
+  - {'maps': [{'a': 1}, {'b': 2}]}
+  - True
+  #+END_SRC
+  
+  如果不带参数，vars()相当于locals()：
+  
+  #+BEGIN_SRC python :session
+    locals() == vars()
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - True
+  #+END_SRC
+  
 * *zip* (*iterables)
   将iterables中的每个元素逐个组成一个由tuple组成的iterator。将最短的
   那个iterable中的元素用完为止。如果只有一个iterable则返回的iterator

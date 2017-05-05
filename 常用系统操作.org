@@ -1,0 +1,629 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-03 17:18:04
+# Commentary:
+#+TITLE: 常用系统服务
+
+* os
+* io
+* time
+* argparse - 解析命令行参数、选择和子命令
+  argparse模块提供易用的命令行接口。程序定义所需参数后，argparse可解析
+  sys.argv获取。argparse模块还可自动生成帮助和使用信息，且当参数无效时
+  显示错误信息。
+  
+** 例子
+   如接受一系列整数获取最大值或和：
+   
+   #+BEGIN_SRC python :eval never
+    import argparse
+
+    parser = argparse.ArgumentParser(description='处理整数。')
+    parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                        help='用于加法的整数')
+    parser.add_argument('--sum', dest='accumulate', action='store_const',
+                        const=sum, default=max,
+                        help='整数相加（默认：找到最大值）')
+
+    args = parser.parse_args()
+    print(args.accumulate(args.integers))
+   #+END_SRC
+   
+   如果将上面代码存储在argparse_demo.py中，则：
+   
+   #+BEGIN_EXAMPLE python
+    $ python3 argparse_demo.py -h
+    usage: argparse_demo.py [-h] [--sum] N [N ...]
+
+    处理整数。
+
+    positional arguments:
+      N           用于加法的整数
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      --sum       整数相加（默认：找到最大值）
+   #+END_EXAMPLE
+   
+   获取最大值或和：
+   
+   #+BEGIN_EXAMPLE python
+    $ python3 argparse_demo.py  1 2 3     4
+    4
+    $ python3 argparse_demo.py  1 2 3 4 --sum
+    10
+   #+END_EXAMPLE
+   
+   传入错误参数：
+   
+   #+BEGIN_EXAMPLE python
+    $ python3 argparse_demo.py  a b c
+    usage: argparse_demo.py [-h] [--sum] N [N ...]
+    argparse_demo.py: error: argument N: invalid int value: 'a'
+   #+END_EXAMPLE
+   
+   通过下面各小节来理解上面程序。
+   
+*** 创建解析器
+    第一步为使用argparse创建ArgumentParser对象：
+    
+    #+BEGIN_SRC python :eval never
+      import argparse
+      parse = argparse.ArgumentParser(description='处理整数')
+    #+END_SRC
+    
+    ArgumentParser对象保有所有将命令行参数转换为Python数据的信息。
+    
+*** 添加参数
+    使用add_argument()方法向ArgumentParser添加参数。通常情况下，此方法
+    告知ArgumentParser对象如何将命令行参数转换为对象。这些信息在使用
+    parse_args()方法时用到。
+
+    #+BEGIN_SRC python :eval never
+      parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                          help='用于加法的整数')
+      parser.add_argument('--sum', dest='accumulate', action='store_const',
+                          default=max, help='整数加法（默认：找到最大值）')
+    #+END_SRC
+
+    随后，调用parse_args()方法时，会返回一个有integers和accumulate属性
+    的对象。integers属性可为1个或多个整数；如果使用了--sum选项，则
+    accumulate属性为sum()函数，否则为max()函数。
+
+*** 解析参数
+    解析参数使用parse_args()方法。检查命令行参数，将每个参数转换为适当
+    的类型并执行行为。大多数情况下，会根据解析的命令行参数转换成的对象
+    生成一个Namespace对象。
+
+    #+BEGIN_SRC python :eval never
+      args = parse.parse_args()
+    #+END_SRC
+
+    在脚本中，parse_args()一般不带参数，ArgumentParser会通过sys.argv自
+    动判断命令行参数。
+
+** ArgumentParser对象
+*** class argparse. *ArgumentParser* (pron=None,usage=None,description=None,epilog=None,parents=[],formatter_class=argparse.HelpFormatter,prefix_chars='-',fromfile_prefix_chars=None,argument_default=None,conflict_handler='error',add_help=True,allow_abbrev=True)
+    创建ArgumentParser对象。所有参数都需使用关键字参数方式传递。各个参
+    数的简要描述为：
+    
+    - prog： 程序名称（默认值：sys.argv[0]）。
+    - usage：描述程序用法的字符串（默认值：通过添加到parser的参数自动
+      生成）。
+    - description：显示在帮助内容前的文本（默认值：None）。
+    - epilog：显示在帮助内容后的文本（默认值：None）。
+    - parents：由ArgumentParser对象组成的链表，用来包含其中每个元素的
+      参数。
+    - formatter_class：用来定制帮助内容输出的类。
+    - prefix_chars：可选参数前缀字符（默认值：“-”）。
+    - fromfile_prefix_chars：一组字符。用于指定读取其他参数的前缀文件。
+      （默认值：None）。
+    - argument_default：所有参数的全局默认值（默认值：None）。
+    - conflict_handler：可选参数冲突时的解决方法（通常没必要）。
+    - allow_abbrev：如果选项缩写明确，允许生成缩写选项（默认值：True）。
+    - add_help：自动添加-h/--help选项（默认值：True）。
+      
+**** prog
+     ArgumentParser对象默认使用sys.argv[0]作为帮助输出的程序名。比如有
+     argparse_demo_prog.py程序:
+
+     #+BEGIN_SRC python :eval never
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', help='foo help')
+       parser.print_help()
+     #+END_SRC
+
+     不管在哪个路径下，都使用argparse_demo_prog.py作为程序名：
+
+     在声明ArgumentParser对象时，也可手动声明prog参数来指定：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='argparse_demo_prog')
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> usage: argparse_demo_prog [-h]
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+
+     不管是自动获取自sys.argv[0]，还是prog=参数，在帮助文本中都可使用
+     “%(prog)s”获取其名称：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='myprog')
+       parser.add_argument('--foo', help='foo of the %(prog)s program')
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='foo of the %(prog)s program', metavar=None)
+     - usage: myprog [-h] [--foo FOO]
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo FOO   foo of the myprog program
+     #+END_SRC
+
+**** usage
+     默认情况下，ArgumentParser会根据包含的参数计算：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG')
+       parser.add_argument('--foo', nargs='?', help='foo help')
+       parser.add_argument('bar', nargs='+', help='bar help')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs='?', const=None, default=None, type=None, choices=None, help='foo help', metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs='+', const=None, default=None, type=None, choices=None, help='bar help', metavar=None)
+     - usage: PROG [-h] [--foo [FOO]] bar [bar ...]
+     - positional arguments:
+     -   bar          bar help
+     - optional arguments:
+     -   -h, --help   show this help message and exit
+     -   --foo [FOO]  foo help
+     #+END_SRC
+     
+     可使用USAGE参数重置：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG', usage='%(prog)s [options]')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> usage: PROG [options]
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+     
+**** description
+     通常情况下都会使用此参数。用来简要描述程序作用及原理。在帮助信息
+     中，输出在命令行选项用法和帮助信息之间：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(description='这是一个没用的程序')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> usage: [-h]
+     - 这是一个没用的程序
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+     
+     默认情况下，如果过长会自动折叠。参考formatter_class参数定制。
+     
+**** epilog
+     显示在帮助信息最后。
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(
+           description='没用的程序',
+           epilog='在最后'
+       )
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... ... >>> usage: [-h]
+     - 没用的程序
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     - 在最后
+     #+END_SRC
+
+     同description参数一样，如果过长会折叠，可使用formatter_class参数
+     定制。
+
+**** parents
+     允许多个parser可能共享一组参数。避免重复定义这些参数，可将此参数
+     值链表中所有ArgumentParser的必选和可选参数添加到当前参数中：
+
+     #+BEGIN_SRC python :session
+       import argparse
+
+       parent_parser = argparse.ArgumentParser(add_help=False)
+       parent_parser.add_argument('--parent', type=int)
+
+       foo_parser = argparse.ArgumentParser(parents=[parent_parser])
+       foo_parser.add_argument('foo')
+       foo_parser.parse_args(['--parent', '2', 'XXX'])
+
+       bar_parser = argparse.ArgumentParser(parents=[parent_parser])
+       bar_parser.add_argument('--bar')
+       bar_parser.parse_args(['--bar', 'YYY'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> _StoreAction(option_strings=['--parent'], dest='parent', nargs=None, const=None, default=None, type=<class 'int'>, choices=None, help=None, metavar=None)
+     - >>> >>> _StoreAction(option_strings=[], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(foo='XXX', parent=2)
+     - >>> >>> _StoreAction(option_strings=['--bar'], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar='YYY', parent=None)
+     #+END_SRC
+
+     *注意* ：如需作为parent，则其属性add_help须为False。否则当前的
+     ArgumentParser对象会认为有2个-h/--help选项，从而抛出错误。
+
+     *注意* ：作为parent的ArgumentParser需在所有parents参数内容前完全
+     实现，在实现子parser后再修改父parser不会反应在子parser中。
+
+**** formatter_class
+     ArgumentParser对象的帮助文本可使用下面4个类定制：
+     
+     - class argparse. *RawDescriptionHelpFormatter*
+     - class argparse. *RawTextHelpFormatter*
+     - class argparse. *ArgumentDefaultsHelpFormatter*
+     - class argparse. *MetavarTypeHelpFormatter*
+       
+     RawDescriptionHelpFormatter和RawTextHelpFormatter用于描述信息输出
+     格式。默认情况下，ArgumentParser对象会自动折叠description和epilog
+     文本输出：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(
+           prog='PROG',
+           description='''this description
+           was indent weird
+               but that is okay''',
+           epilog='''
+               likewise for this epilog whose whitespace will
+           be cleaned up and whose worlds will be wrapped
+           across a couple lines'''
+       )
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... ... ... ... ... ... ... ... >>> usage: PROG [-h]
+     - this description was indent weird but that is okay
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     - likewise for this epilog whose whitespace will be cleaned up and whose worlds will be wrapped across a couple lines
+     #+END_SRC
+     
+     将FORMATTER_CLASS参数设置为RawDescriptionHelpFormatter使
+     DESCRIPTION和EPILOG参数保持原样输出：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       import textwrap
+       parser = argparse.ArgumentParser(
+           prog='PROG',
+           formatter_class=argparse.RawDescriptionHelpFormatter,
+           description=textwrap.dedent('''\
+           Please do not mess up this text!
+           --------------------------------
+               I have indented it
+               exactly the way
+               I want it
+       ''')
+       )
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... ... ... ... ... ... ... ... ... ... >>> usage: PROG [-h]
+     - Please do not mess up this text!
+     - --------------------------------
+     -     I have indented it
+     -     exactly the way
+     -     I want it
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+     
+     而RawTextHelpFormatter则是将所有帮助信息文本（含参数描述）用原因
+     输出。
+     
+     ArgumentDefaultsHelpFormatter则是自动添加参数默认信息值：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(
+           prog='PROG',
+           formatter_class=argparse.ArgumentDefaultsHelpFormatter
+       )
+       parser.add_argument('--foo', type=int, default=42, help='FOO!')
+       parser.add_argument('bar', nargs='*', default=[1, 2, 3], help='BAR!')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... ... >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=42, type=<class 'int'>, choices=None, help='FOO!', metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs='*', const=None, default=[1, 2, 3], type=None, choices=None, help='BAR!', metavar=None)
+     - usage: PROG [-h] [--foo FOO] [bar [bar ...]]
+     - positional arguments:
+     -   bar         BAR! (default: [1, 2, 3])
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo FOO   FOO! (default: 42)
+     #+END_SRC
+
+     MetavarTypeHelpFormatter则是使用add_argument的type参数作为帮助信
+     息中的参数值。（而不是通常情况下的dest值）：
+
+     *注意* ：使用此值后，所有add_argument中都需指定type值。
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(
+           prog='PROG',
+           formatter_class=argparse.MetavarTypeHelpFormatter
+       )
+       parser.add_argument('--foo', type=int)
+       parser.add_argument('bar', type=float)
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... ... >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=<class 'int'>, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=<class 'float'>, choices=None, help=None, metavar=None)
+     - usage: PROG [-h] [--foo int] float
+     - positional arguments:
+     -   float
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo int
+     #+END_SRC
+
+**** prefix_chars
+     绝大多数命令行选项使用“-”作为前缀，如“-f/--foo”。如需使其他前缀合
+     法，可定制PREFIX_CHARS参数：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG', prefix_chars='-+')
+       parser.add_argument('+f')
+       parser.add_argument('--bar')
+       parser.parse_args('+f X --bar Y'.split())
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> _StoreAction(option_strings=['+f'], dest='f', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=['--bar'], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar='Y', f='X')
+     #+END_SRC
+     
+     *注意* ：PREFIX_CHARS中需包含“-”，否则会使“-f/--foo”非法。
+     
+**** fromfile_prefix_chars
+     如果命令行参数过程，可置于文件中。指定FROMFILE_PREFIX_CHARS一个特
+     殊符号，则所有以此特殊符号开始的参数都会作为从文件中获取：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       with open('files/args.txt', 'w') as fp:
+           fp.write('-f\nbar')
+
+       parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
+       parser.add_argument('-f')
+        parser.parse_args(['-f', 'foo', '@files/args.txt'])
+       # 相当于：
+       # parser.parse_args(['-f', 'foo', '-f', 'bar'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... 6
+     - >>> _StoreAction(option_strings=['-f'], dest='f', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - ... ... Namespace(f='bar')
+     #+END_SRC
+
+     *注意* ：文件中，选项和参数需保证每行一个。
+
+**** argument_default
+     通常情况下，为参数设置默认值为在add_argument()方法中传递默认值，
+     或使用ArgumentParser对象的set_defaults()方法。但也可以通过设置
+     ARGUMENT_DEFAULT参数实现为所有命令行参数。如抑制所有没传递的参数：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
+       parser.add_argument('--foo')
+       parser.add_argument('bar', nargs='?')
+       parser.parse_args('--foo 1 BAR'.split())
+       parser.parse_args([])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default='==SUPPRESS==', type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs='?', const=None, default='==SUPPRESS==', type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar='BAR', foo='1')
+     - Namespace()
+     #+END_SRC
+
+**** allow_abbrev
+     默认情况下，parse_args()方法会自动匹配缩写的选项。如需禁用此功能，
+     可将ALLOW_ABBREV设置为False。
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foobar', action='store_true')
+       parser.add_argument('--foonley', action='store_true')
+       parser.parse_args(['--foon'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreTrueAction(option_strings=['--foobar'], dest='foobar', nargs=0, const=True, default=False, type=None, choices=None, help=None, metavar=None)
+     - _StoreTrueAction(option_strings=['--foonley'], dest='foonley', nargs=0, const=True, default=False, type=None, choices=None, help=None, metavar=None)
+     - Namespace(foobar=False, foonley=True)
+     #+END_SRC
+
+**** conflict_handler
+     默认情况下，不允许选项重复，否则抛出错误：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG')
+       parser.add_argument('-f', '--foo', help='old foo help')
+       parser.add_argument('--foo', help='new foo help')
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['-f', '--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='old foo help', metavar=None)
+     - Traceback (most recent call last):
+     -   File "<stdin>", line 1, in <module>
+     -   File "/usr/lib/python3.5/argparse.py", line 1353, in add_argument
+     -     return self._add_action(action)
+     -   File "/usr/lib/python3.5/argparse.py", line 1716, in _add_action
+     -     self._optionals._add_action(action)
+     -   File "/usr/lib/python3.5/argparse.py", line 1557, in _add_action
+     -     action = super(_ArgumentGroup, self)._add_action(action)
+     -   File "/usr/lib/python3.5/argparse.py", line 1367, in _add_action
+     -     self._check_conflict(action)
+     -   File "/usr/lib/python3.5/argparse.py", line 1506, in _check_conflict
+     -     conflict_handler(action, confl_optionals)
+     -   File "/usr/lib/python3.5/argparse.py", line 1515, in _handle_conflict_error
+     -     raise ArgumentError(action, message % conflict_string)
+     - argparse.ArgumentError: argument --foo: conflicting option string: --foo
+     #+END_SRC
+
+     如需覆盖久的选项字符串，可将conflict_handler参数设置为'resolve'：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG', conflict_handler='resolve')
+       parser.add_argument('-f', '--foo', help='old foo help')
+       parser.add_argument('--foo', help='new foo help')
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['-f', '--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='old foo help', metavar=None)
+     - _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='new foo help', metavar=None)
+     - usage: PROG [-h] [-f FOO] [--foo FOO]
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   -f FOO      old foo help
+     -   --foo FOO   new foo help
+     #+END_SRC
+
+     可见，覆盖了第一个选项的“--foo”，使第二个选项的“--foo”生效。
+
+**** add_help
+     默认情况下，会自动添加“-h/--help”选项。如需禁用，可设置ADD_HELP参
+     数为False：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(add_help=False)
+       parser.add_argument('--foo', help='foo help')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='foo help', metavar=None)
+     - usage: [--foo FOO]
+     - optional arguments:
+     -   --foo FOO  foo help
+     #+END_SRC
+     
+     如果设置PREFIX_CHAR参数，且其中不含“-”，“-h/--help”默认使用第一个
+     字符作为前缀：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prefix_chars='#+')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> usage: [#h]
+     - optional arguments:
+     -   #h, ##help  show this help message and exit
+     #+END_SRC
+     
+** add_argument()方法
+*** name或flags
+*** action
+*** args
+*** const
+*** default
+*** type
+*** choices
+*** required
+*** help
+*** metavar
+*** dest
+*** Action类
+** parse_args()方法
+*** 可选值语法
+*** 无效参数
+*** 参数包含
+*** 参数缩写（前缀匹配）
+*** sys.argv之外
+*** Namespace对象
+** 其他用法
+*** 子命令
+*** FileType对象
+*** 参数分组
+*** 共有排除（Mutual exclusion）
+*** Parser defaults
+*** Printing help
+*** Partial parsing
+*** Customizing file parsing
+*** Exiting methods
+** 更新argparse
+* getopt
+* logging
+* logging.config
+* logging.handlers
+* getpass
+* curses
+* curses.textpad
+* curses.ascii
+* curses.panel
+* platform
+* errno
+* ctypes

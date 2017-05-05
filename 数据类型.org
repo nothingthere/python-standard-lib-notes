@@ -37,7 +37,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 * calendar - 日历相关函数
 * collections - 容器类型
   此模块对内置类型dict、list、set和tuple实现了容器包装。
-
+  
   | namedtuple  | 命名式元组工厂函数                     |
   | deque       | 类链表容器，可快速在两端添加和删除元素 |
   | ChainMap    | 类字典类，利用多个映射创建单个view     |
@@ -47,15 +47,15 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
   | UserDict    | 字典对象包装器，方便创建字典子类       |
   | UserList    | 链表对象包装器，方便创建链表子类       |
   | UserString  | 字符串对象包装器，方便创建字符串子类   |
-
+  
 ** ChainMap对象
    将多个映射对象结合，作为单个对象。比创建新字典对象，然后使用字典的
    update()方法快。
-
+   
 *** class collections. *ChainMap* (*maps)
     ChainMap将多个字典或映射对象集合到一起，创建一个新的，可更新的view。
     如果没有MAP参数，则将空字典传递给此构建函数。
-
+    
     #+BEGIN_SRC python :session
       from collections import ChainMap
       books = {'A': 10, 'B': 11}
@@ -64,54 +64,126 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       print(mix)
       ChainMap()
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : >>> >>> >>> ChainMap({'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
-    : ChainMap({})
-
+    #+BEGIN_SRC org
+    - >>> >>> >>> ChainMap({'A': 10, 'B': 11}, {'Lily': 27, 'Mike': 23})
+    - ChainMap({})
+    #+END_SRC
+    
     ChainMap内部用链表集中各个映射对象，各元素映射对象可使用MAP的属性
     获取或跟新。此外无其他任何状态：
-
+    
     #+BEGIN_SRC python :session
       mix['Lily'] = 100
       print(mix)
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : ChainMap({'Lily': 100, 'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
-
+    #+BEGIN_SRC org
+    - ChainMap({'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27, 'Mike': 23})
+    #+END_SRC
+    
     除查找外，重新赋值、跟新和删除都只在第一个映射对象中进行：
-
+    
     #+BEGIN_SRC python :session
       mix['Lily']
       mix['A']
     #+END_SRC
-
+    
     #+RESULTS:
-    : 100
-    : 10
-
+    #+BEGIN_SRC org
+    - 100
+    - 10
+    #+END_SRC
+    
     ChainMap中的元素实际上是原映射的索引，即改变原来映射，其中的元素也
     随之改变：
-
+    
     #+BEGIN_SRC python :session
       del persons['Mike']
       print(persons)
       print(mix)
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : {'Lily': 27}
-    : ChainMap({'Lily': 100, 'B': 11, 'A': 10}, {'Lily': 27})
-
+    #+BEGIN_SRC org
+    - {'Lily': 27}
+    - ChainMap({'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27})
+    #+END_SRC
+    
+    除字典常用方法外，ChainMap还支持下面属性和方法：
+    
 **** maps
-**** new_child
-**** parents
+     返回可更新的字典链表。修改其中的元素即可修改ChainMap本身，也可修
+     改原来的字典对象。
+     
+     #+BEGIN_SRC python :session
+       mix.maps
+       mix.maps[0]['A'] = -1
+       print(mix)
+       print(books)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - [{'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27}]
+     - >>> ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - {'A': -1, 'Lily': 100, 'B': 11}
+     #+END_SRC
 
+**** new_child(m=None)
+     返回新的ChainMap对象，其中第一个元素为M，后面为当前对象的所有maps。
+     如果M参数缺省，则默认为空字典。此方法可用来更新第一个字典，而不影
+     响所有原来的字典。
+
+     下面两种方式等级：
+
+     #+BEGIN_SRC python :eval never
+       d.new_child()
+       ChainMap({}, *d.maps)
+     #+END_SRC
+     
+     更新除第一个以外的字典会影响原来ChainMap，以及字典对象：
+
+     #+BEGIN_SRC python :session
+       submix = mix.new_child()
+       print('submix: ', submix)
+       print('mix: ', mix)
+       print('books: ', books)
+       submix.maps[1]['A'] = -100
+       print('submix after change: ', submix)
+       print('mix after change: ', mix)
+       print('books after change: ', books)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - submix:  ChainMap({}, {'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - mix:  ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - books:  {'A': -1, 'Lily': 100, 'B': 11}
+     - >>> submix after change:  ChainMap({}, {'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - mix after change:  ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - books after change:  {'A': -100, 'Lily': 100, 'B': 11}
+     #+END_SRC
+
+**** parents
+     返回新ChainMap对象，元素含除第一个字典外的所有元素。可用于在搜索
+     时跳过第一个字典。
+     
+     #+BEGIN_SRC python :session
+       mix.parents
+       submix.parents
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ChainMap({'Lily': 27})
+     - ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     #+END_SRC
+     
 *** ChainMap应用举例
+    
 ** Counter对象
 ** deque对象
 *** deque应用举例
