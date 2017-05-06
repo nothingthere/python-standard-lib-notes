@@ -8,8 +8,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 制数据。）。本章介绍一些特殊的数据类型，如dates和times，类型固定的数组，
 队列和集合。
 
-* datetime - 基本日期和时间类型
-
+* datetime - 基本日期和时间类型 （待续）
 ** 模块常量
 *** datetime. *MINYEAR*
 *** datetime. *MAXYEAR*
@@ -34,7 +33,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 ** tzinfo对象
 ** timezone 对象
 ** strftime()和strptime()
-* calendar - 日历相关函数
+* calendar - 日历相关函数 （待续）
 * collections - 容器类型
   此模块对内置类型dict、list、set和tuple实现了容器包装。
   
@@ -55,7 +54,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 *** class collections. *ChainMap* (*maps)
     ChainMap将多个字典或映射对象集合到一起，创建一个新的，可更新的view。
     如果没有MAP参数，则将空字典传递给此构建函数。
-    
+
     #+BEGIN_SRC python :session
       from collections import ChainMap
       books = {'A': 10, 'B': 11}
@@ -64,21 +63,21 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       print(mix)
       ChainMap()
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> >>> ChainMap({'A': 10, 'B': 11}, {'Lily': 27, 'Mike': 23})
+    - >>> >>> >>> ChainMap({'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
     - ChainMap({})
     #+END_SRC
-    
+
     ChainMap内部用链表集中各个映射对象，各元素映射对象可使用MAP的属性
     获取或跟新。此外无其他任何状态：
-    
+
     #+BEGIN_SRC python :session
       mix['Lily'] = 100
       print(mix)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - ChainMap({'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27, 'Mike': 23})
@@ -117,35 +116,35 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 **** maps
      返回可更新的字典链表。修改其中的元素即可修改ChainMap本身，也可修
      改原来的字典对象。
-     
+
      #+BEGIN_SRC python :session
        mix.maps
        mix.maps[0]['A'] = -1
        print(mix)
        print(books)
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
-     - [{'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27}]
-     - >>> ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
-     - {'A': -1, 'Lily': 100, 'B': 11}
+     - [{'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23}]
+     - >>> ChainMap({'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
+     - {'B': 11, 'A': -1}
      #+END_SRC
 
 **** new_child(m=None)
      返回新的ChainMap对象，其中第一个元素为M，后面为当前对象的所有maps。
      如果M参数缺省，则默认为空字典。此方法可用来更新第一个字典，而不影
      响所有原来的字典。
-
+     
      下面两种方式等级：
-
+     
      #+BEGIN_SRC python :eval never
        d.new_child()
        ChainMap({}, *d.maps)
      #+END_SRC
      
      更新除第一个以外的字典会影响原来ChainMap，以及字典对象：
-
+     
      #+BEGIN_SRC python :session
        submix = mix.new_child()
        print('submix: ', submix)
@@ -156,37 +155,675 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        print('mix after change: ', mix)
        print('books after change: ', books)
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
-     - submix:  ChainMap({}, {'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
-     - mix:  ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
-     - books:  {'A': -1, 'Lily': 100, 'B': 11}
-     - >>> submix after change:  ChainMap({}, {'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
-     - mix after change:  ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
-     - books after change:  {'A': -100, 'Lily': 100, 'B': 11}
+     - submix:  ChainMap({}, {'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
+     - mix:  ChainMap({'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
+     - books:  {'B': 11, 'A': -1}
+     - >>> submix after change:  ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23})
+     - mix after change:  ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23})
+     - books after change:  {'B': 11, 'A': -100}
      #+END_SRC
-
+     
 **** parents
      返回新ChainMap对象，元素含除第一个字典外的所有元素。可用于在搜索
      时跳过第一个字典。
-     
+
      #+BEGIN_SRC python :session
        mix.parents
        submix.parents
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - ChainMap({'Lily': 27})
      - ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
      #+END_SRC
-     
+
 *** ChainMap应用举例
-    
+**** 模仿Python的内部查找链
+
+     #+BEGIN_SRC python :session
+       import collections
+       import builtins
+       collections.ChainMap(locals(), globals(), vars(builtins))
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ChainMap({'persons': {'Lily': 27, 'Mike': 23}, 'args': Namespace(foo='BAR'), 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, '__name__': '__main__', 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fdbe62f70d0>, '__builtins__': <module 'builtins' (built-in)>, 'submix': ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'parser': ArgumentParser(prog='', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True), '__builtin__': <module 'builtins' (built-in)>, 'books': {'B': 11, 'A': -100}, '__doc__': None, 'builtins': <module 'builtins' (built-in)>, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fdbe62f7048>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fdbe6b5cf28>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fdbe6a10dd8>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>, '__spec__': None, 'mix': ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'C': <class '__main__.C'>, 'argparse': <module 'argparse' from '/usr/lib/python3.5/argparse.py'>, 'c': <__main__.C object at 0x7fdbe6213780>, 'ChainMap': <class 'collections.ChainMap'>}, {'persons': {'Lily': 27, 'Mike': 23}, 'args': Namespace(foo='BAR'), 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, '__name__': '__main__', 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fdbe62f70d0>, '__builtins__': <module 'builtins' (built-in)>, 'submix': ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'parser': ArgumentParser(prog='', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True), '__builtin__': <module 'builtins' (built-in)>, 'books': {'B': 11, 'A': -100}, '__doc__': None, 'builtins': <module 'builtins' (built-in)>, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fdbe62f7048>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fdbe6b5cf28>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fdbe6a10dd8>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>, '__spec__': None, 'mix': ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'C': <class '__main__.C'>, 'argparse': <module 'argparse' from '/usr/lib/python3.5/argparse.py'>, 'c': <__main__.C object at 0x7fdbe6213780>, 'ChainMap': <class 'collections.ChainMap'>}, {'UnboundLocalError': <class 'UnboundLocalError'>, 'quit': Use quit() or Ctrl-D (i.e. EOF) to exit, 'memoryview': <class 'memoryview'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'NameError': <class 'NameError'>, 'ImportWarning': <class 'ImportWarning'>, '__import__': <built-in function __import__>, 'staticmethod': <class 'staticmethod'>, 'bin': <built-in function bin>, 'complex': <class 'complex'>, 'repr': <built-in function repr>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'sorted': <built-in function sorted>, 'compile': <built-in function compile>, 'abs': <built-in function abs>, 'bytearray': <class 'bytearray'>, 'any': <built-in function any>, 'chr': <built-in function chr>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'eval': <built-in function eval>, 'ValueError': <class 'ValueError'>, 'NotImplemented': NotImplemented, 'tuple': <class 'tuple'>, 'str': <class 'str'>, 'pow': <built-in function pow>, 'len': <built-in function len>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'id': <built-in function id>, 'MemoryError': <class 'MemoryError'>, 'all': <built-in function all>, 'SystemError': <class 'SystemError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+     -     for supporting Python development.  See www.python.org for more information., 'hex': <built-in function hex>, 'FutureWarning': <class 'FutureWarning'>, 'delattr': <built-in function delattr>, 'True': True, 'ImportError': <class 'ImportError'>, 'list': <class 'list'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'IOError': <class 'OSError'>, 'help': Type help() for interactive help, or help(object) for help about object., 'open': <built-in function open>, 'FileExistsError': <class 'FileExistsError'>, 'enumerate': <class 'enumerate'>, 'slice': <class 'slice'>, 'TabError': <class 'TabError'>, 'bool': <class 'bool'>, 'NotImplementedError': <class 'NotImplementedError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'UserWarning': <class 'UserWarning'>, 'UnicodeError': <class 'UnicodeError'>, 'IndentationError': <class 'IndentationError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", 'ResourceWarning': <class 'ResourceWarning'>, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'OSError': <class 'OSError'>, 'False': False, 'property': <class 'property'>, 'iter': <built-in function iter>, 'exit': Use exit() or Ctrl-D (i.e. EOF) to exit, 'BytesWarning': <class 'BytesWarning'>, 'SyntaxError': <class 'SyntaxError'>, 'BufferError': <class 'BufferError'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'object': <class 'object'>, 'sum': <built-in function sum>, 'frozenset': <class 'frozenset'>, 'ChildProcessError': <class 'ChildProcessError'>, 'locals': <built-in function locals>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'print': <built-in function print>, 'format': <built-in function format>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, '__build_class__': <built-in function __build_class__>, 'Warning': <class 'Warning'>, 'issubclass': <built-in function issubclass>, 'KeyError': <class 'KeyError'>, 'set': <class 'set'>, 'Ellipsis': Ellipsis, 'classmethod': <class 'classmethod'>, 'round': <built-in function round>, 'SystemExit': <class 'SystemExit'>, '_': None, 'BaseException': <class 'BaseException'>, 'GeneratorExit': <class 'GeneratorExit'>, 'dir': <built-in function dir>, 'EOFError': <class 'EOFError'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), 'divmod': <built-in function divmod>, 'OverflowError': <class 'OverflowError'>, 'RuntimeError': <class 'RuntimeError'>, 'copyright': Copyright (c) 2001-2017 Python Software Foundation.
+     - All Rights Reserved.
+     - Copyright (c) 2000 BeOpen.com.
+     - All Rights Reserved.
+     - Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+     - All Rights Reserved.
+     - Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+     - All Rights Reserved., 'setattr': <built-in function setattr>, 'float': <class 'float'>, 'reversed': <class 'reversed'>, '__debug__': True, 'bytes': <class 'bytes'>, 'EnvironmentError': <class 'OSError'>, 'int': <class 'int'>, 'isinstance': <built-in function isinstance>, 'LookupError': <class 'LookupError'>, 'InterruptedError': <class 'InterruptedError'>, 'min': <built-in function min>, 'input': <built-in function input>, 'AssertionError': <class 'AssertionError'>, 'type': <class 'type'>, 'map': <class 'map'>, 'license': Type license() to see the full license text, '__name__': 'builtins', 'range': <class 'range'>, 'ReferenceError': <class 'ReferenceError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'None': None, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'super': <class 'super'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'filter': <class 'filter'>, 'TypeError': <class 'TypeError'>, 'TimeoutError': <class 'TimeoutError'>, 'hasattr': <built-in function hasattr>, 'ConnectionError': <class 'ConnectionError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'StopIteration': <class 'StopIteration'>, 'max': <built-in function max>, '__package__': '', 'zip': <class 'zip'>, 'ArithmeticError': <class 'ArithmeticError'>, 'ord': <built-in function ord>, 'IndexError': <class 'IndexError'>, 'vars': <built-in function vars>, 'exec': <built-in function exec>, 'globals': <built-in function globals>, 'ascii': <built-in function ascii>, 'callable': <built-in function callable>, 'RecursionError': <class 'RecursionError'>, 'hash': <built-in function hash>, 'oct': <built-in function oct>, 'Exception': <class 'Exception'>, 'getattr': <built-in function getattr>, 'dict': <class 'dict'>, 'next': <built-in function next>, 'AttributeError': <class 'AttributeError'>, 'PermissionError': <class 'PermissionError'>, 'SyntaxWarning': <class 'SyntaxWarning'>})
+     #+END_SRC
+
+**** 将命令行参数覆盖系统变量，系统变量覆盖默认值
+
+     #+BEGIN_SRC python :session
+       import os
+       import argparse
+       import collections
+       defaults = {'color': 'green', 'user': 'guest'}
+
+       parser = argparse.ArgumentParser()
+       parser.add_argument('-u', '--user')
+       parser.add_argument('-c', '--color')
+       namespace = parser.parse_args('-u claudio'.split())
+       command_line_args = {k: v for k, v in vars(namespace).items() if v}
+       combined = collections.ChainMap(command_line_args, os.environ, defaults)
+       print(combined)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> >>> >>> _StoreAction(option_strings=['-u', '--user'], dest='user', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=['-c', '--color'], dest='color', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - >>> >>> >>> ChainMap({'user': 'claudio'}, environ({'LANG': 'en_HK.UTF-8', 'DESKTOP_AUTOSTART_ID': '10c93015e7a7904596149403809342434000000009360001', 'DESKTOP_SESSION': 'default', 'QT_LINUX_ACCESSIBILITY_ALWAYS_ON': '1', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'COLUMNS': '80', 'XDG_RUNTIME_DIR': '/run/user/1000', 'GDM_LANG': 'en_HK.UTF-8', 'QT4_IM_MODULE': 'fcitx', 'SHLVL': '1', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'QT_ACCESSIBILITY': '1', 'EMACS': 't', 'XDG_MENU_PREFIX': 'gnome-', 'DISPLAY': ':0', 'PS4': '$LINENO + ', 'TERMCAP': '', 'PYTHONPATH': '/home/claudio/python:', 'CLUTTER_IM_MODULE': 'xim', 'WINDOWID': '27262982', 'SSH_AGENT_PID': '1021', 'VTE_VERSION': '4601', 'SESSION_MANAGER': 'local/kali:@/tmp/.ICE-unix/936,unix/kali:/tmp/.ICE-unix/936', 'QT_IM_MODULE': 'fcitx', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share/:/usr/share/', 'XDG_VTNR': '2', 'GTK_MODULES': 'gail:atk-bridge', 'COLORTERM': 'truecolor', 'PYTHONUNBUFFERED': '1', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'TERM': 'dumb', 'SHELL': '/bin/bash', 'GTK_IM_MODULE': 'fcitx', 'USER': 'claudio', '_': '/usr/bin/emacs24', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'XDG_SESSION_DESKTOP': 'default', 'NODE_PATH': '/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript', 'USERNAME': 'claudio', 'GDMSESSION': 'default', 'LOGNAME': 'claudio', 'WINDOWPATH': '2', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'XDG_SEAT': 'seat0', 'INSIDE_EMACS': '24.5.1,comint', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XDG_CURRENT_DESKTOP': 'GNOME', 'XMODIFIERS': '@im=fcitx', 'XDG_SESSION_ID': '2', 'QT_QPA_PLATFORMTHEME': 'qgnomeplatform', 'PWD': '/home/claudio/Desktop/Python/python-standard-lib-notes', 'JOURNAL_STREAM': '8:21649', 'HOME': '/home/claudio', 'XDG_SESSION_TYPE': 'x11', 'PATH': '/home/claudio/tools:/home/claudio/bin:/home/claudio/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games'}), {'user': 'guest', 'color': 'green'})
+     #+END_SRC
+
+**** 模仿嵌套上下文
+
+     #+BEGIN_SRC python :eval never
+       from collections import ChainMap
+
+       c = ChainMap()                    # 创建根上下文
+       d = c.new_child()                 # 创建嵌套子上下文
+       e = c.new_child()                 # 嵌套子上下文，独立于c
+       e.maps[0]                         # 当前上下文字典--相当于Python的locals()
+       e.maps[-1]                        # 根上下文--相当于Python的globals()
+       e.parents                         # 相当于Python的nonlocals
+
+       # d['x']                          # 获取整个上下文中的key
+       d['x'] = 1                        # 设置当前上下文的值
+       del d['x']                      # 删除当前上下文的值
+       list(d)                         # 所有嵌套key
+       k in d                          # 检查包含
+       d.items()                       # 所有嵌套元素
+       dict(d)                         # 转换为普通字典
+     #+END_SRC
+     
+**** 深层赋值和删除
+     默认情况下，ChainMap的删除和赋值都在第一个字典中进行，只有查找在
+     所有字典中进行。如需进行深层赋值和删除，可通过子类实现：
+
+     #+BEGIN_SRC python :session
+       from collections import ChainMap
+
+       class DeepChainMap(ChainMap):
+           '''允许在所有元素字典中赋值和删除的ChainMap子类.'''
+           def __setitem__(self, key, val):
+               for mapping in self.maps:
+                   if key in mapping:
+                       mapping[key] = val
+                       return
+               self.maps[0][key] = val
+           def __delitem__(self, key):
+               for mapping in self.maps:
+                   if key in mapping:
+                       del mapping[key]
+                       return
+               raise KeyError(key)
+
+       d = DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'yellow'})
+       d['lion'] = 'orange'
+       print(d)
+       d['snake'] = 'blue'
+       print(d)
+       del d['zebra']
+       print(d)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'orange'})
+     - >>> DeepChainMap({'zebra': 'black', 'snake': 'blue'}, {'elephant': 'blue'}, {'lion': 'orange'})
+     - >>> DeepChainMap({'snake': 'blue'}, {'elephant': 'blue'}, {'lion': 'orange'})
+     #+END_SRC
+
 ** Counter对象
+   方便快速获取对象“尾部”。比如找到文本中出现频率最高的单词：
+   
+   #+BEGIN_SRC python :session
+     import re
+     from collections import Counter
+     words = re.findall(r'\w+', open('files/emma.txt').read().lower())
+     Counter(words).most_common(4)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> [('to', 5292), ('the', 5265), ('and', 4930), ('of', 4337)]
+   #+END_SRC
+   
+   将链表中的单词按出现频率排序：
+   
+   #+BEGIN_SRC python :session
+     from collections import Counter
+     cnt = Counter()
+     for word in 'red blue red green blue blue'.split():
+         cnt[word] += 1
+
+     print(cnt)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> ... ... >>> >>> Counter({'blue': 3, 'red': 2, 'green': 1})
+   - Counter({'blue': 3, 'red': 2, 'green': 1})
+   #+END_SRC
+   
+*** class collections. *Counter* ([iterable-or-mapping])
+    Counter是dict的子类，用于计数可哈希对象。为无序集合，key值为可哈希
+    元素，value值为元素个数（可为负数和0）。
+    
+    参数可为iterable或其他映射对象：
+    
+    #+BEGIN_SRC python :session
+      from collections import Counter
+      Counter()
+      Counter('gallanhad')
+      Counter({'blue': 4, 'green': 2})
+      Counter(cats=2, dogs=8)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - Counter()
+    - Counter({'a': 3, 'l': 2, 'n': 1, 'g': 1, 'd': 1, 'h': 1})
+    - Counter({'blue': 4, 'green': 2})
+    - Counter({'dogs': 8, 'cats': 2})
+    #+END_SRC
+    
+    对于不存在的元素，默认个数为0：
+    
+    #+BEGIN_SRC python :session
+      from collections import Counter
+      Counter()['a']
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 0
+    #+END_SRC
+    
+    将个数设置为0并不能将元素从对象中删除，还得用del：
+    
+    #+BEGIN_SRC python :session
+      from collections import Counter
+      cnt = Counter('abcabc')
+      print(cnt)
+      cnt['a'] = 0
+      print(cnt)
+      del cnt['a']
+      print(cnt)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> Counter({'c': 2, 'a': 2, 'b': 2})
+    - >>> Counter({'c': 2, 'b': 2, 'a': 0})
+    - >>> Counter({'c': 2, 'b': 2})
+    #+END_SRC
+    
+**** 在dict类型上新增的方法
+***** elements()
+      返回含所有元素个数>0的元素组成的iterable对象，其如果有N个“X”，则
+      含N个“X”元素（顺序不定）：
+
+      #+BEGIN_SRC python :session
+        from collections import Counter
+        c = Counter(a=4, b=2, c=0, d=-2)
+        c.elements()
+        sorted(c.elements())
+      #+END_SRC
+      
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> <itertools.chain object at 0x7fdbe62242b0>
+      - ['a', 'a', 'a', 'a', 'b', 'b']
+      #+END_SRC
+
+***** most_common([n])
+      返回元素个数最多的前N个元素及其个数组成的链表，如果缺省N参数，则
+      返回全部元素。默认从大到小排序：
+
+      #+BEGIN_SRC python :session
+        from collections import Counter
+        Counter('abracadabra').most_common(3)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - [('a', 5), ('b', 2), ('r', 2)]
+      #+END_SRC
+
+***** subtract([iterable-mapping])
+      将元素个数与另一个映射对象中的对应元素个数相减。都可为负数或0：
+
+      #+BEGIN_SRC python :session
+        from collections import Counter
+        c1 = Counter(a=4, b=2, c=0, d=-2, e=3)
+        c2 = Counter(a=1, b=2, c=3, d=4, f=3)
+        c1.subtract(c2)
+        print(c1)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> >>> Counter({'e': 3, 'a': 3, 'b': 0, 'f': -3, 'c': -3, 'd': -6})
+      #+END_SRC
+      
+**** 与dict类型有差异的方法
+***** fromkeys(iterable)
+      Counter对象无此方法。
+      
+***** update([iterable-or-mapping])
+      ITERABLE-OR-MAPPING不为(key, value)形式的集合，而是单个元素组成
+      的集合。
+
+      #+BEGIN_SRC python :session
+        from collections import Counter
+        cnt = Counter('abca')
+        cnt.update('bce')
+        cnt
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> Counter({'c': 2, 'a': 2, 'b': 2, 'e': 1})
+      #+END_SRC
+
+**** 常用操作
+     
+     #+BEGIN_SRC python :eval never
+       sum(c.values())                 # 所有元素个数
+       c.clear()                       # 清空
+       list(c)                         # 转换为没有元素重复的链表
+       set(c)                          # 转换为集合
+       dict(c)                         # 转换为普通链表
+       c.items()                       # 转换为(elem, cnt)形式的链表
+       Counter(dict(list_of_pairs))    # 将(elem,cnt)形式的链表转换为Counter对象
+       c.most_comman()[:-n - 1:-1]     # 获取个数最少的N个元素
+       +c                              # 将个数<=0的元素去除
+     #+END_SRC
+     
+     “|”和“&”操作分别为获取两者个数最多或最少的元素，加和减则是可数的
+     加减。都去除个数<=0的元素：
+
+     #+BEGIN_SRC python :session
+       from collections import Counter
+       c = Counter(a=3, b=1)
+       d = Counter(a=1, b=2)
+       c + d
+       c - d
+       c & d                           # 个数最少的元素
+       c | d                           # 个数最多的元素
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> Counter({'a': 4, 'b': 3})
+     - Counter({'a': 2})
+     - Counter({'a': 1, 'b': 1})
+     - Counter({'a': 3, 'b': 2})
+     #+END_SRC
+
+     单个加/减操作相当于与空Counter对象加/减，并去除个数<=0的元素：
+
+     #+BEGIN_SRC python :session
+       from collections import Counter
+       c = Counter(a=2, b=-4, c=0)
+       c2 = Counter()
+       c + c2, +c
+       c - c2, -c
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> (Counter({'a': 2}), Counter({'a': 2}))
+     - (Counter({'a': 2}), Counter({'b': 4}))
+     #+END_SRC
+
 ** deque对象
+*** class collections. *deque* ([iterable[,maxlen]])
+    将ITERABLE中的元素从左到右使用append()方法初始化到新的deque对象中。
+    如果缺省ITERABLE参数，返回空的deque对象。
+    
+    Deque对象为“堆（stack）”和“队列（queue）”的结合体，为
+    “doubled-enabled queue”的缩写。在其两端添加和删除元素的效率都为
+    O(1)，且线程安全（thread-safe），内存效率高。
+    
+    尽管list类型也支持相同操作，但只对定长链表有性能优化。在首尾删除和
+    添加元素的效率为O(n)。
+    
+    如果MAXLEN参数为None，deque对象可增长为任意长度。否则，当填满元素
+    后再向其中添加元素，相反方向的元素会被自动去除。类似于Unix中的tail
+    命令。
+**** 方法
+***** append(x)
+      将X添加到最右边。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque([1,2])
+        d.append(10)
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> deque([1, 2, 10])
+      #+END_SRC
+
+***** appendleft(x)
+      将X添加到最左边。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque([1, 2])
+        d.appendleft(10)
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> deque([10, 1, 2])
+      #+END_SRC
+
+***** clear()
+      删除所有元素。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abc')
+        print(d)
+        d.clear()
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> deque(['a', 'b', 'c'])
+      - >>> deque([])
+      #+END_SRC
+
+***** copy()
+      浅层复制。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+
+        d1 = deque([[1, 2], [3, 4]])
+        d2 = d1.copy()
+        d2[0][0] = 10
+        d1, d2
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> >>> >>> (deque([[10, 2], [3, 4]]), deque([[10, 2], [3, 4]]))
+      #+END_SRC
+
+***** count(x)
+      返回元素中等于X的个数。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abcda')
+        d.count('a')
+        d.count('A')
+
+        l = list('abcda')
+        l.count('a')
+        l.count('A')
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> 2
+      - 0
+      - >>> >>> 2
+      - 0
+      #+END_SRC
+
+***** extend(iterable)
+      将ITERABLE中的元素添加到后面。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abcd')
+        d.extend('ef')
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> deque(['a', 'b', 'c', 'd', 'e', 'f'])
+      #+END_SRC
+
+***** extendleft(iterable)
+      将ITERABLE中的元素添加到前面。
+      
+      *注意* ：添加后会逆序ITERABLE。
+      
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abcd')
+        d.extendleft('ef')
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> deque(['f', 'e', 'a', 'b', 'c', 'd'])
+      #+END_SRC
+
+***** index(x[,start[,stop]])
+      返回X在的索引，可设置START和END指定搜索范围。如果没找到，抛出
+      ValueError错误。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque(b'abc')
+        print(d)
+        d.index(ord('b'))
+        d.index(1000)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> deque([97, 98, 99])
+      - 1
+      - Traceback (most recent call last):
+      -   File "<stdin>", line 1, in <module>
+      - ValueError: 1000 is not in deque
+      #+END_SRC
+
+***** insert(i,x)
+      将X插入，使其索引为I。
+      
+      *注意* ：如果使deque的中的元素超出maxlen，抛出IndexError错误。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abc')
+        d.insert(0, 'A')
+        print(d)
+
+        d = deque('abc', 3)
+        d.insert(0, 'A')
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> deque(['A', 'a', 'b', 'c'])
+      - >>> >>> Traceback (most recent call last):
+      -   File "<stdin>", line 1, in <module>
+      - IndexError: deque already at its maximum size
+      #+END_SRC
+
+***** pop()
+      将deque的最后一个元素删除，并返回。如果其中没有元素，抛出
+      IndexError错误。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abc')
+        print(d.pop())
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> c
+      - deque(['a', 'b'])
+      #+END_SRC
+
+***** popleft()
+      将最左边的元素删除并返回。如果没有元素，抛出IndexError错误。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abc')
+        print(d)
+        print(d.popleft())
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> deque(['a', 'b', 'c'])
+      - a
+      - deque(['b', 'c'])
+      #+END_SRC
+
+***** remove(value)
+      删除从左到右第一个出现的VALUE，如果没有，抛出ValueError错误。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abcad')
+        print(d)
+        d.remove('a')
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> deque(['a', 'b', 'c', 'a', 'd'])
+      - >>> deque(['b', 'c', 'a', 'd'])
+      #+END_SRC
+
+***** reverse()
+      逆序当前对象，并返回None。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+        d = deque('abc')
+        print(d)
+        print(d.reverse())
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> deque(['a', 'b', 'c'])
+      - None
+      - deque(['c', 'b', 'a'])
+      #+END_SRC
+
+***** rotate(n)？？？
+      交换元素顺序。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+
+        d = deque('abcdef')
+        d.rotate(1)
+        print(d)
+
+        d = deque('abcdef')
+        d.rotate(-1)
+        print(d)
+
+        d = deque('abcdef')
+        d.rotate(2)
+        print(d)
+
+        d = deque('abcdef')
+        d.rotate(-2)
+        print(d)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> >>> deque(['f', 'a', 'b', 'c', 'd', 'e'])
+      - >>> >>> >>> deque(['b', 'c', 'd', 'e', 'f', 'a'])
+      - >>> >>> >>> deque(['e', 'f', 'a', 'b', 'c', 'd'])
+      - >>> >>> >>> deque(['c', 'd', 'e', 'f', 'a', 'b'])
+      #+END_SRC
+      
+**** 属性
+***** maxlen
+      只读属性。如果创建deque对象时有maxlen参数，则返回该值；如果无，
+      则返回None。
+
+      #+BEGIN_SRC python :session
+        from collections import deque
+
+        d = deque('abc')
+        print(d.maxlen)
+
+        d = deque('abc', maxlen=2)
+        print(d.maxlen)
+
+        d.maxlen = 3
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> None
+      - >>> >>> 2
+      - >>> Traceback (most recent call last):
+      -   File "<stdin>", line 1, in <module>
+      - AttributeError: attribute 'maxlen' of 'collections.deque' objects is not writable
+      #+END_SRC
+
+**** 其他
+     *注意* ：访问deque对象的首位元素效率为O(1)，访问中间元素效率为
+     O(n)。所以如果时随机访问元素，建议使用链表。
+
+     除上面的方法外，deque对象还支持的操作有：
+
+     - iteration
+     - len(d)
+     - reversed(d)
+     - copy.copy(d)
+     - copy.deepcopy(d)
+     - in操作
+     - 下标访问：d[-1]
+
 *** deque应用举例
+    
+    - 默认Unix的tail命令：
+      
+      #+BEGIN_SRC python :session
+      from collections import deque
+
+      def tail(filename, n=10):
+          '返回文件的后面N行.'
+          with open(filename) as fp:
+              return deque(fp, n)
+      #+END_SRC
+      
+    -
+     
 ** defaultdict对象
 *** defaultdict应用举例
 ** namedtuple() - 元组工厂函数
@@ -195,7 +832,6 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 ** UserDict对象
 ** UserList对象
 ** UserString对象
-
 * collections.abc - 容器类型抽象基础类（Abstract Base Classes for Containers）
 * heapq - 堆排序算法
 * bisect - 数组二叉树搜索算法

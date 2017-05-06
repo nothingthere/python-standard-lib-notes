@@ -1,0 +1,33 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-06 21:13:47
+# Commentary:
+#+TITLE: 函数式编程模块
+
+* itertools - 创建高效逆变iterator的函数
+** itertool函数
+*** itertools. *accumulate* (iterable[,func])
+*** itertools. *chain* (*iterables)
+*** itertools. *from_iterable* (iterable)
+*** itertools. *combinations* (iterable,r)
+*** itertools. *combinations_with_replacement* (iterable, r)
+*** itertools. *compress* (data,selectors)
+*** itertools. *count* (star=0,step=1)
+*** itertools. *cycle* (iterable)
+*** itertools. *dropwhile* (predicate,iterable)
+*** itertools. *filterfalse* (predicate,iterable)
+*** itertools. *groupby* (iterable,key=None)
+*** itertools. *islice* (iterable,stop)
+*** itertools. *islice* (iterable,start,stop[,step])
+*** itertools. *permutation* (iterable,r=None)
+*** itertools. *product* (*iterables,repeat=1)
+*** itertools. *repeat* (object[,times])
+*** itertools. *startmap* (function,iterable)
+*** itertools. *takewhile* (predicate,iterable)
+*** itertools. *tee* (iterable,n=2)
+*** itertools. *zip_longest* (*iterables,fillvalue=None)
+** itertools用法举例
+* functools - 操作可调用对象的高阶函数
+** partial对象
+* operator - 使用标准操作符作为函数
+** 将操作符映射为函数
+** inplace操作符
