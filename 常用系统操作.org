@@ -10,10 +10,10 @@
   argparse模块提供易用的命令行接口。程序定义所需参数后，argparse可解析
   sys.argv获取。argparse模块还可自动生成帮助和使用信息，且当参数无效时
   显示错误信息。
-  
+
 ** 例子
    如接受一系列整数获取最大值或和：
-   
+
    #+BEGIN_SRC python :eval never
     import argparse
 
@@ -27,9 +27,9 @@
     args = parser.parse_args()
     print(args.accumulate(args.integers))
    #+END_SRC
-   
+
    如果将上面代码存储在argparse_demo.py中，则：
-   
+
    #+BEGIN_EXAMPLE python
     $ python3 argparse_demo.py -h
     usage: argparse_demo.py [-h] [--sum] N [N ...]
@@ -43,36 +43,36 @@
       -h, --help  show this help message and exit
       --sum       整数相加（默认：找到最大值）
    #+END_EXAMPLE
-   
+
    获取最大值或和：
-   
+
    #+BEGIN_EXAMPLE python
     $ python3 argparse_demo.py  1 2 3     4
     4
     $ python3 argparse_demo.py  1 2 3 4 --sum
     10
    #+END_EXAMPLE
-   
+
    传入错误参数：
-   
+
    #+BEGIN_EXAMPLE python
     $ python3 argparse_demo.py  a b c
     usage: argparse_demo.py [-h] [--sum] N [N ...]
     argparse_demo.py: error: argument N: invalid int value: 'a'
    #+END_EXAMPLE
-   
+
    通过下面各小节来理解上面程序。
-   
+
 *** 创建解析器
     第一步为使用argparse创建ArgumentParser对象：
-    
+
     #+BEGIN_SRC python :eval never
       import argparse
       parse = argparse.ArgumentParser(description='处理整数')
     #+END_SRC
-    
+
     ArgumentParser对象保有所有将命令行参数转换为Python数据的信息。
-    
+
 *** 添加参数
     使用add_argument()方法向ArgumentParser添加参数。通常情况下，此方法
     告知ArgumentParser对象如何将命令行参数转换为对象。这些信息在使用
@@ -420,16 +420,16 @@
        parser.add_argument('--bar')
        parser.parse_args('+f X --bar Y'.split())
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> _StoreAction(option_strings=['+f'], dest='f', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
      - _StoreAction(option_strings=['--bar'], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
      - Namespace(bar='Y', f='X')
      #+END_SRC
-     
+
      *注意* ：PREFIX_CHARS中需包含“-”，否则会使“-f/--foo”非法。
-     
+
 **** fromfile_prefix_chars
      如果命令行参数过程，可置于文件中。指定FROMFILE_PREFIX_CHARS一个特
      殊符号，则所有以此特殊符号开始的参数都会作为从文件中获取：
@@ -456,7 +456,7 @@
      *注意* ：文件中，选项和参数需保证每行一个。
 
 **** argument_default
-     通常情况下，为参数设置默认值为在add_argument()方法中传递默认值，
+     通常情况下，为参数设置默认值可在add_argument()方法中传递默认值，
      或使用ArgumentParser对象的set_defaults()方法。但也可以通过设置
      ARGUMENT_DEFAULT参数实现为所有命令行参数。如抑制所有没传递的参数：
 
@@ -498,14 +498,14 @@
 
 **** conflict_handler
      默认情况下，不允许选项重复，否则抛出错误：
-     
+
      #+BEGIN_SRC python :session
        import argparse
        parser = argparse.ArgumentParser(prog='PROG')
        parser.add_argument('-f', '--foo', help='old foo help')
        parser.add_argument('--foo', help='new foo help')
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> _StoreAction(option_strings=['-f', '--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='old foo help', metavar=None)
@@ -552,14 +552,14 @@
 **** add_help
      默认情况下，会自动添加“-h/--help”选项。如需禁用，可设置ADD_HELP参
      数为False：
-     
+
      #+BEGIN_SRC python :session
        import argparse
        parser = argparse.ArgumentParser(add_help=False)
        parser.add_argument('--foo', help='foo help')
        parser.print_help()
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='foo help', metavar=None)
@@ -567,16 +567,16 @@
      - optional arguments:
      -   --foo FOO  foo help
      #+END_SRC
-     
+
      如果设置PREFIX_CHAR参数，且其中不含“-”，“-h/--help”默认使用第一个
      字符作为前缀：
-     
+
      #+BEGIN_SRC python :session
        import argparse
        parser = argparse.ArgumentParser(prefix_chars='#+')
        parser.print_help()
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> usage: [#h]
@@ -585,26 +585,869 @@
      #+END_SRC
      
 ** add_argument()方法
-*** name或flags
-*** action
-*** args
-*** const
-*** default
-*** type
-*** choices
-*** required
-*** help
-*** metavar
-*** dest
-*** Action类
+*** ArgumentParser. *add_argument* (name of flags...[,action][,nargs][,const][,default][,type][,choices][,required][,help][,metavar][,dest])
+    定义如歌解析单个命令行参数。各参数简要描述如下：
+    
+     - name or flags： 一个或多个字符串。如“foo”、“--foo”或“-f”
+     - action：当命令行中出现此参数时的基本操作。
+     - nargs：指定消耗的命令行参数个数。
+     - const：action和nargs指定后，所需的常量。
+     - default：如果命令行缺省对应参数的默认值。
+     - type：命令行中参数转换成的Python类型。
+     - choices：指定命令行中只能出现的参数。
+     - required：命令行中此选项是否必须（只对可选选项有效）。
+     - help：对此选项的简要描述。
+     - metavar：在“Usage”信息中此选项的名字。
+     - dest：parse_args()返回值对应的属性。
+       
+     下面为详细介绍：
+     
+**** name或flags
+     一个或单个字符串，以“-”前缀开始时表示命令行可选参数，无前缀表示命
+     令行必选参数。
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('-f', '--foo')
+       parser.add_argument('bar')
+       parser.parse_args(['BAR'])
+       parser.parse_args('BAR --foo FOO'.split())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> _StoreAction(option_strings=['-f', '--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar='BAR', foo=None)
+     - Namespace(bar='BAR', foo='FOO')
+     #+END_SRC
+
+**** action
+     指定对命令行参数的操作。可对命令行参数进行任意操作，但将其作为
+     parse_args()方法的返回值属性为最常用操作。ACTION对应的字符串指定
+     操作类型：
+     
+     - store：存储参数值，为默认操作：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo')
+         parser.parse_args('--foo 1'.split())
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(foo='1')
+       #+END_SRC
+       
+     - store_const：存储CONST参数指定的值。常用于可选参数：
+       
+       #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', action='store_const', const=42)
+       parser.parse_args(['--foo'])
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreConstAction(option_strings=['--foo'], dest='foo', nargs=0, const=42, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(foo=42)
+       #+END_SRC
+       
+     - store_true和store_false：是store_const的特殊形式，分别存储True
+       和False。
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo', action='store_true')
+         parser.add_argument('--bar', action='store_false')
+         parser.add_argument('--baz', action='store_false')
+         parser.parse_args('--foo --bar'.split())
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> >>> _StoreTrueAction(option_strings=['--foo'], dest='foo', nargs=0, const=True, default=False, type=None, choices=None, help=None, metavar=None)
+       - _StoreFalseAction(option_strings=['--bar'], dest='bar', nargs=0, const=False, default=True, type=None, choices=None, help=None, metavar=None)
+       - _StoreFalseAction(option_strings=['--baz'], dest='baz', nargs=0, const=False, default=True, type=None, choices=None, help=None, metavar=None)
+       - Namespace(bar=False, baz=True, foo=True)
+       #+END_SRC
+       
+       *注意* ：如果缺省对应命令行选项，对应值为相反值，即True得到
+       False，反之亦然。
+       
+     - append：命令行中多次使用选项时，将参数集中到一个链表中：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo', action='append')
+         parser.parse_args('--foo 1 --foo 2 --foo 3'.split())
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _AppendAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(foo=['1', '2', '3'])
+       #+END_SRC
+       
+     - append_const：将CONST参数指定值集中到一个链表中。常用于将多个命
+       令行选项的参数集中到一个链表中：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--str', dest='types', action='append_const', const=str)
+         parser.add_argument('--int', dest='types', action='append_const', const=int)
+         parser.parse_args('--int --str'.split())
+         parser.parse_args(['--int'])
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _AppendConstAction(option_strings=['--str'], dest='types', nargs=0, const=<class 'str'>, default=None, type=None, choices=None, help=None, metavar=None)
+       - _AppendConstAction(option_strings=['--int'], dest='types', nargs=0, const=<class 'int'>, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(types=[<class 'int'>, <class 'str'>])
+       - Namespace(types=[<class 'int'>])
+       #+END_SRC
+       
+     - count：计数命令行中选项出现的次数：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--verbose', '-v', action='count')
+         parser.parse_args(['-vvvv', '-v'])
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _CountAction(option_strings=['--verbose', '-v'], dest='verbose', nargs=0, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(verbose=5)
+       #+END_SRC
+       
+     - help：？？？
+       
+     - version：打印版本信息：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser(prog='PROG')
+         parser.add_argument('--version', action='version', version='%(prog)s 2.0')
+         parser.parse_args(['--version'])
+       #+END_SRC
+
+     如需定制action，可将此参数值设置为Action的子类或有相同接口的对象。
+     建议方法是重置Action的__call__和__init__方法：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+
+       class FooAction(argparse.Action):
+           def __init__(self, option_strings, dest, nargs=None, **kwargs):
+               if nargs is not None:
+                   raise ValueError('nargs not allowed')
+               super(FooAction, self).__init__(option_strings, dest, **kwargs)
+           def __call__(self, parser, namespace, values, option_string=None):
+               print('{} {} {}'.format(namespace, values, option_string))
+               setattr(namespace, self.dest, values)
+
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', action=FooAction)
+       parser.add_argument('bar', action=FooAction)
+       args = parser.parse_args('1 --foo 2'.split())
+       print(args)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... ... ... ... ... ... ... >>> >>> >>> FooAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - FooAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar=None, foo=None) 1 None
+     - Namespace(bar='1', foo=None) 2 --foo
+     - Namespace(bar='1', foo='2')
+     #+END_SRC
+
+**** nargs
+     默认情况下，一个命令行选项只消耗一个命令行参数，使用NARGS参数可指
+     定单个选项消耗的参数个数。可选值为：
+     
+     - N（整数）。将N和参数集中到一起：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo', nargs=2)
+         parser.add_argument('bar', nargs=1)
+         parser.parse_args('--foo a b c'.split())
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=2, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=[], dest='bar', nargs=1, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(bar=['c'], foo=['a', 'b'])
+       #+END_SRC
+       
+       *注意* ：nargs=1时是生成单个参数组成的链表，区别与默认时将选项
+       直接作为指。
+       
+     - ?：可消耗一个命令行参数，或不消耗命令行选项，生成单个选项值（不
+       为链表）。如果没消耗命令行选项，使用DEFAULT参数值。如果为可选选
+       项，且没消耗命令行参数，则使用CONST参数值：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo', nargs='?', const='c', default='d')
+         parser.add_argument('bar', nargs='?', default='d')
+         parser.parse_args('XX --foo YY'.split())
+         parser.parse_args('XX --foo'.split())
+         parser.parse_args([])
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs='?', const='c', default='d', type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=[], dest='bar', nargs='?', const=None, default='d', type=None, choices=None, help=None, metavar=None)
+       - Namespace(bar='XX', foo='YY')
+       - Namespace(bar='XX', foo='c')
+       - Namespace(bar='d', foo='d')
+       #+END_SRC
+       
+     “nargs='?'”的常用方法为允许必选命令行选项中的文件参数缺省：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       import sys
+       parser = argparse.ArgumentParser()
+       parser.add_argument('infile', nargs='?',
+                           type=argparse.FileType('r'), default=sys.stdin)
+       parser.add_argument('outfile', nargs='?',
+                           type=argparse.FileType('w'), default=sys.stdout)
+       parser.parse_args(['files/input.txt', 'files/output.txt'])
+       parser.parse_args([])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... _StoreAction(option_strings=[], dest='infile', nargs='?', const=None, default=<_io.TextIOWrapper name='<stdin>' mode='r' encoding='UTF-8'>, type=FileType('r'), choices=None, help=None, metavar=None)
+     - ... _StoreAction(option_strings=[], dest='outfile', nargs='?', const=None, default=<_io.TextIOWrapper name='<stdout>' mode='w' encoding='UTF-8'>, type=FileType('w'), choices=None, help=None, metavar=None)
+     - Namespace(infile=<_io.TextIOWrapper name='files/input.txt' mode='r' encoding='UTF-8'>, outfile=<_io.TextIOWrapper name='files/output.txt' mode='w' encoding='UTF-8'>)
+     - Namespace(infile=<_io.TextIOWrapper name='<stdin>' mode='r' encoding='UTF-8'>, outfile=<_io.TextIOWrapper name='<stdout>' mode='w' encoding='UTF-8'>)
+     #+END_SRC
+     
+     - *：将所有命令行参数集中到一个链表中：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo', nargs='*')
+         parser.add_argument('--bar', nargs='*')
+         parser.add_argument('baz', nargs='*')
+         parser.parse_args('--foo x y --bar 1 2'.split())
+         parser.parse_args('a b --foo x y'.split())
+       #+END_SRC
+       
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs='*', const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=['--bar'], dest='bar', nargs='*', const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=[], dest='baz', nargs='*', const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(bar=['1', '2'], baz=[], foo=['x', 'y'])
+       - Namespace(bar=None, baz=['a', 'b'], foo=['x', 'y'])
+       #+END_SRC
+       
+     - +：与“*”相同，将所有有效参数集中到链表中。但是至少需一个参数，
+       否则抛出错误：
+       
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('foo', nargs='+')
+         parser.parse_args('a b'.split())
+       #+END_SRC
+
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=[], dest='foo', nargs='+', const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(foo=['a', 'b'])
+       #+END_SRC
+
+     - argparse.REMAINDER：将剩下的所有命令行参数集中到链表中：
+
+       #+BEGIN_SRC python :session
+         import argparse
+         parser = argparse.ArgumentParser()
+         parser.add_argument('--foo')
+         parser.add_argument('command')
+         parser.add_argument('args', nargs=argparse.REMAINDER)
+         parser.parse_args('--foo B cmd --arg1 XX ZZ'.split())
+       #+END_SRC
+
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=[], dest='command', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - _StoreAction(option_strings=[], dest='args', nargs='...', const=None, default=None, type=None, choices=None, help=None, metavar=None)
+       - Namespace(args=['--arg1', 'XX', 'ZZ'], command='cmd', foo='B')
+       #+END_SRC
+
+     如果没提供NARGS参数，则消耗的命令行参数个数由ACTION参数决定。一般
+     情况下，单个命令行选项消耗单个命令行参数，并生成非链表的单个属性
+     值。
+     
+**** const
+     此参数最常见的两个用法为：
+
+     - 当ACTION的值为"store_const"或"append_const"时，使用CONST参数的
+       值作为parse_args()方法返回对象的属性值。
+     - 当NARGS的值为"?"时，如果命令行中无参数，则使用CONST参数的值。
+
+     *注意* ：如果ACTION参数值为"store_const"或"append_const"，必须声
+     明CONST关键字参数值。其他ACTION值情况下，其默认值为None。
+
+**** default
+     命令行中可选选项和一些必选选项可缺省参数。缺省时，使用DEFAULT参数
+     值（默认为None）作为parse_args()方法返回对象的属性值。
+     
+     对于可选选项，如果命令行中没有参数，使用DEFAULT参数的值：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', default=42)
+       parser.parse_args('--foo 2'.split())
+       parser.parse_args([])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=42, type=None, choices=None, help=None, metavar=None)
+     - Namespace(foo='2')
+     - Namespace(foo=42)
+     #+END_SRC
+     
+     如果DEFAULT参数值类型为字符串，parse_args()方法会将其等同命令行中
+     的参数对待，使用TYPE参数指定的类型对其实现类型转换，否则不管：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--length', default='10', type=int)
+       parser.add_argument('--width', default=10.5, type=int)
+       parser.parse_args([])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--length'], dest='length', nargs=None, const=None, default='10', type=<class 'int'>, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=['--width'], dest='width', nargs=None, const=None, default=10.5, type=<class 'int'>, choices=None, help=None, metavar=None)
+     - Namespace(length=10, width=10.5)
+     #+END_SRC
+
+     对于必须选项，如果NARGS参数值为"?"或"*"，当无命令行参数时，也使用
+     DEFAULT参数值作为默认值：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('foo', nargs='?', default=42)
+       parser.parse_args(['a'])
+       parser.parse_args()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=[], dest='foo', nargs='?', const=None, default=42, type=None, choices=None, help=None, metavar=None)
+     - Namespace(foo='a')
+     - Namespace(foo=42)
+     #+END_SRC
+
+     如果default=argparse.SUPPRESS，则当命令行中无参数时，parse_args()
+     方法返回的对象不具备对于属性：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', default=argparse.SUPPRESS)
+       parser.parse_args([])
+       parser.parse_args('--foo 1'.split())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default='==SUPPRESS==', type=None, choices=None, help=None, metavar=None)
+     - Namespace()
+     - Namespace(foo='1')
+     #+END_SRC
+
+**** type
+     ArgumentParser只是将命令行中的参数作为字符串，可在add_argument()
+     方法中使用type参数指定类型转换。可为内置类型和接受单个字符串参数
+     的函数。如果指定了DEFAULT参数，也会根据type参数对其自动转换类型。
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('foo', type=int)
+       parser.add_argument('bar', type=open)
+       parser.parse_args('2 files/input.txt'.split())
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=[], dest='foo', nargs=None, const=None, default=None, type=<class 'int'>, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=<built-in function open>, choices=None, help=None, metavar=None)
+     - Namespace(bar=<_io.TextIOWrapper name='files/input.txt' mode='r' encoding='UTF-8'>, foo=2)
+     #+END_SRC
+     
+     为简化文件类型的使用，argparse模块还提供了FileType工厂函数，接受
+     与open函数相同的mode、bufsize、encoding和errors参数。如将参数转换
+     为可写的文件对象：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('bar', type=argparse.FileType('w'))
+       parser.parse_args(['files/output.txt'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=FileType('w'), choices=None, help=None, metavar=None)
+     - Namespace(bar=<_io.TextIOWrapper name='files/output.txt' mode='w' encoding='UTF-8'>)
+     #+END_SRC
+
+     也可为接受单个字符串参数的任意函数：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       import math
+
+       def perfect_square(string):
+           value = int(string)
+           sqrt = math.sqrt(value)
+           if sqrt != int(sqrt):
+               msg = '{} is not a perfect square'.format(string)
+               raise argparse.ArgumentError(msg)
+           return value
+
+       parser = argparse.ArgumentParser()
+       parser.add_argument('foo', type=perfect_square)
+       parser.parse_args(['9'])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... ... ... ... ... ... >>> >>> _StoreAction(option_strings=[], dest='foo', nargs=None, const=None, default=None, type=<function perfect_square at 0x7ff2678e3158>, choices=None, help=None, metavar=None)
+     - Namespace(foo=9)
+     #+END_SRC
+
+**** choices
+     使用CHOICES参数可限定命令行参数为只为其中的元素。当解析命令行参数
+     时，如果不在其中则抛出错误：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('move', choices=['rock', 'paper', 'scissors'])
+       parser.parse_args(['rock'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=[], dest='move', nargs=None, const=None, default=None, type=None, choices=['rock', 'paper', 'scissors'], help=None, metavar=None)
+     - Namespace(move='rock')
+     #+END_SRC
+
+     *注意* ：包含测试在类型type指定转换后进行，所有CHOICES中的元素类
+     型需与type指定的一致：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('door', type=int, choices=range(1, 4))
+       parser.parse_args(['3'])
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=[], dest='door', nargs=None, const=None, default=None, type=<class 'int'>, choices=range(1, 4), help=None, metavar=None)
+     - Namespace(door=3)
+     #+END_SRC
+
+     任何支持“in”操作的对象都可所谓CHOICES参数的值，即dict、set等都可。
+
+**** required
+     一般情况下，name或flags为“-f”或“-bar”形式时表示命令行可选选择，可
+     缺省。如需将可选选项设置为必须选项，可设置参数REQUIRED为True：
+
+     *注意* ：最好不要将可选选项转换为必选选项。
+     
+**** help
+     用于简要表示描述命令行选项的字符串，用于使用“-h/--help”时打印：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', action='store_true', help='foo选项用法')
+       parser.add_argument('bar', nargs='+', help='bar选项用法')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreTrueAction(option_strings=['--foo'], dest='foo', nargs=0, const=True, default=False, type=None, choices=None, help='foo选项用法', metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs='+', const=None, default=None, type=None, choices=None, help='bar选项用法', metavar=None)
+     - usage: [-h] [--foo] bar [bar ...]
+     - positional arguments:
+     -   bar         bar选项用法
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo       foo选项用法
+     #+END_SRC
+     
+     在字符串中，可使用绝大多数add_argument()方法的参数：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser(prog='PROG')
+       parser.add_argument('bar', nargs='?', type=int, default=24,
+                           help='程序%(prog)s的选项bar，类型%(type)s， 默认值为%(default)s')
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... _StoreAction(option_strings=[], dest='bar', nargs='?', const=None, default=24, type=<class 'int'>, choices=None, help='程序%(prog)s的选项bar，类型%(type)s， 默认值为%(default)s', metavar=None)
+     - usage: PROG [-h] [bar]
+     - positional arguments:
+     -   bar         程序PROG的选项bar，类型int， 默认值为24
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+
+     如需不在“usage”和“help”信息中显示帮助信息，可使用
+     argparse.SUPPRESS：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', help=argparse.SUPPRESS)
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help='==SUPPRESS==', metavar=None)
+     - usage: [-h]
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     #+END_SRC
+
+**** metavar
+     默认情况下，在显示帮助信息时，使用DEST参数值作为选项参数提示。如
+     果为必选选项，直接使用该值；可选选项则使用大写形式：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo')
+       parser.add_argument('bar')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - usage: [-h] [--foo FOO] bar
+     - positional arguments:
+     -   bar
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo FOO
+     #+END_SRC
+     
+     使用metavar可修改此打印值：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', metavar='XXX')
+       parser.add_argument('bar', metavar='YYY')
+       parser.print_help()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar='XXX')
+     - _StoreAction(option_strings=[], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar='YYY')
+     - usage: [-h] [--foo XXX] YYY
+     - positional arguments:
+     -   YYY
+     - optional arguments:
+     -   -h, --help  show this help message and exit
+     -   --foo XXX
+     #+END_SRC
+
+     修改METAVAR只是改变了打印值，而非DEST的值。
+
+     对于不同的NARGS值，会多次打印METAVAR值，此时可使用元组设置多个打
+     印值：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', nargs=2)
+       parser.add_argument('--bar', nargs=2, metavar=('bar', 'baz'))
+       parser.print_help()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=2, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=['--bar'], dest='bar', nargs=2, const=None, default=None, type=None, choices=None, help=None, metavar=('bar', 'baz'))
+     - usage: [-h] [--foo FOO FOO] [--bar bar baz]
+     - optional arguments:
+     -   -h, --help     show this help message and exit
+     -   --foo FOO FOO
+     -   --bar bar baz
+     #+END_SRC
+     
+**** dest
+     定制parse_args()方法返回对象的属性名。默认情况下，对于可选选项，
+     如果有“--foo”形式，则使用第一个该形式，“foo”作为默认属性名，如果
+     没有，则使用第一个“-f”的“f”作为属性名，其中的任何短横线“-”都自动
+     转换为“下划线”，以得到合法的属性名；如果为必选选项“bar”形式，则为
+     add_argument()方法的第一个参数：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('-f', '--foo-bar', '--foo')
+       parser.add_argument('-x', '-y')
+       parser.parse_args('-f 1 -x 2'.split())
+       parser.parse_args('--foo 1 -y 2'.split())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['-f', '--foo-bar', '--foo'], dest='foo_bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - _StoreAction(option_strings=['-x', '-y'], dest='x', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(foo_bar='1', x='2')
+     - Namespace(foo_bar='1', x='2')
+     #+END_SRC
+
+     使用DEST参数则是定制此属性名：
+
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo', dest='bar')
+       parser.parse_args('--foo 1'.split())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='bar', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - Namespace(bar='1')
+     #+END_SRC
+
+*** Action - 定制add_argument方法的action参数？？？
+
 ** parse_args()方法
-*** 可选值语法
+*** ArgumentParser. *parse_args* (args=None,namespace=None)
+    将命令行参数转换为namespace对象属性，返回namespace对象。
+    
+    由add_argument()方法决定如何转换命令行参数。
+    
+    默认情况下，通过sys.argv获取命令行参数，创建全新Namespace对象赋值
+    属性。
+    
+*** 可选语法
+    对于可选选项，parse_args()方法支持多种命令行参数形式，最简单的方式
+    为选项和参数为各自独立：
+    
+    #+BEGIN_SRC python :session
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument('-x')
+      parser.add_argument('--foo')
+      parser.parse_args('-x X'.split())
+      parser.parse_args('--foo FOO'.split())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> _StoreAction(option_strings=['-x'], dest='x', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+    - _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+    - Namespace(foo=None, x='X')
+    - Namespace(foo='FOO', x=None)
+    #+END_SRC
+    
+    如果为全写形式选项，与参数间可用“=”连接：
+    
+    #+BEGIN_SRC python :session
+      parser.parse_args('--foo=FOO'.split())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - Namespace(foo='FOO', x=None)
+    #+END_SRC
+
+    如果为简写形式的选项，可与参数连写：
+
+    #+BEGIN_SRC python :session
+      parser.parse_args(['-xX'])
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - Namespace(foo=None, x='X')
+    #+END_SRC
+
+    多个简写形式的选项有默认值，则可连写，只有最后一个必须提供参数值：
+
+    #+BEGIN_SRC python :session
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument('-x', action='store_true')
+      parser.add_argument('-y', action='store_true')
+      parser.add_argument('-z')
+      parser.parse_args(['-xyzZ'])
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> _StoreTrueAction(option_strings=['-x'], dest='x', nargs=0, const=True, default=False, type=None, choices=None, help=None, metavar=None)
+    - _StoreTrueAction(option_strings=['-y'], dest='y', nargs=0, const=True, default=False, type=None, choices=None, help=None, metavar=None)
+    - _StoreAction(option_strings=['-z'], dest='z', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+    - Namespace(x=True, y=True, z='Z')
+    #+END_SRC
+
 *** 无效参数
-*** 参数包含
+    当parse_args()方法解析命令行时，如果遇到选项不明确、参数类型不正确、
+    必选选项参数个数不正确等会抛出错误，打印错误及使用方法：
+
+    #+BEGIN_SRC python :eval never
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument('--foo', type=int)
+      parser.add_argument('bar', nargs='?')
+
+      # 参数类型不正确
+      parser.parse_args('--foo spam'.split())
+      # 选项错误
+      parser.parse_args(['--bar'])
+      # 参数个数不正确
+      parser.parse_args('spam badger'.split())
+    #+END_SRC
+
+*** 参数包含 - 短横线（“-”）？？？
 *** 参数缩写（前缀匹配）
+    如果缩写明确，parse_args()解析命令行选项时允许缩写。可将
+    ArgumentParser的参数allow_abbrev设置成False取消此功能：
+
+    #+BEGIN_SRC python :session
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument('--bacon')
+      parser.add_argument('--badger')
+      parser.parse_args('--bac MMM'.split())
+      parser.parse_args('--bad WOOD'.split())
+
+      # 缩写不明确，不能正确解析
+      # parser.parse_args('--ba BA'.split())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> _StoreAction(option_strings=['--bacon'], dest='bacon', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+    - _StoreAction(option_strings=['--badger'], dest='badger', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+    - Namespace(bacon='MMM', badger=None)
+    - Namespace(bacon=None, badger='WOOD')
+    #+END_SRC
+
 *** sys.argv之外
+    普通用法中，一般parse_args()方法都不带参数，直接解析命令行，即
+    sys.argv。上面所有例子中为演示方便，都是直接提供链表模仿命令行。此
+    方法在测试时很有用：
+
+    #+BEGIN_SRC python :session
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument(
+          'integers', nargs='+', metavar='int', type=int,
+          choices=range(10), help='0-9间的整数'
+      )
+      parser.add_argument(
+          '--sum', dest='accumulate', action='store_const', const=sum,
+          default=max, help='将整数相加（默认：找到最大值）'
+      )
+      parser.parse_args('1 2 3 4'.split())
+      parser.parse_args('1 2 3 4 --sum'.split())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... _StoreAction(option_strings=[], dest='integers', nargs='+', const=None, default=None, type=<class 'int'>, choices=range(0, 10), help='0-9间的整数', metavar='int')
+    - ... ... ... _StoreConstAction(option_strings=['--sum'], dest='accumulate', nargs=0, const=<built-in function sum>, default=<built-in function max>, type=None, choices=None, help='将整数相加（默认：找到最大值）', metavar=None)
+    - Namespace(accumulate=<built-in function max>, integers=[1, 2, 3, 4])
+    - Namespace(accumulate=<built-in function sum>, integers=[1, 2, 3, 4])
+    #+END_SRC
+
 *** Namespace对象
-** 其他用法
+**** class argparse. *Namespace*
+     parse_args()方法使用的一个简单的类，创建来保存属性并返回。
+     
+     此类仅是object的一个子类。如需将其转换为字典，可使用内置函数
+     vars()：
+     
+     #+BEGIN_SRC python :session
+       import argparse
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo')
+       args = parser.parse_args('--foo BAR'.split())
+       vars(args)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - >>> {'foo': 'BAR'}
+     #+END_SRC
+
+     如需将解析结果添加到已有对象上，可使用NAMESPACE参数：
+
+     #+BEGIN_SRC python :session
+       import argparse
+
+       class C:
+           pass
+
+       c = C()
+       parser = argparse.ArgumentParser()
+       parser.add_argument('--foo')
+       parser.parse_args(args='--foo BAR'.split(), namespace=c)
+       vars(c)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... >>> >>> >>> >>> _StoreAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
+     - <__main__.C object at 0x7fdbe6213780>
+     - {'foo': 'BAR'}
+     #+END_SRC
+
+** 其他用法 （待续）
 *** 子命令
 *** FileType对象
 *** 参数分组
@@ -614,8 +1457,14 @@
 *** Partial parsing
 *** Customizing file parsing
 *** Exiting methods
-** 更新argparse
+** 更新argparse （待续）
 * getopt
+  
+  #+BEGIN_QUOTE
+  *注意* ：此模块的功能也是解析命令行，只是使用了与C的getopt()函数相同
+  的API。如果不属性C的getopt()函数，或不想多写代码，可使用argparse模块。
+  #+END_QUOTE
+  
 * logging
 * logging.config
 * logging.handlers
