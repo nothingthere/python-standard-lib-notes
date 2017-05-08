@@ -3537,17 +3537,19 @@
 
 *** *add* (elem)
     在set中添加元素ELEM。
-
+    
     #+BEGIN_SRC python :session
       s = set([1, 2, 3])
       s.add(4)
+      s.add(4)
       print(s)
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : >>> {1, 2, 3, 4}
-
+    #+BEGIN_SRC org
+    - >>> >>> >>> {1, 2, 3, 4}
+    #+END_SRC
+    
 *** *remove* (elem)
     删除set中的ELEM元素，如果ELEM不存在，则返回KeyError错误。
     #+BEGIN_SRC python :session

@@ -814,12 +814,19 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     - 默认Unix的tail命令：
       
       #+BEGIN_SRC python :session
-      from collections import deque
+        from collections import deque
 
-      def tail(filename, n=10):
-          '返回文件的后面N行.'
-          with open(filename) as fp:
-              return deque(fp, n)
+        def tail(filename, n=10):
+            '返回文件的后面N行.'
+            with open(filename) as fp:
+                return deque(fp, n)
+
+        tail('files/emma.txt', 2)
+      #+END_SRC
+      
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> ... ... ... ... >>> deque(['\n', 'End of The Project Gutenberg Etext of Emma, by Jane Austen\n'], maxlen=2)
       #+END_SRC
       
     -

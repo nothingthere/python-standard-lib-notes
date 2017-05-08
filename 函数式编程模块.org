@@ -4,28 +4,669 @@
 #+TITLE: 函数式编程模块
 
 * itertools - 创建高效逆变iterator的函数
+  - 返回无限循环iterator的函数：
+
+    | 函数    | 参数         | 结果                               | 举例                       |
+    |---------+--------------+------------------------------------+----------------------------|
+    | count() | start[,step] | start,start+step, start+2*step,... | count(10) --> 10 11 12 ... |
+    |         |              |                                    |                            |
+
+  - 耗尽最短序列结束的函数：
+
+    | 函数 | 参数 | 结果 | 举例 |
+    |------+------+------+------|
+    |      |      |      |      |
+
+  - 排列组合式函数：
+
+    | 函数 | 参数 | 结果 | 举例 |
+    |------+------+------+------|
+    |      |      |      |      |
+
 ** itertool函数
+   下面的模块函数都为构建并返回迭代器（iterators）。其中一些返回无限长
+   度的stream，所以只可被截断stream的函数或循环体使用。
+
 *** itertools. *accumulate* (iterable[,func])
+    返回将元素逐个使用FUNC（默认为相加）操作结果组成的迭代器。如果提供
+    FUNC参数，需为接受两个与ITERABLE中元素类型相同的参数，比如如果为默
+    认的相加，则参数类型应为整数或浮点数，或其他接受可相加的对象。如果
+    ITERABLE为空，则返回的迭代器也为空。
+
+    #+BEGIN_SRC python :session
+      from itertools import accumulate
+      from operator import mul
+      list(accumulate([1, 2, 3, 4, 5]))
+      list(accumulate([1, 2, 3, 4, 5], mul))
+      list(accumulate(['a', 'b', 'c']))
+      list(accumulate([]))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> [1, 3, 6, 10, 15]
+    - [1, 2, 6, 24, 120]
+    - ['a', 'ab', 'abc']
+    - []
+    #+END_SRC
+
+    基本上等价于：
+
+    #+BEGIN_SRC python :session
+      import operator
+      def my_accumulate(iterable, func=operator.add):
+          it = iter(iterable)
+          try:
+              total = next(it)
+          except StopIteration:
+              return
+          yield total
+          for element in it:
+              total = func(total, element)
+              yield total
+
+      list(my_accumulate([1, 2, 3]))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... ... ... ... ... ... ... ... >>> [1, 3, 6]
+    #+END_SRC
+
+    FUNC的用法有多种，如：
+
+    - min()和max()求最大/小值。
+
+      #+BEGIN_SRC python :session
+        from itertools import accumulate
+        data = [2, 3, 4, 32, 3, 23, 2, 2, 3]
+        list(accumulate(data, max))
+        list(accumulate(data, min))
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> [2, 3, 4, 32, 32, 32, 32, 32, 32]
+      - [2, 2, 2, 2, 2, 2, 2, 2, 2]
+      #+END_SRC
+
+    - 使用operator.mul迭代乘积：
+
+      #+BEGIN_SRC python :session
+        import operator
+        list(accumulate(data, operator.mul))
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - [2, 6, 24, 768, 2304, 52992, 105984, 211968, 635904]
+      #+END_SRC
+
+    - 计算分期付款：
+
+      #+BEGIN_SRC python :session
+        cashflow = [1000, -90, -90, -90]
+        list(accumulate(cashflow, lambda bal, pmt: bal * 1.05 + pmt))
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - [1000, 960.0, 918.0, 873.9000000000001]
+      #+END_SRC
+
+    - [[https://en.wikipedia.org/wiki/Recurrence_relation][recurrence relations]] ？？？
+
+      #+BEGIN_SRC python :session
+        from itertools import accumulate, repeat
+
+        def logistic_map(x, _): return r * x * (1 - x)
+
+        r, x0 = 3.8, 0.4
+        inputs = repeat(x0, 36)
+        [format(x, '.2f') for x in accumulate(inputs, logistic_map)]
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> ... >>> >>> >>> ['0.40', '0.91', '0.30', '0.81', '0.60', '0.92', '0.29', '0.79', '0.63', '0.88', '0.39', '0.90', '0.33', '0.84', '0.52', '0.95', '0.18', '0.57', '0.93', '0.25', '0.71', '0.79', '0.63', '0.88', '0.39', '0.91', '0.32', '0.83', '0.54', '0.95', '0.20', '0.60', '0.91', '0.30', '0.80', '0.60']
+      #+END_SRC
+
+      functools.reduce()的原理相同，只是返回增量结果的最后一个值。
+
 *** itertools. *chain* (*iterables)
-*** itertools. *from_iterable* (iterable)
+    将ITERABLES中的每个迭代器中的每个元素逐个添加到新的迭代器中，直到
+    消耗完毕，最后返回：
+
+    #+BEGIN_SRC python :session
+      from itertools import chain
+      list(chain([1, 2, 3], 'abc', (100, 200)))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [1, 2, 3, 'a', 'b', 'c', 100, 200]
+    #+END_SRC
+
+    基本上等价于：
+
+    #+BEGIN_SRC python :eval never
+      def my_chain(*iterables):
+          for it in iterables:
+              for element in it:
+                  yield element
+    #+END_SRC
+
+*** classmethod chain. *from_iterable* (iterable)
+    chain()的另一个构造器。从单个迭代参数中获取链式输入并“懒执行
+    （evaluated lazily）”：
+
+    #+BEGIN_SRC python :session
+      from itertools import chain
+      list(chain.from_iterable([[1, 2, 3], 'abc', (100, 200)]))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [1, 2, 3, 'a', 'b', 'c', 100, 200]
+    #+END_SRC
+
+    基本上等价于：
+
+    #+BEGIN_SRC python :eval never
+      def from_iterable(iterables):
+          for it in iterables:
+              for element in it:
+                  yield element
+    #+END_SRC
+
 *** itertools. *combinations* (iterable,r)
+    返回ITERABLE中长度为R的子序列组成的迭代器，其中子序列为元组。
+
+    结合按ITERABLE中元素的顺序进行。所以，如果ITERABLE以排序，则各元组
+    也排序好。
+
+    每个元素以其在ITERABLE中的位置区分，而非其值。所以，如果每个元素没
+    有重复，则返回值中的每个元组中也没重复。
+
+    #+BEGIN_SRC python :session
+      from itertools import combinations
+      list(combinations('abc', 2))
+      list(combinations('abc', 3))
+
+      list(combinations(range(4), 3))
+      list(combinations(range(4), 4))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('a', 'b'), ('a', 'c'), ('b', 'c')]
+    - [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')]
+    - [('a', 'b', 'c')]
+    - >>> [(0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3)]
+    - [(0, 1, 2, 3)]
+    #+END_SRC
+
+    基本上等价于：？？？
+
+    #+BEGIN_SRC python :eval never
+      def combinations(iterable, r):
+          pool = tuple(iterable)
+          n = len(pool)
+          if r > n:
+              return
+          indices = list(range(r))
+          yield tuple(pool[i] for i in indices)
+          while True:
+              for i in reversed(range(r)):
+                  if indices[i] != i + n - r:
+                      break
+              else:
+                  return
+              indices[i] += 1
+              for j in range(i + 1, r):
+                  indices[j] = indices[j - 1] + 1
+              yield tuple(pool[i] for i in indices)
+    #+END_SRC
+
+    也等价于去除permutations()结果中没按原来元素排序的元素：
+
+    #+BEGIN_SRC python :session
+      from itertools import combinations, permutations
+      list(combinations('abc', 2))
+      list(permutations('abc', 2))
+
+      def my_combinations(iterable, r):
+          pool = tuple(iterable)
+          n = len(pool)
+          for indices in permutations(range(n), r):
+              if sorted(indices) == list(indices):
+                  yield tuple(pool[i] for i in indices)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('a', 'b'), ('a', 'c'), ('b', 'c')]
+    - [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')]
+    #+END_SRC
+
 *** itertools. *combinations_with_replacement* (iterable, r)
+    返回ITERABLE长度为R的子序列，所有子序列都应按ITERABLE原来的顺序排
+    列。与combinations()方法不同的是，自身元素可重复。
+    
+    #+BEGIN_SRC python :session
+      from itertools import combinations_with_replacement
+      list(combinations_with_replacement('abc', 2))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('a', 'a'), ('a', 'b'), ('a', 'c'), ('b', 'b'), ('b', 'c'), ('c', 'c')]
+    #+END_SRC
+
+    相当于自身重复R次笛卡尔乘积结果去除不按原来元素顺序排列的结果：
+
+    #+BEGIN_SRC python :eval never
+      from itertools import product
+
+      def combinations_with_replacement(iterable, r):
+          pool = tuple(iterable)
+          n = len(pool)
+          for indices in product(range(n), repeat=r):
+              if sorted(indices) == list(indices):
+                  yield tuple(pool[i] for i in indices)
+    #+END_SRC
+
 *** itertools. *compress* (data,selectors)
+    返回DATA中的元素，只有元素在SELECTORS中对应位置的元素为True时才包
+    含。直到DATA或SELECTORS中有一个的元素消耗完为止：
+
+    #+BEGIN_SRC python :session
+      from itertools import compress
+      list(compress('ABCDEF', [1, 0, 1, 0, 1, 0, 1, 0, 1, 1]))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ['A', 'C', 'E']
+    #+END_SRC
+
+    大致相当于：
+
+    #+BEGIN_SRC python :eval never
+      def compress(data, selectors):
+          return (d for d, s in zip(data, selectors) if s)
+    #+END_SRC
+
 *** itertools. *count* (star=0,step=1)
+    返回以START开始，步数为STEP的数字迭代器。可迭代出无限个数字。可为
+    浮点数。
+
+    #+BEGIN_SRC python :session
+      from itertools import count
+      cnt = count(step=10)
+      for i in range(10):
+          print(next(cnt), end=' ')
+
+      print()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... 0 10 20 30 40 50 60 70 80 90 >>>
+    #+END_SRC
+
+    大致等价于：
+
+    #+BEGIN_SRC python :eval never
+      def count(start=0, step=1):
+          n = start
+          while True:
+              yield n
+              n += step
+    #+END_SRC
+
 *** itertools. *cycle* (iterable)
+    将ITERABLE模仿为循环结构：
+
+    #+BEGIN_SRC python :session
+      from itertools import cycle
+      c = cycle('abc')
+      for i in range(10):
+          print(next(c), end=' ')
+
+      print()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... a b c a b c a b c a >>>
+    #+END_SRC
+
+    *注意* ：很耗内存。
+
 *** itertools. *dropwhile* (predicate,iterable)
+    从左到右去除ITERABLE中元素，直到PREDICT调用为True。
+    
+    *注意* ： 直到找到为False的值或ITERABLE耗尽时才返回，所以会有等待。
+    
+    #+BEGIN_SRC python :session
+      from itertools import dropwhile, takewhile
+      lst = [1, 4, 6, 7, 1]
+      list(dropwhile(lambda x: x < 6, lst))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> [6, 7, 1]
+    #+END_SRC
+    
+    大致相当于：
+    
+    #+BEGIN_SRC python :eval never
+      def dropwhile(predict, iterable):
+          it = iter(iterable)
+          for x in iterable:
+              if not predict(x):
+                  yield x
+                  break
+          for x in iterable:
+              yield x
+    #+END_SRC
+    
 *** itertools. *filterfalse* (predicate,iterable)
+    过滤PREDICT调用ITERABLE中元素为False的元素，如果PREDICT为None，则
+    为ITERABLE中元素为false的元素：
+
+    #+BEGIN_SRC python :session
+      from itertools import filterfalse
+      list(filterfalse(lambda x: x % 2, range(10)))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [0, 2, 4, 6, 8]
+    #+END_SRC
+
+    大致相当于：
+
+    #+BEGIN_SRC python :eval never
+      def filterfalse(predict, iterable):
+          if predict is None:
+              predict = bool
+          for x in iterable:
+              if not predict(x):
+                  yield x
+    #+END_SRC
+
 *** itertools. *groupby* (iterable,key=None)
+    返回迭代器中的每个元素元组第一个元素为ITERABLE的一个元素，第二个元
+    素为该元素相邻请调用KEY参数与第一个元素值相同元素组成的迭代器。如
+    果KEY为None，相当于“lambda x: x”。
+
+    通常情况下，应该相对于KEY已经排序好。类似于Unix的uniq命令。
+
+    #+BEGIN_SRC python :session
+      from itertools import groupby
+      data = 'AAABBBXXDAABB'
+      # data = ''.join(sorted(list(data), key=lambda x: x.lower()))
+      # print(data)
+      [k for k, g in groupby(data)]
+      [list(g) for k, g in groupby(data)]
+      list(groupby(data))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ['A', 'B', 'X', 'D', 'A', 'B']
+    - [['A', 'A', 'A'], ['B', 'B', 'B'], ['X', 'X'], ['D'], ['A', 'A'], ['B', 'B']]
+    - [('A', <itertools._grouper object at 0x7f8fda279588>), ('B', <itertools._grouper object at 0x7f8fda2797f0>), ('X', <itertools._grouper object at 0x7f8fda279668>), ('D', <itertools._grouper object at 0x7f8fda2796a0>), ('A', <itertools._grouper object at 0x7f8fda279780>), ('B', <itertools._grouper object at 0x7f8fda279710>)]
+    #+END_SRC
+
 *** itertools. *islice* (iterable,stop)
 *** itertools. *islice* (iterable,start,stop[,step])
+    类似于range的用法，不过各个参数都不能为负数。
+    
+    如果START为None，默认为0,；如果STEP为None，默认为1；如果STOP为None，
+    直到消耗完整个ITERABLE。
+    
+    #+BEGIN_SRC python :session
+      from itertools import islice
+
+      data = 'ABCDEFG'
+      list(islice(data, 2))
+      list(islice(data, 2, 4))
+      list(islice(data, 0, None, 2))
+      list(islice(data, 2, None))
+      list(islice(data, 0, None, 2))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ['A', 'B']
+    - ['C', 'D']
+    - ['A', 'C', 'E', 'G']
+    - ['C', 'D', 'E', 'F', 'G']
+    - ['A', 'C', 'E', 'G']
+    #+END_SRC
+    
 *** itertools. *permutation* (iterable,r=None)
+    返回ITERABLE中长度为R的所有排列组合方式组成的迭代器，其中每个元素
+    为元素。如果R为None，则所有元素长度都与ITERABLE长度相同。
+
+    结合按ITERABLE中元素的顺序进行。所以，如果ITERABLE以排序，则各元组
+    也排序好。
+
+    每个元素以其在ITERABLE中的位置区分，而非其值。所以，如果每个元素没
+    有重复，则返回值中的每个元组中也没重复。
+
+    #+BEGIN_SRC python :session
+      from itertools import permutations
+      list(permutations('abc', 2))
+      list(permutations('abc'))
+      list(permutations(range(3)))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')]
+    - [('a', 'b', 'c'), ('a', 'c', 'b'), ('b', 'a', 'c'), ('b', 'c', 'a'), ('c', 'a', 'b'), ('c', 'b', 'a')]
+    - [(0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0)]
+    #+END_SRC
+
 *** itertools. *product* (*iterables,repeat=1)
+    返回ITERABLES中元素 [[http://baike.baidu.com/item/%25E7%25AC%259B%25E5%258D%25A1%25E5%25B0%2594%25E4%25B9%2598%25E7%25A7%25AF][笛卡尔乘积]] 的组合形式。每个元素为元组。如果要
+    返回ITERABLE自身的笛卡尔乘积，可使用REPEAT参数。大致相当于：
+
+    #+BEGIN_SRC python :eval never
+      ((x, y) for x in A y in B)
+    #+END_SRC
+
+    如：
+
+    #+BEGIN_SRC python :session
+      from itertools import product
+      list(product('ABCD', 'xy'))
+      list(product(range(2), repeat=2))
+      list(product('A', repeat=4))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('A', 'x'), ('A', 'y'), ('B', 'x'), ('B', 'y'), ('C', 'x'), ('C', 'y'), ('D', 'x'), ('D', 'y')]
+    - [(0, 0), (0, 1), (1, 0), (1, 1)]
+    - [('A', 'A', 'A', 'A')]
+    #+END_SRC
+
+    再如打印九九乘法表：
+
+    #+BEGIN_SRC python :session
+      from itertools import product
+      from functools import reduce
+      from operator import mul
+
+      num = range(1, 10)
+      mul_table = product(num, num)
+
+      for pair in mul_table:
+          print(format(reduce(mul, pair), '3d'), end=' ')
+          if(pair[1] % 9 == 0):
+              print()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> >>> >>> >>> ... ... ... ...   1   2   3   4   5   6   7   8   9
+    -   2   4   6   8  10  12  14  16  18
+    -   3   6   9  12  15  18  21  24  27
+    -   4   8  12  16  20  24  28  32  36
+    -   5  10  15  20  25  30  35  40  45
+    -   6  12  18  24  30  36  42  48  54
+    -   7  14  21  28  35  42  49  56  63
+    -   8  16  24  32  40  48  56  64  72
+    -   9  18  27  36  45  54  63  72  81
+    #+END_SRC
+
+    大致相当于：
+
+    #+BEGIN_SRC python :eval never
+      def product(*args, repeat=1):
+          pools = [tuple(pool) for pool in args] * repeat
+          result = [[]]
+          for pool in pools:
+              result = [x + [y] for x in result for y in pool]
+          for prod in result:
+              yield tuple(prod)
+    #+END_SRC
+
 *** itertools. *repeat* (object[,times])
+    返回迭代对象，不断重复OBJECT。如果有参数TIMES，则重复TIMES次。常与
+    map和zip函数一起使用：
+    
+    #+BEGIN_SRC python :session
+      from itertools import repeat
+      list(map(pow, range(10), repeat(2)))
+      list(map(pow, range(10), repeat(2, 2)))
+      list(zip(range(10), repeat(pow)))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+    - [0, 1]
+    - [(0, <built-in function pow>), (1, <built-in function pow>), (2, <built-in function pow>), (3, <built-in function pow>), (4, <built-in function pow>), (5, <built-in function pow>), (6, <built-in function pow>), (7, <built-in function pow>), (8, <built-in function pow>), (9, <built-in function pow>)]
+    #+END_SRC
+    
+    大致相当于：
+    
+    #+BEGIN_SRC python :eval never
+      def repeat(object, times=None):
+          if times is None:
+              while True:
+                  yield object
+              else:
+                  for i in times:
+                      yield object
+    #+END_SRC
+    
+    *注意* ：执行list(repeat(1))足够让机器卡死。！！！
+    
 *** itertools. *startmap* (function,iterable)
+    与map的区别为：
+
+    1. 只能有ITERABLE一个迭代器。
+    2. FUNCTION的参数为ITERABLE中每个元素的元素个数一样。
+
+    #+BEGIN_SRC python :session
+      from itertools import starmap
+      list(starmap(pow, [(2, 5), (3, 2), (10, 3)]))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [32, 9, 1000]
+    #+END_SRC
+
 *** itertools. *takewhile* (predicate,iterable)
-*** itertools. *tee* (iterable,n=2)
+    返回迭代器中包含PREDICT调用每个元素直到返回False的元素。
+
+    #+BEGIN_SRC python :session
+      from itertools import dropwhile, takewhile
+      lst = [1, 4, 6, 7, 8]
+
+      def predict(x): return x < 5
+
+      list(takewhile(predict, lst))
+      list(dropwhile(predict, lst))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... >>> [1, 4]
+    - [6, 7, 8]
+    #+END_SRC
+
+*** itertools. *tee* (iterable,n=2)？？？
+    使用ITERABLE生成N个独立的迭代器。
+    
+    #+BEGIN_SRC python :session
+      from itertools import tee
+      data = [1, 2, 3, 4, 2, 3]
+      x, y = tee(data, 2)
+      print(list(x))
+      print(list(y))
+      data[-1]=100
+      print(list(x))
+      print(list(y))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> [1, 2, 3, 4, 2, 3]
+    - [1, 2, 3, 4, 2, 3]
+    - >>> []
+    - []
+    #+END_SRC
+
 *** itertools. *zip_longest* (*iterables,fillvalue=None)
+    与zip()的区别为：直到消耗完最长的ITERABLE，长度不够的使用FILLVALUE
+    代替。
+
+    #+BEGIN_SRC python :session
+      from itertools import zip_longest, repeat
+
+      list(zip_longest('abc', [1, 2, 3, 4]))
+      list(zip('abc', [1, 2, 3, 4]))
+      list(zip_longest('abc', [1, 2, 3, 4], fillvalue='Z'))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> [('a', 1), ('b', 2), ('c', 3), (None, 4)]
+    - [('a', 1), ('b', 2), ('c', 3)]
+    - [('a', 1), ('b', 2), ('c', 3), ('Z', 4)]
+    #+END_SRC
+
+    *注意* ：
+
+    如果其中一个iterable为无限结构，需限制调用次数，如使用islice或
+    takewhile。不然将机器卡死。
+
+    #+BEGIN_SRC python :session
+      from itertools import repeat, zip_longest, islice
+      x = zip_longest('abc', repeat(1))
+      list(islice(x, 0, 10))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> [('a', 1), ('b', 1), ('c', 1), (None, 1), (None, 1), (None, 1), (None, 1), (None, 1), (None, 1), (None, 1)]
+    #+END_SRC
+
 ** itertools用法举例
+   下面的扩展工具具有相同的高性能。每次只处理一个元素，而不是将整个迭
+   代对象一次抛到内存中，从而减少内存开销。每个函数代码量少，以此减少
+   中间变量，并遵循了“函数式”风格。
+   
 * functools - 操作可调用对象的高阶函数
 ** partial对象
 * operator - 使用标准操作符作为函数

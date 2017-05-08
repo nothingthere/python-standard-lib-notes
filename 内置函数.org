@@ -19,8 +19,8 @@
 * *all* (iterable)
   如果所有ITERABLE的元素为True，则返回True。如果ITERABLE为空，也返回
   True。相当于：
-  
-  #+BEGIN_SRC python :session
+
+  #+BEGIN_SRC python :eval never
     def all(iterable):
         for element in iterable:
             if not element:
@@ -42,28 +42,28 @@
 
 * *any* (iterable)
   如果ITERABLE中任何一个元素为true则返回True，如果为空则返回False。
-
-  #+BEGIN_SRC python :session
+  
+  #+BEGIN_SRC python :eval never
     def any(iterable):
         for element in iterable:
             if element:
                 return True
         return False
   #+END_SRC
-
+  
   #+BEGIN_SRC python :session
     any([1, 2, 3])
     any([0, 1, 2, 3])
     any([])
     any([0, '', (), [], False])
   #+END_SRC
-
+  
   #+RESULTS:
   : True
   : True
   : False
   : False
-
+  
 * *ansii* (object)
   同repr()含义一样，返回OBJECT的打印时的字符串。不同的是，会转义非
   ASCII码：
@@ -1216,6 +1216,27 @@
 
 * class *slice* (stop)？？？
 * class *slice* (start,stop,[,step])
+  其实x[a:b:c]内部就是使用的此slice类进行截断。返回与原来相同的数据类
+  型。如需返回iterator对象，可使用itertools.islice()方法。
+  
+  #+BEGIN_SRC python :session
+    from itertools import islice
+    data = 'abcdefgh'
+    myslice = slice(3)
+    data[myslice]
+    myslice = slice(3, None)
+    data[myslice]
+    myslice = slice(3, None, 2)
+    data[myslice]
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - >>> >>> 'abc'
+  - >>> 'defgh'
+  - >>> 'dfh'
+  #+END_SRC
+  
 * *sorted* (iterable[,key][,reverse])
   返回排序后的iterable对象。
 
@@ -1308,9 +1329,9 @@
    #+RESULTS:
    :
    : 'a|b|c'
-
+   
    - math.fsum()：求浮点数和，且保留精度。
-
+     
    #+BEGIN_SRC python :session
      floats = [10 / 3, 10 / 7, 10 / 9]
      sum(floats)
@@ -1318,14 +1339,14 @@
      import math
      math.fsum(floats)
    #+END_SRC
-
+   
    #+RESULTS:
    :
    : 5.8730158730158735
    : >>> >>> 5.8730158730158735
-
+   
    - itertools.chain()：拼接多个iterable。
-
+     
 * *super* ([type[,object-or-type]])
 
   #+BEGIN_SRC python :session
