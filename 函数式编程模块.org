@@ -6,23 +6,42 @@
 * itertools - 创建高效逆变iterator的函数
   - 返回无限循环iterator的函数：
 
-    | 函数    | 参数         | 结果                               | 举例                       |
-    |---------+--------------+------------------------------------+----------------------------|
-    | count() | start[,step] | start,start+step, start+2*step,... | count(10) --> 10 11 12 ... |
-    |         |              |                                    |                            |
-
+    | 函数    | 参数         | 结果                                | 举例                               |
+    |---------+--------------+-------------------------------------+------------------------------------|
+    | count() | start[,step] | start,start+step, start+2*step,...  | count(10) --> 10 11 12 ...         |
+    | cycle() | p            | p0,p1,...plast,p0,p1,...            | cycle('ABCD') --> A B C D A B C... |
+    | repeat  | elem[,n]     | elem,elem,elem,...无限循环或循环N次 | repeat(10, 3) -> 10 10 10          |
+    
   - 耗尽最短序列结束的函数：
 
-    | 函数 | 参数 | 结果 | 举例 |
-    |------+------+------+------|
-    |      |      |      |      |
-
+    | 函数                  | 参数                   | 结果                                 | 举例                                                     |
+    |-----------------------+------------------------+--------------------------------------+----------------------------------------------------------|
+    | accumulate()          | p[,func]               | p0,p0+p1,p0+p1+p2,...                | accumulate([1,2,3]) --> 1 3 6                            |
+    | chain()               | q,q...                 | p0,p1,...plast,q0,q1,...             | chain('ABC', 'DEF') --> A B C D E F                      |
+    | chain.from_iterable() | iterable               | p0,p1,...q0,q1,...                   | chain.from_iterable(['ABC','DEF']) --> A B C D E F       |
+    | compress()            | data,selectors         | (d[0] if s[0]),(d[1] if s[1]),...    | compress('ABCD', [1,0,1,0,1,1]) --> A C                  |
+    | dropwhile()           | pred,seq               | seq[n],seq[n+1],从pred返回false开始  | dropwhile(lambda x: x<5, [1,4,6,4,1]) --> 6 4 1          |
+    | filterfalse()         | pred,seq               | 过滤掉不满足pred的元素               | filterfalse(lambda x: x%2!=0, range(10)) --> 0 2 4 6 8   |
+    | groupby()             | iterable[,keyfun]      | 按KEYFUN组成的子迭代器               |                                                          |
+    | islice()              | seq,[start]stop[,step] | seq[start:stop:step]                 | islice('ABCDEFD', 2, None) -->  C D E F G                |
+    | startmap()            | func,seq               | func(*seq[0]),func(*seq[1])...       | startmap(pow, [(2,5),[3,2],(10,3)]) --> 32 9 1000        |
+    | takewhile()           | pred,seq               | seq[0],seq[1],...直到pred返回False   | tabewhile(lambda x: x<5, [1,4,6,4,1]) --> 1 4            |
+    | tee()                 | it,n                   | it1,it2,..itn。将it分割为N给副本？？ |                                                          |
+    | zip_longest()         | p,q...                 | (p0,q0), (p1,q1)                     | zip_longest('ABCD', 'xy', fillvalue='-') --> Ax By C- D- |
+    
   - 排列组合式函数：
-
-    | 函数 | 参数 | 结果 | 举例 |
-    |------+------+------+------|
-    |      |      |      |      |
-
+    
+    | 函数                                     | 参数              | 结果                                            |
+    |------------------------------------------+-------------------+-------------------------------------------------|
+    | product()                                | p,q,...[repeat=1] | 笛卡尔乘积。等价于多个嵌套历遍                  |
+    | permutations()                           | p[,r]             | R长度元组。所有可能顺序。无元素重复             |
+    | combinations()                           | p,r               | R长度元组。按原来顺序。如元素重复               |
+    | combinations_with_replacement()          | p,r               | R长度元组。按原来顺序。有元素重复               |
+    | product('ABCD', repeat=2)                |                   | AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD |
+    | permutations('ABCD', 2)                  |                   | AB AC AD BA BC BD CA CB CD DA DB DA             |
+    | combinations('ABCD', 2)                  |                   | AB AC AD BC BD CD                               |
+    | combinations_with_replacement('ABCD', 2) |                   | AA AB AC AD BB BC BD CC CD DD                   |
+    
 ** itertool函数
    下面的模块函数都为构建并返回迭代器（iterators）。其中一些返回无限长
    度的stream，所以只可被截断stream的函数或循环体使用。
@@ -372,7 +391,7 @@
           for x in iterable:
               yield x
     #+END_SRC
-    
+
 *** itertools. *filterfalse* (predicate,iterable)
     过滤PREDICT调用ITERABLE中元素为False的元素，如果PREDICT为None，则
     为ITERABLE中元素为false的元素：
@@ -402,33 +421,34 @@
     返回迭代器中的每个元素元组第一个元素为ITERABLE的一个元素，第二个元
     素为该元素相邻请调用KEY参数与第一个元素值相同元素组成的迭代器。如
     果KEY为None，相当于“lambda x: x”。
-
+    
     通常情况下，应该相对于KEY已经排序好。类似于Unix的uniq命令。
-
+    
     #+BEGIN_SRC python :session
       from itertools import groupby
       data = 'AAABBBXXDAABB'
       # data = ''.join(sorted(list(data), key=lambda x: x.lower()))
-      # print(data)
+      # print(list(groupby(data)))
       [k for k, g in groupby(data)]
       [list(g) for k, g in groupby(data)]
       list(groupby(data))
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> ... ... ['A', 'B', 'X', 'D', 'A', 'B']
+    - >>> ... <itertools.groupby object at 0x7f3ab90bb3b8>
+    - ['A', 'B', 'X', 'D', 'A', 'B']
     - [['A', 'A', 'A'], ['B', 'B', 'B'], ['X', 'X'], ['D'], ['A', 'A'], ['B', 'B']]
-    - [('A', <itertools._grouper object at 0x7f8fda279588>), ('B', <itertools._grouper object at 0x7f8fda2797f0>), ('X', <itertools._grouper object at 0x7f8fda279668>), ('D', <itertools._grouper object at 0x7f8fda2796a0>), ('A', <itertools._grouper object at 0x7f8fda279780>), ('B', <itertools._grouper object at 0x7f8fda279710>)]
+    - [('A', <itertools._grouper object at 0x7f3ab90bd198>), ('B', <itertools._grouper object at 0x7f3ab90bd080>), ('X', <itertools._grouper object at 0x7f3ab90bd160>), ('D', <itertools._grouper object at 0x7f3ab90bd0b8>), ('A', <itertools._grouper object at 0x7f3ab90bd1d0>), ('B', <itertools._grouper object at 0x7f3ab90bd208>)]
     #+END_SRC
-
+    
 *** itertools. *islice* (iterable,stop)
 *** itertools. *islice* (iterable,start,stop[,step])
     类似于range的用法，不过各个参数都不能为负数。
-    
+
     如果START为None，默认为0,；如果STEP为None，默认为1；如果STOP为None，
     直到消耗完整个ITERABLE。
-    
+
     #+BEGIN_SRC python :session
       from itertools import islice
 
@@ -439,7 +459,7 @@
       list(islice(data, 2, None))
       list(islice(data, 0, None, 2))
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> ['A', 'B']
@@ -448,7 +468,7 @@
     - ['C', 'D', 'E', 'F', 'G']
     - ['A', 'C', 'E', 'G']
     #+END_SRC
-    
+
 *** itertools. *permutation* (iterable,r=None)
     返回ITERABLE中长度为R的所有排列组合方式组成的迭代器，其中每个元素
     为元素。如果R为None，则所有元素长度都与ITERABLE长度相同。
@@ -666,9 +686,676 @@
    下面的扩展工具具有相同的高性能。每次只处理一个元素，而不是将整个迭
    代对象一次抛到内存中，从而减少内存开销。每个函数代码量少，以此减少
    中间变量，并遵循了“函数式”风格。
-   
+
 * functools - 操作可调用对象的高阶函数
 ** partial对象
 * operator - 使用标准操作符作为函数
-** 将操作符映射为函数
+  operator模块提供了一套与内置操作符对应的高效函数。如
+  operator.__add__(x,y)等价于x+y。这些函数名同时也是类定义时可能会用到
+  的特殊方法名；为方便使用，还是有对应无双下划线版本。
+
+** 模块函数
+*** 大小比较
+    这些函数适用于所有类型比较。
+
+**** operator. *lt* (a,b)
+**** operator. *le* (a,b)
+**** operator. *eq* (a,b)
+**** operator. *ne* (a,b)
+**** operator. *ge* (a,b)
+**** operator. *gt* (a,b)
+**** operator. *__lt__* (a,b)
+**** operator. *__le__* (a,b)
+**** operator. *__eq__* (a,b)
+**** operator. *__ne__* (a,b)
+**** operator. *__ge__* (a,b)
+**** operator. *__gt__* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import (lt, __lt__,
+                             le, __le__,
+                             eq, __eq__,
+                             ne, __ne__,
+                             ge, __ge__,
+                             gt, __gt__)
+       a, b=1, 2
+       a < b, lt(a, b), __lt__(a, b)
+       a <= b, le(a, b), __le__(a, b)
+       a == b, eq(a, b), __eq__(a, b)
+       a != b, ne(a, b), __ne__(a, b)
+       a > b, gt(a, b), __gt__(a, b)
+       a >= b, ge(a, b), __ge__(a, b)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ... ... ... ... >>> >>> (True, True, True)
+     - (True, True, True)
+     - (False, False, False)
+     - (True, True, True)
+     - (False, False, False)
+     - (False, False, False)
+     #+END_SRC
+*** 逻辑判断
+**** operator. *not_* (obj)
+**** operator. *__not__* (obj)
+     对应not(obj)。
+     
+     *注意* ：
+     
+     - 所有对象都无__not__()方法，只有解释器内部定义了此方法。
+     - 结果受__bool__()和__len__()方法影响。？？？
+       
+     #+BEGIN_SRC python :session
+       from operator import not_, __not__
+       not(1), not_(1), __not__(1)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - (False, False, False)
+     #+END_SRC
+**** operator. *truth* (obj)
+     对应bool构造器。
+
+     #+BEGIN_SRC python :session
+       from operator import truth
+       truth('abc'), bool('abc')
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - (True, True)
+     #+END_SRC
+**** operator. *is_* (a,b)
+**** operator. *is_not* (a,b)
+     对应a is b和a is not b。测试两个对象是否完全等价。
+
+     #+BEGIN_SRC python :session
+       from operator import is_, is_not
+       1 is 1, is_(1, 1)
+       1 is not 1, is_not(1, 1)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - (True, True)
+     - (False, False)
+     #+END_SRC
+
+*** 数字和bit计算
+**** 普通数学计算
+***** operator. *abs* (obj)
+***** operator. *__abs__* (obj)
+
+      #+BEGIN_SRC python :session
+        import operator
+        abs(-1), operator.abs(-1), operator.__abs__(-1)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - (1, 1, 1)
+      #+END_SRC
+
+***** operator. *add* (a,b)
+***** operator. *__add__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import add, __add__
+        a, b = 1, 2
+        a + b, add(a, b), __add__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (3, 3, 3)
+      #+END_SRC
+
+***** operator. *floordiv* (a,b)
+***** operator. *__floordiv__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import floordiv, __floordiv__
+        a, b = 10, 3
+        a // 3
+        floordiv(a, b)
+        __floordiv__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> 3
+      - 3
+      - 3
+      #+END_SRC
+
+***** operator. *index* (a)
+***** operator. *__index__* (a) ？？？
+      返回转换后的整数。等价于a.__index__()。
+      
+      #+BEGIN_SRC python :session
+        from operator import index, __index__
+        index(-111), __index__(-111), (-111).__index__()
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - (-111, -111, -111)
+      #+END_SRC
+
+***** operator. *mod* (a,b)
+***** operator. *__mod__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import mod, __mod__
+        a, b = 10, 3
+        a % b, mod(a, b), __mod__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (1, 1, 1)
+      #+END_SRC
+
+***** operator. *mul* (a,b)
+***** operator. *__mul__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import mul, __mul__
+        a, b = 10, 3
+        a * b, mul(a, b), __mul__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (30, 30, 30)
+      #+END_SRC
+
+***** operator. *matmul* (a,b)
+***** operator. *__matmul__* (a,b)？？？
+      矩阵乘法。返回a @ b。
+
+      #+BEGIN_SRC python :session
+        a = 1
+        b = (10, 100, 30)
+        b @ a
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> Traceback (most recent call last):
+      -   File "<stdin>", line 1, in <module>
+      - TypeError: unsupported operand type(s) for @: 'tuple' and 'int'
+      #+END_SRC
+
+***** operator. *neg* (obj)
+***** operator. *__neg__* (obj)
+
+      #+BEGIN_SRC python :session
+        from operator import neg, __neg__
+        obj = 1
+        -obj, neg(obj), __neg__(obj)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (-1, -1, -1)
+      #+END_SRC
+
+***** operator. *pos* (a,b)
+***** operator. *__pos__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import pos, __pos__
+        obj = -1
+        +obj, pos(obj), __pos__(obj)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (-1, -1, -1)
+      #+END_SRC
+
+***** operator. *pow* (a,b)
+***** operator. *__pow__* (a,b)
+
+      #+BEGIN_SRC python :session
+        import operator
+        a, b = 2, 10
+        a**b, pow(a, b), operator.pow(a, b), operator.__pow__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (1024, 1024, 1024, 1024)
+      #+END_SRC
+
+***** operator *sub* (a,b)
+***** operator *__sub__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import sub, __sub__
+        a, b = 2, 1
+        a - b, sub(a, b), __sub__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (1, 1, 1)
+      #+END_SRC
+
+***** operator *truediv* (a,b)
+***** operator *__truediv__* (a,b)
+      返回a / b。2/3为.66，而不是0。
+
+      #+BEGIN_SRC python :session
+        from operator import truediv, __truediv__
+        a, b = 2, 3
+        a / b, truediv(a, b), __truediv__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (0.6666666666666666, 0.6666666666666666, 0.6666666666666666)
+      #+END_SRC
+
+**** bit计算
+***** operator. *and_* (a,b)
+***** operator. *__and__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import and_, __and__
+        a, b = 1, 1
+        a & b, and_(a, b), __and__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (1, 1, 1)
+      #+END_SRC
+
+***** operator. *inv* (obj)
+***** operator. *invert* (obj)
+***** operator. *__inv__* (obj)
+***** operator. *__invert__* (obj)
+      
+      #+BEGIN_SRC python :session
+        from operator import inv, invert, __inv__, __invert__
+        num = 2 ** 10
+        ~num + 1
+        inv(num) + 1
+        invert(num) + 1
+        __inv__(num) + 1
+        __invert__(num) + 1
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> -1024
+      - -1024
+      - -1024
+      - -1024
+      - -1024
+      #+END_SRC
+
+***** operator. *lshift* (a,b)
+***** operator. *__lshift* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import lshift, __lshift__
+        a, b = 2, 1
+        a << b, lshift(a, b), __lshift__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (4, 4, 4)
+      #+END_SRC
+
+***** operator. *or_* (a,b)
+***** operator. *__or__* (a,b)
+      
+      #+BEGIN_SRC python :session
+        from operator import or_, __or__
+        a, b = 8, 4
+        a | b, or_(a, b), __or__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (12, 12, 12)
+      #+END_SRC
+
+***** operator. *rshift* (a,b)
+***** operator. *__rshift__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import rshift, __rshift__
+        a, b = 4, 1
+        a >> b, rshift(a, b), __rshift__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (2, 2, 2)
+      #+END_SRC
+      
+***** operator *xor* (a,b)
+***** operator *__xor__* (a,b)
+
+      #+BEGIN_SRC python :session
+        from operator import xor, __xor__
+        a, b = 8, 8
+        a ^ b, xor(a, b), __xor__(a, b)
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> (0, 0, 0)
+      #+END_SRC
+
+*** 序列操作
+**** operator *concat* (a,b)
+**** operator *__concat__* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import concat, __concat__
+       a, b = 'hello ', 'world'
+       a + b
+       concat(a, b)
+       __concat__(a, b)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 'hello world'
+     - 'hello world'
+     - 'hello world'
+     #+END_SRC
+     
+**** operator *contains* (a,b)
+**** operator *__contains__* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import contains, __contains__
+       a, b = 'a', 'abc'
+       a in b, contains(b, a), __contains__(b, a)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> (True, True, True)
+     #+END_SRC
+
+**** operator *countOf* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import countOf
+       a, b = 'banana', 'a'
+       a.count(b)
+       countOf(a, b)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 3
+     - 3
+     #+END_SRC
+
+**** operator *delitem* (a,b)
+**** operator *__delitem__* (a,b)
+     将A中索引为B的元素删除。
+
+     #+BEGIN_SRC python :session
+       from operator import delitem, __delitem__
+       a, b = ['a', 'b', 'c'], 1
+       delitem(a, b)
+       print(a)
+
+       a, b = ['a', 'b', 'c'], 1
+       del a[b]
+       print(a)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ['a', 'c']
+     - >>> >>> >>> ['a', 'c']
+     #+END_SRC
+
+**** operator *getitem* (a,b)
+**** operator *__getitem__* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import getitem, __getitem__
+       a, b = ['a', 'b', 'c'], 1
+       a[b], getitem(a, b)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ('b', 'b')
+     #+END_SRC
+
+**** operator *indexOf* (a,b)
+
+     #+BEGIN_SRC python :session
+       from operator import indexOf
+       a, b = 'banana', 'a'
+       a.index(b), indexOf(a, b)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> (1, 1)
+     #+END_SRC
+     
+**** operator *setitem* (a,b,c)
+**** operator *__setitem__* (a,b,c)
+
+     #+BEGIN_SRC python :session
+       from operator import setitem
+
+       a, b = [1, 2, 3], 2
+       a[b] = 30
+       print(a)
+
+       a, b = [1, 2, 3], 2
+       setitem(a, b, 30)
+       print(a)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> [1, 2, 30]
+     - >>> >>> >>> [1, 2, 30]
+     #+END_SRC
+
+**** operator *length_hint* (obj,default=0)
+     返回OBJ的预测长度。首先尝试返回真实长度，再使用
+     obj.__length_hint__()方法，最后返回默认值。
+
+     #+BEGIN_SRC python :session
+       from operator import length_hint
+       obj = 'abc'
+       len(obj), length_hint(obj, 100)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> (3, 3)
+     #+END_SRC
+     
+*** 属性和元素获取
+    很有利于与map()、sorted()、itertools.groupby()等需求函数参数的函数
+    连用，快速获取属性和元素。
+    
+**** operator. *attrgetter* (attr)
+**** operator. *attrgetter* (*attrs)
+     - 声明f=arrtgetter('name')后，f(b)返回b.name。
+     - 声明f=attrgetter('name', 'date')后,f(b)返回(b.name, b.date)。
+     - 声明f=attrgetter('name.first', 'name.last')后，f(b)返回
+       (b.name.first, b.name.last)。
+
+     等价于：
+
+     #+BEGIN_SRC python :eval never
+       def attrgetter(*items):
+           if any(not isinstance(item, str) for item in items):
+               raise TypeError('熟悉名须为字符串')
+           if len(items) == 1:
+               attr = items[0]
+
+               def g(obj):
+                   return resolve_attr(obj, attr)
+           else:
+               def g(obj):
+                   return tuple(resolve_attr(obj, attr) for attr in items)
+           return g
+
+       def resolve_attr(obj, attr):
+           for name in attr.split('.'):
+               obj = getattr(obj, name)
+           return obj
+     #+END_SRC
+
+**** operator. *itemgetter* (item)
+**** operator. *itemgetter* (*items)
+     获取对象的__getitem__()方法。
+     
+     - 声明f=itemgetter(2)后，f(r)返回r[2]。
+     - 声明f=itemgetter(2,5,3)后，f(r)返回(r[2],r[5],r[3])。
+       
+     等价于：
+     
+     #+BEGIN_SRC python :eval never
+       def itemgetter(*items):
+           if len(items) == 1:
+               item = items[0]
+
+               def g(obj):
+                   return obj[item]
+           else:
+               def g(obj):
+                   return tuple(obj[item] for item in items)
+           return g
+     #+END_SRC
+     
+     比如：
+     
+     #+BEGIN_SRC python :session
+       from operator import itemgetter
+       data = 'ABCDEFG'
+       itemgetter(1)(data)
+       itemgetter(1, 3, 5)(data)
+       itemgetter(slice(2, None))(data)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 'B'
+     - ('B', 'D', 'F')
+     - 'CDEFG'
+     #+END_SRC
+
+     再比如操作元素的特点域：
+
+     #+BEGIN_SRC python :session
+       from operator import itemgetter
+       inventory = [('apple', 3), ('banana', 2), ('pear', 5), ('orange', 1)]
+       getcount = itemgetter(1)
+       list(map(getcount, inventory))
+       sorted(inventory, key=getcount)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> [3, 2, 5, 1]
+     - [('orange', 1), ('banana', 2), ('apple', 3), ('pear', 5)]
+     #+END_SRC
+
+**** operator. *methodcaller* (name[,args...])
+     重建对象方法。
+     
+     - 声明f=methodcaller('name')后，f(b)返回b.name()。
+     - 声明f=methodcaller('name', 'foo', bar=1)后，f(b)返回
+       b.name('foo', bar=1)。
+
+     等价于：
+
+     #+BEGIN_SRC python :eval never
+       def methodcaller(name, *args, **kwargs):
+           def caller(obj):
+               return getattr(obj, name)(*args, **kwargs)
+           return caller
+     #+END_SRC
+
+** 将操作符映射为函数 （待续）
 ** inplace操作符
+   比如：
+   
+   - x += y，等价于x = operator.iadd(x, y)。
+   - z = operator.iadd(x,y)，等价于z=x;z += y。
+     
+   对于immutable类型的数据，不影响原来值：
+   
+   #+BEGIN_SRC python :session
+     from operator import iadd
+     a = 'hello'
+     iadd(a, ' world')
+     print(a)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> 'hello world'
+   - hello
+   #+END_SRC
+   
+   对于mutable类型的数据，则会改变原来数据：
+   
+   #+BEGIN_SRC python :session
+     from operator import iadd
+     s = ['h', 'e', 'l', 'l', 'o']
+     iadd(s, ['w', 'o', 'r', 'l', 'd'])
+     print(s)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> ['h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd']
+   - ['h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd']
+   #+END_SRC
+*** operator. *iadd* (a,b)
+*** operator. *__iadd__* (a,b)
+    a=iadd(a,b)等价于a+=b。
+*** operator. *iand* (a,b)
+*** operator. *__iand__* (a,b)
+    a=iand(a,b)等价于a&=b
+*** operator. *iconcat* (a,b)
+*** operator. *__iconcat__* (a,b)
+    a=iconcat(a,b)等价于a+=b。
+*** operator. *ifloordiv* (a,b)
+*** operator. *__ifloordiv__* (a,b)
+    a=floordiv(a,b)等价于a//=b。
+*** operator. *ilshift* (a,b)
+*** operator. *__ilshift__* (a,b)
+*** operator. *imod* (a,b)
+*** operator. *__imod__* (a,b)
+*** operator. *mul* (a,b)
+*** operator. *__mul__* (a,b)
+*** operator. *imatmul* (a,b)
+*** operator. *__imatmul__* (a,b)
+*** operator. *ior* (a,b)
+*** operator. *__ior__* (a,b)
+*** operator. *ipow* (a,b)
+*** operator. *__ipow__* (a,b)
+*** operator. *irshift* (a,b)
+*** operator. *__irshift__* (a,b)
+*** operator. *isub* (a,b)
+*** operator. *__isub__* (a,b)
+*** operator. *itruediv* (a,b)
+*** operator. *__itruediv__* (a,b)
+*** operator. *ixor* (a,b)
+*** operator. *__ixor__* (a,b)
