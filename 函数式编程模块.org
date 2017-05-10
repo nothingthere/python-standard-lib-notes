@@ -658,7 +658,7 @@
       list(zip('abc', [1, 2, 3, 4]))
       list(zip_longest('abc', [1, 2, 3, 4], fillvalue='Z'))
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> [('a', 1), ('b', 2), ('c', 3), (None, 4)]
@@ -686,9 +686,140 @@
    下面的扩展工具具有相同的高性能。每次只处理一个元素，而不是将整个迭
    代对象一次抛到内存中，从而减少内存开销。每个函数代码量少，以此减少
    中间变量，并遵循了“函数式”风格。
-
+   
 * functools - 操作可调用对象的高阶函数
+  此模块提供操作函数或返回函数的高阶函数。对此模块而言，任何可被调用的
+  对象都可作函数对待。
+  
+** 函数
+*** functools. *cmp_to_key* (func)
+    将传统的比较函数（接受两个参数，返回大于、小于或等于0作为大小比较），
+    转换为key函数（接受单个参数，使用返回值作比较）。
+
+    将比较函数转换为key函数可基本实现为：
+
+    #+BEGIN_SRC python :eval never
+      def cmp_to_key(mycmp):
+          'Convert a cmp= function into a key= function'
+          class K:
+              def __init__(self, obj, *args):
+                  self.obj = obj
+
+              def __lt__(self, other):
+                  return mycmp(self.obj, other.obj) < 0
+
+              def __gt__(self, other):
+                  return mycmp(self.obj, other.obj) > 0
+
+              def __eq__(self, other):
+                  return mycmp(self.obj, other.obj) == 0
+
+              def __le__(self, other):
+                  return mycmp(self.obj, other.obj) <= 0
+
+              def __ge__(self, other):
+                  return mycmp(self.obj, other.obj) >= 0
+
+              def __ne__(self, other):
+                  return mycmp(self.obj, other.obj) != 0
+
+          return K
+    #+END_SRC
+    
+*** @functools. *lru_cache* (maxsize=128,typed=False)
+    装饰器函数，用于缓存函数对象，缓存最近最多MAXSIZE大小的调用结果。
+    一般使用在周期性多次调用同一参数的函数上，如fib函数和多次打开相同
+    文件的函数。
+    
+    由于缓存结果用字典存储，所有被包装的函数参数都需为可哈希对象。
+    
+    当MAXSIZE参数为None时，可无限制缓存；当为2的次方数时，可发挥最佳的
+    性能优化功能。
+    
+    如果TYPED参数为True，不同类型的参数会分开缓存，如f(3)和f(3.0)会区
+    别对待。
+    
+    为帮助测试效率，调试MAXSIZE参数，被包装的函数被添加了cache_info()
+    函数，返回named tuple类型，元素有hits、misses和currsize。在多线程
+    环境下，hits和misses元素值只为近似值。
+    
+    被包装的函数可使用__wrapped__属性获得原函数。
+    
+    LRU（least recently used）缓存在随后调用可预测的情况下效果最佳。缓
+    存的最大值会限制以免超出限度，比如在服务器上长时间运行的进程。
+    
+    比如缓存静态网页内容：
+    
+    #+BEGIN_SRC python :session
+      import functools
+      import urllib.error
+      import urllib.request
+
+      @functools.lru_cache(maxsize=32)
+      def get_pep(num):
+          resorce = 'http://www.python.org/dev/peps/pep-{:04}'.format(num)
+          try:
+              with urllib.request.urlopen(resorce) as s:
+                  return s.read()
+          except urllib.error.HTTPError:
+              return 'Not Found'
+
+      for n in 8, 290, 308, 320, 8, 218, 320, 279, 289, 320, 9991:
+          pep = get_pep(n)
+          print(n, len(pep))
+
+      print(get_pep.cache_info())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> ... ... ... ... ... ... ... ... >>> ... ... ... 8 116713
+    - 290 64288
+    - 308 51317
+    - 320 51820
+    - 8 116713
+    - 218 47839
+    - 320 51820
+    - 279 49780
+    - 289 51829
+    - 320 51820
+    - 9991 9
+    - CacheInfo(hits=3, misses=8, maxsize=32, currsize=8)
+    #+END_SRC
+    
+    再比如为斐波那契函数添加缓存：
+    
+    #+BEGIN_SRC python :session
+      from functools import lru_cache
+
+      @lru_cache(maxsize=None)
+      def fib(n):
+          if n < 2:
+              return n
+          else:
+              return fib(n - 1) + fib(n - 2)
+
+      [fib(n) for n in range(16)]
+      fib.cache_info()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... ... >>> >>> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
+    - CacheInfo(hits=28, misses=16, maxsize=None, currsize=16)
+    #+END_SRC
+    
+*** @functools. *total_ordering*
+*** functools. *partial* (func,*args,**keywords)
+*** class functools. *partialmethod* (func,*args,**keywords)
+*** functools. *reduce* (function,iterable[,initializer])
+*** @functools. *singledispatch* (default)
+*** functools. *update_wrapper* (wrapper,wrapped,assigned=WRAPPER_ASSIGNMENT,updated=WRAPPER_UPDATES)
+*** @functools. *wraps* (wrapped,assignment=WRAPPER_ASSIGNMENTS,updated=WRAPPER_UPDATES)
 ** partial对象
+*** partial. *func*
+*** partial. *args*
+*** partial. *keywords*
 * operator - 使用标准操作符作为函数
   operator模块提供了一套与内置操作符对应的高效函数。如
   operator.__add__(x,y)等价于x+y。这些函数名同时也是类定义时可能会用到
