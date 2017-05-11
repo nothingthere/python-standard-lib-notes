@@ -786,9 +786,9 @@
     - 9991 9
     - CacheInfo(hits=3, misses=8, maxsize=32, currsize=8)
     #+END_SRC
-    
+
     再比如为斐波那契函数添加缓存：
-    
+
     #+BEGIN_SRC python :session
       from functools import lru_cache
 
@@ -802,29 +802,409 @@
       [fib(n) for n in range(16)]
       fib.cache_info()
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> ... ... ... ... ... ... >>> >>> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
     - CacheInfo(hits=28, misses=16, maxsize=None, currsize=16)
     #+END_SRC
-    
+
 *** @functools. *total_ordering*
+    只要在类定义时，定义__lt__()、__le__()、__gt__()或__ge__()其中的一
+    个，再定义__eq__()方法，使用@total_ordring就可以自动定义其他比较函
+    数。
+    
+    #+BEGIN_QUOTE
+    *注意* ：此装饰器方便定义比较方法。但确定是执行速度慢，且使
+    traceback更复杂。如果性能测试时发现使用此装饰器影响整个程序性能，
+    最好手动编写6个比较函数。
+    #+END_QUOTE
+
+    #+BEGIN_SRC python :session
+      from functools import total_ordering
+
+      @total_ordering
+      class Student:
+          def __init__(self, firstname, lastname):
+              self.firstname = firstname
+              self.lastname = lastname
+          def _is_valid_operand(self, other):
+              return hasattr(other, 'firstname') and hasattr(other, 'lastname')
+          def __eq__(self, other):
+              if not self._is_valid_operand(other):
+                  return NotImplemented
+              else:
+                  return ((self.firstname.lower(), self.lastname.lower())
+                          == (other.firstname.lower(), other.lastname.lower()))
+          def __lt__(self, other):
+              if not self._is_valid_operand(other):
+                  return NotImplemented
+              else:
+                  return ((self.firstname.lower(), self.lastname.lower()) <
+                          (other.firstname.lower(), other.lastname.lower()))
+
+      s1 = Student('a', 'b')
+      s2 = Student('C', 'D')
+      s1 == s2, s1 < s2, s1 <= s2, s1 > s2, s1 >= s2
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> (False, True, True, False, False)
+    #+END_SRC
+
 *** functools. *partial* (func,*args,**keywords)
+    返回新的partial可调用对象，调用时相当于FUNC调用必选参数ARGS和关键
+    字参数KEYWORDS。如果调用partial对象时还有参数，则将ARGS追加到必选
+    参数后，将KEYWORDS追加到关键字参数后。基本上等价于：
+
+    #+BEGIN_SRC python :eval never
+      def partial(func, *args, **keywords):
+          def newfunc(*fargs, **fkeywords):
+              newkeyords = keywords.copy()
+              newkeyords.update(fkeywords)
+              return func(*args, *fargs, **newkeyords)
+          newfunc.func = func
+          newfunc.args = args
+          newfunc.keywrods = keywords
+          return newfunc
+    #+END_SRC
+
+    partial()一般用于为函数设置默认参数，使函数使用更简单。如为int()函
+    数设置默认进制为2：
+
+    #+BEGIN_SRC python :session
+      from functools import partial
+
+      basetwo = partial(int, base=2)
+      basetwo('10010')
+      basetwo.__doc__ = '将2进制字符串转换为数字'
+      basetwo.__doc__
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 18
+    - >>> '将2进制字符串转换为数字'
+    #+END_SRC
+
 *** class functools. *partialmethod* (func,*args,**keywords)
+    返回一个新的partialmethod“描述器（descriptor）”，与partial相似，不
+    过只用于类定义中的方法。
+
+    （待续。。。）
+
+    #+BEGIN_SRC python :session
+      from functools import partialmethod
+      class Cell(object):
+          def __init__(self):
+              self._alive = False
+          @property
+          def alive(self):
+              return self._alive
+          def set_state(self, state):
+              self._alive = bool(state)
+          set_alive = partialmethod(set_state, True)
+          set_dead = partialmethod(set_state, False)
+
+      c1, c2 = Cell(), Cell()
+      c1.set_alive()
+      c1.alive, c2.alive
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... ... ... ... ... ... ... ... >>> >>> >>> (True, False)
+    #+END_SRC
+
 *** functools. *reduce* (function,iterable[,initializer])
+    相当于Lisp中的reduce函数。
+
+    #+BEGIN_SRC python :session
+      from operator import add
+      from functools import reduce
+      reduce(add, range(3))
+      reduce(add, range(3), 100)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> 3
+    - 103
+    #+END_SRC
+
+    基本上等价于：
+
+    #+BEGIN_SRC python :eval never
+      def reduce(function, iterable, initializer=None):
+          it = iter(iterable)
+          if initializer is None:
+              value = next(iterable)
+          else:
+              value = initializer
+          for element in it:
+              value = function(value, element)
+          return value
+    #+END_SRC
+
 *** @functools. *singledispatch* (default)
-*** functools. *update_wrapper* (wrapper,wrapped,assigned=WRAPPER_ASSIGNMENT,updated=WRAPPER_UPDATES)
+    将函数包装成“泛型函数（generic function）”。依靠第一个参数执行不同
+    的函数。
+    
+    需成为泛型函数成员的函数定义时，前面加装饰器“@fun.register(类型)”：
+    
+    #+BEGIN_SRC python :session
+      from functools import singledispatch
+
+      @singledispatch
+      def fun(arg, verbose=False):
+          if verbose:
+              print('原函数：', end=' ')
+          print(arg)
+
+      @fun.register(int)
+      def fun_diapatch(arg, verbose=False):
+          if verbose:
+              print('第一个参数为整型：', end=' ')
+          print(arg)
+
+      @fun.register(list)
+      def fun_dispatch(arg, verbose=False):
+          if verbose:
+              print('第一个参数为链表：')
+          for i, elem in enumerate(arg):
+              print(i, elem)
+
+      fun(1, True)
+      fun([1, 2, 3], True)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... >>> >>> ... ... ... ... ... >>> >>> ... ... ... ... ... ... >>> >>> 第一个参数为整型： 1
+    - 第一个参数为链表：
+    - 0 1
+    - 1 2
+    - 2 3
+    #+END_SRC
+    
+    也可使用原函数的register方法添加成员：
+    
+    #+BEGIN_SRC python :session
+      def nothing(arg, verbose=False):
+          if verbose:
+              print('nothing：', end=' ')
+          print(arg)
+
+      fun.register(type(None), nothing)
+      fun(None)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... >>> >>> <function nothing at 0x7fd898edb598>
+    - None
+    #+END_SRC
+    
+    register()属性返回的去装饰函数可用于重包装、pickling和创建单元测试。
+    
+    #+BEGIN_SRC python :session
+      from decimal import Decimal
+
+      @fun.register(float)
+      @fun.register(Decimal)
+      def fun_dispatch(arg, verbose=False):
+          if verbose:
+              print('float或Decimal：', end=' ')
+          print(arg)
+
+      fun(1.1, True)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... ... >>> >>> float或Decimal： 1.1
+    #+END_SRC
+    
+    如果有两个泛型成员函数类型一样，则后声明覆盖前面声明的函数。
+    
+    #+BEGIN_SRC python :session
+      @fun.register(tuple)
+      def fun_dispatch(arg, verbose=False):
+          if verbose:
+              print('tuple1：', end=' ')
+          print(arg)
+
+      @fun.register(tuple)
+      def fun_dispatch(arg, verbose=False):
+          if verbose:
+              print('tuple2：', end=' ')
+          print(arg)
+
+      fun((1, 2), True)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... ... >>> >>> ... ... ... ... ... >>> >>> tuple2： (1, 2)
+    #+END_SRC
+    
+    原函数相当于dispatch的参数为object，即如果没有找到对应类型的成员函
+    数，则使用原函数：
+    
+    #+BEGIN_SRC python :session
+      fun({'a': 1}, True)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 原函数： {'a': 1}
+    #+END_SRC
+    
+    使用registry.keys()只读属性可获取所有泛型成员函数：
+    
+    #+BEGIN_SRC python :session
+      fun.registry.keys()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - dict_keys([<class 'tuple'>, <class 'NoneType'>, <class 'float'>, <class 'decimal.Decimal'>, <class 'int'>, <class 'list'>, <class 'object'>])
+    #+END_SRC
+    
+*** functools. *update_wrapper* (wrapper,wrapped,assigned=WRAPPER_ASSIGNMENT,updated=WRAPPER_UPDATES) （待续。。。）
 *** @functools. *wraps* (wrapped,assignment=WRAPPER_ASSIGNMENTS,updated=WRAPPER_UPDATES)
+    update_wrapper的作用为跟新封装函数，使其看起来像被封装的函数。可选
+    参数都为元组，分别用于指定哪些将被封装函数的对应属性设置或跟新为封
+    装函数的属性。默认值分别为模块常量WRAPPER_ASSIGNMENT和
+    WRAPPER_UPDATES：
+    
+    #+BEGIN_SRC python :session
+      import functools
+      functools.WRAPPER_ASSIGNMENTS
+      functools.WRAPPER_UPDATES
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ('__module__', '__name__', '__qualname__', '__doc__', '__annotations__')
+    - ('__dict__',)
+    #+END_SRC
+    
+    通过封装函数的__wrapped__属性可获取被封装函数。
+    
+    使用update_wrapper()主要是使被封装函数的元数据保持不变。
+    
+    wraps函数为使用partial()函数对update_wrapper()函数封装的结果。等价
+    于：
+    
+    #+BEGIN_SRC python :eval never
+      partial(update_wrapper, wrapped=wrapped, assgned=assigned, update=update)
+    #+END_SRC
+    
+    不用wraps函数的效果：
+    
+    #+BEGIN_SRC python :session
+      def my_decorator(f):
+          def wrapper(*arg, **kwds):
+              print('调用装饰器函数')
+              return f(*arg, **kwds)
+          return wrapper
+
+      @my_decorator
+      def example():
+          'example函数。'
+          print('调用example函数')
+
+      example()
+      print(example.__doc__)
+      print(example.__name__)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... ... >>> ... ... ... ... >>> 调用装饰器函数
+    - 调用example函数
+    - None
+    - wrapper
+    #+END_SRC
+    
+    如果使用了wraps函数：
+    
+    #+BEGIN_SRC python :session
+      from functools import wraps
+
+      def my_decorator(f):
+          @wraps(f)
+          def wrapper(*arg, **kwds):
+              print('调用装饰器函数')
+              return f(*arg, **kwds)
+          return wrapper
+
+      @my_decorator
+      def example():
+          'example函数。'
+          print('调用example函数')
+
+      example()
+      print(example.__doc__)
+      print(example.__name__)
+
+      print(example)
+      print(example.__wrapped__)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... ... >>> ... ... ... ... >>> 调用装饰器函数
+    - 调用example函数
+    - example函数。
+    - example
+    - >>> <function example at 0x7fd898eeda60>
+    - <function example at 0x7fd898edb378>
+    #+END_SRC
+    
 ** partial对象
+   调用partial()函数返回的可调用对象。
+
+   与普通函数一样，可调用，可weak reference，可具备属性。不同点有：
+
+   - __name__和__doc__属性不会自动创建。
+   - 类定义中使用相当于创建静态方法。
+
+   有下面3个只读属性：
+
 *** partial. *func*
+    partial()函数的第一个参数，即原来的函数或可调用对象。调用partial对
+    象时，会将新的参数传递给此参数调用返回。
+
 *** partial. *args*
+    元组。使用partial()函数时提供的默认必选参数。
 *** partial. *keywords*
+    字典。使用partial()函数时提供的默认关键字参数。
+    #+BEGIN_SRC python :session
+      import functools
+
+      basetwo = functools.partial(int, base=2)
+      print(basetwo('10010', base=10))
+      print('func：{}'.format(basetwo.func))
+      print('args：{}'.format(basetwo.args))
+      print('keywords：{}'.format(basetwo.keywords))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 10010
+    - func：<class 'int'>
+    - args：()
+    - keywords：{'base': 2}
+    #+END_SRC
+
 * operator - 使用标准操作符作为函数
   operator模块提供了一套与内置操作符对应的高效函数。如
   operator.__add__(x,y)等价于x+y。这些函数名同时也是类定义时可能会用到
   的特殊方法名；为方便使用，还是有对应无双下划线版本。
-
+  
 ** 模块函数
 *** 大小比较
     这些函数适用于所有类型比较。
