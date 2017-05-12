@@ -1371,7 +1371,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     有INITIAL-DATA参数，则data属性初始化为该值。
 
     *注意* ：不会保存INITIAL-DATA的指针，使其可用于其他操作。
-
+    
     #+BEGIN_SRC python :session
       from collections import UserDict
 
@@ -1401,7 +1401,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     - {'b': 'ABC', 'a': [1, 2, 3, 4]}
     - >>> >>> >>> {'c': 'XYZ', 'b': 'ABC', 'a': [1, 2, 3, 4]}
     #+END_SRC
-
+    
     除普通的字典操作外，UserDict对象还添加了data属性：
 
 **** data
@@ -1410,6 +1410,143 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 ** UserList对象 （待续）
 ** UserString对象 （待续）
 * collections.abc - 容器类型抽象基础类（Abstract Base Classes for Containers）
+  此模块提供的所有抽象类可用于检测特点类是否提供某个接口。比如是否可哈
+  希或是否是映射对象：
+  
+  #+BEGIN_SRC python :session
+    from collections import abc
+    isinstance(1, abc.Hashable)
+    isinstance({'a': 1}, abc.Mapping)
+    isinstance(1, abc.Mapping)
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - True
+  - True
+  - False
+  #+END_SRC
+  
+** 抽象类
+   下表为abc模块提供的所有抽象类：
+   
+   | ABC             | 继承自          | 抽象方法                 | 混入方法                                            |
+   |-----------------+-----------------+--------------------------+-----------------------------------------------------|
+   | Container       |                 | __contains__             |                                                     |
+   | Hashable        |                 | __hash__                 |                                                     |
+   | Iterable        |                 | __iter__                 |                                                     |
+   | Iterator        | Iterable        | __next__                 | __iter__                                            |
+   | Generator       | Iterator        | send,throw               | close,__iter__,__next__                             |
+   | Sized           |                 | __len__                  |                                                     |
+   | Callable        |                 | __call__                 |                                                     |
+   | Sequence        | Sized,Iterable, | __getitem__,__len__      | __contains__,__iter__,__reversed__,index和count     |
+   |                 | Container       |                          |                                                     |
+   | MutableSequence | Sequence        | __getitem__,__setitem__  | 所有Sequence混入的方法，再加上：                    |
+   |                 |                 | __delitem__,__len__      | append,reverse,extend,pop,remove和__iadd__          |
+   |                 |                 | insert                   |                                                     |
+   | ByteString      | Sequence        | __getitem__,__len__      | 所有Sequence混入的方法，再加上                      |
+   | Set             | Sized,Iterable, | __contains__,__iter__,   | __le__,__lt__,__eq__,__ne__,__gt__,__ge__,          |
+   |                 | Container       | __len__                  | __and__,__or__,__sub__,__xor__和isdisjoint          |
+   | MutableSet      | Set             | __contains___,_iter__,   | 所有Set的混入方法，再加上：                         |
+   |                 |                 | __len__,add和discard     | clear,pop,remove,__ior__,iand__,__ixor__,和__isub__ |
+   | Mapping         | Sized,Iterable, | __getitem__,__iter__,    | __contains__,keys,items,values,get,__eq__和__ne__   |
+   |                 | Container       | __len__                  |                                                     |
+   | MutableMapping  | Mapping         | __getitem__,__setitem__, | 所有Mapping混入的方法，再加上：                     |
+   |                 |                 | __delitem__,__iter__,    | pop,popitem,clear,update和setdefault                |
+   |                 |                 | __len__                  |                                                     |
+   | MappingView     | Sized           |                          | __len__                                             |
+   | ItemsVies       | MappingView,Set |                          | __contains__,__iter__                               |
+   | KeysView        | MappingView,Set |                          | __contains__,__iter__                               |
+   | ValuesView      | MappingView     |                          | __contains__,__iter__                               |
+   | Awaitable       |                 | __await__                |                                                     |
+   | Coroutine       | Awaitable       | send,throw               | close                                               |
+   | AsyncIterable   |                 | __aiter__                |                                                     |
+   | AsyncIterator   | AsyncIterable   | __anext__                | __aiter__                                           |
+   
+   #+BEGIN_QUOTE
+   *？* ：新建类时，是否只要继承自ABC，手动实现所有“抽象方法”，就会自
+   动添加“混入方法”。
+   #+END_QUOTE
+   
+*** class collections.abc. *Container*
+*** class collections.abc. *Hashable*
+*** class collections.abc. *Sized*
+*** class collections.abc. *Callable*
+    
+    #+BEGIN_SRC python :session
+      from collections import abc
+
+      class ListCallable(abc.Callable, abc.Sequence):
+          def __init__(self, iterable):
+              self.elements = lst = []
+              for x in iterable:
+                  lst.append(x)
+          def __call__(self, index):
+              return self.elements[index]
+          def __getitem__(self, index):
+              return self.__call__(index)
+          def __len__(self):
+              return len(self.elements)
+
+      l = ListCallable('abcefabd')
+      # 利用__call__，使用函数方式获取元素
+      l(1)
+      # 利用自动混入的__contains__方法判断元素包含
+      'e' in l
+      # 利用自动混入的__iter__方法历遍
+      for x in l:
+          print(x, end=' ')
+
+      print()
+      # 利用自动混入的__reversed__方法逆序
+      list(reversed(l))
+      # 利用自动混入的index和count操作支持
+      l.index('b')
+      l.count('b')
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> ... 'b'
+    - ... True
+    - ... ... ... a b c e f a b d >>>
+    - ... ['d', 'b', 'a', 'f', 'e', 'c', 'b', 'a']
+    - ... 1
+    - 2
+    #+END_SRC
+*** 待续
+** 举例
+   
+   #+BEGIN_SRC python :session
+     from collections import abc
+
+     class ListBasedSet(abc.Set):
+         def __init__(self, iterable):
+             self.elements = lst = []
+             for value in iterable:
+                 if value not in lst:
+                     lst.append(value)
+         def __iter__(self):
+             return iter(self.elements)
+         def __contains__(self, value):
+             return value in self.elements
+         def __len__(self):
+             return len(self.elements)
+
+     ls1 = ListBasedSet('mississippi')
+     ls2 = ListBasedSet('miss')
+     print(list(ls1))
+     print(list(ls1 & ls2))
+     print(list(ls1 | ls2))
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> ['m', 'i', 's', 'p']
+   - ['m', 'i', 's']
+   - ['m', 'i', 's', 'p']
+   #+END_SRC
+   
 * heapq - 堆排序算法
 * bisect - 数组二叉树搜索算法
 * array - 高效数字数组
