@@ -1472,7 +1472,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 *** class collections.abc. *Hashable*
 *** class collections.abc. *Sized*
 *** class collections.abc. *Callable*
-    
+
     #+BEGIN_SRC python :session
       from collections import abc
 
@@ -1516,7 +1516,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     #+END_SRC
 *** 待续
 ** 举例
-   
+
    #+BEGIN_SRC python :session
      from collections import abc
 
@@ -1539,16 +1539,372 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      print(list(ls1 & ls2))
      print(list(ls1 | ls2))
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
    - >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> >>> ['m', 'i', 's', 'p']
    - ['m', 'i', 's']
    - ['m', 'i', 's', 'p']
    #+END_SRC
-   
+
 * heapq - 堆排序算法
-* bisect - 数组二叉树搜索算法
+  此模块提供“优先队列（Priority Queue）”算法实现。
+  
+  在二叉树堆上，所有父节点的值都<=其子节点的值。此实现使用数组，且任意
+  索引为k的元素，都有heap[k] <= heap[2*k+1]，且heap[k] <= heap[2*k+2]。
+  为方便比较，任何不存在的元素当做无穷大。整个堆上最小的元素为根节点，
+  即heap[0]。
+  
+  初始化二叉树堆可使用[]，或将链表参数传递给heapify()函数。
+  
+  #+BEGIN_SRC python :session
+    import heapq
+    lst = [9, 1, 3]
+    heapq.heapify(lst)
+    for i in range(3):
+        print(heapq.heappop(lst))
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - >>> >>> ... ... 1
+  - 3
+  - 9
+  #+END_SRC
+  
+** 函数
+*** heapq. *heappush* (heap,item)
+    向堆上添加元素，保持排序顺序不变。
+
+    #+BEGIN_SRC python :session
+      import heapq
+      lst = [9, 1, 3]
+      heapq.heapify(lst)
+      print(lst)
+      heapq.heappush(lst, 2)
+      print(lst)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> [1, 9, 3]
+    - >>> [1, 2, 3, 9]
+    #+END_SRC
+
+*** heapq. *heappop* (heap)
+    Pop并返回HEAP上最下的元素，保证排序顺序不变。如果HEAP为空，则抛出
+    IndexError错误。如需获取最小元素而不Pop，可使用heap[0]：
+    
+    #+BEGIN_SRC python :session
+      from heapq import *
+      lst = [2, 21, 3, 2, 1, 3, 243, 24]
+      heapify(lst)
+      lst[0] == heappop(lst) == 1
+      print(lst)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> True
+    - [2, 2, 3, 24, 21, 3, 243]
+    #+END_SRC
+
+*** heapq. *heappushpop* (heap,item)
+    先将ITEM push到堆上，再返回堆上最下的元素。比先使用heappush()再使用
+    heappop()效率高。
+    
+    #+BEGIN_SRC python :session
+      from heapq import *
+      lst = [12, 123, 12, 23, 1, 1, 2]
+      heapify(lst)
+      heappushpop(lst, 100)
+      print(lst)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 1
+    - [1, 23, 2, 100, 123, 12, 12]
+    #+END_SRC
+
+*** heapq. *heapify* (x)
+    将链表直接转换为二叉树堆。耗时为线性增长。
+
+*** heapq. *heapreplace* (heap,item)
+    先Pop并返回最小值元素，再添加ITEM。整个堆的元素个数不变，如果堆为空，
+    抛出IndexError错误。
+
+    比先使用heappop()，再使用heappush()效率高，适合于定长堆。
+
+    返回值可能比ITEM大，如需返回值小于ITEM，可使用heappushpop()。
+    
+    #+BEGIN_SRC python :session
+      from heapq import *
+      lst = [3, 23, 23, 4, 3]
+      heapify(lst)
+      heapreplace(lst, 1)
+      print(lst)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 3
+    - [1, 3, 23, 4, 23]
+    #+END_SRC
+
+*** 通用函数
+    此模块还提供了下面3个基于二叉树堆的通用函数：
+    
+**** heapq. *merge* (*iterables,key=None,reverse=False)
+     将已排序好的*ITERABLES排序为单个iterator，并返回。
+
+     类似于sorted(itertools.chain(*iterables))，但并不会一下将所有数据
+     拉入内存，且假定所有ITERABLES都已排序好。
+
+     KEY参数指定比较函数，必须为关键字参数。
+
+     REVERSE参数为布尔值，假定*ITERABLES是否本来为逆序排列。
+     
+     #+BEGIN_SRC python :session
+       from heapq import merge
+       x = merge((1, 2, 3), b'abc', [100, 200, 300])
+       print(list(x))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> [1, 2, 3, 97, 98, 99, 100, 200, 300]
+     #+END_SRC
+
+**** heapq. *nlargest* (n,iterable,key=None)
+     将ITERABLE中最小的N个元素组成链表返回。KEY为比较函数。
+     key=str.lower时，等价于sorted(iterable,key=key,revese=True)[:n]。
+     
+     #+BEGIN_SRC python :session
+       from heapq import nlargest
+       nlargest(2, [2123, 12, 22, 222222])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - [222222, 2123]
+     #+END_SRC
+     
+**** heapq. *nsmallest* (n,iterable,key=None)
+     与nlargest用法相同。
+     
+     #+BEGIN_SRC python :session
+       from heapq import nsmallest
+       nsmallest(2, [122, 12, 2, 12, 121, 1])
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - [1, 2]
+     #+END_SRC
+     
+     nlargest和nsmallest函数只有在N值较小时性能最佳。如果元素过多，使
+     用sorted()函数性能更佳。如果N为1，使用min()和max()函数性能最佳。
+     如果需重复使用者两个函数，可尝试将ITERABLE转换为整整的二叉树堆。
+     
+** 基本示例
+   利用heapq排序，可现将元素历遍添加到heap上，然后再使用heappop从最小
+   的元素逐个取出：
+   
+   #+BEGIN_SRC python :session
+     import heapq
+
+     def heapsort(iterable):
+         h = []
+         for value in iterable:
+             heapq.heappush(h, value)
+         return [heapq.heappop(h) for i in range(len(h))]
+
+     heapsort([1, 3, 5, 7, 9, 2, 4, 6, 8, 0])
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... ... ... ... ... >>> >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+   #+END_SRC
+
+   与sorted(iterable)类似，但实现并不稳定。？？？
+
+   元素可为元组，因此可用来比较权限值，并附带记录信息：
+
+   #+BEGIN_SRC python :session
+     from heapq import heappush, heappop
+     h = []
+     heappush(h, (5, '写代码'))
+     heappush(h, (7, '发布产品'))
+     heappush(h, (1, '编写规范'))
+     heappush(h, (3, '创建测试'))
+     heappop(h)
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> >>> >>> >>> (1, '编写规范')
+   #+END_SRC
+
+** 优先队列（Priority Queue）实现注意点（待续）
+** 原理 （待续）
+* bisect - 数组二分查找算法
+  利用此模块可实现每次插入元素时都不破坏链表排序。对于元素量大，元素间
+  比较消耗大的链表，可大大提高效率。
+  
+  模块名为bisect的原因为采用了二分查找算法。[[https://hg.python.org/cpython/file/3.5/Lib/bisect.py][模块源码]] 可作为此算法的例
+  子。
+** 函数
+*** bisect. *bisect_left* (a,x,lo=0,hi=len(a))
+    返回假定在A中插入X元素并保持排序的索引。LO和HI参数用于指定链表A的
+    计算区域，默认为整个链表。如果X已经在A中，则返回该元素前面一个索引。
+    返回值可用于list.insert()方法。
+
+    对于返回索引值i，都有：
+
+    #+BEGIN_SRC python :eval never
+      all(val < x for val in a[lo:i])
+      all(val >= x for val in a[i:hi])
+    #+END_SRC
+
+*** bisect. *bisect_right* (a,x,lo=0,hi=len(a))
+*** bisect. *bisect* (a,x,lo=0,hi=len(a))
+    类似与bisect_left，不过当A中存在元素X时，返回该元素后面一个索引。
+
+    对于返回索引值，都有：
+
+    #+BEGIN_SRC python :eval never
+      all(val <= x for val in a[lo:i])
+      all(val > x for val in a[i:hi])
+    #+END_SRC
+
+    #+BEGIN_SRC python :session
+      from bisect import *
+      lst = [1, 2, 3]
+      x = 2
+      bisect_left(lst, x)
+      bisect_right(lst, x)
+      bisect(lst, x)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 1
+    - 2
+    - 2
+    #+END_SRC
+
+*** bisect. *insort_left* (a,x,lo=0,hi=len(a))
+    将X插入A中，保持排序不变。等价于：
+
+    #+BEGIN_SRC python :eval never
+      a.insert(bisect.bisect_left(a, x, lo, hi), x)
+    #+END_SRC
+
+*** bisect. *insort_right* (a,x,lo=0,hi=len(a))
+*** bisect. *insort* (a,x,lo=0,hi=len(a))
+    类似于isort_left，只是如果X存在与A中，则插入到原来元素的右边。
+
+    #+BEGIN_SRC python :session
+      from bisect import *
+      data = [1, 2, 3]
+      insort_left(data, 2)
+      print(data)
+      insort_right(data, 2)
+      print(data)
+      insort(data, 2)
+      print(data)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> [1, 2, 2, 3]
+    - >>> [1, 2, 2, 2, 3]
+    - >>> [1, 2, 2, 2, 2, 3]
+    #+END_SRC
+
+** 在已排序链表中查找
+   如需查找插入位置，上面的函数很有用，但完成常规搜索任务时用起来挺复
+   杂。下面就利用这些函数实现了对已排序链表的搜索实现：
+   
+   #+BEGIN_SRC python :eval never
+     def index(a, x):
+         '定位最左边等于X的元素。'
+         i = bisect_left(a, x)
+         if i != len(a) and a[i] == x:
+             return i
+         raise ValueError
+
+     def find_lt(a, x):
+         '获取<X的最右边的元素。'
+         i = bisect_left(a, x)
+         if i != 0:
+             return a[i - 1]
+         raise ValueError
+
+     def find_le(a, x):
+         '获取<=X的最右边的元素。'
+         i = bisect_right(a, x)
+         if i != 0:
+             return a[i - 1]
+         raise ValueError
+
+     def find_gt(a, x):
+         '获取>X的最左边的元素。'
+         i = bisect_right(a, x)
+         if i != len(x):
+             return a[i]
+         raise ValueError
+
+     def find_ge(a, x):
+         '获取>=X最左边的元素。'
+         i = bisect_left(a, x)
+         if i != len(a):
+             return a[i]
+         raise ValueError
+   #+END_SRC
+
+** 其他例子
+   根据得分判断等级：
+   
+   #+BEGIN_SRC python :session
+     from bisect import bisect
+
+     def grade(score, breakpoints=[60, 70, 80, 90], grade='FDCBA'):
+         i = bisect(breakpoints, score)
+         return grade[i]
+
+     [grade(score) for score in [33, 99, 77, 70, 89, 90, 100]]
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> ... ... ... >>> ['F', 'A', 'C', 'C', 'B', 'A', 'A']
+   #+END_SRC
+   
+   为不影响实现效率，bisect模块的函数并不像sorted()函数一样可传递key和
+   reverse参数。不过可提前计算出不同数据类型的key排序：
+   
+   #+BEGIN_SRC python :session
+     from bisect import bisect_left as lt
+     data = [('red', 5), ('blue', 1), ('yellow', 8), ('black', 0)]
+     data.sort(key=lambda x: x[1])
+     keys = [x[1] for x in data]
+     data[lt(keys, 0)]
+     data[lt(keys, 1)]
+     data[lt(keys, 5)]
+     data[lt(keys, 8)]
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> >>> ('black', 0)
+   - ('blue', 1)
+   - ('red', 5)
+   - ('yellow', 8)
+   #+END_SRC
+   
 * array - 高效数字数组
   此模块为精简表示基本数据类型的数组：字符型、整型和浮点型。array类型
   与链表类型十分相似，只是存储其中的数据类型有约束。
@@ -2067,7 +2423,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
 *** array. *tolist* ()
     将数组转换为普通链表。
-
+    
     #+BEGIN_SRC python :session
       from array import array
 
@@ -2107,6 +2463,32 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     : >>> '我有一个梦想！'
 
 * weakref
+  
+  [[http://stackoverflow.com/questions/1507566/how-and-when-to-appropriately-use-weakref-in-python]]
+  
+** 函数
+*** class weakref. *ref* (object[,callback])
+    
+    #+BEGIN_SRC python :session
+      from weakref import ref
+      s = {1, 2, 3}
+      s_ref = ref(s, lambda x: print(x, 'deleted'))
+      print(s_ref)
+      del s
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> <weakref at 0x7ff1f4bea318; to 'set' at 0x7ff1f4c5ef28>
+    - <weakref at 0x7ff1f4bea318; dead> deleted
+    #+END_SRC
+    
+**** __callback__
+*** weakref. *proxy* (object[,callback])
+** Weak Reference对象
+** 举例
+** Finalizer对象
+** finalizers与__del__方法
 * types - 内置类型动态创建和命名
 * copy - 浅层复制和深层复制
 * pprint - 数据美化显示
