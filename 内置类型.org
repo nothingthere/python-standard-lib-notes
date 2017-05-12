@@ -3794,7 +3794,7 @@
     : >>> >>> >>> <dict_keyiterator object at 0x7f22c154b818>
     : <dict_keyiterator object at 0x7f22c1544098>
     : >>> (['a', 'b', 'c'], ['a', 'b', 'c'])
-
+    
 *** *clear* ()
     清空所有内容。
 
@@ -3830,18 +3830,20 @@
 
 *** classmethod *fromkeys* (seq[,value])
     类方法，返回字典，SEQ中的各个元素成为key值，对应的值都为VALUE。
-
+    
     如果VALUE缺省，则所有值都为None。
-
+    
     #+BEGIN_SRC python :session
       dict.fromkeys('abc')
       dict.fromkeys('abc', [1, 2])
     #+END_SRC
-
+    
     #+RESULTS:
-    : {'a':    None, 'b': None, 'c': None}
-    : {'a':    [1, 2], 'b': [1, 2], 'c': [1, 2]}
-
+    #+BEGIN_SRC org
+    - {'c': None, 'b': None, 'a': None}
+    - {'c': [1, 2], 'b': [1, 2], 'a': [1, 2]}
+    #+END_SRC
+    
 *** *get* (key[,default])
     返回KEY对应的值，如果KEY不存在则返回DEFAULT对应的值。DEFAULT的默认
     值为None，所以方法不会返回KeyError错误。

@@ -139,17 +139,17 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 
       struct.unpack('3s', x)
       #+END_SRC
-
+      
       #+RESULTS:
       :
       : >>> >>> b'abA'
       : >>> (b'abA',)
-
+      
     - “s”与“p”的区别为：前者为C形式字符串，后者为Pascal形式字符串。
-
+      
     - 使用“?”格式字符时，打包结果只是0或1或标准布尔值，解包结果为True
       或False。
-
+      
       #+BEGIN_SRC python :session
       import struct
 
@@ -159,13 +159,13 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       struct.unpack('?', x)
       print(x)
       #+END_SRC
-
+      
       #+RESULTS:
      :
      : >>> >>> b'\x01'
      : >>> (True,)
      : b'\x01'
-
+      
 ** 函数和Exceptions
 *** exception struct. *error*
     所有报错入口，其参数报错信息。
@@ -173,7 +173,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
 *** struct. *pack* (fmt,v1,v2...)
     返回bytes对象，包含所有V1、V2...根据FMT打包后的结果。所有参数需满
     足FMT指定形式。
-
+    
     #+BEGIN_SRC python :session
       import struct
       from array import array
@@ -182,12 +182,13 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
       print(buff)
       print(struct.unpack('!4s4si', buff))
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : >>> >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00\x00\x00\x00a'
-    : (b'\xe4\xb8\x80\x00', b'a\x00\x00\x00', 97)
-
+    #+BEGIN_SRC org
+    - >>> >>> >>> b'\xe4\xb8\x80\x00a\x00\x00\x00\x00\x00\x00a'
+    - (b'\xe4\xb8\x80\x00', b'a\x00\x00\x00', 97)
+    #+END_SRC
+    
 *** struct. *pack_into* (fmt,buffer,offset,v1,v2)
     将V1、V2...根据FMT写入BUFFER中，必须指定开始写入位置，即OFFSET参数。
 
@@ -472,7 +473,7 @@ Python内置的二进制序列有：bytes、bytearray和memoryview。
    : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
    : b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00'
 
-* codecs - 译码注册和基础类 ？？？
+* codecs - 译码注册和基础类 （待续）
   此模块为标准Python“译码器（codecs，含编码器encoder和解码器decoders）”提
   高基础类，并提高Python内部“译码注册（codec registry，处理解码器和查
   询过程中的错误）”。大多数标准译码都是针对文本，即将文本编码为bytes对

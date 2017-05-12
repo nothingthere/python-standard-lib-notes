@@ -36,7 +36,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 * calendar - 日历相关函数 （待续）
 * collections - 容器类型
   此模块对内置类型dict、list、set和tuple实现了容器包装。
-  
+
   | namedtuple  | 命名式元组工厂函数                     |
   | deque       | 类链表容器，可快速在两端添加和删除元素 |
   | ChainMap    | 类字典类，利用多个映射创建单个view     |
@@ -46,11 +46,11 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
   | UserDict    | 字典对象包装器，方便创建字典子类       |
   | UserList    | 链表对象包装器，方便创建链表子类       |
   | UserString  | 字符串对象包装器，方便创建字符串子类   |
-  
+
 ** ChainMap对象
    将多个映射对象结合，作为单个对象。比创建新字典对象，然后使用字典的
    update()方法快。
-   
+
 *** class collections. *ChainMap* (*maps)
     ChainMap将多个字典或映射对象集合到一起，创建一个新的，可更新的view。
     如果没有MAP参数，则将空字典传递给此构建函数。
@@ -66,7 +66,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> >>> ChainMap({'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23})
+    - >>> >>> >>> ChainMap({'A': 10, 'B': 11}, {'Lily': 27, 'Mike': 23})
     - ChainMap({})
     #+END_SRC
 
@@ -96,7 +96,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     - 10
     #+END_SRC
     
-    ChainMap中的元素实际上是原映射的索引，即改变原来映射，其中的元素也
+    ChainMap中的元素实际上是原映射的指针，即改变原来映射，其中的元素也
     随之改变：
     
     #+BEGIN_SRC python :session
@@ -116,21 +116,21 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 **** maps
      返回可更新的字典链表。修改其中的元素即可修改ChainMap本身，也可修
      改原来的字典对象。
-
+     
      #+BEGIN_SRC python :session
        mix.maps
        mix.maps[0]['A'] = -1
        print(mix)
        print(books)
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
-     - [{'B': 11, 'A': 10}, {'Lily': 27, 'Mike': 23}]
-     - >>> ChainMap({'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
-     - {'B': 11, 'A': -1}
+     - [{'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27}]
+     - >>> ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - {'A': -1, 'Lily': 100, 'B': 11}
      #+END_SRC
-
+     
 **** new_child(m=None)
      返回新的ChainMap对象，其中第一个元素为M，后面为当前对象的所有maps。
      如果M参数缺省，则默认为空字典。此方法可用来更新第一个字典，而不影
@@ -155,35 +155,35 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        print('mix after change: ', mix)
        print('books after change: ', books)
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
-     - submix:  ChainMap({}, {'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
-     - mix:  ChainMap({'B': 11, 'A': -1}, {'Lily': 27, 'Mike': 23})
-     - books:  {'B': 11, 'A': -1}
-     - >>> submix after change:  ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23})
-     - mix after change:  ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23})
-     - books after change:  {'B': 11, 'A': -100}
+     - submix:  ChainMap({}, {'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - mix:  ChainMap({'A': -1, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - books:  {'A': -1, 'Lily': 100, 'B': 11}
+     - >>> submix after change:  ChainMap({}, {'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - mix after change:  ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
+     - books after change:  {'A': -100, 'Lily': 100, 'B': 11}
      #+END_SRC
-     
+
 **** parents
      返回新ChainMap对象，元素含除第一个字典外的所有元素。可用于在搜索
      时跳过第一个字典。
-
+     
      #+BEGIN_SRC python :session
        mix.parents
        submix.parents
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - ChainMap({'Lily': 27})
      - ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27})
      #+END_SRC
-
+     
 *** ChainMap应用举例
 **** 模仿Python的内部查找链
-
+     
      #+BEGIN_SRC python :session
        import collections
        import builtins
@@ -192,15 +192,15 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      
      #+RESULTS:
      #+BEGIN_SRC org
-     - >>> ChainMap({'persons': {'Lily': 27, 'Mike': 23}, 'args': Namespace(foo='BAR'), 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, '__name__': '__main__', 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fdbe62f70d0>, '__builtins__': <module 'builtins' (built-in)>, 'submix': ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'parser': ArgumentParser(prog='', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True), '__builtin__': <module 'builtins' (built-in)>, 'books': {'B': 11, 'A': -100}, '__doc__': None, 'builtins': <module 'builtins' (built-in)>, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fdbe62f7048>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fdbe6b5cf28>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fdbe6a10dd8>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>, '__spec__': None, 'mix': ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'C': <class '__main__.C'>, 'argparse': <module 'argparse' from '/usr/lib/python3.5/argparse.py'>, 'c': <__main__.C object at 0x7fdbe6213780>, 'ChainMap': <class 'collections.ChainMap'>}, {'persons': {'Lily': 27, 'Mike': 23}, 'args': Namespace(foo='BAR'), 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, '__name__': '__main__', 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fdbe62f70d0>, '__builtins__': <module 'builtins' (built-in)>, 'submix': ChainMap({}, {'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'parser': ArgumentParser(prog='', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True), '__builtin__': <module 'builtins' (built-in)>, 'books': {'B': 11, 'A': -100}, '__doc__': None, 'builtins': <module 'builtins' (built-in)>, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fdbe62f7048>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fdbe6b5cf28>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fdbe6a10dd8>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>, '__spec__': None, 'mix': ChainMap({'B': 11, 'A': -100}, {'Lily': 27, 'Mike': 23}), 'C': <class '__main__.C'>, 'argparse': <module 'argparse' from '/usr/lib/python3.5/argparse.py'>, 'c': <__main__.C object at 0x7fdbe6213780>, 'ChainMap': <class 'collections.ChainMap'>}, {'UnboundLocalError': <class 'UnboundLocalError'>, 'quit': Use quit() or Ctrl-D (i.e. EOF) to exit, 'memoryview': <class 'memoryview'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'NameError': <class 'NameError'>, 'ImportWarning': <class 'ImportWarning'>, '__import__': <built-in function __import__>, 'staticmethod': <class 'staticmethod'>, 'bin': <built-in function bin>, 'complex': <class 'complex'>, 'repr': <built-in function repr>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'sorted': <built-in function sorted>, 'compile': <built-in function compile>, 'abs': <built-in function abs>, 'bytearray': <class 'bytearray'>, 'any': <built-in function any>, 'chr': <built-in function chr>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'eval': <built-in function eval>, 'ValueError': <class 'ValueError'>, 'NotImplemented': NotImplemented, 'tuple': <class 'tuple'>, 'str': <class 'str'>, 'pow': <built-in function pow>, 'len': <built-in function len>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'id': <built-in function id>, 'MemoryError': <class 'MemoryError'>, 'all': <built-in function all>, 'SystemError': <class 'SystemError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
-     -     for supporting Python development.  See www.python.org for more information., 'hex': <built-in function hex>, 'FutureWarning': <class 'FutureWarning'>, 'delattr': <built-in function delattr>, 'True': True, 'ImportError': <class 'ImportError'>, 'list': <class 'list'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'IOError': <class 'OSError'>, 'help': Type help() for interactive help, or help(object) for help about object., 'open': <built-in function open>, 'FileExistsError': <class 'FileExistsError'>, 'enumerate': <class 'enumerate'>, 'slice': <class 'slice'>, 'TabError': <class 'TabError'>, 'bool': <class 'bool'>, 'NotImplementedError': <class 'NotImplementedError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'UserWarning': <class 'UserWarning'>, 'UnicodeError': <class 'UnicodeError'>, 'IndentationError': <class 'IndentationError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", 'ResourceWarning': <class 'ResourceWarning'>, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'OSError': <class 'OSError'>, 'False': False, 'property': <class 'property'>, 'iter': <built-in function iter>, 'exit': Use exit() or Ctrl-D (i.e. EOF) to exit, 'BytesWarning': <class 'BytesWarning'>, 'SyntaxError': <class 'SyntaxError'>, 'BufferError': <class 'BufferError'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'object': <class 'object'>, 'sum': <built-in function sum>, 'frozenset': <class 'frozenset'>, 'ChildProcessError': <class 'ChildProcessError'>, 'locals': <built-in function locals>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'print': <built-in function print>, 'format': <built-in function format>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, '__build_class__': <built-in function __build_class__>, 'Warning': <class 'Warning'>, 'issubclass': <built-in function issubclass>, 'KeyError': <class 'KeyError'>, 'set': <class 'set'>, 'Ellipsis': Ellipsis, 'classmethod': <class 'classmethod'>, 'round': <built-in function round>, 'SystemExit': <class 'SystemExit'>, '_': None, 'BaseException': <class 'BaseException'>, 'GeneratorExit': <class 'GeneratorExit'>, 'dir': <built-in function dir>, 'EOFError': <class 'EOFError'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), 'divmod': <built-in function divmod>, 'OverflowError': <class 'OverflowError'>, 'RuntimeError': <class 'RuntimeError'>, 'copyright': Copyright (c) 2001-2017 Python Software Foundation.
+     - >>> ChainMap({'persons': {'Lily': 27}, 'books': {'A': -100, 'Lily': 100, 'B': 11}, 's2': <__main__.Student object at 0x7fd899977f98>, '__spec__': None, 'basetwo': functools.partial(<class 'int'>, base=2), 'add': <built-in function add>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fd899974e10>, 'Decimal': <class 'decimal.Decimal'>, 'A': <function A at 0x7fd898edbd90>, 'nothing': <function nothing at 0x7fd898edb598>, 'partial': <class 'functools.partial'>, 'partialmethod': <class 'functools.partialmethod'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fd899ac0f28>, 'reduce': <built-in function reduce>, 'my_decorator': <function my_decorator at 0x7fd898eedb70>, 'mix': ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27}), '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fd89925b048>, '__name__': '__main__', 'wraps': <function wraps at 0x7fd8999aad90>, 'B': <function B at 0x7fd898edba60>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fd89925b0d0>, '_': <function _ at 0x7fd898edb048>, 'Student': <class '__main__.Student'>, 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__builtins__': <module 'builtins' (built-in)>, 'c2': <__main__.Cell object at 0x7fd898ec2b38>, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, 'Cell': <class '__main__.Cell'>, 'fun': <function fun at 0x7fd898edb2f0>, 'example': <function example at 0x7fd898eeda60>, 'fun_dispatch': <function fun_dispatch at 0x7fd898eed9d8>, '__package__': None, 's1': <__main__.Student object at 0x7fd89926d0b8>, '__builtin__': <module 'builtins' (built-in)>, 'builtins': <module 'builtins' (built-in)>, 'total_ordering': <function total_ordering at 0x7fd89993bb70>, 'c1': <__main__.Cell object at 0x7fd898ec2ac8>, 'fun_diapatch': <function fun_diapatch at 0x7fd898edb400>, 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, 'functools': <module 'functools' from '/usr/lib/python3.5/functools.py'>, 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'ChainMap': <class 'collections.ChainMap'>, 'submix': ChainMap({}, {'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27}), 'singledispatch': <function singledispatch at 0x7fd8999ad6a8>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", '__doc__': None, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>}, {'persons': {'Lily': 27}, 'books': {'A': -100, 'Lily': 100, 'B': 11}, 's2': <__main__.Student object at 0x7fd899977f98>, '__spec__': None, 'basetwo': functools.partial(<class 'int'>, base=2), 'add': <built-in function add>, '__pyfile': <codecs.StreamReaderWriter object at 0x7fd899974e10>, 'Decimal': <class 'decimal.Decimal'>, 'A': <function A at 0x7fd898edbd90>, 'nothing': <function nothing at 0x7fd898edb598>, 'partial': <class 'functools.partial'>, 'partialmethod': <class 'functools.partialmethod'>, '__PYTHON_EL_get_completions': <function __PYTHON_EL_get_completions at 0x7fd899ac0f28>, 'reduce': <built-in function reduce>, 'my_decorator': <function my_decorator at 0x7fd898eedb70>, 'mix': ChainMap({'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27}), '__FFAP_get_module_path': <function __FFAP_get_module_path at 0x7fd89925b048>, '__name__': '__main__', 'wraps': <function wraps at 0x7fd8999aad90>, 'B': <function B at 0x7fd898edba60>, '__PYDOC_get_help': <function __PYDOC_get_help at 0x7fd89925b0d0>, '_': <function _ at 0x7fd898edb048>, 'Student': <class '__main__.Student'>, 'collections': <module 'collections' from '/usr/lib/python3.5/collections/__init__.py'>, '__builtins__': <module 'builtins' (built-in)>, 'c2': <__main__.Cell object at 0x7fd898ec2b38>, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, 'Cell': <class '__main__.Cell'>, 'fun': <function fun at 0x7fd898edb2f0>, 'example': <function example at 0x7fd898eeda60>, 'fun_dispatch': <function fun_dispatch at 0x7fd898eed9d8>, '__package__': None, 's1': <__main__.Student object at 0x7fd89926d0b8>, '__builtin__': <module 'builtins' (built-in)>, 'builtins': <module 'builtins' (built-in)>, 'total_ordering': <function total_ordering at 0x7fd89993bb70>, 'c1': <__main__.Cell object at 0x7fd898ec2ac8>, 'fun_diapatch': <function fun_diapatch at 0x7fd898edb400>, 'codecs': <module 'codecs' from '/usr/lib/python3.5/codecs.py'>, 'functools': <module 'functools' from '/usr/lib/python3.5/functools.py'>, 'readline': <module 'readline' from '/usr/lib/python3.5/lib-dynload/readline.cpython-35m-x86_64-linux-gnu.so'>, 'rlcompleter': <module 'rlcompleter' from '/usr/lib/python3.5/rlcompleter.py'>, 'ChainMap': <class 'collections.ChainMap'>, 'submix': ChainMap({}, {'A': -100, 'Lily': 100, 'B': 11}, {'Lily': 27}), 'singledispatch': <function singledispatch at 0x7fd8999ad6a8>, '__code': b"def __PYDOC_get_help(obj):\n    try:\n        import inspect\n        if hasattr(obj, 'startswith'):\n            obj = eval(obj, globals())\n        doc = inspect.getdoc(obj)\n        if not doc and callable(obj):\n            target = None\n            if inspect.isclass(obj) and hasattr(obj, '__init__'):\n                target = obj.__init__\n                objtype = 'class'\n            else:\n                target = obj\n                objtype = 'def'\n            if target:\n                args = inspect.formatargspec(\n                    *inspect.getargspec(target)\n                )\n                name = obj.__name__\n                doc = '{objtype} {name}{args}'.format(\n                    objtype=objtype, name=name, args=args\n                )\n        else:\n            doc = doc.splitlines()[0]\n    except:\n        doc = ''\n    try:\n        exec('print doc')\n    except SyntaxError:\n        print(doc)", '__doc__': None, 'os': <module 'os' from '/usr/lib/python3.5/os.py'>}, {'FutureWarning': <class 'FutureWarning'>, 'Warning': <class 'Warning'>, 'SystemError': <class 'SystemError'>, 'hash': <built-in function hash>, 'LookupError': <class 'LookupError'>, 'UnicodeError': <class 'UnicodeError'>, 'next': <built-in function next>, 'str': <class 'str'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), 'issubclass': <built-in function issubclass>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'staticmethod': <class 'staticmethod'>, 'FileExistsError': <class 'FileExistsError'>, 'copyright': Copyright (c) 2001-2017 Python Software Foundation.
      - All Rights Reserved.
      - Copyright (c) 2000 BeOpen.com.
      - All Rights Reserved.
      - Copyright (c) 1995-2001 Corporation for National Research Initiatives.
      - All Rights Reserved.
      - Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
-     - All Rights Reserved., 'setattr': <built-in function setattr>, 'float': <class 'float'>, 'reversed': <class 'reversed'>, '__debug__': True, 'bytes': <class 'bytes'>, 'EnvironmentError': <class 'OSError'>, 'int': <class 'int'>, 'isinstance': <built-in function isinstance>, 'LookupError': <class 'LookupError'>, 'InterruptedError': <class 'InterruptedError'>, 'min': <built-in function min>, 'input': <built-in function input>, 'AssertionError': <class 'AssertionError'>, 'type': <class 'type'>, 'map': <class 'map'>, 'license': Type license() to see the full license text, '__name__': 'builtins', 'range': <class 'range'>, 'ReferenceError': <class 'ReferenceError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'None': None, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'super': <class 'super'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'filter': <class 'filter'>, 'TypeError': <class 'TypeError'>, 'TimeoutError': <class 'TimeoutError'>, 'hasattr': <built-in function hasattr>, 'ConnectionError': <class 'ConnectionError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'StopIteration': <class 'StopIteration'>, 'max': <built-in function max>, '__package__': '', 'zip': <class 'zip'>, 'ArithmeticError': <class 'ArithmeticError'>, 'ord': <built-in function ord>, 'IndexError': <class 'IndexError'>, 'vars': <built-in function vars>, 'exec': <built-in function exec>, 'globals': <built-in function globals>, 'ascii': <built-in function ascii>, 'callable': <built-in function callable>, 'RecursionError': <class 'RecursionError'>, 'hash': <built-in function hash>, 'oct': <built-in function oct>, 'Exception': <class 'Exception'>, 'getattr': <built-in function getattr>, 'dict': <class 'dict'>, 'next': <built-in function next>, 'AttributeError': <class 'AttributeError'>, 'PermissionError': <class 'PermissionError'>, 'SyntaxWarning': <class 'SyntaxWarning'>})
+     - All Rights Reserved., 'id': <built-in function id>, 'ImportWarning': <class 'ImportWarning'>, 'ArithmeticError': <class 'ArithmeticError'>, 'all': <built-in function all>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'OverflowError': <class 'OverflowError'>, 'help': Type help() for interactive help, or help(object) for help about object., 'Ellipsis': Ellipsis, 'BrokenPipeError': <class 'BrokenPipeError'>, 'globals': <built-in function globals>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'BufferError': <class 'BufferError'>, 'chr': <built-in function chr>, 'len': <built-in function len>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'classmethod': <class 'classmethod'>, 'bin': <built-in function bin>, 'sorted': <built-in function sorted>, '_': None, 'ConnectionResetError': <class 'ConnectionResetError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'bytes': <class 'bytes'>, 'frozenset': <class 'frozenset'>, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, 'StopIteration': <class 'StopIteration'>, 'ValueError': <class 'ValueError'>, 'bytearray': <class 'bytearray'>, '__package__': '', 'BytesWarning': <class 'BytesWarning'>, 'license': Type license() to see the full license text, 'SyntaxError': <class 'SyntaxError'>, 'MemoryError': <class 'MemoryError'>, 'repr': <built-in function repr>, 'input': <built-in function input>, 'TabError': <class 'TabError'>, 'RecursionError': <class 'RecursionError'>, 'dict': <class 'dict'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BaseException': <class 'BaseException'>, 'hex': <built-in function hex>, 'sum': <built-in function sum>, 'None': None, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'RuntimeError': <class 'RuntimeError'>, '__import__': <built-in function __import__>, 'delattr': <built-in function delattr>, 'NotImplemented': NotImplemented, 'TypeError': <class 'TypeError'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'exec': <built-in function exec>, 'max': <built-in function max>, 'tuple': <class 'tuple'>, 'NotImplementedError': <class 'NotImplementedError'>, 'locals': <built-in function locals>, 'slice': <class 'slice'>, 'FloatingPointError': <class 'FloatingPointError'>, 'EOFError': <class 'EOFError'>, 'IndentationError': <class 'IndentationError'>, 'map': <class 'map'>, 'iter': <built-in function iter>, 'AttributeError': <class 'AttributeError'>, 'list': <class 'list'>, 'True': True, 'False': False, 'compile': <built-in function compile>, 'NameError': <class 'NameError'>, 'any': <built-in function any>, 'round': <built-in function round>, 'OSError': <class 'OSError'>, 'SystemExit': <class 'SystemExit'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'TimeoutError': <class 'TimeoutError'>, 'dir': <built-in function dir>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'format': <built-in function format>, 'complex': <class 'complex'>, 'min': <built-in function min>, 'ConnectionError': <class 'ConnectionError'>, 'isinstance': <built-in function isinstance>, 'eval': <built-in function eval>, 'getattr': <built-in function getattr>, 'EnvironmentError': <class 'OSError'>, 'abs': <built-in function abs>, 'ord': <built-in function ord>, '__name__': 'builtins', 'reversed': <class 'reversed'>, 'exit': Use exit() or Ctrl-D (i.e. EOF) to exit, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'super': <class 'super'>, 'filter': <class 'filter'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'hasattr': <built-in function hasattr>, 'IOError': <class 'OSError'>, 'set': <class 'set'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ChildProcessError': <class 'ChildProcessError'>, 'setattr': <built-in function setattr>, 'callable': <built-in function callable>, 'print': <built-in function print>, 'divmod': <built-in function divmod>, 'bool': <class 'bool'>, '__debug__': True, 'type': <class 'type'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'AssertionError': <class 'AssertionError'>, 'UserWarning': <class 'UserWarning'>, 'pow': <built-in function pow>, 'IndexError': <class 'IndexError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'ascii': <built-in function ascii>, 'GeneratorExit': <class 'GeneratorExit'>, '__build_class__': <built-in function __build_class__>, 'memoryview': <class 'memoryview'>, 'open': <built-in function open>, 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+     -     for supporting Python development.  See www.python.org for more information., 'PermissionError': <class 'PermissionError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'object': <class 'object'>, 'quit': Use quit() or Ctrl-D (i.e. EOF) to exit, 'oct': <built-in function oct>, 'ImportError': <class 'ImportError'>, 'ReferenceError': <class 'ReferenceError'>, 'float': <class 'float'>, 'Exception': <class 'Exception'>, 'InterruptedError': <class 'InterruptedError'>, 'range': <class 'range'>, 'enumerate': <class 'enumerate'>, 'int': <class 'int'>, 'KeyError': <class 'KeyError'>, 'zip': <class 'zip'>, 'vars': <built-in function vars>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'property': <class 'property'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices."})
      #+END_SRC
 
 **** 将命令行参数覆盖系统变量，系统变量覆盖默认值
@@ -224,7 +224,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      #+BEGIN_SRC org
      - >>> >>> >>> >>> >>> _StoreAction(option_strings=['-u', '--user'], dest='user', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
      - _StoreAction(option_strings=['-c', '--color'], dest='color', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
-     - >>> >>> >>> ChainMap({'user': 'claudio'}, environ({'LANG': 'en_HK.UTF-8', 'DESKTOP_AUTOSTART_ID': '10c93015e7a7904596149403809342434000000009360001', 'DESKTOP_SESSION': 'default', 'QT_LINUX_ACCESSIBILITY_ALWAYS_ON': '1', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'COLUMNS': '80', 'XDG_RUNTIME_DIR': '/run/user/1000', 'GDM_LANG': 'en_HK.UTF-8', 'QT4_IM_MODULE': 'fcitx', 'SHLVL': '1', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'QT_ACCESSIBILITY': '1', 'EMACS': 't', 'XDG_MENU_PREFIX': 'gnome-', 'DISPLAY': ':0', 'PS4': '$LINENO + ', 'TERMCAP': '', 'PYTHONPATH': '/home/claudio/python:', 'CLUTTER_IM_MODULE': 'xim', 'WINDOWID': '27262982', 'SSH_AGENT_PID': '1021', 'VTE_VERSION': '4601', 'SESSION_MANAGER': 'local/kali:@/tmp/.ICE-unix/936,unix/kali:/tmp/.ICE-unix/936', 'QT_IM_MODULE': 'fcitx', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share/:/usr/share/', 'XDG_VTNR': '2', 'GTK_MODULES': 'gail:atk-bridge', 'COLORTERM': 'truecolor', 'PYTHONUNBUFFERED': '1', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'TERM': 'dumb', 'SHELL': '/bin/bash', 'GTK_IM_MODULE': 'fcitx', 'USER': 'claudio', '_': '/usr/bin/emacs24', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'XDG_SESSION_DESKTOP': 'default', 'NODE_PATH': '/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript', 'USERNAME': 'claudio', 'GDMSESSION': 'default', 'LOGNAME': 'claudio', 'WINDOWPATH': '2', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'XDG_SEAT': 'seat0', 'INSIDE_EMACS': '24.5.1,comint', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XDG_CURRENT_DESKTOP': 'GNOME', 'XMODIFIERS': '@im=fcitx', 'XDG_SESSION_ID': '2', 'QT_QPA_PLATFORMTHEME': 'qgnomeplatform', 'PWD': '/home/claudio/Desktop/Python/python-standard-lib-notes', 'JOURNAL_STREAM': '8:21649', 'HOME': '/home/claudio', 'XDG_SESSION_TYPE': 'x11', 'PATH': '/home/claudio/tools:/home/claudio/bin:/home/claudio/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games'}), {'user': 'guest', 'color': 'green'})
+     - >>> >>> >>> ChainMap({'user': 'claudio'}, environ({'NODE_PATH': '/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript', 'QT_IM_MODULE': 'fcitx', 'XDG_SESSION_ID': '3', 'COLUMNS': '151', 'LANG': 'en_HK.UTF-8', 'DISPLAY': ':0', 'TERMCAP': '', 'LOGNAME': 'claudio', 'XDG_SESSION_DESKTOP': 'default', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share/:/usr/share/', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'SSH_AGENT_PID': '1055', 'GTK_IM_MODULE': 'fcitx', 'PS4': '$LINENO + ', 'XDG_VTNR': '2', 'USERNAME': 'claudio', 'PWD': '/home/claudio/Desktop/Python/python-standard-lib-notes', 'SHLVL': '1', 'PATH': '/home/claudio/tools:/home/claudio/bin:/home/claudio/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'HOME': '/home/claudio', 'DESKTOP_SESSION': 'default', 'QT_QPA_PLATFORMTHEME': 'qgnomeplatform', 'XMODIFIERS': '@im=fcitx', 'PYTHONPATH': '/home/claudio/python:', 'TERM': 'dumb', '_': '/usr/bin/emacs24', 'XDG_RUNTIME_DIR': '/run/user/1000', 'SESSION_MANAGER': 'local/kali:@/tmp/.ICE-unix/970,unix/kali:/tmp/.ICE-unix/970', 'EMACS': 't', 'XDG_CURRENT_DESKTOP': 'GNOME', 'QT_ACCESSIBILITY': '1', 'JOURNAL_STREAM': '8:16293', 'XDG_MENU_PREFIX': 'gnome-', 'QT_LINUX_ACCESSIBILITY_ALWAYS_ON': '1', 'COLORTERM': 'truecolor', 'PYTHONUNBUFFERED': '1', 'XDG_SEAT': 'seat0', 'USER': 'claudio', 'GDM_LANG': 'en_HK.UTF-8', 'XDG_SESSION_TYPE': 'x11', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'QT4_IM_MODULE': 'fcitx', 'VTE_VERSION': '4601', 'CLUTTER_IM_MODULE': 'xim', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'SHELL': '/bin/bash', 'WINDOWPATH': '2', 'WINDOWID': '27262982', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'GTK_MODULES': 'gail:atk-bridge', 'DESKTOP_AUTOSTART_ID': '101650a80580e95109149442005843100200000009700001', 'GDMSESSION': 'default', 'INSIDE_EMACS': '24.5.1,comint'}), {'color': 'green', 'user': 'guest'})
      #+END_SRC
 
 **** 模仿嵌套上下文
@@ -239,19 +239,19 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        e.maps[-1]                        # 根上下文--相当于Python的globals()
        e.parents                         # 相当于Python的nonlocals
 
-       # d['x']                          # 获取整个上下文中的key
+       d['x']                            # 获取整个上下文中的key
        d['x'] = 1                        # 设置当前上下文的值
-       del d['x']                      # 删除当前上下文的值
-       list(d)                         # 所有嵌套key
-       k in d                          # 检查包含
-       d.items()                       # 所有嵌套元素
-       dict(d)                         # 转换为普通字典
+       del d['x']                        # 删除当前上下文的值
+       list(d)                           # 所有嵌套key
+       k in d                            # 检查包含
+       d.items()                         # 所有嵌套元素
+       dict(d)                           # 转换为普通字典
      #+END_SRC
-     
+
 **** 深层赋值和删除
      默认情况下，ChainMap的删除和赋值都在第一个字典中进行，只有查找在
      所有字典中进行。如需进行深层赋值和删除，可通过子类实现：
-
+     
      #+BEGIN_SRC python :session
        from collections import ChainMap
 
@@ -281,7 +281,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
      #+RESULTS:
      #+BEGIN_SRC org
-     - >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'orange'})
+     - >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... ... ... >>> >>> >>> DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'orange'})
      - >>> DeepChainMap({'zebra': 'black', 'snake': 'blue'}, {'elephant': 'blue'}, {'lion': 'orange'})
      - >>> DeepChainMap({'snake': 'blue'}, {'elephant': 'blue'}, {'lion': 'orange'})
      #+END_SRC
@@ -301,7 +301,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
    - >>> >>> [('to', 5292), ('the', 5265), ('and', 4930), ('of', 4337)]
    #+END_SRC
    
-   将链表中的单词按出现频率排序：
+   如记录单词出现次数：
    
    #+BEGIN_SRC python :session
      from collections import Counter
@@ -314,16 +314,15 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
    
    #+RESULTS:
    #+BEGIN_SRC org
-   - >>> ... ... >>> >>> Counter({'blue': 3, 'red': 2, 'green': 1})
-   - Counter({'blue': 3, 'red': 2, 'green': 1})
+   - >>> ... ... >>> Counter({'blue': 3, 'red': 2, 'green': 1})
    #+END_SRC
    
 *** class collections. *Counter* ([iterable-or-mapping])
     Counter是dict的子类，用于计数可哈希对象。为无序集合，key值为可哈希
     元素，value值为元素个数（可为负数和0）。
-    
+
     参数可为iterable或其他映射对象：
-    
+
     #+BEGIN_SRC python :session
       from collections import Counter
       Counter()
@@ -331,7 +330,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       Counter({'blue': 4, 'green': 2})
       Counter(cats=2, dogs=8)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - Counter()
@@ -339,14 +338,14 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     - Counter({'blue': 4, 'green': 2})
     - Counter({'dogs': 8, 'cats': 2})
     #+END_SRC
-    
+
     对于不存在的元素，默认个数为0：
-    
+
     #+BEGIN_SRC python :session
       from collections import Counter
       Counter()['a']
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - 0
@@ -375,7 +374,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 ***** elements()
       返回含所有元素个数>0的元素组成的iterable对象，其如果有N个“X”，则
       含N个“X”元素（顺序不定）：
-
+      
       #+BEGIN_SRC python :session
         from collections import Counter
         c = Counter(a=4, b=2, c=0, d=-2)
@@ -388,21 +387,21 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       - >>> <itertools.chain object at 0x7fdbe62242b0>
       - ['a', 'a', 'a', 'a', 'b', 'b']
       #+END_SRC
-
+      
 ***** most_common([n])
       返回元素个数最多的前N个元素及其个数组成的链表，如果缺省N参数，则
       返回全部元素。默认从大到小排序：
-
+      
       #+BEGIN_SRC python :session
         from collections import Counter
-        Counter('abracadabra').most_common(3)
+        Counter('abracadabra').most_common(2)
       #+END_SRC
-
+      
       #+RESULTS:
       #+BEGIN_SRC org
-      - [('a', 5), ('b', 2), ('r', 2)]
+      - [('a', 5), ('b', 2)]
       #+END_SRC
-
+      
 ***** subtract([iterable-mapping])
       将元素个数与另一个映射对象中的对应元素个数相减。都可为负数或0：
 
@@ -418,11 +417,11 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       #+BEGIN_SRC org
       - >>> >>> >>> Counter({'e': 3, 'a': 3, 'b': 0, 'f': -3, 'c': -3, 'd': -6})
       #+END_SRC
-      
+
 **** 与dict类型有差异的方法
 ***** fromkeys(iterable)
       Counter对象无此方法。
-      
+
 ***** update([iterable-or-mapping])
       ITERABLE-OR-MAPPING不为(key, value)形式的集合，而是单个元素组成
       的集合。
@@ -438,7 +437,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       #+BEGIN_SRC org
       - >>> >>> Counter({'c': 2, 'a': 2, 'b': 2, 'e': 1})
       #+END_SRC
-
+      
 **** 常用操作
      
      #+BEGIN_SRC python :eval never
@@ -465,7 +464,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        c & d                           # 个数最少的元素
        c | d                           # 个数最多的元素
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> Counter({'a': 4, 'b': 3})
@@ -476,6 +475,8 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
      单个加/减操作相当于与空Counter对象加/减，并去除个数<=0的元素：
 
+     分别为去掉元素大于等于0/小于等于0的元素。
+
      #+BEGIN_SRC python :session
        from collections import Counter
        c = Counter(a=2, b=-4, c=0)
@@ -483,7 +484,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        c + c2, +c
        c - c2, -c
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> (Counter({'a': 2}), Counter({'a': 2}))
@@ -494,14 +495,14 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 *** class collections. *deque* ([iterable[,maxlen]])
     将ITERABLE中的元素从左到右使用append()方法初始化到新的deque对象中。
     如果缺省ITERABLE参数，返回空的deque对象。
-    
+
     Deque对象为“堆（stack）”和“队列（queue）”的结合体，为
     “doubled-enabled queue”的缩写。在其两端添加和删除元素的效率都为
     O(1)，且线程安全（thread-safe），内存效率高。
-    
+
     尽管list类型也支持相同操作，但只对定长链表有性能优化。在首尾删除和
     添加元素的效率为O(n)。
-    
+
     如果MAXLEN参数为None，deque对象可增长为任意长度。否则，当填满元素
     后再向其中添加元素，相反方向的元素会被自动去除。类似于Unix中的tail
     命令。
@@ -798,9 +799,9 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 **** 其他
      *注意* ：访问deque对象的首位元素效率为O(1)，访问中间元素效率为
      O(n)。所以如果时随机访问元素，建议使用链表。
-
+     
      除上面的方法外，deque对象还支持的操作有：
-
+     
      - iteration
      - len(d)
      - reversed(d)
@@ -808,7 +809,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      - copy.deepcopy(d)
      - in操作
      - 下标访问：d[-1]
-
+       
 *** deque应用举例
     
     - 默认Unix的tail命令：
@@ -828,17 +829,586 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       #+BEGIN_SRC org
       - >>> >>> ... ... ... ... >>> deque(['\n', 'End of The Project Gutenberg Etext of Emma, by Jane Austen\n'], maxlen=2)
       #+END_SRC
-      
-    -
-     
+
+    - 模仿 [[http://en.wikipedia.org/wiki/Moving_average][Moving_average]] ：
+
+      #+BEGIN_SRC python :session
+        from itertools import islice
+        from collections import deque
+
+        def moving_average(iterable, n=3):
+            it = iter(iterable)
+            d = deque(islice(it, n - 1))
+            # print(list(it))
+            d.appendleft(0)
+            s = sum(d)
+            # print(s)
+            for elem in it:
+                s += elem - d.popleft()
+                # print(s)
+                d.append(elem)
+                yield s / n
+
+        print(list(moving_average([40, 30, 50, 46, 39, 44])))
+      #+END_SRC
+
+      #+RESULTS:
+      #+BEGIN_SRC org
+      - >>> >>> ... ... ... ... ... ... ... ... ... ... ... ... >>> [40.0, 42.0, 45.0, 43.0]
+      #+END_SRC
+
+    - 只有python代码实现del d[n]：
+
+      #+BEGIN_SRC python :eval never
+        from collections import deque
+
+        def delete_nth(d, n):
+            d.rotate(-n)
+            d.popleft()
+            d.rotate(n)
+      #+END_SRC
+
 ** defaultdict对象
+*** class collections. *defaultdict* ([default_factory[,...]])
+    返回一个新的类字典对象。default为内置dict类的子类，支持dict类型的
+    所有用法。
+
+    第一个参数DEFAULT_FACTORY为新建对象同名属性，默认为None。剩余所有
+    你参数都被视作创建dict对象时的参数。
+
+**** __missing__(key)
+     在dict类型上新增的操作。
+
+     如果default_factory属性为None，不管KEY是否存在于当前实例上，都会
+     抛出KeyError错误。
+
+     如果如果default_factory不为，不管KEY是否存在于当前实例上，调用不
+     带参数的default_factory函数，将其作为KEY对应值。
+
+     如果调用default_factory时抛出任何错误，不做任何修改向上冒泡。
+
+     当KEY不存在时，此方法由dict类的__getitem__()方法调用。任何返回值
+     或错误抛出都由__getitem__()函数返回或抛出。
+
+     此方法只由__getitem__()方法调用。所有使用get()方法时与普通字典相
+     同，即如果不存在指定key，则返回默认值（默认为None），而不会调用
+     default_factory。
+
+**** default_factory
+     可写属性，供__missing__()方法使用。为不带参数的可调用对象，默认值
+     为None。
+
 *** defaultdict应用举例
+**** 构建链表字典
+
+     #+BEGIN_SRC python :session
+       from collections import defaultdict
+
+       s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+       d = defaultdict(list)
+       for k, v in s:
+           d[k].append(v)
+
+       print(sorted(d.items()))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> ... ... >>> [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+     #+END_SRC
+
+     当第一次遇见K时，使用default_factory指定的函数list创建空链表，再
+     使用链表的append()方法将对应元素添加带链表中。如果再遇见相同K，则
+     与普通字典查找方式相同。
+
+     此方法比使用dict.setdefault()方法快：
+
+     #+BEGIN_SRC python :session
+       d = {}
+       s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+       for k, v in s:
+           d.setdefault(k, []).append(v)
+
+       print(sorted(d.items()))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... ... >>> [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+     #+END_SRC
+
+**** 历遍计数
+     由于不带参数的int()函数始终返回0，所以当K不存在时将对应值设置为0，
+     再与当前值相加。
+
+     #+BEGIN_SRC python :session
+       from collections import defaultdict
+       s = 'mississippi'
+       d = defaultdict(int)
+       for k in s:
+           d[k] += 1
+
+       print(sorted(d.items()))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... >>> [('i', 4), ('m', 1), ('p', 2), ('s', 4)]
+     #+END_SRC
+
+**** 与lambda连用
+     如上例使用int设置默认值为常量的形式，如果使用lambda构建常量函数更
+     灵活，且速度更快。使用lambda改写上例为：
+     
+     #+BEGIN_SRC python :session
+       from collections import defaultdict
+
+       def constant_factory(value):
+           return lambda: value
+
+       d = defaultdict(constant_factory(0))
+       for k in 'mississippi':
+           d[k] += 1
+
+       print(sorted(d.items()))
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... >>> >>> >>> ... ... >>> [('i', 4), ('m', 1), ('p', 2), ('s', 4)]
+     #+END_SRC
+
+     再如：
+     
+     #+BEGIN_SRC python :session
+       d = defaultdict(constant_factory('<missing>'))
+       d.update(name='john', action='ran')
+       print('{name}s {action}s to {object}s'.format(**d))
+       print(d.items())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> johns rans to <missing>s
+     - dict_items([('action', 'ran'), ('name', 'john'), ('object', '<missing>')])
+     #+END_SRC
+     
+**** 构建集合字典
+     
+     #+BEGIN_SRC python :session
+       from collections import defaultdict
+       d = defaultdict(set)
+       s = [('red', 1), ('blue', 2), ('red', 3), ('blue', 4), ('red', 1), ('blue', 4)]
+       for k, v in s:
+           d[k].add(v)
+
+       print(d.items())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... >>> dict_items([('blue', {2, 4}), ('red', {1, 3})])
+     #+END_SRC
+
 ** namedtuple() - 元组工厂函数
+   为元组每个元素添加“域名（field name）”，增加可读性。支持元组的所有
+   操作，并添加用域名获取元素的功能。
+   
+*** collections. *namedtuple* (typename,filed_names,verbose=False,rename=False)
+    返回以TYPENAME命名的元组子类。可使用域名访问元素，也可使用下标访问
+    元素进行历遍。
+    
+    FILED_NAMES可为单个字符串，各域名由空格或/和逗号隔开的字符串，如'x
+    y'或'x, y'。也可为字符串链表，如['x', 'y']。
+    
+    除关键字如class、for等，以下划线开始的识别符外，任何有效Python识别
+    符都可作为TYPENAME。
+    
+    如果RENAME参数为True，无效的FIELD_NAME会自动转换为位置名称：
+    
+    #+BEGIN_SRC python :session
+      from collections import namedtuple
+      X = namedtuple('X', ['abc', 'def', 'ghi', 'abc'], rename=True)
+      print(X(1, 2, 3, 4))
+    #+END_SRC
+    
+    如果VERBOSE参数为True，创建namedtuple对象后，会打印定义该
+    namedtuple的源码。（将废除，可使用_source属性获取。）
+    
+    #+BEGIN_SRC python :eval never
+      print(X._source)
+    #+END_SRC
+    
+    *注意* ：namedtuple对象内部没有实现字典，所以与普通元组一样轻量。
+    
+    基本示例：
+    
+    #+BEGIN_SRC python :session
+      from collections import namedtuple
+      Point = namedtuple('Point', 'x y')
+      p = Point(1, y=2)               # 使用位置参数和关键字参数创建实例
+      print(p[0] + p[1])              # 同普通元组一样可使用数字下标
+      x, y = p                        # 同普通元组一样结构
+      print(x, y)
+      p.x + p.y                       # 使用域名获取元素
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 3
+    - >>> 1 2
+    - 3
+    #+END_SRC
+    
+    namedtuple特别适合于将csv和sqlite3的返回值赋值给元素：
+    
+    #+BEGIN_SRC python :eval never
+      from collections import namedtuple
+      EmployeeRecord = namedtuple(
+          'Employeerecord', 'name, age, title, department, paygrade')
+
+      import csv
+      for emp in map(EmployeeRecord._make, csv.reader(open('employees.csv', 'rb'))):
+          print(emp.name, emp.title)
+
+      import sqlite3
+      conn = sqlite3.connect('/companydata')
+      cursor = conn.cursor()
+      cursor.execute('SELECT name, age, title, department, paygrade FROM employees')
+      for emp in map(EmployeeRecord._make, cursor.fetchall()):
+          print(emp.name, emp.title)
+    #+END_SRC
+    
+    除普通元组的方法和属性外，namedtuple还添加了下面3个方法和2个属性。
+    为避免与域名重名，都以下划线开头：
+    
+**** classmethod somenamedtuple._make(iterable)
+     模块函数，使用ITERABLE序列或iterable对象创建新对象。
+
+     #+BEGIN_SRC python :session
+       from collections import namedtuple
+       Point = namedtuple('Point', 'x, y')
+       t = [11, 22]
+       p1 = Point._make(t)
+       print(p1)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> Point(x=11, y=22)
+     #+END_SRC
+
+**** somenamedtuple._asdict()
+     将namedtuple对象返回为OrderedDict对象：
+
+     #+BEGIN_SRC python :session
+       from collections import namedtuple
+       P = namedtuple('P', 'x, y')
+       p1 = P._make([11, 22])
+       print(p1._asdict())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> OrderedDict([('x', 11), ('y', 22)])
+     #+END_SRC
+
+**** somenamedtuple._replace(kwargs)
+     替换KWARGS指定的元素和值，返回新的namedtuple对象：
+     
+     #+BEGIN_SRC python :session
+       from collections import namedtuple
+       Point = namedtuple('Point', 'x, y')
+       p1 = Point(1, 2)
+       p2 = p1._replace(x=100)
+       print(p1, p2)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> Point(x=1, y=2) Point(x=100, y=2)
+     #+END_SRC
+
+**** somenamedtuple._source
+     返回构建namedtuple类的源码。可由于exec()函数执行，可保存到文件
+     import。
+
+**** somenamedtuple._fields
+     返回由域名组成的元组。可用于查看，或利用已有的namedtuple创建新的
+     namedtuple。
+
+     #+BEGIN_SRC python :session
+       from collections import namedtuple
+       Color = namedtuple('Color', 'red green, blue')
+       Point = namedtuple('Point', 'x y')
+       Pixel = namedtuple('Pixel', Point._fields + Color._fields)
+       print(Color._fields)
+       print(Point._fields)
+       print(Pixel._fields)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> ('red', 'green', 'blue')
+     - ('x', 'y')
+     - ('x', 'y', 'red', 'green', 'blue')
+     #+END_SRC
+     
+*** 举例
+    可使用getattr()获取域名对应值：
+    
+    #+BEGIN_SRC python :session
+      from collections import namedtuple
+      Point = namedtuple('Point', 'x y')
+      p = Point(1, 2)
+      getattr(p, 'x')
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 1
+    #+END_SRC
+    
+    利用字典初始化实例：
+    
+    #+BEGIN_SRC python :session
+      d = {'x': 11, 'y': 22}
+      print(Point(**d))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - Point(x=11, y=22)
+    #+END_SRC
+    
+    由于namedtuple本身为一般的Python类，所以可通过声明子类添加和更改功
+    能。
+    
+    #+BEGIN_SRC python :session
+      from collections import namedtuple
+
+      class Point(namedtuple('Point', 'x y')):
+          __slots__ = ()
+          @property
+          def hypot(self):
+              return (self.x**2 + self.y**2) ** 0.5
+          def __str__(self):
+              return 'Point: x={:6.3f} y={:6.3f} hypot={:6.3f}'.format(self.x, self.y, self.hypot)
+
+      for p in Point(3, 4), Point(14, 5 / 7):
+          print(p)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... ... ... >>> >>> ... ... Point: x= 3.000 y= 4.000 hypot= 5.000
+    - Point: x=14.000 y= 0.714 hypot=14.018
+    #+END_SRC
+    
+    *注意* ：上例将__slots__属性设置为空元组目的是防止创建实例字典，减
+    少内存消耗。
+    
+    如果要添加域名，使用__fields属性不创建子类更有用：
+
+    #+BEGIN_SRC python :eval never
+      Point3D = namedtuple('Point3D', Point_fileds + ('Z',))
+    #+END_SRC
+
+    可定制实例及其域名的__doc__属性。（可以help(Book)查看结果）：
+
+    #+BEGIN_SRC python :eval never
+      from collections import namedtuple
+      Book = namedtuple('Book', 'id title authors')
+      Book.__doc__ += '：预售书籍'
+      Book.id.__doc__ = '13位ISBN编号'
+      Book.title.__doc__ = '第一版书名'
+      Book.authors.__doc__ = '由于所有作者名组成的链表'
+      # help(Book)
+    #+END_SRC
+
+    可创建原型实例实现默认值，再使用_replace()方法定制：
+
+    #+BEGIN_SRC python :session
+      from collections import namedtuple
+      Account = namedtuple('Account', 'owner balance transaction_count')
+      default_account = Account('<owner name>', 0.0, 0)
+      johns_account = default_account._replace(owner='John')
+      janes_account = default_account._replace(owner='Janes')
+      print(default_account)
+      print(johns_account)
+      print(janes_account)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> >>> Account(owner='<owner name>', balance=0.0, transaction_count=0)
+    - Account(owner='John', balance=0.0, transaction_count=0)
+    - Account(owner='Janes', balance=0.0, transaction_count=0)
+    #+END_SRC
+
 ** OrderedDict对象
+   OrderedDict只是在dict的基础上，添加记忆元素参数位置的功能。遍历时，
+   返回元素顺序与第一次插入时一样。
+   
+*** class collections. *OrderedDict* ([items])
+    返回dict子类实例，支持dict的一般方法。OrderedDict会记录key第一次插
+    入的位置。如果重写已存在的key，不会改变位置；如果删除再插入key，则
+    会添加到最后。
+    
+**** popitem(last=True)
+     返回并删除键值对。如果LAST为True，顺序为LIFO；如果为False，顺序为
+     FIFO。
+
+     #+BEGIN_SRC python :session
+       from collections import OrderedDict
+       d = OrderedDict.fromkeys('abcd')
+       d.popitem()
+       d.popitem(False)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ('d', None)
+     - ('a', None)
+     #+END_SRC
+
+**** move_to_end(key,last=True)
+     将已存在的key移动到两端。如果LAST参数为True，移动到最后；如果为
+     False，则移动到最前。
+     
+     #+BEGIN_SRC python :session
+       from collections import OrderedDict
+       d = OrderedDict.fromkeys('abcd')
+       d.move_to_end('b')
+       print(''.join(d.keys()))
+       d.move_to_end('b', last=False)
+       print(''.join(d.keys()))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> acdb
+     - >>> bacd
+     #+END_SRC
+     
+**** 其他
+     除普通的dict映射方法外，OrderedDict还支持reversed()操作。
+
+     OrderedDict之间的相等比较会考虑元素顺序，与普通dict之间的相等比较
+     不会考虑顺序。
+
+     *注意* ：当OrderedDict和update()使用关键字参数创建和更新
+     OrderedDict实例时，不会记忆元素顺序。因为如果参数为关键字参数，实
+     际上是将参数传递给普通dict。
+     
+     OrderedDict的键、值和键值对view也支持reversed()操作。
+
 *** OrderedDict应用举例
+    由于可记录元素顺序，可利用sorted将字典转换为排序版本：
+    
+    #+BEGIN_SRC python :session
+      from collections import OrderedDict
+      d = {'banana': 3, 'apple': 4, 'pear': 1, 'orange': 2}
+
+      # 按key排序
+      OrderedDict(sorted(d.items(), key=lambda x: x[0]))
+      # 按value排序
+      OrderedDict(sorted(d.items(), key=lambda x: x[1]))
+      # 按key字符串的长度排序
+      OrderedDict(sorted(d.items(), key=lambda x: len(x[0])))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... OrderedDict([('apple', 4), ('banana', 3), ('orange', 2), ('pear', 1)])
+    - ... OrderedDict([('pear', 1), ('orange', 2), ('banana', 3), ('apple', 4)])
+    - ... OrderedDict([('pear', 1), ('apple', 4), ('orange', 2), ('banana', 3)])
+    #+END_SRC
+    
+    当key被删除后，其他key的顺序保持不变；当新增key时，添加到末尾，会
+    破坏顺序。
+    
+    通过子类可实现：插入key时，不管是否已存在，将其添加到最后。
+
+    #+BEGIN_SRC python :eval never
+      from collections import OrderedDict
+      class LastUpdatedOrderedDict(OrderedDict):
+          '不管是否已存在，插入key时都添加到最后。'
+          def __setitem__(self, key, value):
+              if key in self:
+                  del self[key]
+              OrderedDict.__setitem__(self, key, value)
+    #+END_SRC
+
+    与Counter类一起使用，使Counter对象记录元素插入顺序：？？？
+
+    #+BEGIN_SRC python :session
+      from collections import Counter, OrderedDict
+
+      class OrderedCounter(Counter, OrderedDict):
+          def __repr__(self):
+              return '{!s}({!r})'.format(self.__class__.__name__, OrderedDict(self))
+          def __reduce__(self):
+              return self.__class__, (OrderedDict(self),)
+
+      x = OrderedCounter('mississippi')
+      print(x)
+      x.__reduce__()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... >>> >>> >>> OrderedCounter(OrderedDict([('m', 1), ('i', 4), ('s', 4), ('p', 2)]))
+    - (<class '__main__.OrderedCounter'>, (OrderedDict([('m', 1), ('i', 4), ('s', 4), ('p', 2)]),))
+    #+END_SRC
+
 ** UserDict对象
-** UserList对象
-** UserString对象
+   UserDict相当于普通字典的包装器。可通过子类声明的方法取代这个类型；
+   不过UserDict对象上可使用data属性获取原来字典对象，使用起来更容易。
+   
+*** class collections. *UserDict* ([initial-data])
+    模仿dict的类。实例内容保存在普通字典内，可通过data属性获取。如果
+    有INITIAL-DATA参数，则data属性初始化为该值。
+
+    *注意* ：不会保存INITIAL-DATA的指针，使其可用于其他操作。
+
+    #+BEGIN_SRC python :session
+      from collections import UserDict
+
+      d = {'a': [1, 2, 3], 'b': 'ABC'}
+      ud = UserDict(d)
+      print(ud)
+
+      # 更改通过指针传递的value会改变原来对象
+      ud['a'].append(4)
+      print(d)
+
+      # 添加键值对不会改变原来对象
+      ud['c'] = 'XYZ'
+      print(ud)
+      print(d)
+
+      d['Z'] = 'abc'
+      print(ud)
+
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> {'b': 'ABC', 'a': [1, 2, 3]}
+    - >>> ... >>> {'b': 'ABC', 'a': [1, 2, 3, 4]}
+    - >>> ... >>> {'c': 'XYZ', 'b': 'ABC', 'a': [1, 2, 3, 4]}
+    - {'b': 'ABC', 'a': [1, 2, 3, 4]}
+    - >>> >>> >>> {'c': 'XYZ', 'b': 'ABC', 'a': [1, 2, 3, 4]}
+    #+END_SRC
+
+    除普通的字典操作外，UserDict对象还添加了data属性：
+
+**** data
+     用于存储UserDict内容的真正字典。
+
+** UserList对象 （待续）
+** UserString对象 （待续）
 * collections.abc - 容器类型抽象基础类（Abstract Base Classes for Containers）
 * heapq - 堆排序算法
 * bisect - 数组二叉树搜索算法
