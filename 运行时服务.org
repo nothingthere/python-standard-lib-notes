@@ -4,23 +4,24 @@
 #+TITLE: 运行时服务（Runtime Services）
 
 * sys - 系统参数和函数
+  
 * sysconfig - 提供Python的配置信息
 * builtins - 内置对象
 * __main__ - 顶层脚本环境
 * warnings - 警告控制
 * contextlib - with语句上下文环境工具
   此模块提供使用with声明相关的常用工具。
-  
+
 ** 工具
-   
+
    工具函数和类。
-   
+
 *** @contextlib. *contextmanager*
     此函数为装饰器，可用作为with声明的上下文管理器定义工厂函数，无需创
     建新类或单独的__enter__()和__exit__()方法。
-    
+
     下面为一个简单例子（不建议使用此方法生成HTML！）：
-    
+
     #+BEGIN_SRC python :session
       from contextlib import contextmanager
 
@@ -34,7 +35,7 @@
           with tag('h1'):
               print('一级标题')
     #+END_SRC
-    
+
     #+RESULTS:
     :
     : >>> ... ... ... ... ... >>> ... ... ... <div>
@@ -42,19 +43,19 @@
     : 一级标题
     : </h1>
     : </div>
-    
+
     被装饰的函数被调用时需返回一个“生成器迭代器”。此迭代器需只yield一
     个值，用于赋值with表达式中as后的变量。
-    
+
     包含在with语句中时，执行顺序为：yield语句前的代码, with语句中的表
     达式，yield后的代码。即相当于将with语句中的表达式嵌套在了yield处。
     所以，可使用try-except-finally表达式捕捉错误（如果有），或者保证一
     些清空行为（如关闭文件对象）。
-    
+
     contextmanager()使用ContextDecorator创建，所以其创建的上下文管理器
     可用作装饰器，及在with语句中使用。当被用作装饰器时，函数每次调用都
     会创建一个新的生成器对象。
-    
+
 *** contextlib. *closing* (thing)
     执行完代码块后，返回一个关闭THING的上下文管理器。基本上相当于：
 

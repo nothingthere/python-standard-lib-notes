@@ -2423,7 +2423,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
 *** array. *tolist* ()
     将数组转换为普通链表。
-    
+
     #+BEGIN_SRC python :session
       from array import array
 
@@ -2434,16 +2434,16 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     #+RESULTS:
     :
     : >>> >>> [1, 2, 3]
-
+    
 *** array. *tostring* ()
     已废除，新名为tobytes()。
-
+    
     #+BEGIN_SRC python :session
       from array import array
       a = array('i', [1, 2, 3])
       a.tostring()
     #+END_SRC
-
+    
     #+RESULTS:
     :
     : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
@@ -2457,34 +2457,298 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       a = array('u', '我有一个梦想！')
       a.tounicode()
     #+END_SRC
-
+    
     #+RESULTS:
     :
     : >>> '我有一个梦想！'
-
-* weakref
-  
+    
+* weakref - 弱引用
   [[http://stackoverflow.com/questions/1507566/how-and-when-to-appropriately-use-weakref-in-python]]
+  
+  #+BEGIN_QUOTE
+  Python采用计数制进行垃圾回收，即对象被引用的次数为0时被回收。
+  #+END_QUOTE
+  
+  使用weakref模块可为对象创建弱引用。
+  
+  一个对对象的弱引用并不足够使对象保持存活：当对象的被引用只剩弱引用时，
+  就可以被回收，重用所占内存。但是，直到该对象被真正销毁前，即时没有强
+  引用，弱引用也可返回该对象。
+  
+  弱引用的主要用途为实现对大型对象的缓存和映射。因为只需大型对象存在于
+  缓存或映射中，不需保持存活。
+  
+  比如，如需将多个大型二进制图像对象与名称映射，如果使用Python字典将名
+  称映射为图像对象，或图像对象映射为名称，由于图像对象为字典的键或值，
+  会一直保持存活。这时，可使用weakref模块的WeakKeyDictionary和
+  WeakValueDictionary，这样就图像对象就不会一直存活。比如将图像对象作
+  为WeakValueDictionary的value值，当对图像对象的引用只剩该弱映射引用时，
+  就可被垃圾回收，在映射中的节点也被删除。
+  
+  WeakKeyDictionary和WeakValueDictionary中，可设置回调函数，当弱引用对
+  象被删除时执行。WeakSet实现了set类型接口，对set对象的元素进行弱引用。
+  
+  使用finalize可直接为对象注册函数，当被回收后调用。比直接在原生弱引用
+  对象上声明回调函数更简单，因为即时被引用对象被回收，finalize对象依然
+  存在。
+  
+  对绝大多数程序而言，上面的3个弱引用容器和finalize就够用，没必要手动
+  创建弱引用机制。weakref模块暴露底层机制只为高级用法。
+  
+  不是所有对象都支持被弱引用。支持的有：类实例、Python函数（非C函数）、
+  实例方法、set、frozenset、一些文件对象、生成器（generator）、类型对
+  象、socket、array、deque、正则匹配对象和代码对象。
+  
+  如list和dict这样的内置类型不能直接支持弱引用，不过可通过子类实现：
+  
+  #+BEGIN_SRC python :eval never
+    class Dict(dict):
+        pass
+
+    obj = Dict(read=1, green=2, blue=3)  # 此对象支持弱引
+  #+END_SRC
+  
+  其他如tuple和int的内置类型即使通过子类也无法支持弱引用。
   
 ** 函数
 *** class weakref. *ref* (object[,callback])
+    返回一个弱引用对象。如果被引用对象依然存活，调用此弱引用对象返回被
+    引用对象；如果被引用对象不再存活，调用此引弱用对象返回None。
+    
+    如果提供CALLBACK参数且不为None，当返回的弱引用对象将被终结时调用，
+    只有一个表示弱引用对象的参数。调用后，返回的弱引用对象不再存在。
+    
+    如果允许为相同对象创建弱引用，回调函数会从最后添加的开始调用。
+    
+    如果被引用对象相等，则返回的弱引用对象也相等，不受回调函数影响。当
+    某个被应用对象被删除后，只有引用相同对象的弱引用对象才相等。
     
     #+BEGIN_SRC python :session
       from weakref import ref
       s = {1, 2, 3}
-      s_ref = ref(s, lambda x: print(x, 'deleted'))
-      print(s_ref)
+
+      def about_to_del1(obj):
+          print('1：弱引用对象：{} 被删除'.format(obj))
+
+      def about_to_del2(obj):
+          print('2：弱引用对象：{} 被删除'.format(obj))
+
+      x = ref(s, about_to_del1)
+      y = ref(s, about_to_del2)
+
+      x == y
+
       del s
+      print('被引用对象不再存活后：')
+      print(x(), y())
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> <weakref at 0x7ff1f4bea318; to 'set' at 0x7ff1f4c5ef28>
-    - <weakref at 0x7ff1f4bea318; dead> deleted
+    - >>> >>> ... ... >>> ... ... >>> >>> >>> >>> True
+    - >>> 2：弱引用对象：<weakref at 0x7f2a31754458; dead> 被删除
+    - 1：弱引用对象：<weakref at 0x7f2a317544a8; dead> 被删除
+    - 被引用对象不再存活后：
+    - None None
     #+END_SRC
-    
+
 **** __callback__
+     自读属性，返回弱引用对象创建时的CALLBACK参数。如果没有CALLBACK参
+     数，或被引用对象不再存在，此属性值为None。
+
+     #+BEGIN_SRC python :session
+       from weakref import ref
+       s = set((1, 2, 3))
+
+       def callback(ref_obj):
+           print(ref_obj)
+
+       x = ref(s, callback)
+       print(x.__callback__)
+       del s
+       print(x.__callback__)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - <weakref at 0x7f2a31754598; dead>
+     - >>> ... ... >>> >>> <function callback at 0x7f2a3103b510>
+     - <weakref at 0x7f2a317544a8; dead>
+     - None
+     #+END_SRC
+
 *** weakref. *proxy* (object[,callback])
+    使用弱引用返回OBJECT的代理对象。返回值的类型取决与OBJECT是否为
+    callble类型为ProxyType或CallableProxyType。不管被引用对象是否可哈
+    希，返回的代理对象都不可哈希。
+
+    #+BEGIN_SRC python :session
+      from weakref import proxy
+
+      s = set([1, 2, 3])
+      sp = proxy(s)
+      s.add(4)
+      sp.add(5)
+      del sp
+      print(s)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> >>> >>> >>> {1, 2, 3, 4, 5}
+    #+END_SRC
+
+*** weakref. *getweakrefcount* (obj)
+    返回一个对象被弱引用和代理的次数。
+    
+    #+BEGIN_SRC python :session
+      from weakref import *
+      s = set([1, 2, 3])
+      getweakrefcount(s)
+      x = ref(s)
+      getweakrefcount(s)
+      y = proxy(s)
+      getweakrefcount(s)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> 0
+    - >>> 1
+    - >>> 2
+    #+END_SRC
+
+*** weakref. *getweakrefs* (obj)
+    返回OBJ弱引用和代理的对象链表。
+
+    #+BEGIN_SRC python :session
+      from weakref import *
+      s = set([1, 2, 3])
+      getweakrefs(s)
+      x = ref(s)
+      getweakrefs(s)
+      y = proxy(s)
+      getweakrefs(s)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> []
+    - >>> [<weakref at 0x7f2a31754458; to 'set' at 0x7f2a31732e48>]
+    - >>> [<weakref at 0x7f2a31754458; to 'set' at 0x7f2a31732e48>, <weakproxy at 0x7f2a317544a8 to set at 0x7f2a31732e48>]
+    #+END_SRC
+
+*** class weakref. *WeakKeyDictionary* ([dict])
+    
+    key为弱引用的映射类。当字典中的key没有强引用时，对应键值对会被删除。
+    可用来映射应用中其他部分的数据。
+    
+    #+BEGIN_QUOTE
+    *注意* ：WeakKeyDictionary构建在普通字典基础上。在遍历时，有可能某
+    些键值对被回收，所以不能遍历所有元素。
+    #+END_QUOTE
+    
+    #+BEGIN_SRC python :session
+      from weakref import *
+
+      def foo(): pass
+
+      def bar(): pass
+
+      wd = WeakKeyDictionary({foo: 1, bar: 2})
+      foo = None
+      print(list(wd.keys()))
+
+      # 不使用弱引用时，即时原来作为key值的函数被删除后，依然存在于字典中
+      def foo(): pass
+
+      def bar(): pass
+
+      d = ({foo: 1, bar: 2})
+      foo = None
+      print(list(d.keys()))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... >>> ... >>> >>> >>> [<function bar at 0x7f2a3103b598>]
+    - >>> ... ... >>> ... >>> >>> >>> [<function bar at 0x7f2a3103b620>, <function foo at 0x7f2a3103b378>]
+    #+END_SRC
+
+**** WeakKeyDictionary. *keyrefs* ()
+     获取当前存在的弱引用key，可用来检查是否有key被回收。
+
+     #+BEGIN_SRC python :session
+       from weakref import *
+
+       def foo(): pass
+
+       def bar(): pass
+
+       wd = WeakKeyDictionary({foo: 1, bar: 2})
+       print(wd.keyrefs())
+       foo = None
+       print(wd.keyrefs())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... >>> ... >>> >>> [<weakref at 0x7f2a31754598; to 'function' at 0x7f2a3103b6a8 (foo)>, <weakref at 0x7f2a31754728; to 'function' at 0x7f2a3103b7b8 (bar)>]
+     - >>> [<weakref at 0x7f2a31754728; to 'function' at 0x7f2a3103b7b8 (bar)>]
+     #+END_SRC
+     
+*** class weakref. *WeakValueDictionary* ([dict])
+**** WeakValueDictionary *valuerefs* ()
+     用法同WeakKeyDictionary。
+*** class weakref. *WeakSet* ([elements])
+    对元素弱引用的集合类。如果某个元素上没有强引用，则在集合中被删除。
+
+    #+BEGIN_SRC python :session
+      from weakref import WeakSet
+
+      def foo(): pass
+
+      def bar(): pass
+
+      ws = WeakSet([foo, bar])
+      del foo
+      for x in ws:
+          print(x)
+
+      print('不使用弱引用：')
+
+      def foo(): pass
+
+      def bar(): pass
+
+      ws = set([foo, bar])
+      del foo
+      for x in ws:
+          print(x)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f2a3103b6a8>
+    - 不使用弱引用：
+    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f2a3103b7b8>
+    - <function foo at 0x7f2a3103b2f0>
+    #+END_SRC
+
+*** class weakref. *WeakMethod* (method)
+    
+*** class weakref. *finalize* (obj,func,*args,**kwargs)
+    
+**** __call__()
+**** detach()
+**** peak()
+**** alive
+**** atexit
+*** weakref. *ReferenceType*
+*** weakref. *ProxyType*
+*** weakref. *CallableProxyType*
+*** weakref. *ProxyTypes*
+*** weakref. *ReferenceError*
 ** Weak Reference对象
 ** 举例
 ** Finalizer对象

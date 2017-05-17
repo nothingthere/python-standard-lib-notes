@@ -3602,49 +3602,49 @@
     : Traceback (most recent call last):
     :   File "<stdin>", line 2, in <module>
     : KeyError: 'pop from an empty set'
-    
+
 *** *clear* ()
     清空set。
-    
+
     #+BEGIN_SRC python :session
       s = set([1, 2, 3])
       s.clear()
       print(s)
     #+END_SRC
-    
+
     #+RESULTS:
     :
     : >>> set()
-    
+
     *注意* ：
-    
+
     - update、intersection_update、difference_update和
       symmetric_difference_update方法可接受任意iterable类型作为参数。
-      
+
     - __contains__()、remove()和discard()的参数可以是frozenset对象。为
       做比较，在搜索和重置过程中ELEM为mutable形式。在搜索过程中不要读
       取或改变此元素。
-      
+
 * 映射类型（Mapping）-dict
   映射对象可将“可哈希值”映射到任意对象上。映射对象为mutable类型。目前
   为止，Python只有一个标准的映射类型-字典（dict）。
-  
+
   除“不可哈希”类型，即含链表，字典或其他mutable类型（比较时使用值比较，
   而不是内存比较）外，都可用作字典的key值。当使用数数字作为key值时，使
   用值比较，如1和1.0都可映射到同一值。（由于计算机存储浮点数实际上是存
   储的近似值，所以最好不要用浮点数作为key值。）
-  
+
   除dict构造器外，可使用使用字面量形式创建字典：
-  
+
   #+BEGIN_SRC python :session
     d = {'name': 'claudio', 'age': 18, 'gender': 'male'}
   #+END_SRC
-  
+
 ** class *dict* (**kwarg)
 ** class *dict* (mapping,**kwarg)
 ** class *dict* (iterable,**kwarg)
    根据可选参数和关键字参数返回新的字典对象。
-   
+
    - 如果没有参数，返回空字典。
    - 如果只有一个参数：
      - 如果为映射对象，则新生成字典与其有相同的键值对。
@@ -3654,9 +3654,9 @@
    - 如果有关键字参数，则各个关键字参数成为字典的键值对。如果不只第一
      个参数，则添加到第一个参数生成的字典后；如果key值有重复。则关键字
      参数的值成为最终值。
-     
+
    为演示不同构建方法，下面每种方法都会生成相同的字典：
-   
+
    #+BEGIN_SRC python :session
      a = dict(one=1, two=2, three=3)
      b = {'one': 1, 'two': 2, 'three': 3}

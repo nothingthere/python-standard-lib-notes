@@ -1157,14 +1157,14 @@
     print(l.reverse())
     print(l)
   #+END_SRC
-  
+
   #+RESULTS:
   :
   : [3, 2, 1]
   : [1, 2, 3]
   : >>> None
   : [3, 2, 1]
-  
+
 * *round* (number[,ndigits])
   返回小数点后有ndigits个数的浮点数。如果无ndigits参数或为None，则返
   回最近的整数。
@@ -1195,30 +1195,31 @@
   : {1, 2, 3}
 
 * *setattr* (object,name,value)
-   与getattr()相反。参数分别为object、字符串和任意值。string可以是
-   object已有的属性名，也可是新属性名。setattr(x, 'foobar', '123')相当
-   于x.foobar = 123。
+  与getattr()相反。参数分别为object、字符串和任意值。string可以是
+  object已有的属性名，也可是新属性名。setattr(x, 'foobar', '123')相当
+  于x.foobar = 123。
 
-   #+BEGIN_SRC python :session
+  #+BEGIN_SRC python :session
      o = object()
-     setattr(o, 'foo', 'bar')
-     print(o.foo)
-   #+END_SRC
 
-   #+RESULTS:
-   :
-   : Traceback (most recent call last):
-   :   File "<stdin>", line 1, in <module>
-   : AttributeError: 'object' object has no attribute 'foo'
-   : Traceback (most recent call last):
-   :   File "<stdin>", line 1, in <module>
-   : AttributeError: 'object' object has no attribute 'foo'
+     class T:
+         pass
+
+     t = T()
+     setattr(t, 'foo', 'bar')
+     print(t.foo)
+  #+END_SRC
+
+  #+RESULTS:
+  #+BEGIN_SRC org
+   - >>> >>> >>> ... ... >>> >>> >>> >>> bar
+  #+END_SRC
 
 * class *slice* (stop)？？？
 * class *slice* (start,stop,[,step])
   其实x[a:b:c]内部就是使用的此slice类进行截断。返回与原来相同的数据类
   型。如需返回iterator对象，可使用itertools.islice()方法。
-  
+
   #+BEGIN_SRC python :session
     from itertools import islice
     data = 'abcdefgh'
@@ -1229,14 +1230,14 @@
     myslice = slice(3, None, 2)
     data[myslice]
   #+END_SRC
-  
+
   #+RESULTS:
   #+BEGIN_SRC org
   - >>> >>> 'abc'
   - >>> 'defgh'
   - >>> 'dfh'
   #+END_SRC
-  
+
 * *sorted* (iterable[,key][,reverse])
   返回排序后的iterable对象。
 
