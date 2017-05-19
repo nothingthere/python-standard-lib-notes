@@ -1,0 +1,700 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-19 11:23:35
+# Commentary:
+#+TITLE: 文件和文件夹操作
+
+* pathlib - 面向对象的文件系统路径
+  此模块提供不同系统表示文件系统的类。路径类分为两类，对I/O没有操作的
+  纯路径计算操作Pure Path，和继承于Pure Path，对I/O有操作的Concrete
+  Path。
+  
+  如果从来没使用过此模块，或不确定使用哪个类，最好选用Path类。它实例
+  化了当前环境中的Concrete Path。
+  
+  Pure Path在一些特殊情况下有用。如：
+  
+   - 如需在Unix系统下操作Window路径（反之亦然），不能在Unix系统上实例
+     化WindowsPath类，但可以实例化PureWindowsPath。
+   - 如需保证代码操作路径同时，不与操作系统产生交互，可实例化纯路径类。
+     
+** 基本用法
+   导入主类：
+   
+   #+BEGIN_EXAMPLE python
+     >>> from pathlib import Path
+   #+END_EXAMPLE
+   
+   列出当前子文件夹：
+   
+   #+BEGIN_EXAMPLE python
+     >>> [x for x in p.iterdir() if x.is_dir()]
+     [...]
+   #+END_EXAMPLE
+   
+   列出当前文件夹中的所有Python源码文件：
+   
+   #+BEGIN_EXAMPLE python
+     >>> list(p.glob('**/*.py'))
+     [PosixPath('test.py')]
+   #+END_EXAMPLE
+   
+   浏览在文件夹中：
+   
+   #+BEGIN_EXAMPLE python
+     >>> p = Path('/etc')
+     >>> q = p/'init.d'/'reboot'
+     >>> q
+     PosixPath('/etc/init.d/reboot')
+     >>> q.resolve()
+     PosixPath('/etc/init.d/reboot')
+   #+END_EXAMPLE
+   
+   获取路径属性：
+   
+   #+BEGIN_EXAMPLE python
+     >>> q.exists()
+     True
+     >>> q.is_dir()
+     False
+     >>> q.is_file()
+     True
+   #+END_EXAMPLE
+   
+   打开文件：
+   
+   #+BEGIN_EXAMPLE python
+     >>> with q.open() as f: f.readline()
+     ...
+     '#! /bin/sh\n'
+   #+END_EXAMPLE
+   
+** 纯路径（Pure Path）
+*** 类
+    纯路径对象可在不真正操作文件系统情况下处理路径。有下面3个类可选。
+
+    因为没有真正操作文件系统，任何操作系统中都可实例化这些对象。
+
+**** class pathlib. *PurePath* (*pathsegments)
+     通用类，根据系统路径特点表示路径（通过调用PurePosixPath或
+     PureWindowsPath实例化）。
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('setup.py')
+       PurePosixPath('setup.py')
+     #+END_EXAMPLE
+
+     PATHSEGMENTS参数可为单个字符串，也可为多个字符串或path对象：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('foo', 'some/path', 'bar')
+       PurePosixPath('foo/some/path/bar')
+       >>> PurePath(Path('foo'), 'bar')
+       PurePosixPath('foo/bar')
+     #+END_EXAMPLE
+
+     如果无参数，则表示当前文件夹：
+
+     #+BEGIN_EXAMPLE
+       >>> PurePath()
+       PurePosixPath('.')
+     #+END_EXAMPLE
+
+     如果有多个决定路径，则最后一个被作为起点：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('etc', '/usr', 'lib64')
+       PurePosixPath('/usr/lib64')
+       >>> PurePath('foo', '/etc', '/bar', 'usr', 'lib64')
+       PurePosixPath('/bar/usr/lib64')
+       >>> PureWindowsPath('c:/Windows', 'd:/bar')
+       PureWindowsPath('d:/bar')
+     #+END_EXAMPLE
+
+     但在Windows形式中，设置根目录不会忽视驱动盘位置：
+
+     #+BEGIN_EXAMPLE python
+       >>> PureWindowsPath('c:/Windows', '/Program Files')
+       PureWindowsPath('c:/Program Files')
+     #+END_EXAMPLE
+
+     多余的单点和斜杠会被自动去除，双点则不会：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('foo//bar')
+       PurePosixPath('foo/bar')
+       >>> PurePath('foo/./bar')
+       PurePosixPath('foo/bar')
+       >>> PurePath('foo/../bar')
+       PurePosixPath('foo/../bar')
+     #+END_EXAMPLE
+
+**** class pathlib. *PurePosixPath* (*pathsegments)
+     PurePath子类，表示非-Windows系统文件路径。
+
+     PATHSEGMENTS参数用法同PurePath。
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('/etc')
+       PurePosixPath('/etc')
+     #+END_EXAMPLE
+
+**** class pathlib. *PureWindowsPath* (*pathsegments)
+     PurePath子类，表示Windows系统文件路径。
+
+     PATHSEGMENTS参数用法同PurePath。
+
+     #+BEGIN_EXAMPLE
+       >>> PureWindowsPath('c:/Proram Files')
+       PureWindowsPath('c:/Proram Files')
+     #+END_EXAMPLE
+
+*** 一般属性
+    Path对象为Immutable类型，可哈希。可同字符串一样进行排序和大小比较。
+    大小写与对应的系统类别相同，即非-Windows类型区分大小写，Windows类
+    型不区分大小写。
+
+    #+BEGIN_EXAMPLE python
+      >>> PurePosixPath('foo') == PurePosixPath('FOO')
+      False
+      >>> PureWindowsPath('foo') == PureWindowsPath('FOO')
+      True
+      >>> PureWindowsPath('foo') in  {PureWindowsPath('FOO')}
+      True
+      >>> PureWindowsPath('c:') < PureWindowsPath('d:')
+      True
+      >>> PureWindowsPath('c:') < PureWindowsPath('D:')
+      True
+    #+END_EXAMPLE
+
+    不同类型的路径形式绝不相等，且不可比较大小：
+
+    #+BEGIN_EXAMPLE
+      >>> PureWindowsPath('foo') == PurePosixPath('foo')
+      False
+      >>> PureWindowsPath('foo') < PurePosixPath('foo')
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        TypeError: unorderable types: PureWindowsPath() < PurePosixPath()
+    #+END_EXAMPLE
+
+*** 操作符
+    使用斜杠可创建子路径：
+
+    #+BEGIN_EXAMPLE python
+      >>> p = PurePath('/etc')
+      >>> p / 'init.d' / 'apache2'
+      PurePosixPath('/etc/init.d/apache2')
+      >>> q = PurePath('bin')
+      >>> '/usr' / q
+      PurePosixPath('/usr/bin')
+    #+END_EXAMPLE
+
+    将Path对象转换为字符串后，斜杠会根据不同系统类型转换：
+    
+    #+BEGIN_EXAMPLE python
+      >>> p = PurePath('/etc')
+      >>> str(p)
+      '/etc'
+      >>> p = PureWindowsPath('c:/Program Files')
+      >>> p
+      PureWindowsPath('c:/Program Files')
+      >>> str(p)
+      'c:\\Program Files'
+    #+END_EXAMPLE
+
+    使用bytes转换同理：
+
+    #+BEGIN_EXAMPLE python
+      >>> p = PurePath('/etc')
+      >>> bytes(p)
+      b'/etc'
+      >>> p = PureWindowsPath('c:/Program Files')
+      >>> bytes(p)
+      b'c:\\Program Files'
+    #+END_EXAMPLE
+
+    #+BEGIN_QUOTE
+    *注意* ：bytes仅在Unix系统上建议使用。
+    #+END_QUOTE
+
+*** 获取部分内容
+**** PurePath. *parts*
+     返回路径每个部分组成的元组：
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PurePath('/usr/bin/python3')
+       >>> p.parts
+       ('/', 'usr', 'bin', 'python3')
+       >>> p = PureWindowsPath('c:/Program Files')
+       >>> p.parts
+       ('c:\\', 'Program Files')
+     #+END_EXAMPLE
+
+*** 方法和属性
+**** PurePath. *drive*
+     如果路径中有驱动设备名，返回该字母：
+
+     #+BEGIN_EXAMPLE python
+       >>> PureWindowsPath('c:/Program Files').drive
+       'c:'
+       >>> PureWindowsPath('Program Files').drive
+       ''
+       >>> PurePath('c:/Program Files').drive
+       ''
+       >>> PureWindowsPath('//host/share/foo.txt').drive
+       '\\\\host\\share'
+     #+END_EXAMPLE
+
+**** PurePath. *root*
+     根目录：
+
+     #+BEGIN_EXAMPLE python
+       >>> PureWindowsPath('c:/Program Files').root
+       '\\'
+       >>> PureWindowsPath('c:Program Files').root
+       ''
+       >>> PurePosixPath('/etc').root
+       '/'
+       >>> PureWindowsPath('//host/share').root
+       '\\'
+     #+END_EXAMPLE
+**** PurePath. *anchor*
+     drive属性+root属性：
+
+     #+BEGIN_EXAMPLE python
+       >>> PureWindowsPath('c:/Program Files').anchor
+       'c:\\'
+       >>> PureWindowsPath('c:Program Files/').anchor
+       'c:'
+       >>> PurePosixPath('/etc').anchor
+       '/'
+       >>> PureWindowsPath('//host/share').anchor
+       '\\\\host\\share\\'
+     #+END_EXAMPLE
+
+**** PurePath. *parents*
+     immutable类类型序列，含所有上级路径。
+
+     #+BEGIN_EXAMPLE python
+       >>> p=PureWindowsPath('c:/foo/bar/setup.py')
+       >>> p.parents
+       <PureWindowsPath.parents>
+       >>> list(p.parents)
+       [PureWindowsPath('c:/foo/bar'), PureWindowsPath('c:/foo'), PureWindowsPath('c:/')]
+     #+END_EXAMPLE
+
+**** PurePath. *parent*
+     字面上的父级路径。
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PurePosixPath('/a/b/c/d')
+       >>> p.parent
+       PurePosixPath('/a/b/c')
+     #+END_EXAMPLE
+
+     如果没有父级，返回本身：
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PurePosixPath('/')
+       >>> p.parent
+       PurePosixPath('/')
+       >>> p = PurePosixPath('.')
+       >>> p.parent
+       PurePosixPath('.')
+     #+END_EXAMPLE
+
+     “字面上”的含义是只考虑参数字符串，如：
+
+     #+BEGIN_EXAMPLE
+       >>> p = PurePosixPath('foo/..')
+       >>> p
+       PurePosixPath('foo/..')
+       >>> p.parent
+       PurePosixPath('foo')
+     #+END_EXAMPLE
+
+     如需向上变量文件系统，建议先调用Path.resolve()方法，以确认软连接
+     和“..”部分。
+
+**** PurePath. *name*
+     返回表示路径最末部分的字符串：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('my/lib/setup.py').name
+       'setup.py'
+       >>> PureWindowsPath('//some/share/setup.py').name
+       'setup.py'
+       >>> PureWindowsPath('//some/share/').name
+       ''
+       >>> PureWindowsPath('//some/share').name
+       ''
+     #+END_EXAMPLE
+**** PurePath. *suffix*
+     返回字符串表示的文件后缀：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('my/lib/setup.py').suffix
+       '.py'
+       >>> PurePosixPath('my/lib.tar.gz').suffix
+       '.gz'
+       >>> PurePosixPath('my/lib').suffix
+       ''
+     #+END_EXAMPLE
+
+**** PurePath. *suffixes*
+     所有文件后缀组成的链表：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('my/lib/setup.py').suffixes
+       ['.py']
+       >>> PurePosixPath('my/lib.tar.gz').suffixes
+       ['.tar', '.gz']
+       >>> PurePosixPath('my/lib').suffixes
+       []
+     #+END_EXAMPLE
+
+**** PurePath. *stem*
+     除后缀外的路径最后部分：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('my/lib/setup.py').stem
+       'setup'
+       >>> PurePosixPath('my/lib.tar.gz').stem
+       'lib.tar'
+       >>> PurePosixPath('my/lib').stem
+       'lib'
+     #+END_EXAMPLE
+**** PurePath. *as_posix* ()
+     返回以斜杠（/）形式表示的路径字符串：
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PureWindowsPath('c://Windows')
+       >>> str(p)
+       'c:\\Windows'
+       >>> p.as_posix()
+       'c:/Windows'
+     #+END_EXAMPLE
+
+**** PurePath. *as_uri* ()
+     将路径名转换为文件链接。如果不是绝对路径，抛出ValueError错误：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('/etc/passwd').as_uri()
+       'file:///etc/passwd'
+       >>> PureWindowsPath('c:/Windows').as_uri()
+       'file:///c:/Windows'
+       >>> PurePosixPath('./passwd').as_uri()
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+           File "/usr/lib/python3.5/pathlib.py", line 713, in as_uri
+               raise ValueError("relative path can't be expressed as a file URI")
+               ValueError: relative path can't be expressed as a file URI
+     #+END_EXAMPLE
+**** PurePath. *is_absolute* ()
+     是否为绝对路径，即同时具备驱动路径（Windows）和根目录：
+     
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('/a/b').is_absolute()
+       True
+       >>> PurePosixPath('a/b').is_absolute()
+       False
+       >>> PureWindowsPath('c:/a/b').is_absolute()
+       True
+       >>> PureWindowsPath('/a/b').is_absolute()
+       False
+       >>> PureWindowsPath('c:/').is_absolute()
+       True
+       >>> PureWindowsPath('c:').is_absolute()
+       False
+       >>> PureWindowsPath('//some/share').is_absolute()
+       True
+     #+END_EXAMPLE
+**** PurePath. *is_reserved* ()
+     是否为Windows系统下的保留路径名。对应PurePosixPath始终返回False。
+
+     #+BEGIN_EXAMPLE python
+       >>> PureWindowsPath('nul').is_reserved()
+       True
+       >>> PurePosixPath('nul').is_reserved()
+       False
+     #+END_EXAMPLE
+
+**** PurePath. *joinpath* (*other)
+     将当前路径与*OTHER结合：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePosixPath('/etc').joinpath('passwd')
+       PurePosixPath('/etc/passwd')
+       >>> PurePosixPath('/etc').joinpath(PurePosixPath('passwd'))
+       PurePosixPath('/etc/passwd')
+       >>> PurePosixPath('/etc').joinpath('init.d', 'apache2')
+       PurePosixPath('/etc/init.d/apache2')
+       >>> PureWindowsPath('c:').joinpath('Program Files')
+       PureWindowsPath('c:Program Files')
+       >>> PureWindowsPath('c:').joinpath('/Program Files')
+       PureWindowsPath('c:/Program Files')
+     #+END_EXAMPLE
+
+**** PurePath. *match* (pattern)
+     是否与glob风格的PATTERN匹配。
+
+     如果PATTERN为相对路径，则即可为相对路径，也可为绝对路径：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('a/b.py').match('*.py')
+       True
+       >>> PurePath('a/b/c.py').match('b/*.py')
+       True
+       >>> PurePath('a/b/c.py').match('a/*.py')
+       False
+       >>> PurePath('a/b/c.py').match('a/**/*.py')
+       True
+     #+END_EXAMPLE
+
+     如果PATTERN为绝对路径，则也需为绝对路径：
+
+     #+BEGIN_EXAMPLE python
+       >>> PurePath('/a.py').match('/*.py')
+       True
+       >>> PurePath('*/a.py').match('/*.py')
+       False
+     #+END_EXAMPLE
+
+     是否区别大小写会自动识别：
+
+     #+BEGIN_EXAMPLE
+       >>> PureWindowsPath('*/a.py').match('*.PY')
+       True
+     #+END_EXAMPLE
+
+**** PurePath. *relative_to* (*other)
+     返回相对OTHER的路径：
+     
+     #+BEGIN_EXAMPLE python
+       >>> p = PurePosixPath('/etc/passwd')
+       >>> p.relative_to('/etc')
+       PurePosixPath('passwd')
+       >>> p.relative_to('/')
+       PurePosixPath('etc/passwd')
+       >>> p.relative_to('/usr')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+           File "/usr/lib/python3.5/pathlib.py", line 864, in relative_to
+               .format(str(self), str(formatted)))
+               ValueError: '/etc/passwd' does not start with '/usr'
+     #+END_EXAMPLE
+
+**** PurePath. *with_name* (name)
+     替换文件名。如果没有文件名抛出ValueError错误：
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PureWindowsPath('c:/Downloads/pathlib.tar.gz')
+       >>> p.with_name('setup.py')
+       PureWindowsPath('c:/Downloads/setup.py')
+       >>> p = PureWindowsPath('c:/Downloads/pathlib')
+       >>> p.with_name('setup.py')
+       PureWindowsPath('c:/Downloads/setup.py')
+       >>> p = PurePosixPath('bar/baz')
+       >>> p.with_name('test.txt')
+       PurePosixPath('bar/test.txt')
+       >>> p = PureWindowsPath('c:/')
+       >>> p.with_name('setup.py')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+           File "/usr/lib/python3.5/pathlib.py", line 809, in with_name
+               raise ValueError("%r has an empty name" % (self,))
+               ValueError: PureWindowsPath('c:/') has an empty name
+     #+END_EXAMPLE
+
+**** PurePath. *with_suffix* (suffix)
+     替换后缀名，如果没有后缀名，则添加此后缀：
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PureWindowsPath('c:/Downloads/pathlib.tar.gz')
+       >>> p.with_suffix('.bz2')
+       PureWindowsPath('c:/Downloads/pathlib.tar.bz2')
+       >>> p = PureWindowsPath('c:/Downloads/')
+       >>> p.with_suffix('.bz2')
+       PureWindowsPath('c:/Downloads.bz2')
+     #+END_EXAMPLE
+
+** 具体路径（Concrete Path）
+   
+   具体路径为纯路径的子类，除上面纯路径的属性和方法外，还添加可调用操
+   作系统的方法和属性。
+   
+*** 类
+    有下面3个类创建具体路径。
+**** class pathlib. *Path* (*pathsegments)
+**** class pathlib. *PosixPath* (*pathsegments)
+**** class pathlib. *WindowsPath* (*pathsegments)
+     用法和参数同纯路径的对应类，只是只能使用系统对应的类创建对象：
+
+     #+BEGIN_EXAMPLE python
+       >>> import os
+       >>> os.name
+       'posix'
+       >>> Path('setup.py')
+       PosixPath('setup.py')
+       >>> PosixPath('setup.py')
+       PosixPath('setup.py')
+       >>>
+       >>> WindowsPath('setup.py')
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+           File "/usr/lib/python3.5/pathlib.py", line 972, in __new__
+               % (cls.__name__,))
+               NotImplementedError: cannot instantiate 'WindowsPath' on your system
+     #+END_EXAMPLE
+
+*** 方法
+    除纯路径方法外，具体路径实例还提供下面方法，其中大多数在系统调用失
+    败时（如路径不存在）可抛出OSError错误。
+    
+**** classmethod Path. *cwd* ()
+     返回表示当前路径的路径对象。
+
+     #+BEGIN_EXAMPLE python
+       >>> Path.cwd()
+       PosixPath('/home/claudio')
+     #+END_EXAMPLE
+
+     与os.getcwd()返回值相同：
+
+     #+BEGIN_EXAMPLE python
+       >>> os.getcwd()
+       '/home/claudio'
+     #+END_EXAMPLE
+
+**** classmethod Path. *home* ()
+     返回表示家目录的路径对象。
+
+     #+BEGIN_EXAMPLE python
+       >>> Path.home()
+       PosixPath('/home/claudio')
+     #+END_EXAMPLE
+
+     与os.path.expanduser('~')返回值相同：
+
+     #+BEGIN_EXAMPLE python
+       >>> os.path.expanduser('~')
+       '/home/claudio'
+     #+END_EXAMPLE
+     
+**** Path. *stat* ()
+     与os.stat()返回值相似，返回路径对象的具体信息。
+
+     #+BEGIN_EXAMPLE python
+       >>> p = Path('dict.txt')
+       >>> p.stat()
+       os.stat_result(st_mode=33188, st_ino=23987801, st_dev=2049, st_nlink=1, st_uid=
+       1000, st_gid=1000, st_size=472, st_atime=1495200610, st_mtime=1494496832, st_ct
+       >>> p = Path('dict.txt')
+       >>> p.stat()
+       os.stat_result(st_mode=33188, st_ino=23987801, st_dev=2049, st_nlink=1, st_uid=
+       1000, st_gid=1000, st_size=472, st_atime=1495200610, st_mtime=1494496832, st_ct
+       ime=1494496832)
+       >>> p.stat().st_gid
+       1000
+       >>> p.stat().st_size
+       472
+     #+END_EXAMPLE
+
+**** Path. *chmod* (mode)
+     更改文件模式和权限，类似于os.chmod()。
+
+     #+BEGIN_EXAMPLE python
+       >>> p = Path('dict.txt')
+       >>> p.stat().st_mode
+       33188
+       >>> p.chmod(0o444)
+       >>> p.stat().st_mode
+       33060
+     #+END_EXAMPLE
+
+**** Path. *exists* ()
+     当前路径是否指向一个存在的文件/文件夹：
+     
+     #+BEGIN_EXAMPLE python
+       >>> Path('.').exists()
+       True
+       >>> Path('dict.txt').exists()
+       True
+       >>> Path('/etc').exists()
+       True
+       >>> Path('不存在').exists()
+       False
+     #+END_EXAMPLE
+
+     #+BEGIN_QUOTE
+     *注意* ：如果路径指向软链接，是否存在根据指向文件/文件夹是否存在
+     判断。
+     #+END_QUOTE
+**** Path. *expanduser* ()
+     返回扩展~和~user后的新路径对象。与os.path.expanduer()返回值相同。
+
+     #+BEGIN_EXAMPLE python
+       >>> p = PosixPath('~/dict.txt')
+       >>> p.expanduser()
+       PosixPath('/home/claudio/dict.txt')
+     #+END_EXAMPLE
+
+**** Path. *glob* (pattern)
+     返回路径中匹配glob形式PATTERN的所有文件路径组成的链表。
+
+     #+BEGIN_EXAMPLE python
+       >>> sorted(Path('.').glob('*.txt'))
+       [PosixPath('.phone-list.txt'), PosixPath('defaultdict.txt'), PosixPath('dict.tx
+       t')]
+     #+END_EXAMPLE
+
+     可使用“**”匹配“当前文件夹和所有子文件夹”进行递归匹配。（在大型文
+     件夹下会很耗时）
+
+**** Path. *group* ()
+     返回用户组名称。如果用户组gid不存在于系统数据库中，抛出KeyError错
+     误。
+
+     #+BEGIN_EXAMPLE python
+       >>> Path('.').group()
+       'claudio'
+     #+END_EXAMPLE
+
+**** Path. *is_dir* ()
+**** Path. *is_file* ()
+**** Path. *is_symlink* ()
+**** Path. *is_socket* ()
+**** Path. *is_fifo* ()
+**** Path. *is_block_device* ()
+**** Path. *is_char_device* ()
+**** Path. *iterdir* ()
+**** Path. *lchmod* (mode)
+**** Path. *lstat* ()
+**** Path. *mkdir* (mode=0o777,parents=False,exist_ok=False)
+**** Path. *open* (mode='r',buffering=-1,encoding=None,errors=None,newlines=None)
+**** Path. *owner* ()
+**** Path. *read_bytes* ()
+**** Path. *read_text* (encoding=None,errors=None)
+**** Path. *rename* (target)
+**** Path. *replace* (target)
+**** Path. *resolve* ()
+**** Path. *rglob* (pattern)
+**** Path. *rmdir* ()
+**** Path. *samefile* (other_path)
+**** Path. *symlink_to* (target,target_is_directory=False)
+**** Path. *touch* (mode=0o666,exist_ok=True)
+**** Path. *unlink* ()
+**** Path. *write_bytes* (data)
+**** Path. *write_text* (data,encoding=None,errors=None)
+
+* os.path - 常用路径名操作
+  
+* fileinput - 迭代多个输入流中的行
+* stat - 转换系统stat命令结果
+* filcmp - 文件和文件夹对比
+* tempfile - 创建临时文件/文件夹
+* glob - Unix风格路径扩张
+* fnmatch - Unix文件名模式匹配
+* linecache - 随机操作文本行
+* shutil - 高阶文件操作
+* macpath - “Mac OS 9”路径处理函数 （待续）

@@ -90,44 +90,44 @@
      在网络应用中，字节序为必须考虑的因素，因为不同类型机器可能采用不
      同 标准的字节序。
 * Gestalt匹配 [[http://www.drdobbs.com/database/pattern-matching-the-gestalt-approach/184407970?pgno%3D5][参考地址]] [[http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/DDJ/1988/8807/8807c/8807c.htm][打开更快的网页]]
-  
+
   [[http://blog.csdn.net/sunboyiris/article/details/18264311][Gestalt视觉理论]]
-  
+
   [[https://zh.wikipedia.org/wiki/%25E6%25A0%25BC%25E5%25BC%258F%25E5%25A1%2594%25E5%25AD%25A6%25E6%25B4%25BE][@zh.wikipedia]] ：
-  
+
   #+BEGIN_QUOTE
   格式塔学派主张人脑的运作原理是整体的，“整體不同於其部件的總和”。例如，
   我們對一朵花的感知，並非純粹單單從對花的形狀、顏色、大小等感官資訊而
   來，還包括我們對花過去的經驗和印象，加起來才是我們對一朵花的感知
   #+END_QUOTE
-  
+
   何为Gestalt匹配？Gestalt是用于描述人们认知局部特性模型时，并不是根据
   所有特性总和特性作为判断依据。比如“连线拼图游戏”，可能还没连完，或刚
   开始就能认出最终图形。将已知填充图形的过程就称之为Gestalt。
-  
+
   Ratcliff/Obershelp匹配算法就是利用这一特点计算一维模型的相似度。由于
   文本字符串为一维，此算法可求得两个字符串的相似率，或百分百。
-  
+
   由于此算法可即快又轻松子字符串是否匹配，可用在很多场景。如编译器识别
   变量、关键字或函数名时，即时有拼写错误也可识别；教育软件中识别答案时，
   即时有拼写错误也可识别；shell命令中有部分参数或选项拼写错误，也能智
   能识别，执行预想命令，或提供正确选项供修改；文本冒险游戏时此算法的最
   佳应用场景：根据用户输入生成大量假设。
-  
+
   Ratcliff/Obershelp匹配算法由John W. Ratcliff和John A Obershelp于1983
   年提出，用于教育软件。通常，教育软件喜欢用多选题的主要原因为：如果转
   变为填空题，需要逐个字符比较判断答案是否正确。而此算法可判断是否是拼
   写错误，还是错误答案。如今，此算法已被应用在商业拼写检查软件、数据库
   搜索程序和编译器中。
-  
+
   比如将此算法应用到C编译器中。当碰到拼写错误的函数、关键字和变量名时，
   可根据所有已经定义的identifiers进行匹配，如果与某个identifier匹配率
   超过60%，则可做出正确的猜测，否则正常抛出错误。这样，编译器即可正常
   处理，也可显示做出的假设及所在行。同时，还可让程序员选择假设是否正确，
   甚至自动修改源码。
-  
+
 ** 算法原理
-   
+
    抽象点说，Ratcliff/Obershelp匹配算法可认为是：匹配通配符
    （wild-cards）时不需要通配符。此算法会根据最近的匹配，创建自己的通
    配符。具体讲，先找到2个字符串中最多匹配的字符，然后使用此组字符作为
@@ -135,7 +135,7 @@
    续比较。此过程会在“堆”中的所有子字符串总一直进行，直到耗尽。最后用
    两个字符串中相同字符数乘以2，再除以两个字符串的总字符数，返回整数值，
    作为匹配率。
-   
+
    比如，假设比较字符串“Pennsylvania”和“Pencilvaneya”。最长的相同子字
    符串为“lvan”，他们左边的子字符串分别为“Pennsy”和“Penci”，右边的子字
    符串分别为“ia”和“eya”，此时的得分为8（“lvan”的长度乘以2）。右边子字
@@ -143,29 +143,29 @@
    相同子字符串，结束右边比较；右边相同子字符有“Pen”，的得分为6，总得
    分增加到16，剩下右边子字符串分别为“nsy”和“ci”，无相同子字符串，到此
    结束。最后得到匹配比率为 16 / 24 = 67%。
-   
+
 ** 实现
-   
+
    [[file:files/gestalt.c][gestalt.c]] 为C语言实现，原文使用了汇编实现其中的simil函数。
-   
+
    此程序需高效，其中最耗时的部分为比较子字符串中最相同字符个数的过程。
    最坏的情况为两个子字符串根本没有相同字符，此时需比较的次数为N X M次，
    其中N和M分别为两个字符串中字符长度。所以原文使用了汇编实现simil函数。
-   
+
    [[https://github.com/wernsey/miscsrc/blob/master/simil.c][simil函数C实现参考]]
-   
+
    比较过程包含两个循环：内层循环字符串1，外层循环字符串2。但发现有字
    符相等时，检查目前位置相同字符数量是否大于已发现的最大相同字符数量。
-   如果是，跟新最大相同字符数量，跟新相同的子字符串。当更新完最大相同
+   如果是，更新最大相同字符数量，更新相同的子字符串。当更新完最大相同
    字符数量后，可将搜索缩减到"strlen(str1)-max_chars"的长度。原因为假
    设已经有5个字符相等，如何字符串还剩余5个字符，则不可能大于5个字符串
    相同。
-   
+
    获取到最大相同字符数后，然后再在其左右分别求相同字符数，如此递归至
    子字符串中没有字符为止。
-   
+
 ** 性能问题
-   
+
    To evaluate the performance of the routines, the following tests were
    performed. First, a series of strings were created from 1 to 20
    characters in length. Then 10,000 calls were made to the
@@ -183,25 +183,25 @@
    showing a quadratic curve in the form of N2 (from 8,000
    comparisons/second for one character to 200 comparisons/second for two
    20-character strings).
-   
+
    Strings that match at the beginning can exit quickly and those that
    match in the middle divide their search problem in half. (455
    comparisons/second for 20-character strings.) Strings that match at
    the end model those that are totally unalike since nearly the entire
    strings are searched before the matching substring is located. (270
    comparisons/second.)
-   
+
    Next, two 12-character strings were analyzed for every percentage that
    the procedure could return. At each percentage, a wide variety of
    combinations of substring matches were tried. These varieties included
    matches at the beginning, in the middle, and at the end, and those
    spread differently throughout the two strings. Figure 2, page 51,
    displays the average time for these tests at each percentage.
-   
+
    Figure 1: Effects of timing during different compare types
-   
+
 ** 后记
-   
+
    Implementing this algorithm in your application can dramatically
    improve your software, but it does require some judgment based on the
    environment. The first step in interpreting the ambiguous data should
@@ -214,13 +214,13 @@
    would be best to provide the user with these matches in order of
    similarity, along with a convenient and rapid method of confirmation,
    such as a pop-up menu.
-   
+
    We hope this article has sparked some interest in the programming
    community, and we'd appreciate hearing about your applications of the
    algorithm. Adding pattern recognition to software has tremendous
    potential for improving all our lived programmers and users alike. We
    might finally make "user-friendly" something more than a marketing
    cliche.
-   
+
    Figure 2: Average timing for every percentage of a 12- to 12-character
    string match

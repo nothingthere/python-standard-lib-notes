@@ -1043,67 +1043,67 @@
 
       fun((1, 2), True)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - ... ... ... ... >>> >>> ... ... ... ... ... >>> >>> tuple2： (1, 2)
     #+END_SRC
-    
+
     原函数相当于dispatch的参数为object，即如果没有找到对应类型的成员函
     数，则使用原函数：
-    
+
     #+BEGIN_SRC python :session
       fun({'a': 1}, True)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - 原函数： {'a': 1}
     #+END_SRC
-    
+
     使用registry.keys()只读属性可获取所有泛型成员函数：
-    
+
     #+BEGIN_SRC python :session
       fun.registry.keys()
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - dict_keys([<class 'tuple'>, <class 'NoneType'>, <class 'float'>, <class 'decimal.Decimal'>, <class 'int'>, <class 'list'>, <class 'object'>])
     #+END_SRC
-    
+
 *** functools. *update_wrapper* (wrapper,wrapped,assigned=WRAPPER_ASSIGNMENT,updated=WRAPPER_UPDATES) （待续。。。）
 *** @functools. *wraps* (wrapped,assignment=WRAPPER_ASSIGNMENTS,updated=WRAPPER_UPDATES)
-    update_wrapper的作用为跟新封装函数，使其看起来像被封装的函数。可选
-    参数都为元组，分别用于指定哪些将被封装函数的对应属性设置或跟新为封
+    update_wrapper的作用为更新封装函数，使其看起来像被封装的函数。可选
+    参数都为元组，分别用于指定哪些将被封装函数的对应属性设置或更新为封
     装函数的属性。默认值分别为模块常量WRAPPER_ASSIGNMENT和
     WRAPPER_UPDATES：
-    
+
     #+BEGIN_SRC python :session
       import functools
       functools.WRAPPER_ASSIGNMENTS
       functools.WRAPPER_UPDATES
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - ('__module__', '__name__', '__qualname__', '__doc__', '__annotations__')
     - ('__dict__',)
     #+END_SRC
-    
+
     通过封装函数的__wrapped__属性可获取被封装函数。
-    
+
     使用update_wrapper()主要是使被封装函数的元数据保持不变。
-    
+
     wraps函数为使用partial()函数对update_wrapper()函数封装的结果。等价
     于：
-    
+
     #+BEGIN_SRC python :eval never
       partial(update_wrapper, wrapped=wrapped, assgned=assigned, update=update)
     #+END_SRC
-    
+
     不用wraps函数的效果：
-    
+
     #+BEGIN_SRC python :session
       def my_decorator(f):
           def wrapper(*arg, **kwds):

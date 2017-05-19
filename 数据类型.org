@@ -36,7 +36,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 * calendar - 日历相关函数 （待续）
 * collections - 容器类型
   此模块对内置类型dict、list、set和tuple实现了容器包装。
-
+  
   | namedtuple  | 命名式元组工厂函数                     |
   | deque       | 类链表容器，可快速在两端添加和删除元素 |
   | ChainMap    | 类字典类，利用多个映射创建单个view     |
@@ -46,15 +46,15 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
   | UserDict    | 字典对象包装器，方便创建字典子类       |
   | UserList    | 链表对象包装器，方便创建链表子类       |
   | UserString  | 字符串对象包装器，方便创建字符串子类   |
-
+  
 ** ChainMap对象
    将多个映射对象结合，作为单个对象。比创建新字典对象，然后使用字典的
    update()方法快。
-
+   
 *** class collections. *ChainMap* (*maps)
     ChainMap将多个字典或映射对象集合到一起，创建一个新的，可更新的view。
     如果没有MAP参数，则将空字典传递给此构建函数。
-
+    
     #+BEGIN_SRC python :session
       from collections import ChainMap
       books = {'A': 10, 'B': 11}
@@ -63,27 +63,27 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       print(mix)
       ChainMap()
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> >>> ChainMap({'A': 10, 'B': 11}, {'Lily': 27, 'Mike': 23})
     - ChainMap({})
     #+END_SRC
-
+    
     ChainMap内部用链表集中各个映射对象，各元素映射对象可使用MAP的属性
-    获取或跟新。此外无其他任何状态：
-
+    获取或更新。此外无其他任何状态：
+    
     #+BEGIN_SRC python :session
       mix['Lily'] = 100
       print(mix)
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - ChainMap({'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27, 'Mike': 23})
     #+END_SRC
     
-    除查找外，重新赋值、跟新和删除都只在第一个映射对象中进行：
+    除查找外，重新赋值、更新和删除都只在第一个映射对象中进行：
     
     #+BEGIN_SRC python :session
       mix['Lily']
@@ -116,14 +116,14 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 **** maps
      返回可更新的字典链表。修改其中的元素即可修改ChainMap本身，也可修
      改原来的字典对象。
-     
+
      #+BEGIN_SRC python :session
        mix.maps
        mix.maps[0]['A'] = -1
        print(mix)
        print(books)
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - [{'A': 10, 'Lily': 100, 'B': 11}, {'Lily': 27}]
