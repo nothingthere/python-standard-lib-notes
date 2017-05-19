@@ -2434,16 +2434,16 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     #+RESULTS:
     :
     : >>> >>> [1, 2, 3]
-    
+
 *** array. *tostring* ()
     已废除，新名为tobytes()。
-    
+
     #+BEGIN_SRC python :session
       from array import array
       a = array('i', [1, 2, 3])
       a.tostring()
     #+END_SRC
-    
+
     #+RESULTS:
     :
     : >>> b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
@@ -2457,11 +2457,11 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       a = array('u', '我有一个梦想！')
       a.tounicode()
     #+END_SRC
-    
+
     #+RESULTS:
     :
     : >>> '我有一个梦想！'
-    
+
 * weakref - 弱引用
   [[http://stackoverflow.com/questions/1507566/how-and-when-to-appropriately-use-weakref-in-python]]
   
@@ -2472,11 +2472,11 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
   使用weakref模块可为对象创建弱引用。
   
   一个对对象的弱引用并不足够使对象保持存活：当对象的被引用只剩弱引用时，
-  就可以被回收，重用所占内存。但是，直到该对象被真正销毁前，即时没有强
+  就可以被回收，释放所占内存。但是，直到该对象被真正销毁前，即时没有强
   引用，弱引用也可返回该对象。
   
-  弱引用的主要用途为实现对大型对象的缓存和映射。因为只需大型对象存在于
-  缓存或映射中，不需保持存活。
+  弱引用的主要用途为实现对大型对象缓存和映射的引用。因为只需大型对象存
+  在于缓存或映射中，不需保持存活。
   
   比如，如需将多个大型二进制图像对象与名称映射，如果使用Python字典将名
   称映射为图像对象，或图像对象映射为名称，由于图像对象为字典的键或值，
@@ -2527,11 +2527,14 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       from weakref import ref
       s = {1, 2, 3}
 
+
       def about_to_del1(obj):
           print('1：弱引用对象：{} 被删除'.format(obj))
 
+
       def about_to_del2(obj):
           print('2：弱引用对象：{} 被删除'.format(obj))
+
 
       x = ref(s, about_to_del1)
       y = ref(s, about_to_del2)
@@ -2540,17 +2543,23 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
       del s
       print('被引用对象不再存活后：')
+      print(x, y)
       print(x(), y())
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> ... ... >>> ... ... >>> >>> >>> >>> True
-    - >>> 2：弱引用对象：<weakref at 0x7f2a31754458; dead> 被删除
-    - 1：弱引用对象：<weakref at 0x7f2a317544a8; dead> 被删除
+    - >>> >>> >>> >>> ... ... >>> >>> ... ... >>> >>> >>> >>> >>> True
+    - >>> 2：弱引用对象：<weakref at 0x7f0203be5598; dead> 被删除
+    - 1：弱引用对象：<weakref at 0x7f0203be5638; dead> 被删除
     - 被引用对象不再存活后：
+    - <weakref at 0x7f0203be5638; dead> <weakref at 0x7f0203be5598; dead>
     - None None
     #+END_SRC
+
+    #+BEGIN_QUOTE
+    是一个可继承的子类，而非工厂函数。
+    #+END_QUOTE
 
 **** __callback__
      自读属性，返回弱引用对象创建时的CALLBACK参数。如果没有CALLBACK参
@@ -2581,8 +2590,32 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     使用弱引用返回OBJECT的代理对象。返回值的类型取决与OBJECT是否为
     callble类型为ProxyType或CallableProxyType。不管被引用对象是否可哈
     希，返回的代理对象都不可哈希。
+    
+    #+BEGIN_SRC python
+      from weakref import proxy
+      s = {1, 2, 3}
 
-    #+BEGIN_SRC python :session
+      def about_to_del1(obj):
+          print('1：弱引用对象：{} 被删除'.format(obj))
+
+      def about_to_del2(obj):
+          print('2：弱引用对象：{} 被删除'.format(obj))
+
+      x = proxy(s, about_to_del1)
+      y = proxy(s, about_to_del2)
+
+      print(x, y)
+      del s
+      print('被引用对象不再存活后：')
+
+      print(x, y)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    #+END_SRC
+    
+    #+BEGIN_SRC python
       from weakref import proxy
 
       s = set([1, 2, 3])
@@ -2592,12 +2625,12 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       del sp
       print(s)
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> >>> >>> >>> >>> {1, 2, 3, 4, 5}
+    - {1, 2, 3, 4, 5}
     #+END_SRC
-
+    
 *** weakref. *getweakrefcount* (obj)
     返回一个对象被弱引用和代理的次数。
     
@@ -2623,19 +2656,19 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
     #+BEGIN_SRC python :session
       from weakref import *
-      s = set([1, 2, 3])
-      getweakrefs(s)
-      x = ref(s)
-      getweakrefs(s)
-      y = proxy(s)
-      getweakrefs(s)
+      sx = set([1, 2, 3])
+      getweakrefs(sx)
+      x = ref(sx)
+      getweakrefs(sx)
+      y = proxy(sx)
+      getweakrefs(sx)
     #+END_SRC
 
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> []
-    - >>> [<weakref at 0x7f2a31754458; to 'set' at 0x7f2a31732e48>]
-    - >>> [<weakref at 0x7f2a31754458; to 'set' at 0x7f2a31732e48>, <weakproxy at 0x7f2a317544a8 to set at 0x7f2a31732e48>]
+    - >>> [<weakref at 0x7f72f0242598; to 'set' at 0x7f72f0220128>]
+    - >>> [<weakref at 0x7f72f0242598; to 'set' at 0x7f72f0220128>, <weakproxy at 0x7f72f0242728 to set at 0x7f72f0220128>]
     #+END_SRC
 
 *** class weakref. *WeakKeyDictionary* ([dict])
@@ -2668,13 +2701,13 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       foo = None
       print(list(d.keys()))
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> ... >>> ... >>> >>> >>> [<function bar at 0x7f2a3103b598>]
-    - >>> ... ... >>> ... >>> >>> >>> [<function bar at 0x7f2a3103b620>, <function foo at 0x7f2a3103b378>]
+    - >>> ... >>> ... >>> >>> >>> [<function bar at 0x7f72efb2a2f0>]
+    - >>> ... ... >>> ... >>> >>> >>> [<function bar at 0x7f72efb2a400>, <function foo at 0x7f72efb2a268>]
     #+END_SRC
-
+    
 **** WeakKeyDictionary. *keyrefs* ()
      获取当前存在的弱引用key，可用来检查是否有key被回收。
 
@@ -2729,32 +2762,474 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f2a3103b6a8>
+    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f72efb2a510>
     - 不使用弱引用：
-    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f2a3103b7b8>
-    - <function foo at 0x7f2a3103b2f0>
+    - >>> ... >>> ... >>> >>> >>> ... ... <function bar at 0x7f72efb2a488>
+    - <function foo at 0x7f72efb2a2f0>
+    #+END_SRC
+    
+*** class weakref. *WeakMethod* (method)
+    定制ref子类，模仿对实例方法的弱引用。由于实例的方法会立即消失，使
+    用标准的ref弱引用不会成功。使用WeakMethod返回的代理对象只有当原实
+    例不存活后才没有引用。
+    
+    #+BEGIN_SRC python :session
+      import weakref
+
+      class C:
+          def method(self):
+              print('method方法被调用。')
+
+      c = C()
+      standard_ref = weakref.ref(c.method)
+      method_ref = weakref.WeakMethod(c.method)
+      print('对两个代理方法为：')
+      print(standard_ref())
+      print(method_ref())
+      print('删除原实例后，仍可获取原来方法，只不过为None：')
+      del c
+      print(method_ref())
     #+END_SRC
 
-*** class weakref. *WeakMethod* (method)
-    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... >>> >>> >>> >>> >>> 对两个代理方法为：
+    - None
+    - <bound method C.method of <__main__.C object at 0x7f72efb26f98>>
+    - 删除原实例后，仍可获取原来方法，只不过为None：
+    - >>> None
+    #+END_SRC
+
 *** class weakref. *finalize* (obj,func,*args,**kwargs)
+    返回一个可调用的finalizer对象，当被引用对象被回收后被调用。不同于
+    普通弱引用，在被引用对象将要回收时调用，而是在回收后调用，从而简化
+    了其生命周期管理。
+    
+    调用finalizer对象的返回值为FUNC(*ARGS,**KWARGS)。如果此引用对象不
+    再存活，返回值为None。
+    
+    回调函数如果抛出错误，将显示在stderr中，不能传播。这点同实例
+    的__del__()方法和弱引用对象回调函数抛出错误时的处理方式相同。
+    
+    除非atexit属性设置为false，每个存活的finalizer对象都会在程序结束时
+    被调用。调用顺序与添加顺序相反。
+    
+    #+BEGIN_SRC python :session
+      import weakref
+
+
+      class C:
+          def method(self):
+              print('method方法被调用')
+
+
+      c = C()
+      d = {1, 2, 3}
+      f = weakref.finalize(c.method, list, '1')
+      f1 = weakref.finalize(d, list, '2')
+      print(f())
+      print(f1())
+      del d
+      print(f1())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... >>> >>> >>> >>> >>> >>> None
+    - ['2']
+    - >>> None
+    #+END_SRC
     
 **** __call__()
+     当自身存活时，返回调用FUNC(*ARGS,**KWARGS)调用结果，并将自身标记
+     为不存活；如果自身不存活，返回None。
+
+     #+BEGIN_SRC python :session
+       import weakref
+       o = set((1, 2, 3))
+       f = weakref.finalize(o, list, 'abc')
+       print(f.__call__())
+       print(f)
+       print(f.__call__())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ['a', 'b', 'c']
+     - <finalize object at 0x7f72f03e60b0; dead>
+     - None
+     #+END_SRC
+
 **** detach()
+     如果自身存活，返回元组(obj,func,*args,**kwargs)，并将自身标记为不
+     存活；如果自身不存活，返回None。
+
+     #+BEGIN_SRC python :session
+       import weakref
+       o = set((1, 2, 3))
+       f = weakref.finalize(o, list, 'abc')
+       print(f.detach())
+       print(f)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ({1, 2, 3}, <class 'list'>, ('abc',), {})
+     - <finalize object at 0x7f72f03e60a0; dead>
+     #+END_SRC
+
 **** peak()
+     与detach()的区别为：调用后不将自身标记为不存活。
+
+     #+BEGIN_SRC python :session
+       import weakref
+       o = set((1, 2, 3))
+       f = weakref.finalize(o, list, 'abc')
+       print(f.peek())
+       print(f)
+       print(f())
+       print(f)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ({1, 2, 3}, <class 'list'>, ('abc',), {})
+     - <finalize object at 0x7f72f03e60b0; for 'set' at 0x7f72f0220e48>
+     - ['a', 'b', 'c']
+     - <finalize object at 0x7f72f03e60b0; dead>
+     #+END_SRC
+
 **** alive
+     返回布尔值，表示自身是否存活。
+
+     #+BEGIN_SRC python :session
+       import weakref
+       o = set((1, 2, 3))
+       f = weakref.finalize(o, list, 'abc')
+       print(f.alive)
+       f()
+       print(f.alive)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> True
+     - ['a', 'b', 'c']
+     - False
+     #+END_SRC
+
 **** atexit
+     可写布尔值属性，默认值为True。当程序退出时，会调用所有此属性为
+     True的finalizer对象，调用顺序与添加顺序相反。
+
+     #+BEGIN_QUOTE
+     *注意* ：需保证func、args和kwargs不对obj有直接/间接引用，否则obj
+     完全没可能被回收。fun也不能为obj的实例方法。
+     #+END_QUOTE
+
 *** weakref. *ReferenceType*
+    表示弱引用对象的类型对象。
+
+    #+BEGIN_SRC python :session
+      import weakref
+      o = set((1, 2, 3))
+      r = weakref.ref(o)
+      f = weakref.finalize(o, list, 'abc')
+      print(type(r), type(f))
+      print(isinstance(r, weakref.ReferenceType))
+      print(isinstance(f, weakref.ReferenceType))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> <class 'weakref'> <class 'weakref.finalize'>
+    - True
+    - False
+    #+END_SRC
+
 *** weakref. *ProxyType*
 *** weakref. *CallableProxyType*
+    可调用和不可调用的代理类型对象。
+
+    #+BEGIN_SRC python :session
+      import weakref
+
+      def foo(): pass
+
+      o = set((1, 2, 3))
+
+      fp = weakref.proxy(foo)
+      op = weakref.proxy(o)
+      print(type(fp), type(op))
+      print(isinstance(fp, weakref.CallableProxyType))
+      print(isinstance(op, weakref.ProxyType))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... >>> >>> >>> >>> >>> >>> <class 'weakcallableproxy'> <class 'weakproxy'>
+    - True
+    - True
+    #+END_SRC
+
 *** weakref. *ProxyTypes*
-*** weakref. *ReferenceError*
+    返回含上面两种代理类型的元组，简化代理对象的类型判断。
+    
+    #+BEGIN_SRC python :session
+      import weakref
+
+      def foo(): pass
+
+      o = set((1, 2, 3))
+      fp = weakref.proxy(foo)
+      op = weakref.proxy(o)
+      print(weakref.ProxyTypes)
+      print(isinstance(fp, weakref.ProxyTypes))
+      print(isinstance(op, weakref.ProxyTypes))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... >>> >>> >>> >>> >>> (<class 'weakproxy'>, <class 'weakcallableproxy'>)
+    - True
+    - True
+    #+END_SRC
+
+*** weakref. *ReferenceError* ？？？
+
+    #+BEGIN_SRC python :session
+      import weakref
+
+      o = set((1, 2, 3))
+      try:
+          o = None
+          op = weakref.proxy(o)
+      except TypeError:
+          print('抛出代理错误')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> ... ... ... ... ... 抛出代理错误
+    #+END_SRC
+    
 ** Weak Reference对象
+   弱引用对象除ref.__callback__外，无任何属性和方法。调用弱引用对象可
+   获取原对象，如果原对象不存在，则返回None：
+   
+   #+BEGIN_SRC python :session
+     import weakref
+
+     class Object:
+         pass
+
+     o = Object()
+     r = weakref.ref(o)
+     o2 = r()
+     print(o is o2)
+
+     del o, o2
+     print(r())
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... ... >>> >>> >>> >>> >>> True
+   - >>> >>> None
+   #+END_SRC
+   
+   如果在线程应用中使用弱引用，为保证安全无论是单线程还是多线程，使用
+   被引用对象前都需检查是否已被回收，通常的模式为：
+   
+   #+BEGIN_SRC python :eval never
+     # r为一个弱引用对象
+     o = r()
+     if o is None:
+         # 被引用对象已被回收
+         print('对象o已被回收。')
+     else:
+         print('被引用对象仍存活')
+         o.de_somthing_useful()
+   #+END_SRC
+
+   可通过继承ref类定制引用对象，如WeakValueDictionary。如下例实现对弱
+   引用对象进行调用计数：
+
+   #+BEGIN_SRC python :session
+     import weakref
+
+     class ExtendedRef(weakref.ref):
+         def __init__(self, ob, callback=None, **annotations):
+             super(ExtendedRef, self).__init__(ob, callback)
+             self.__count = 0
+             for k, v in annotations.items():
+                 setattr(self, k, v)
+         def __call__(self):
+             ob = super(ExtendedRef, self).__call__()
+             if ob is not None:
+                 self.__count += 1
+                 ob = (ob, self.__count)
+             return ob
+
+     def foo(): print('foo 函数被调用')
+
+     r = ExtendedRef(foo)
+     print(r())
+     r()[0]()
+     print(r())
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> ... ... ... ... ... ... ... ... ... ... ... ... >>> ... >>> >>> (<function foo at 0x7f72efb2a510>, 1)
+   - foo 函数被调用
+   - (<function foo at 0x7f72efb2a510>, 3)
+   #+END_SRC
+
 ** 举例
+   下例使用对象ID实现映射，当对象被回收后，仍可使用该对象的ID；如果未
+   被回收，还可使用该ID获取原对象。
+   
+   #+BEGIN_SRC python :session
+     import weakref
+     _id2obj_dict = weakref.WeakValueDictionary()
+
+     def remember(obj):
+         oid = id(obj)
+         _id2obj_dict[oid] = obj
+         return oid
+
+     def id2obj(oid):
+         return _id2obj_dict[oid]
+
+     x = set((1, 2, 3))
+
+     xid = remember(x)
+     print(dict(_id2obj_dict.items()))
+     x = None
+     # print(_id2obj_dict[xid])
+     print(dict(_id2obj_dict.items()))
+     print(xid)
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> >>> ... ... ... ... >>> >>> ... ... >>> >>> >>> >>> >>> {140131624486952: {1, 2, 3}}
+   - >>> ... {}
+   - 140131624486952
+   #+END_SRC
+
 ** Finalizer对象
+   使用finalizer的好处为简化回调函数注册，无需保存返回的finalizer对象。
+   比如：
+   
+   #+BEGIN_EXAMPLE python
+     >>> import weakref
+     >>> class Object:
+     ...     pass
+     ...
+     >>> kenny = Object()
+     >>> weakref.finalize(kenny, print, 'You killed Kenny')
+     <finalize object at 0x7f4558c1f0a0; for 'Object' at 0x7f4558a69198>
+     >>> del kenny
+     You killed Kenny
+   #+END_EXAMPLE
+   
+   finalizer对象可直接调用。调用后自身不再存活：
+   
+   #+BEGIN_EXAMPLE python
+     >>> def callback(x, y, z):
+     ...     print('回调函数被调用')
+     ...     return x + y + z
+     ...
+     >>> obj = Object()
+     >>> f = weakref.finalize(obj, callback, 1, 2, z=3)
+     >>> assert f.alive
+     >>> assert f() == 6
+     回调函数被调用
+     >>> assert not f.alive
+     >>> f()     # 由于finalizer对象不再存活，回调函数不会被调用
+     >>> del obj # 由于finalizer对象不再存活，回调函数不会被调用
+   #+END_EXAMPLE
+   
+   可使用detach()方法返回构建弱引用对象时的参数，并使finalizer对象不再
+   存活：
+   
+   #+BEGIN_EXAMPLE python
+     >>> obj = Object()
+     >>> f = weakref.finalize(obj, callback, 1, 2, z=3)
+     >>> f.detach()
+     (<__main__.Object object at 0x7f4558a69160>, <function callback at 0x7f4558a6a0)
+     >>> newobj, func, args, kwargs = _
+     >>> assert not f.alive
+     >>> assert newobj is obj
+     >>> assert func(*args, **kwargs) == 6
+     回调函数被调用
+   #+END_EXAMPLE
+
+   如果atexit属性不为False，如果finalizer对象存活，回调函数在程序退出
+   时也会调用：
+
+   #+BEGIN_EXAMPLE python
+     >>> obj = Object()
+     回调函数被调用
+     >>> f = weakref.finalize(obj, print, '对象被回收或程序退出')
+     >>> exit()
+     对象被回收或程序退出
+   #+END_EXAMPLE
+
 ** finalizers与__del__方法
-* types - 内置类型动态创建和命名
-* copy - 浅层复制和深层复制
-* pprint - 数据美化显示
-* reprlib - 另一个repr()实现
-* enum - 枚举支持
+   假设创建类表示临时文件夹，文件夹及其内容需在下面任何一种情况发生时
+   被删除：
+   
+   - 类对象被垃圾回收。
+   - 对象的remove()方法被调用。
+   - 程序退休。
+     
+   可能会尝试使用__del__方法：
+   
+   #+BEGIN_SRC python :session
+     import shutil
+     import tempfile
+
+     class TempDir:
+         def __init__(self):
+             self.name = tempfile.mkdtemp()
+         def remove(self):
+             if self.name is not None:
+                 shutil.rmtree(self.name)
+         @property
+         def removed(self):
+             return self.name is None
+         def __del__(self):
+             self.remove()
+   #+END_SRC
+
+   从Python 3.4开始，__del__()方法调用时，即时环形引用的也会被回
+   收，在interpreter shutdown时，模块的全局变量不被强制为None。所以此
+   方法在CPython中没有问题。？？？
+
+   但是，__del__()依赖实现的垃圾回收机制实现，所以更健壮的方法时使用弱
+   引用：
+
+   #+BEGIN_SRC python :session
+     import shutil
+     import tempfile
+     import weakref
+
+     class TempDir:
+         def __init__(self):
+             self.name = tempfile.mkdtemp()
+             self.__finalizer = weakref.finalize(self, shutil.rmtree, self.name)
+         def remove(self):
+             self.__finalizer()
+         @property
+         def removed(self):
+             return not self.__finalizer.alive
+   #+END_SRC
+
+* types - 内置类型动态创建和命名 （待续）
+* copy - 浅层复制和深层复制 （待续）
+* pprint - 数据美化显示 （待续）
+* reprlib - 另一个repr()实现 （待续）
+* enum - 枚举支持 （待续）
