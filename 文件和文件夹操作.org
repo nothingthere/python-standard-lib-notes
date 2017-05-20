@@ -641,7 +641,7 @@
 
 **** Path. *glob* (pattern)
      返回路径中匹配glob形式PATTERN的所有文件路径组成的链表。
-
+     
      #+BEGIN_EXAMPLE python
        >>> sorted(Path('.').glob('*.txt'))
        [PosixPath('.phone-list.txt'), PosixPath('defaultdict.txt'), PosixPath('dict.tx
@@ -661,34 +661,299 @@
      #+END_EXAMPLE
 
 **** Path. *is_dir* ()
-**** Path. *is_file* ()
-**** Path. *is_symlink* ()
-**** Path. *is_socket* ()
-**** Path. *is_fifo* ()
-**** Path. *is_block_device* ()
-**** Path. *is_char_device* ()
-**** Path. *iterdir* ()
-**** Path. *lchmod* (mode)
-**** Path. *lstat* ()
-**** Path. *mkdir* (mode=0o777,parents=False,exist_ok=False)
-**** Path. *open* (mode='r',buffering=-1,encoding=None,errors=None,newlines=None)
-**** Path. *owner* ()
-**** Path. *read_bytes* ()
-**** Path. *read_text* (encoding=None,errors=None)
-**** Path. *rename* (target)
-**** Path. *replace* (target)
-**** Path. *resolve* ()
-**** Path. *rglob* (pattern)
-**** Path. *rmdir* ()
-**** Path. *samefile* (other_path)
-**** Path. *symlink_to* (target,target_is_directory=False)
-**** Path. *touch* (mode=0o666,exist_ok=True)
-**** Path. *unlink* ()
-**** Path. *write_bytes* (data)
-**** Path. *write_text* (data,encoding=None,errors=None)
+     如果为文件夹，或为指向文件夹的软链接，返回True。
 
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛出。
+
+**** Path. *is_file* ()
+     如果为文件，或为指向文件的软链接，返回True。
+
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
+     出。
+
+**** Path. *is_symlink* ()
+     如果为软连接返回True，否则返回False。
+
+     如果不存在，返回False；其他如权限错误会向上抛出。
+
+**** Path. *is_socket* ()
+     如果为Unix socket（或为指向Unix socket的软连接），则返回True，否
+     则返回False。
+
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
+     出。
+
+**** Path. *is_fifo* ()
+     如果为FIFO（或为指向FIFO的软连接），则返回True，否则返回False。
+
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
+     出。
+
+**** Path. *is_block_device* ()
+     如果为块设备（或为指向块设备的软连接），则返回True，否则返回False。
+     
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
+     出。
+     
+**** Path. *is_char_device* ()
+     如果为字符设备（或为指向字符设备的软连接），则返回True，否则返回
+     False。
+
+     如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
+     出。
+     
+     #+BEGIN_SRC python :session
+       from pathlib import *
+       Path('/dev/cdrom').is_block_device()
+       Path('/dev/tty1').is_char_device()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - True
+     - True
+     #+END_SRC
+
+**** Path. *iterdir* ()
+     当为文件夹时，返回其中内容组成的路径迭代对象：
+
+     #+BEGIN_EXAMPLE python
+       for child in Path('.').resolve().iterdir():
+           print(child)
+     #+END_EXAMPLE
+     
+**** Path. *lchmod* (mode)
+     类似与Path.chmod()，不过如果为软连接，修改的为软连接的权限模式，
+     而不是目标文件的权限模式。
+
+**** Path. *lstat* ()
+     类似于Path.lstat()，不过如果为软连接，返回该软链接的文件信息，而
+     不是模板文件的信息。
+
+**** Path. *mkdir* (mode=0o777,parents=False,exist_ok=False)
+     创建新文件夹。如果指定MODE参数，则系统umask值结果决定文件夹权限。
+     如果文件夹已存在，则抛出FileExistsError 错误。
+
+     如果PARENTS参数为True，会自动创建不存在的父文件夹，但这些父文件夹
+     的权限模式会使用系统默认值，忽视MODE参数。
+
+     如果PARENTS参数为False（默认值），缺少父文件夹抛出
+     FileNotFoundError错误。
+
+     如果EXIST_OK参数为False（默认值），如果文件夹已存在，抛出
+     FileExistsError错误。
+
+**** Path. *open* (mode='r',buffering=-1,encoding=None,errors=None,newlines=None)
+     与内置函数open类型。
+
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+
+       with Path('/etc/hostname').open() as fp:
+           fp.readline()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... ... 'kali\n'
+     #+END_SRC
+
+**** Path. *owner* ()
+     返回路径文件的拥有者用户名。如果对应uid不存在于系统数据库，抛出
+     KeyError错误。
+
+     #+BEGIN_EXAMPLE python
+       >>> Path('dict.txt').owner()
+       'claudio'
+     #+END_EXAMPLE
+
+**** Path. *read_bytes* ()
+     将路径文件内容作为bytes对象返回。
+
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+
+       p = Path('~/dict').expanduser()
+       p.write_bytes(b'banary-data')
+       p.read_bytes()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> 11
+     - b'banary-data'
+     #+END_SRC
+
+**** Path. *read_text* (encoding=None,errors=None)
+     返回路径文件中解码有的内容。
+     
+     可选参数与open()函数含义相同。
+     
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+       p = Path('~/dict.txt').expanduser()
+       p.write_text('文本文件内容')
+       p.read_bytes()
+       p.read_text()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 6
+     - b'\xe6\x96\x87\xe6\x9c\xac\xe6\x96\x87\xe4\xbb\xb6\xe5\x86\x85\xe5\xae\xb9'
+     - '文本文件内容'
+     #+END_SRC
+     
+**** Path. *rename* (target)
+     将路径文件/文件夹重命名为TARGET。在Unix系统下，如果TARGET存在且为
+     文件，并有权限，会无条件重命名。
+
+     TARGET可为字符串，也可为另一个路径对象。
+
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+
+       p = Path('~/foo.txt').expanduser()
+       target = Path('~/bar.txt').expanduser()
+       p.write_text('1111')
+       p.rename(target)
+       p.exists()
+       target.read_text()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> 4
+     - >>> False
+     - '1111'
+     #+END_SRC
+
+**** Path. *replace* (target)
+     重命名当前文件/文件夹路径。如果target指向已存在文件/文件夹，无条
+     件替换。
+
+     *？* ：与renmae有何区别？？？
+
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+
+       p = Path('~/foo.txt').expanduser()
+       target = Path('~/bar.txt').expanduser()
+       p.write_text('1111')
+       p.replace(target)
+       p.exists()
+       target.read_text()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> 4
+     - >>> False
+     - '1111'
+     #+END_SRC
+     
+**** Path. *resolve* ()
+     将路径转换为决定路径，如果为软连接返回指向目标文件/文件夹的路径。
+
+     如果路径不存在，抛出FileNotFoundError错误；如果出现无限循环，抛出
+     RunTimeError错误。
+
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+
+       p = Path('/dev/cdrom/')
+       p.resolve()
+
+       p = Path('/dev/cdrom/../cdrom')
+       p.resolve()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> PosixPath('/dev/sr0')
+     - >>> >>> PosixPath('/dev/sr0')
+     #+END_SRC
+
+**** Path. *rglob* (pattern)
+     递归版本的path.glob()，相当于在前面添加了“**/”。
+
+     #+BEGIN_EXAMPLE python
+       sorted(Path().rglob('*.py'))
+     #+END_EXAMPLE
+
+**** Path. *rmdir* ()
+     删除路径文件夹。文件夹必须为空文件夹。
+
+**** Path. *samefile* (other_path)
+     是否与OTHER_PATH为同一文件。OTHER_PATH可为字符串，也可为另一个路
+     径对象。
+
+     两个路径需同时存在。
+
+**** Path. *symlink_to* (target,target_is_directory=False)
+     创建软连接。将当前路径作为软连接指向TARGET。
+
+     在Windows中，TARGET_IS_DIRECTORY需为True（默认为False），在POSIX
+     中则会忽视此参数。
+
+     #+BEGIN_EXAMPLE python
+       In [7]: ls
+       test.txt
+
+       In [8]: p = Path('mylink')
+     
+       In [9]: p.symlink_to('test.txt')
+
+       In [10]: p.resolve()
+       Out[10]: PosixPath('/home/claudio/test/test.txt')
+     #+END_EXAMPLE
+
+**** Path. *touch* (mode=0o666,exist_ok=True)
+     根据路径新建文件。如果有MODE参数，与系统umask值结合决定文件权限和
+     模式。如果文件已存在，且EXIST_OK参数不为True，抛出FileExistsError
+     错误。
+     
+**** Path. *unlink* ()
+     删除路径表示的文件或软连接。如果为文件夹，使用Path.rmdir()。
+
+**** Path. *write_bytes* (data)
+     以二进制模式打开文件，写入DATA，最后关闭。
+     
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+       p = Path('not-exists-file')
+       p.write_bytes(b'123')
+       p.read_bytes()
+       p.unlink()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 3
+     - b'123'
+     #+END_SRC
+     
+     如果文件已经存在，重写；如果不存在，则创建。
+     
+**** Path. *write_text* (data,encoding=None,errors=None)
+     以文本模式打开文件，写入DATA，最后关闭文件。
+     
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+       p = Path('not-exists-file')
+       p.write_text('123')
+       p.read_text()
+       p.unlink()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> 3
+     - '123'
+     #+END_SRC
+     
+     如果文件已经存在，重写；如果不存在，则创建。
 * os.path - 常用路径名操作
-  
 * fileinput - 迭代多个输入流中的行
 * stat - 转换系统stat命令结果
 * filcmp - 文件和文件夹对比
