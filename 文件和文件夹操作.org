@@ -918,7 +918,7 @@
 
 **** Path. *write_bytes* (data)
      以二进制模式打开文件，写入DATA，最后关闭。
-     
+
      #+BEGIN_SRC python :session
        from pathlib import Path
        p = Path('not-exists-file')
@@ -926,18 +926,18 @@
        p.read_bytes()
        p.unlink()
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> 3
      - b'123'
      #+END_SRC
-     
+
      如果文件已经存在，重写；如果不存在，则创建。
-     
+
 **** Path. *write_text* (data,encoding=None,errors=None)
      以文本模式打开文件，写入DATA，最后关闭文件。
-     
+
      #+BEGIN_SRC python :session
        from pathlib import Path
        p = Path('not-exists-file')
@@ -945,15 +945,504 @@
        p.read_text()
        p.unlink()
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> 3
      - '123'
      #+END_SRC
-     
+
      如果文件已经存在，重写；如果不存在，则创建。
 * os.path - 常用路径名操作
+** 模块函数
+   此模块提供操作路径名的函数。如需读写文件，使用内置函数open()，操作
+   文件系统使用os模块。函数的PATH参数可为字符串，也可为bytes对象。应用
+   中首选Unicode形式字符串（默认）。但在Unix系统中，一些文件名不能用字
+   符串表示，此时可使用bytes对象；在Windows系统中，bytes对象不能表示所
+   有文件名，所以需使用字符串形式。
+   
+   不同于shell，Python不会自动扩张路径，如需扩张，可使用expanduser()和
+   expandvars()函数，也可参考glob模块。
+   
+   #+BEGIN_QUOTE
+   pathlib模块提供高阶的路径对象。
+   #+END_QUOTE
+   
+   #+BEGIN_QUOTE
+   *注意* ：此模块中的所有函数只能同时使用字符串和bytes对象中的一种作
+   为参数，返回值与参数形式相同。
+   #+END_QUOTE
+   
+   #+BEGIN_QUOTE
+   *注意* ：不同的系统路径名规范不同，但os.path始终保存与当前操作系统
+   兼容。如需在本地使用不同规范的路径模块，可参考（都有相同接口）：
+   
+   - posixpath： Unix
+   - ntpath：Windows
+   - macpath：老式MocOS
+   #+END_QUOTE
+   
+*** os.path. *abspath* (path)
+    将将PATH标准化为绝对路径。在绝大多数系统中，等价于
+    normpath(join(os.getcwd(), path))。
+
+    #+BEGIN_SRC python :session
+      from os.path import abspath
+      abspath('README.org')
+      abspath('not-exists-file')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/home/claudio/Desktop/Python/python-standard-lib-notes/README.org'
+    - '/home/claudio/Desktop/Python/python-standard-lib-notes/not-exists-file'
+    #+END_SRC
+
+*** os.path. *basename* (path)
+    返回PATH的basename，与os.path.split()结果中的第二个元素值相同。
+
+    *注意* ：不同于Unix的basename命令，如'/foo/bar/'，该命令的返回结果
+    为'bar'，而此函数的返回值为空。
+
+    #+BEGIN_SRC python :session
+      from os.path import basename
+      name = '~/data/test.db'
+      print(basename('~/qwd/'))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>>
+    #+END_SRC
+
+*** os.path. *commonpath* (path)
+    返回PATHS中最长的相同子路径。PATHS只能同时为绝对路径和相对路径中的
+    一种，且不能为空，否则抛出ValueError错误。
+
+    不同于commonprefix，此函数的返回值为有效路径。
+    
+    #+BEGIN_SRC python :session
+      from os.path import commonpath
+      commonpath(['/usr/lib', '/usr/local/lib'])
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/usr'
+    #+END_SRC
+
+    兼容：Unix、Windows
+
+*** os.path. *commonprefix* (list)
+    逐个字符比较，获取最长相同路径字符串，如果LIST为空，返回空。
+    
+    不同于commonpath函数，此函数返回值可能不是有效路径。
+
+    #+BEGIN_SRC python :session
+      from os.path import commonprefix
+      commonprefix(['/usr/lib', '/usr/local/lib'])
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/usr/l'
+    #+END_SRC
+
+*** os.path. *dirname* (path)
+    返回路径的文件夹，与os.path.split()返回值的第一个参数相同。
+
+*** os.path. *exits* (path)
+    如果PATH表示的路径为存在的文件/文件夹，或表示open file descriptor
+    的整数，返回True。如果为被损坏的软连接，返回False。
+
+    在一些系统中，如果没有足够权限执行os.stat()，即时文件存在，也会返
+    回False。
+
+    #+BEGIN_SRC python :session
+      import os.path
+      os.path.exists('~')
+      os.path.exists(os.path.expanduser('~'))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - False
+    - True
+    #+END_SRC
+
+*** os.path. *lexists* (path)
+    如果系统上不能实现os.lstat()，等价于os.path.exists()。即即时时损坏
+    的软连接也会返回True。
+
+*** os.path. *expanduser* (path)
+    在Unix和Windows系统上，返回最前面将~和~user替换为家目录后的结果。
+    如果没有~符号，原样返回。
+
+    在Unix系统中，如果设置了环境变量HOME，~使用该变量值代替；否则使用
+    pwd模块获取当前用户的家目录代替。如果为，~usr会直接在password文件
+    中查询。
+
+    在Windows系统中，如果有设置，使用HOME和USERPROFILE；否则结合
+    HOMEPATH和HOMEDRIVE。 An initial ~user is handled by stripping the
+    last directory component from the created user path derived above.
+
+    #+BEGIN_SRC python :session
+      from os.path import expanduser
+      expanduser('~')
+      expanduser('~root')
+      expanduser('~notexists')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/home/claudio'
+    - '/root'
+    - '~notexists'
+    #+END_SRC
+
+*** os.path. *expandvars* (path)
+    将PATH中$name和${name}显示使用环境变量替换。如果不存在该环境变量，
+    则保存不变。
+
+    在Windows中，还可使用%name%形式。
+
+    #+BEGIN_SRC python :session
+      from os.path import expandvars
+
+      expandvars('${PYTHONPATH}')
+      expandvars('${pythonpath}')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> '/home/claudio/python:'
+    - '${pythonpath}'
+    #+END_SRC
+
+*** os.path. *getatime* (path)
+    
+    返回PATH上次被访问时间。
+    
+    结果为自“January 1, 1970, 00:00:00 (UTC).” 开始的秒数。如果不存在
+    或无访问权限，抛出OSError错误。
+    
+    如果os.stat_float_times()的返回结果为True，结果为浮点数。
+    
+    #+BEGIN_SRC python :session
+      from os.path import getatime
+      import pathlib
+      path = 'files/emma.txt'
+
+      print('起点时间：', getatime(path))
+      with open(path) as fp:
+          fp.readline()
+
+      print('读取内容后：', getatime(path))
+
+      pathlib.Path(path).chmod(0o666)
+      print('修改权限后：', getatime(path))
+
+      with open(path, 'a+') as fp:
+          fp.write('10')
+
+      print('写入内容后：', getatime(path))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> 起点时间： 1495265725.0639217
+    - ... ... '101010101010101010101010101010101010101010101010101010101010101010101010101010101010'
+    - 读取内容后： 1495265935.3199155
+    - >>> >>> 修改权限后： 1495265935.3199155
+    - >>> ... ... 2
+    - 写入内容后： 1495265935.3199155
+    #+END_SRC
+
+*** os.path. *getmtime* (path)
+    返回PATH上次被修改的时间。
+    
+    结果为自“January 1, 1970, 00:00:00 (UTC).” 开始的秒数。如果不存在
+    或无访问权限，抛出OSError错误。
+    
+    如果os.stat_float_times()的返回结果为True，结果为浮点数。
+    
+    #+BEGIN_SRC python :session
+      from os.path import getmtime
+      import pathlib
+      path = 'files/emma.txt'
+
+      print('起点时间：', getmtime(path))
+      with open(path) as fp:
+          fp.readline()
+
+      print('读取内容后：', getmtime(path))
+
+      pathlib.Path(path).chmod(0o666)
+      print('修改权限后：', getmtime(path))
+
+      with open(path, 'a+') as fp:
+          fp.write('10')
+
+      print('写入内容后：', getmtime(path))
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> 起点时间： 1495266106.8199103
+    - ... ... ''
+    - 读取内容后： 1495266106.8199103
+    - >>> >>> 修改权限后： 1495266106.8199103
+    - >>> ... ... 2
+    - 写入内容后： 1495266124.2679098
+    #+END_SRC
+    
+*** os.path. *getctime* (path)
+    在Unix系统中，为PATH的metadata上次被修改的时间；在Windows中，为
+    PATH创建时间。
+    
+    结果为自“January 1, 1970, 00:00:00 (UTC).” 开始的秒数。如果不存在
+    或无访问权限，抛出OSError错误。
+    
+    如果os.stat_float_times()的返回结果为True，结果为浮点数。
+    
+    #+BEGIN_SRC python :session
+      from os.path import getctime
+      import pathlib
+      path = 'files/emma.txt'
+
+      print('起点时间：', getctime(path))
+      with open(path) as fp:
+          fp.readline()
+
+      print('读取内容后：', getctime(path))
+
+      pathlib.Path(path).chmod(0o666)
+      print('修改权限后：', getctime(path))
+
+      with open(path, 'a+') as fp:
+          fp.write('10')
+
+      print('写入内容后：', getctime(path))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> 起点时间： 1495265993.2799137
+    - ... ... '1010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010'
+    - 读取内容后： 1495265993.2799137
+    - >>> >>> 修改权限后： 1495265995.1919136
+    - >>> ... ... 2
+    - 写入内容后： 1495265995.2199137
+    #+END_SRC
+
+*** os.path. *getsize* (path)
+    返回以byte数表示的文件大小。如果不存在或无访问权限，抛出OSError错
+    误。
+
+    #+BEGIN_SRC python :session
+      from os.path import getsize
+      getsize('files/emma.txt')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 2
+    #+END_SRC
+
+*** os.path. *isabs* (path)
+    是否为决定路径。即在Unix系统中，以斜杠开头；在Windows中，去除驱动
+    字符（如果有）后以反斜杠开头。
+
+*** os.path. *isfile* (path)
+    是否为存在的普通文件。会“跟随”软连接，所以如果为指向普通文件的软链
+    接也会返回True。
+
+    #+BEGIN_SRC python :session
+      from os.path import isfile
+      isfile('/etc/localtime')
+      isfile('/dev/cdrom')
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - True
+    - False
+    #+END_SRC
+
+*** os.path. *isdir* (path)
+    是否为存在的文件夹。会“跟随”软连接，所有为指向存在文件夹的软连接也
+    会返回True。
+
+    #+BEGIN_SRC python :session
+      from os.path import isdir
+      isdir('/etc/localtime')
+      isdir('files')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - False
+    - True
+    #+END_SRC
+
+*** os.path. *islink* (path)
+    是否为软连接。在不支持软连接的运行环境中，始终返回False。
+
+    #+BEGIN_SRC python :session
+      from os.path import islink
+      islink('/etc/localtime')
+      islink('/dev/cdrom')
+      # islink('files/emma.txt')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - True
+    - True
+    #+END_SRC
+
+*** os.path. *ismount* (path)
+    是否为挂载点：当前文件系统中，不同文件系统的的位置。在POSIX中，
+    On POSIX, the function checks whether path‘s parent, path/.., is
+    on a different device than path, or whether path/.. and path point
+    to the same i-node on the same device — this should detect mount
+    points for all Unix and POSIX variants. On Windows, a drive letter
+    root and a share UNC are always mount points, and for any other
+    path GetVolumePathName is called to see if it is different from
+    the input path.
+    
+    #+BEGIN_SRC python :session
+      from os.path import ismount
+      ismount('/run/user/1000')
+      ismount('files/emma.txt')
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - True
+    - False
+    #+END_SRC
+
+*** os.path. *join* (path, *paths)
+    拼接路径。将PATH和*PATH使用os.sep拼接。自动去除多余的斜杠和空字符
+    串。当最后一个元素后有斜杠，或为空时，返回结果才以斜杠接受。如果有
+    一个元素第一个字符为斜杠（即绝对路径），前面的内容被忽略，从当前开
+    始拼接。
+
+    Windows：（待续）
+
+    #+BEGIN_SRC python :session
+      import os.path
+
+      os.path.join('~')
+      os.path.join('/', 'etc')
+      os.path.join('/', 'etc/')
+      os.path.join('files', 'emma.txt')
+      os.path.join('files/', 'emma.txt', '')
+      os.path.join('files/', '', 'emma.txt', '')
+      os.path.join('files/', '', '/emma.txt', '')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> '~'
+    - '/etc'
+    - '/etc/'
+    - 'files/emma.txt/'
+    - 'files/emma.txt/'
+    - 'files/emma.txt/'
+    - '/emma.txt/'
+    #+END_SRC
+
+*** os.path. *normcase* (path)
+    在不忽略大小写的系统上，原样返回；在忽略大小写的系统上，全部转换为
+    小写。在Windows中，将斜杠转换为反斜杠。如果PATH不为字符串或bytes对
+    象，抛出TypeError错误。
+    
+*** os.path. *normpath* (path)
+*** os.path. *realpath* (path)
+*** os.path. *relpath* (path,start=os.curdir)
+*** os.path. *samefile* (fp1,fp2)
+*** os.path. *samestat* (stat1,stat2)
+*** os.path. *split* (path)
+    将路径PATH分割为(head, tail)形式。其中tail为路径最后一部分，head为
+    前面所有内容。
+
+    tail部分不会有任何斜杠，如果PATH以斜杠结束，则tail为空；如果PATH中
+    无任何斜杠，则head为空。
+
+    除非为根目录，head中最后一个斜杠被自动去除。
+
+    所有情况下，os.path.join(head, trail)的结果都与PATH含义一样，可能
+    在字符串上有区别。
+
+    #+BEGIN_SRC python :session
+      import os.path
+
+      os.path.split('~/Desktop/Python/test.py')
+      os.path.split('~/Desktop/Python/')
+      os.path.split('test.py')
+      os.path.split('/')
+      os.path.split('')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ('~/Desktop/Python', 'test.py')
+    - ('~/Desktop/Python', '')
+    - ('', 'test.py')
+    - ('/', '')
+    - ('', '')
+    #+END_SRC
+
+*** os.path. *splitdrive* (path)
+    将PATH分割为(drive, tail)，其中drive为挂载点或空字符串。在不支持驱
+    动路径名的系统上，drive始终为空。所有情况下，drive+tail的结果都为
+    PATH。
+
+    如果PATH中有驱动名，则drive为冒号和之前的所有内容，如
+    splitdrive('c:/dir')的结果为('c:', '/dir')。
+
+    如果PATH为UNC路径，drive会包含主机名和共享文件夹名，如
+    splitdrive('//host/share/dir')的结果为('//host/share', '/dir')。
+
+*** os.path. *splitext* (path)
+    将PATH分割为(root, ext)，且root+ext==PATH。ext为空或最多包含一个点
+    的字符串。basename中最前面的点会被忽视。
+    
+    #+BEGIN_SRC python :session
+      from os.path import splitext
+      splitext('.emacs')
+      splitext('.emacs/custom.el')
+      splitext('emacs/custom.el')
+      splitext('emacs/custom..el')
+      splitext('emacs/custom')
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ('.emacs', '')
+    - ('.emacs/custom', '.el')
+    - ('emacs/custom', '.el')
+    - ('emacs/custom.', '.el')
+    - ('emacs/custom', '')
+    #+END_SRC
+    
+*** os.path. *splitunc* (path)
+    *注意* ：自从3.1版本就废除，使用splitdrive。
+*** os.path. *supports_unicode_filenames*
+    是否支持任意Unicode字符串作为文件名。
+
+    #+BEGIN_SRC python :session
+      from os.path import supports_unicode_filenames
+      print(supports_unicode_filenames)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - False
+    #+END_SRC
+
 * fileinput - 迭代多个输入流中的行
 * stat - 转换系统stat命令结果
 * filcmp - 文件和文件夹对比
