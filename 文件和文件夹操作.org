@@ -1358,12 +1358,90 @@
     在不忽略大小写的系统上，原样返回；在忽略大小写的系统上，全部转换为
     小写。在Windows中，将斜杠转换为反斜杠。如果PATH不为字符串或bytes对
     象，抛出TypeError错误。
-    
+
 *** os.path. *normpath* (path)
+    去除多余相对路径原点和斜杠。在Windows中，会将斜杠转换为反斜杠。
+
+    *注意* ：如果PATH为软链接，可能会改变其含义。
+
+    #+BEGIN_SRC python :session
+      from os.path import normpath
+      normpath('A//B')
+      normpath('A/B/')
+      normpath('A/./B')
+      normpath('A/foo/../B/')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 'A/B'
+    - 'A/B'
+    - 'A/B'
+    - 'A/B'
+    #+END_SRC
+
 *** os.path. *realpath* (path)
+    将PATH转换为标准路径，如果为存在的软连接，返回指向目标。
+
+    #+BEGIN_SRC python :session
+      from os.path import realpath
+      realpath('/dev/cdrom')
+      realpath('.')
+      realpath('~')
+      realpath('not-exists')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/dev/sr0'
+    - '/home/claudio/Desktop/Python/python-standard-lib-notes'
+    - '/home/claudio/Desktop/Python/python-standard-lib-notes/~'
+    - '/home/claudio/Desktop/Python/python-standard-lib-notes/not-exists'
+    #+END_SRC
+
 *** os.path. *relpath* (path,start=os.curdir)
-*** os.path. *samefile* (fp1,fp2)
+    返回PATH相对于START（默认值为当前文件夹）的路径。
+
+    仅仅是路径计算：不会访问文件系统判断PATH或START是否真实存在。
+
+    #+BEGIN_SRC python :session
+      from os.path import relpath
+      relpath('/home')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '../../../../../hom'
+    #+END_SRC
+*** os.path. *samefile* (path1,path2)
+    如果path1和path2指向同一文件/文件夹，返回True。判断依据为“设备编
+    号”（device number）和i-node值。如果对其中任意一个调用os.stat()失
+    败，则抛出错误。
+
+    #+BEGIN_SRC python :session
+      from os.path import samefile
+      samefile('files/emma.txt', 'files/../files/emma.txt')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - True
+    #+END_SRC
+
+    兼容：Unix，Windows
+
+*** os.path. *sameopenfile* (fp1,fp2)？？？
+    如果FP1和FP2“文件描述符”（file descriptor）指向同一文件，返回True。
+
+    兼容：Unix，Windows
 *** os.path. *samestat* (stat1,stat2)
+    如果元组STAT1和STAT2指向同一文件，返回True。STAT1和STAT2可为
+    os.fstat()、os.lstat()、os.stat()的返回结果。
+    
+    samefile()和sameopenfile()内部就是使用此函数进行的比较。
+    
+    兼容：Unix，Windows
+    
 *** os.path. *split* (path)
     将路径PATH分割为(head, tail)形式。其中tail为路径最后一部分，head为
     前面所有内容。
