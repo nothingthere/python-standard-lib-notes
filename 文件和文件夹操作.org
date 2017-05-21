@@ -1487,7 +1487,7 @@
 *** os.path. *splitext* (path)
     将PATH分割为(root, ext)，且root+ext==PATH。ext为空或最多包含一个点
     的字符串。basename中最前面的点会被忽视。
-    
+
     #+BEGIN_SRC python :session
       from os.path import splitext
       splitext('.emacs')
@@ -1496,7 +1496,7 @@
       splitext('emacs/custom..el')
       splitext('emacs/custom')
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - ('.emacs', '')
@@ -1505,7 +1505,7 @@
     - ('emacs/custom.', '.el')
     - ('emacs/custom', '')
     #+END_SRC
-    
+
 *** os.path. *splitunc* (path)
     *注意* ：自从3.1版本就废除，使用splitdrive。
 *** os.path. *supports_unicode_filenames*
@@ -1522,6 +1522,219 @@
     #+END_SRC
 
 * fileinput - 迭代多个输入流中的行
+** fileinput. *input* (files=None,inplace=False,backup='',bufsize=0,mode='r',openhook=none)
+   创建一个FileInput类的实例。此实例被用作此模块中所有函数的全局状态，
+   and is also returned to use during iteration。参数会全部传递给
+   FileInput类的构造器。
+   
+   可使用with语句上下文管理器，即时处理文件时抛出错误，with语句退出时
+   也会自动关闭文件：
+   
+   #+BEGIN_EXAMPLE python
+     with fileinput.input(files=('spam.txt', 'eggs.txt')) as f:
+          for line in f:
+              process(line)
+   #+END_EXAMPLE
+   
+   #+BEGIN_SRC python :session
+      import fileinput
+      with fileinput.input(files=('files/a.txt', 'files/b.txt')) as f:
+          for line in f:
+              print(line)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - ... ... ... 1
+   - 2
+   - 3
+   - a
+   - b
+   - c
+   #+END_SRC
+   
+   下面为使用fileinput.input()创建全局状态的函数。如果还没有调用
+   fileinput.input()，抛出RuntimeError错误。
+   
+   #+BEGIN_SRC python :session
+     import fileinput
+     fileinput.filename()
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - Traceback (most recent call last):
+   -   File "<stdin>", line 1, in <module>
+   -   File "/usr/lib/python3.5/fileinput.py", line 127, in filename
+   -     raise RuntimeError("no active input()")
+   - RuntimeError: no active input()
+   #+END_SRC
+   
+*** fileinput. *filename* ()
+    返回当前处理的文件名。如果还没开始读取，返回None。
+    
+    #+BEGIN_SRC python :session
+      import fileinput
+      with fileinput.input(files=('files/a.txt', 'files/b.txt')) as f:
+          print(fileinput.filename())
+          for line in f:
+              print(fileinput.filename() + ' -> ' + line)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... ... None
+    - files/a.txt -> 1
+    - files/a.txt -> 2
+    - files/a.txt -> 3
+    - files/b.txt -> a
+    - files/b.txt -> b
+    - files/b.txt -> c
+    #+END_SRC
+
+*** fileinput. *fileno* ()
+    返回整数表示的当前文件“文件描述符”。如果没有文件被打开，返回-1。
+
+    #+BEGIN_QUOTE
+    文件描述符：第一次打开为3，以后每次打开增加1。？？？
+    #+END_QUOTE
+
+    #+BEGIN_SRC python :session
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files) as f:
+          print(fileinput.fileno())
+          for line in f:
+              print(fileinput.fileno(), ' -> ', line)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... -1
+    - 3  ->  1
+    - 3  ->  2
+    - 3  ->  3
+    - 3  ->  a
+    - 3  ->  b
+    - 3  ->  c
+    #+END_SRC
+
+*** fileinput. *lineno* ()
+    返回当前所有文件总共的处理函数。如果还没开始读取文件，返回0；如果
+    已处理完所有行，返回最后一行的行数。
+
+    #+BEGIN_SRC python :session
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files) as f:
+          print(fileinput.lineno())
+          for line in f:
+              print(fileinput.lineno(), ' -> ', line)
+          print(fileinput.lineno())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... 0
+    - 1  ->  1
+    - 2  ->  2
+    - 3  ->  3
+    - 4  ->  a
+    - 5  ->  b
+    - 6  ->  c
+    - 6
+    #+END_SRC
+
+*** fileinput. *filelineno* ()
+    返回当前文件所在行数。如果还没读取任何行，返回0；如果已读取最后一
+    个文件的最后一行，返回最后一个文件最后一行的行数。
+
+    #+BEGIN_SRC python :session
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files) as f:
+          print(fileinput.filelineno())
+          for line in f:
+              print(fileinput.filelineno(), ' -> ', line)
+          print(fileinput.filelineno())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... 0
+    - 1  ->  1
+    - 2  ->  2
+    - 3  ->  3
+    - 1  ->  a
+    - 2  ->  b
+    - 3  ->  c
+    - 3
+    #+END_SRC
+
+*** fileinput. *isfirstline* ()
+    如果时当前文件的第一行返回True，否则返回False。
+
+    #+BEGIN_SRC python :session
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files) as f:
+          print(fileinput.isfirstline())
+          for line in f:
+              print('YES' if fileinput.isfirstline() else 'NO', ' -> ', line)
+          print(fileinput.isfirstline())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... False
+    - YES  ->  1
+    - NO  ->  2
+    - NO  ->  3
+    - YES  ->  a
+    - NO  ->  b
+    - NO  ->  c
+    - False
+    #+END_SRC
+    
+*** fileinput. *isstdin* ()
+    如果上一行读取自sys.stdin返回True。
+
+*** fileinput. *nextfile* ()
+    关闭当前处理文件，读取下一个文件（如果有）。总共读取的函数lineno()
+    根据实际读取行数递增。直到下一个文件的第一行读取，filename()不会变。
+
+    在第一个文件的第一行读取前，以及在最后一个文件的最后一行读取后，此
+    函数没有任何效果。
+
+    #+BEGIN_SRC python :session
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files) as f:
+          print(f.readline())
+          print(fileinput.fileno())
+          print('共读取行数：', fileinput.lineno())
+          fileinput.nextfile()
+          print(f.readline())
+          print('共读取行数：', fileinput.lineno())
+          print(fileinput.filename())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... ... ... ... 1
+    - 3
+    - 共读取行数： 1
+    - a
+    - 共读取行数： 2
+    - files/b.txt
+    #+END_SRC
+
+*** fileinput. *close* ()
+    关闭文件序列。
+** class fileinput. *FileInput* *input* (files=None,inplace=False,backup='',bufsize=0,mode='r',openhook=none)
+** 钩子函数
+*** fileinput. *hook_compressed* (filename, mode)
+*** fileinput. *hook_encoded* (encoding)
 * stat - 转换系统stat命令结果
 * filcmp - 文件和文件夹对比
 * tempfile - 创建临时文件/文件夹

@@ -1,0 +1,23 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-21 16:53:18
+# Commentary:
+#+TITLE: 开发者工具
+
+* typing - 数据类型提示 （待续）
+* pydoc - 文档生成器和在线帮助系统 （待续）
+* doctest - 交互测试示例代码
+** 简例：测试文档字符串中的例子
+** 简例：测试文本文件中的例子
+** 原理
+** 基础API
+** 单元测试API
+** 高阶API
+** Debugging
+** Soapbox
+   
+* unittest - 单元测试框架
+* unittest.mock - mock对象库
+* unittest.mock - 实践
+* 2to3 - Python2代码转换为Python3代码
+* test - “回归测试（Regression Test）”插件
+* test.support - 测试工具
