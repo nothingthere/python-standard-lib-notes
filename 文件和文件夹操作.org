@@ -1483,7 +1483,7 @@
 
     如果PATH为UNC路径，drive会包含主机名和共享文件夹名，如
     splitdrive('//host/share/dir')的结果为('//host/share', '/dir')。
-
+    
 *** os.path. *splitext* (path)
     将PATH分割为(root, ext)，且root+ext==PATH。ext为空或最多包含一个点
     的字符串。basename中最前面的点会被忽视。
@@ -1522,27 +1522,50 @@
     #+END_SRC
 
 * fileinput - 迭代多个输入流中的行
+  此模块的作用为迭代标准输入列或多个文件，如果只读写单个文件，可使用
+  open()函数。
+  
+  基本用法为：
+  
+  #+BEGIN_EXAMPLE python
+    import fileinput
+    for line in fileinput.input():
+        process(line)
+  #+END_EXAMPLE
+  
+  此例将迭代sys.argv[1:]指定文件的所有行，如果此链表为空，则迭代
+  sys.stdin；如果文件名为'-'，也迭代sys.stdin。如需指定文件名，可将文
+  件名组成的链表作为input的参数，也可使用单个文件名作为参数。
+  
+  除在交互模式，或使用sys.stdin.seek(0)重置时，多次迭代sys.stdin只有第
+  一个有效。
+  
+  空文件一打开就立即关闭。只有上一个文件最后一行读取后后一个文件名才有
+  意义。
+  
+  可使用openhook参数控制文件打开方式。
+  
 ** fileinput. *input* (files=None,inplace=False,backup='',bufsize=0,mode='r',openhook=none)
    创建一个FileInput类的实例。此实例被用作此模块中所有函数的全局状态，
    and is also returned to use during iteration。参数会全部传递给
    FileInput类的构造器。
-   
+
    可使用with语句上下文管理器，即时处理文件时抛出错误，with语句退出时
    也会自动关闭文件：
-   
+
    #+BEGIN_EXAMPLE python
      with fileinput.input(files=('spam.txt', 'eggs.txt')) as f:
           for line in f:
               process(line)
    #+END_EXAMPLE
-   
+
    #+BEGIN_SRC python :session
       import fileinput
       with fileinput.input(files=('files/a.txt', 'files/b.txt')) as f:
           for line in f:
               print(line)
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
    - ... ... ... 1
@@ -1552,15 +1575,15 @@
    - b
    - c
    #+END_SRC
-   
+
    下面为使用fileinput.input()创建全局状态的函数。如果还没有调用
    fileinput.input()，抛出RuntimeError错误。
-   
+
    #+BEGIN_SRC python :session
      import fileinput
      fileinput.filename()
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
    - Traceback (most recent call last):
@@ -1695,7 +1718,7 @@
     - NO  ->  c
     - False
     #+END_SRC
-    
+
 *** fileinput. *isstdin* ()
     如果上一行读取自sys.stdin返回True。
 
@@ -1732,9 +1755,94 @@
 *** fileinput. *close* ()
     关闭文件序列。
 ** class fileinput. *FileInput* *input* (files=None,inplace=False,backup='',bufsize=0,mode='r',openhook=none)
-** 钩子函数
-*** fileinput. *hook_compressed* (filename, mode)
-*** fileinput. *hook_encoded* (encoding)
+   
+   FileInput类是i内部实现。除上面的模块函数对应的方法外，还有
+   readline()方法，用于读取下一行；以及用于实现序列特性的__getitem__()
+   方法。作为序列时，需按顺序获取内容；不能随机获取内容和readline()方
+   法同时使用。
+   
+   #+BEGIN_SRC python :session
+     import fileinput
+     files = ('files/a.txt', 'files/b.txt')
+     fs = fileinput.FileInput(files=files)
+     # for line in fs:
+     print(fs.readline())
+     print(fs.readline())
+     fs.close()
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... 1
+   - 2
+   #+END_SRC
+   
+   MODE参数需为'r'、'rU'、'U'和'rb'中的一种。
+   
+   #+BEGIN_SRC python :session
+     import fileinput
+     files = ('files/a.txt', 'files/b.txt')
+
+     def hook(filename, mode):
+         return open(filename, mode='r+')
+
+     with fileinput.input(files=files, openhook=hook) as fp:
+         for line in fp:
+             print(line)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... ... >>> ... ... ... 1
+   - 2
+   - 3
+   - a
+   - b
+   - c
+   #+END_SRC
+   
+   提供OPENHOOK参数时，须为接受两个参数的函数，FILENAME和MODE，并返回
+   对应类文件对象。不同时使用INPLACE和OPENHOOK参数。
+   
+   FileInput实例也可用于with上下文，所有文件在离开with时自动关闭：
+   
+   #+BEGIN_EXAMPLE python
+     with FileInput(files=('spam.txt', 'eggs.txt')) as input:
+          process(input)
+   #+END_EXAMPLE
+   
+*** inplace可选参数
+
+    如果将fileinput.input()和FileInput的inplace参数设置为True，原文件
+    将备份，且输出内容直接写入原文件。此时如果提供BACKUP参数，需为指定
+    备份文件后缀的字符串。
+
+    读取标准输入流时，此参数被忽视。
+
+    #+BEGIN_EXAMPLE python
+      import fileinput
+      files = ('files/a.txt', 'files/b.txt')
+      with fileinput.input(files=files, inplace=True, backup='.BAK') as fp:
+          for line in fp:
+              print(fileinput.filename() + ' ' + line)
+    #+END_EXAMPLE
+
+*** 钩子函数
+**** fileinput. *hook_compressed* (filename, mode)
+     使用gzip和bz2模块打开gzip和bzip2压缩文件（依靠.gz和.bz2后缀识别）。
+     如果文件不是以.gz或.bz2结尾，如普通文件一样打开。用法：
+
+     #+BEGIN_EXAMPLE python
+       fi = fileinput.Fileinput(openhook=fileinput.hook_compressed)
+     #+END_EXAMPLE
+
+**** fileinput. *hook_encoded* (encoding)
+     使用指定ENCODING打开并返回文件对象。用法：
+
+     #+BEGIN_EXAMPLE python
+       fi = fileinput.Fileinput(openhook=fileinput.hook_encoded)
+     #+END_EXAMPLE
+     
 * stat - 转换系统stat命令结果
 * filcmp - 文件和文件夹对比
 * tempfile - 创建临时文件/文件夹
