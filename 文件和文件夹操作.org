@@ -641,7 +641,7 @@
 
 **** Path. *glob* (pattern)
      返回路径中匹配glob形式PATTERN的所有文件路径组成的链表。
-     
+
      #+BEGIN_EXAMPLE python
        >>> sorted(Path('.').glob('*.txt'))
        [PosixPath('.phone-list.txt'), PosixPath('defaultdict.txt'), PosixPath('dict.tx
@@ -676,6 +676,17 @@
 
      如果不存在，返回False；其他如权限错误会向上抛出。
 
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+       p = Path('/dev/cdrom')
+       p.is_symlink()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> True
+     #+END_SRC
+
 **** Path. *is_socket* ()
      如果为Unix socket（或为指向Unix socket的软连接），则返回True，否
      则返回False。
@@ -695,13 +706,24 @@
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
      出。
      
+     #+BEGIN_SRC python :session
+       from pathlib import Path
+       p = Path('/dev/cdrom')
+       p.is_block_device()
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> True
+     #+END_SRC
+     
 **** Path. *is_char_device* ()
      如果为字符设备（或为指向字符设备的软连接），则返回True，否则返回
      False。
 
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
      出。
-     
+
      #+BEGIN_SRC python :session
        from pathlib import *
        Path('/dev/cdrom').is_block_device()
@@ -721,7 +743,7 @@
        for child in Path('.').resolve().iterdir():
            print(child)
      #+END_EXAMPLE
-     
+
 **** Path. *lchmod* (mode)
      类似与Path.chmod()，不过如果为软连接，修改的为软连接的权限模式，
      而不是目标文件的权限模式。
@@ -1810,7 +1832,7 @@
      with FileInput(files=('spam.txt', 'eggs.txt')) as input:
           process(input)
    #+END_EXAMPLE
-   
+
 *** inplace可选参数
 
     如果将fileinput.input()和FileInput的inplace参数设置为True，原文件
@@ -1842,12 +1864,380 @@
      #+BEGIN_EXAMPLE python
        fi = fileinput.Fileinput(openhook=fileinput.hook_encoded)
      #+END_EXAMPLE
-     
-* stat - 转换系统stat命令结果
+
+* stat - 解释stat()函数结果
+  stat模块定义了用于解释os.stat()、os.fstat()和os.lstat()返回结果的常
+  量和函数。
+  
+  #+BEGIN_SRC python :session
+    import stat
+    import os
+    print(os.stat('files/a.txt'))
+  #+END_SRC
+  
+  #+RESULTS:
+  #+BEGIN_SRC org
+  - >>> os.stat_result(st_mode=33188, st_ino=24779705, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=6, st_atime=1495439421, st_mtime=1495439408, st_ctime=1495439408)
+  #+END_SRC
+  
+** 判断函数
+   
+   正常情况下，可使用os.path.is*()函数判断文件类型。当多次判断同一文件
+   的属性时，使用这些函数可避免重复调用stat()。还可判断os.path不能处理
+   的文件类型，如块类型文件。
+   
+   *？* ：使用pathlib中的判断方法也能解决所有类型文件的判断问题。
+   
+   #+BEGIN_SRC python :session
+    import os
+    import sys
+    import stat
+
+    def walktree(top, callback):
+        for f in os.listdir(top):
+            pathname = os.path.join(top, f)
+            mode = os.stat(pathname).st_mode
+            # print(os.stat(pathname))
+            if stat.S_ISDIR(mode):
+                walktree(pathname, callback)
+            elif stat.S_ISREG(mode):
+                callback(pathname)
+            else:
+                print('跳过：' + pathname)
+
+    def visitfile(file):
+        print('访问：' + file)
+
+    walktree(os.path.expanduser('files'), visitfile)
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+    - >>> >>> >>> ... ... ... ... ... ... ... ... ... ... ... >>> ... ... >>> 访问：files/argparse_demo.py
+    - 访问：files/b.txt
+    - 访问：files/diff.py
+    - 访问：files/output.txt
+    - 访问：files/args.txt
+    - 访问：files/gestalt.c
+    - 访问：files/input.txt
+    - 访问：files/a.txt
+    - 访问：files/gestalt
+    - 访问：files/emma.txt
+    - 访问：files/argparse_demo_prog.py
+   #+END_SRC
+   
+*** stat. *S_ISDIR* (mode)
+    如果MODE来自文件夹，返回非0值。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      filename = 'files/emma.txt'
+      dirname = 'files'
+      file_mode = os.stat(filename).st_mode
+      dir_mode = os.stat(dirname).st_mode
+      print('原来mode类型为整数：', file_mode)
+      stat.S_ISREG(file_mode)
+      stat.S_ISDIR(dir_mode)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> >>> >>> 原来mode类型为整数： 33206
+    - True
+    - True
+    #+END_SRC
+
+*** stat. *S_ISCHR* (mode)
+    如果MODE来自字符类型文件，返回非0值。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('/dev/tty').st_mode
+      stat.S_ISCHR(mode)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> True
+    #+END_SRC
+
+*** stat. *S_ISBLK* (mode)
+    如果MODE来自块类型文件，返回非0值。
+
+    #+BEGIN_SRC python :session
+      import stat
+      import os
+      mode = os.stat('/dev/cdrom').st_mode
+      stat.S_ISBLK(mode)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> True
+    #+END_SRC
+    
+*** stat. *S_ISREG* (mode)
+    如果MODE来自普通文件，返回非0值。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('files/emma.txt').st_mode
+      stat.S_ISREG(mode)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> True
+    #+END_SRC
+
+*** stat. *S_ISFIFO* (mode)
+    如果MODE来自FIFO类型文件（如命名管道），返回非0值。
+*** stat. *S_ISLINK* (mode) ？？？
+    如果MODE来自软连接，返回非0值。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('/dev/cdrom').st_mode
+      print(mode)
+      stat.S_ISLNK(mode)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 25008
+    - False
+    #+END_SRC
+
+*** stat. *S_ISSOCK* (mode) （待续）
+*** stat. *S_ISDOOR* (mode) （待续）
+*** stat. *S_ISPORT* (mode) （待续）
+*** stat. *S_ISWHT* (mode) （待续）
+*** stat. *S_IMODE* (mode)
+    返回MODE中能被os.chmod()使用的部分。即权限位、sticky位、用户组ID位、
+    用户ID位。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('files').st_mode
+      print(mode, stat.S_IMODE(mode))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 16877 493
+    #+END_SRC
+
+*** stat. *S_IFMT* (mode)
+    返回MODE中表示文件类型的部分。上面的S_IS*判断函数就是使用的此返回
+    值。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('files').st_mode
+      print(mode, stat.S_IFMT(mode))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 16877 16384
+    #+END_SRC
+
+** 将mode转换为可读性强的字符形式
+*** stat. *filemode* (mode)
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      mode = os.stat('files/emma.txt').st_mode
+      stat.filemode(mode)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> '-rw-rw-rw-'
+    #+END_SRC
+** 对stat()结果进行所有的常量
+   os.stat()、os.fstat()和os.lstat()的返回结果都是10个元素的元组。下面
+   的常量其实都是整数，用于索引元组中的对应元素。
+   
+*** stat. *ST_MODE* ？？？
+    inode protection mode。
+
+    #+BEGIN_SRC python :session
+       import stat
+       import os
+       mode = os.stat('files/')
+       mode[stat.ST_MODE]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 16877
+    #+END_SRC
+
+*** stat. *ST_INO*
+    inode值。
+    
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+      st = os.stat('files/emma.txt')
+      st[stat.ST_INO]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 24779756
+    #+END_SRC
+
+    #+BEGIN_SRC sh :session
+      ls files/emma.txt --inode
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 24779756 files/emma.txt
+    #+END_SRC
+
+*** stat. *ST_DEV* ？？？
+    所在设备。
+
+    #+BEGIN_SRC python :session
+      import os
+      import stat
+
+      st = os.stat('files/emma.txt')
+      print(st)
+      st[stat.ST_DEV]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> os.stat_result(st_mode=33206, st_ino=24779756, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=2, st_atime=1495507123, st_mtime=1495266124, st_ctime=1495266124)
+    - 2049
+    #+END_SRC
+
+*** stat. *ST_NLINK*
+    链接数量。
+
+    #+BEGIN_SRC python :session
+      st[stat.ST_NLINK]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1
+    #+END_SRC
+
+*** stat. *ST_UID*
+    用户ID。
+
+    #+BEGIN_SRC python :session
+      st[stat.ST_UID]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+*** stat. *ST_GID*
+    用户组ID。
+
+    #+BEGIN_SRC python :session
+      st[stat.ST_GID]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+*** stat. *ST_SIZE*
+    文件大小。
+
+    文件“大小”的解释取决于文件类型。
+
+    - 普通文件为byte数。
+    - FIFO（如命名管道）和socket为当os.stat()、os.fstat()和os.lstat()
+      调用时等待读取的byte数。
+    - 字符型和块型文件的大小取决于系统调用。
+
+    #+BEGIN_SRC python :session
+      st[stat.ST_SIZE]
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 2
+    #+END_SRC
+
+*** stat. *ST_ATIME*
+*** stat. *ST_MTIME*
+*** stat. *ST_CTIME*
+    上次访问时间、修改时间和创建时间。
+
+    创建时间CTIME由系统决定。在Unix中为上次元数据修改时间，Windows中为
+    创建时间。
+
+    #+BEGIN_SRC python :session
+      import datetime
+      import os
+      import stat
+      st = os.stat('files/emma.txt')
+      atime = st[stat.ST_ATIME]
+      mtime = st[stat.ST_MTIME]
+      ctime = st[stat.ST_CTIME]
+
+      def time_2_readable(time):
+          return datetime.date.fromtimestamp(time)
+
+      print('上次访问时间：', time_2_readable(atime))
+      print('上次修改时间：', time_2_readable(mtime))
+      print('创建时间：', time_2_readable(ctime))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> >>> >>> >>> >>> >>> ... ... >>> >>> 上次访问时间： 2017-05-23
+    - 上次修改时间： 2017-05-20
+    - 创建时间： 2017-05-20
+    #+END_SRC
+** ？？？
+*** stat. *S_IFSOCK*
+    
+    #+BEGIN_SRC python :session
+      import stat
+      stat.S_IFSOCK
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 49152
+    #+END_SRC
+    
+*** stat. *S_IFLINK*
+*** stat. *S_IFREG*
+*** stat. *S_IFBLK*
+*** stat. *S_IFDIR*
+*** stat. *S_IFCHR*
+*** stat. *S_IFIFO*
+*** stat. *S_IFDOOR*
+*** stat. *S_IFPORT*
+*** stat. *S_IFWHT*
+    
 * filcmp - 文件和文件夹对比
 * tempfile - 创建临时文件/文件夹
+
 * glob - Unix风格路径扩张
 * fnmatch - Unix文件名模式匹配
 * linecache - 随机操作文本行
 * shutil - 高阶文件操作
+
 * macpath - “Mac OS 9”路径处理函数 （待续）

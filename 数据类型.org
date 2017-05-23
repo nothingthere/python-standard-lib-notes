@@ -1084,7 +1084,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     
 **** classmethod somenamedtuple._make(iterable)
      模块函数，使用ITERABLE序列或iterable对象创建新对象。
-
+     
      #+BEGIN_SRC python :session
        from collections import namedtuple
        Point = namedtuple('Point', 'x, y')
@@ -1097,25 +1097,25 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      #+BEGIN_SRC org
      - >>> >>> >>> Point(x=11, y=22)
      #+END_SRC
-
+     
 **** somenamedtuple._asdict()
      将namedtuple对象返回为OrderedDict对象：
-
+     
      #+BEGIN_SRC python :session
        from collections import namedtuple
        P = namedtuple('P', 'x, y')
        p1 = P._make([11, 22])
        print(p1._asdict())
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> OrderedDict([('x', 11), ('y', 22)])
      #+END_SRC
-
+     
 **** somenamedtuple._replace(kwargs)
      替换KWARGS指定的元素和值，返回新的namedtuple对象：
-     
+
      #+BEGIN_SRC python :session
        from collections import namedtuple
        Point = namedtuple('Point', 'x, y')

@@ -2,15 +2,843 @@
 # Created: 2017-05-03 17:18:04
 # Commentary:
 #+TITLE: 常用系统服务
+本章介绍模块的接口适用于绝大多数操作系统，如文件和时钟。接口主要基于
+Unix或C，但可用于大多数系统。
 
 * os - 各种操作系统接口
+  
+  #+BEGIN_QUOTE
+  *注意* ：当不能访问文件名或路径，或其他参数类型正确，但不被操作系统
+  接受时，此模块中所有函数都抛出OSError错误。
+  #+END_QUOTE
+  
+  - exception os. *error* ： 内置OSError别名。
+  - os. *name* ：操作系统类型。目前支持的名称有：posix、nt、ce、java。
+    
+    #+BEGIN_SRC python :session
+      import os
+      print(os.name)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - posix
+    - posix.uname_result(sysname='Linux', nodename='kali', release='4.9.0-kali3-amd64', version='#1 SMP Debian 4.9.18-1kali1 (2017-04-04)', machine='x86_64')
+    #+END_SRC
+    
+    另外，还有sys.platform模块，以及os.uname()获取系统详细信息：
+    
+    #+BEGIN_SRC python :session
+      import sys
+      import os
+      print(sys.platform)
+      print(os.uname())
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> linux
+    - posix.uname_result(sysname='Linux', nodename='kali', release='4.9.0-kali3-amd64', version='#1 SMP Debian 4.9.18-1kali1 (2017-04-04)', machine='x86_64')
+    #+END_SRC
+    
 ** 文件名、命令行参数和环境变量
-** 进程参数
+   在Python中，文件名、命令行参数和环境变量都使用字符串表示。在一些系
+   统中，传给操作系统前，会对这些字符串编码和解码。这时，Python文件系
+   统编码编码这些字符串：
+
+   #+BEGIN_SRC python :session
+     import sys
+     print(sys.getfilesystemencoding())
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - utf-8
+   #+END_SRC
+
+** 获取进程参数
+   下面这些函数和数据表示当前进程和用户信息：
+*** os. *ctermid* ()
+    返回控制当前进程的终端文件。
+
+    #+BEGIN_SRC python :session
+      import os
+      print(os.ctermid())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - /dev/tty
+    #+END_SRC
+
+    兼容：Unix。
+*** os. *environ*
+    返回表示当前系统环境的映射对象，以字符串表示。比如environ['HOME']
+    等价于C中的getenv("HOME")。
+
+    #+BEGIN_SRC python :eval never
+      import os
+      for k, v in sorted(os.environ.items()):
+          print(k + ' -> ' + v)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+      ...
+      - LANG -> en_HK.UTF-8
+      - LOGNAME -> claudio
+      ...
+      ...
+      - _ -> /usr/bin/emacs24
+    #+END_SRC
+
+    此映射对象在os模块第一次导入时获取，即Python启动时处理site.py时计
+    算。此后如果系统修改变量，不会改变此映射对象，除非直接修改os.environ
+    本身。
+
+    在支持putenv()的系统中，修改此映射后会自动调用putenv()函数，实现对
+    此映射和系统变量的同时修改。？？？
+
+    在Unix中，键值字符串编码使用
+    sys.getfilesystemencoding()和'surrogateeascape'处理错误。如需使用
+    其他编码形式，使用environb。
+
+    #+BEGIN_QUOTE
+    *注意* ：
+
+    1. 直接使用putenv()不能改变os.environ，所以最好直接修改os.environ
+       值。
+    2. 在FreeBSD和Mac OS X等平台上，修改environ可能会会造成内存泄露。
+       具体可参考系统的putenv()文档。
+    #+END_QUOTE
+
+    如果系统没有putenv()，此映射会传递给进程创建函数，使子进程修改系统
+    变量。
+
+    如果系统支持unsetenv()，使用pop()或clear()删除映射中键值对后，系统
+    会自动调用unsetenv()，删除环境变量。
+
+*** os. *environb*
+    与environ相同，只是键值对使用bytes对象表示。environ和environb自动
+    同步，即修改其中一个另一个会自动修改。
+
+    只有当os.supports_bytes_environ为True时，才支持environb属性。
+
+    #+BEGIN_SRC python :session
+      import os
+      print(os.supports_bytes_environ)
+      os.environ['LANG'] = 'whatever'
+      os.environb[b'LANG']
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - True
+    - >>> b'whatever'
+    #+END_SRC
+
+*** os. *chdir* (path)
+*** os. *fchdir* (fd)
+*** os. *getcwd* ()
+    这3个函数在下面文件和文件夹章节介绍。
+    
+*** os. *fsencode* (filename)
+    使用系统编码，附带surrogateescape错误处理（Windows为strict），使用
+    文件系统编码，编码FILENAME。
+
+    #+BEGIN_SRC python :session
+      import os
+      import sys
+      filename = '文件'
+      print(os.fsencode(filename))
+      os.fsencode(filename) == filename.encode(sys.getfilesystemencoding())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> b'\xe6\x96\x87\xe4\xbb\xb6'
+    - True
+    #+END_SRC
+
+*** os. *fsdecode* (filename)
+    使用系统编码，附带surrogateescape错误处理（Windows为strict），使用
+    文件系统编码，解码FILENAME。
+
+*** os. *getenv* (key,default=None)
+    如果KEY存在，返回对应系统变量；如果不存在，返回DEFAULT值。
+
+    在Unix中，键值字符串使用sys.getfilesystemencoding()解码，并使用
+    surrogateescape错误处理函数。如需使用不同编码形式，使用
+    os.getenvb()。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getenv('TERM')
+      os.getenv('non-exists', 'HAHA!')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 'dumb'
+    - 'HAHA!'
+    #+END_SRC
+
+    兼容：绝大多数Unix，Windows。
+
+*** os. *getenvb* (key,default=None)
+    同getenv()，返回值为bytes对象。
+
+    只有os.supports_bytes_environ返回True时才支持。
+
+    兼容：绝大多数Unix。
+
+*** os. *get_exec_path* (env=None)
+    返回系统变量$PATH中路径组成的链表。
+
+    如果使用env参数，须为含PATH键的映射。默认为None，即使用os.environ。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.get_exec_path()
+      os.get_exec_path({'PATH': 'w'})
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ['/home/claudio/tools', '/home/claudio/python', '/home/claudio/bin', '/home/claudio/.local/bin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/local/games', '/usr/games']
+    - ['w']
+    #+END_SRC
+
+*** os. *getegid* ()
+    返回当前进程的“有效”用户组ID。？？？
+    
+    #+BEGIN_SRC python :session
+      import os
+      os.getegid()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+    兼容：Unix。
+*** os. *geteuid* ()
+    返回当前进程的用户ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.geteuid()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+    兼容：Unix。
+
+*** os. *getgid* ()
+    返回当前进程的真正用户组ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getgid()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+    兼容：Unix。
+
+*** os. *getgrouplist* (user,group) ？？？
+    返回用户USER所属用户组ID组成的链表。如果group不包含在返回值内，将
+    其加入；GROUP为USER添加到password中的用户组ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getgrouplist('claudio', 1000)
+      os.getgrouplist('claudio', 0)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [1000]
+    - [0]
+    #+END_SRC
+
+    兼容：Unix。
+*** os. *getgroups* ()
+    返回当前进程所属用户组ID组成的链表。
+    
+    #+BEGIN_SRC python :session
+      import os
+      os.getgroups()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [1000]
+    #+END_SRC
+
+    兼容：Unix。
+
+*** os. *getlogin* ()
+    返回控制当前进程命令行的登录用户名。大多数情况下，使用下面几种方式
+    更有效：
+    
+    - environ['LOGNAME']
+    - environ['USERNAME']
+    - pwd.getpwuid(os.getuid()).pw_name
+      
+    #+BEGIN_SRC python :session
+      import os
+      import sys
+      import pwd
+      os.getlogin()
+      os.environ['LOGNAME']
+      os.environ['USERNAME']
+      pwd.getpwuid(os.getuid()).pw_name
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 'claudio'
+    - 'claudio'
+    - 'claudio'
+    - 'claudio'
+    #+END_SRC
+
+    兼容：Unix，Windows。
+*** os. *getpgid* (pid) ？？？
+    返回进程为ID值为PID的进程用户组ID。如果pid为0，返回当前进程的用户
+    组ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getpgid(0)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 2465
+    #+END_SRC
+
+    兼容：Unix。
+
+*** os. *getpgrp* ()
+    返回当前经常用户组ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getpgrp()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 2465
+    #+END_SRC
+
+    兼容：Unix。
+*** os. *getpid* ()
+    返回当前进程ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getpid()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 2465
+    #+END_SRC
+
+*** os. *getppid* ()
+    返回父进程ID。
+    
+    当父进程退出，在Unix中返回值为初始化进程ID（1），在Windows中，不会
+    有变化，但该父进程ID可能已经他用。
+    
+    #+BEGIN_SRC sh :session
+      ps aux | grep emacs24
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - claudio   1692  1.1  2.1 361824 82160 pts/0    Sl+  08:46   2:29 emacs24 -nw
+    - claudio   8352  0.0  0.0  12720   968 ?        S    12:32   0:00 grep emacs24
+    #+END_SRC
+    
+    #+BEGIN_SRC python :session
+      import os
+      os.getppid()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1692
+    #+END_SRC
+    
+*** os. *getpriority* () （待续）
+*** os. *PRIO_PROCESS* （待续）
+*** os. *PRIO_PGRP* （待续）
+*** os. *PRIO_USER* （待续）
+*** os. *getresuid* ()
+    返回元组（ruid, euid, suid），即当前进程用户（真实ID,有效ID,以保存
+    ID）。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getresuid()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - (1000, 1000, 1000)
+    #+END_SRC
+
+    兼容：Unix。
+
+*** os. *getresgid* ()
+    返回元组（ruid, euid, suid），即当前进程用户组（真实ID,有效ID,以保
+    存ID）。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getresgid()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - (1000, 1000, 1000)
+    #+END_SRC
+
+*** os. *getuid* ()
+    返回当前进程真实用户ID。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.getuid()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1000
+    #+END_SRC
+
+*** os. *initgroups* (username,gid) ？？？
+    调用系统initgroups()函数。
+
+    兼容：Unix。
+
+*** os. *putenv* (key,value)
+    将环境变量KEY设置为VALUE。此更改只在os.system()、popen()、fork()、
+    execv()开始执行时影响子进程。
+
+    #+BEGIN_QUOTE
+    *注意* ：在FreeBSD和Mac OS X等平台上，修改environ映射属性可能造成
+    内存泄露。参考系统putenv()函数。
+    #+END_QUOTE
+
+    如果支持putenv()，修改os.environ直接翻译为调用putenv()；但是，调用
+    putenv()不会更新os.environ，所以建议直接修改os.environ。
+
+*** os. *setegid* (egid)
+    设置当前进程的有效用户组ID。
+
+    兼容：Unix。
+
+*** os. *seteuid* (euid)
+    设置当前进程的有效用户ID。
+
+    兼容：Unix。
+*** os. *setgid* (gid)
+    设置当前进程的用户组ID。
+
+    兼容：Unix。
+
+*** os. *setgroups* (groups) ？？？
+*** os. *setpgrp* ()
+*** os. *setpgid* (pid,pgrp)
+*** os. *setpriority* (which,who,priority)
+*** os. *setregid* (rgid,egid)
+*** os. *setresid* (rgid,egid,sgid)
+*** os. *setresuid* (ruid,euid,suid)
+*** os. *setreuid* (ruid,euid)
+*** os. *getsid* (pid)
+*** os. *setsid* ()
+*** os. *setuid* (uid)
+*** os. *strerror* (code)
+*** os. *supports_bytes_environ*
+*** os. *umask* (mask)
+    设置当前当前umask值为MASK，并返回原来umask值。
+*** os. *uname* ()
+    返回当前操作系统信息组成的namedtuple。返回值有下面5个属性：
+    
+    - sysname： 操作系统名称。
+    - nodename：主机在网络中的名称。
+    - release：操作系统发行信息。
+    - version：操作系统版本。
+    - machine：硬件信息。
+
+    #+BEGIN_SRC python :session
+      import os
+      print(os.uname().release)
+      for x in os.uname():
+          print(x)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 4.9.0-kali3-amd64
+    - ... ... Linux
+    - kali
+    - 4.9.0-kali3-amd64
+    - #1 SMP Debian 4.9.18-1kali1 (2017-04-04)
+    - x86_64
+    #+END_SRC
+
+    一些系统会将nodename属性删减为8个字符；获取nodename更可靠的方式为
+    socket.gethostname()或socket.gethostbyaddr(socket.gethostname())：
+    
+    #+BEGIN_SRC python :session
+      import socket
+      socket.gethostname()
+      socket.gethostbyaddr(socket.gethostname())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 'kali'
+    - ('kali', [], ['127.0.1.1'])
+    #+END_SRC
+    
+    兼容：最近版本的Unix。
+
+*** os. *unsetenv* (key)
 ** 创建文件对象
+*** os. *fdopen* (fd,*args,**kwargs)
+    返回FD文件描述符对应的文件对象。与内置函数open()使用相同参数，唯一
+    不同为第一个参数为文件描述符（整数）。
+
+    #+BEGIN_SRC python :session
+      import os
+      fd = os.open('files/emma.txt', os.O_RDONLY)
+      print('当前文件描述符为：', fd)
+      fo = os.fdopen(fd)
+      fo.read()
+      fo.close()
+      # print(fd)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> 当前文件描述器为： 3
+    - >>> '10'
+    #+END_SRC
+
 ** 文件描述器操作
+   下面的函数使用文件描述符操作I/O流。
+   
+   文件描述符为小整数，与当前进程打开文件数相关。比如，标注输入流描述
+   符为0，标准输出流为1，标准错误流为2。以后，每打开一个文件，此数字递
+   增，并对应当前打开文件。在Unix中，sockets和pip都会有对应文件描述符。
+   
+   io.fileno()可获取文件对象对应的文件描述符：
+   
+   #+BEGIN_SRC python :session
+     import sys
+     sys.stdin.fileno()
+     sys.stdout.fileno()
+     sys.stderr.fileno()
+     with open('files/emma.txt') as f:
+         print(f.fileno())
+   #+END_SRC
+   
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - 0
+   - 1
+   - 2
+   - ... ... 3
+   #+END_SRC
+   
+*** 普通函数
+**** os. *close* (fd)
+     关闭文件描述符FD。
+
+     #+BEGIN_QUOTE
+     *注意* ：此函数专用于底层I/O调用，只能关闭os.open()或os.pipe()打
+     开的文件描述符。如需关闭open()、popen()或fdopen()打开的文件对象，
+     则需使用该文件对象的close()方法。
+     #+END_QUOTE
+
+     #+BEGIN_SRC python :session
+       import os
+       fd = os.open('files/emma.txt', os.O_RDONLY)
+       os.read(fd, 1)
+       os.close(fd)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> b'1'
+     #+END_SRC
+
+**** os. *closerange* (fd_low,fd_high)
+     关闭文件描述符从FD_LOW（包含）到FD_HIGH（不包含）的所有文件描述符，
+     忽视抛出错误。基本上等价于（但快于）：
+
+     #+BEGIN_EXAMPLE python
+       for fd in range(fd_low, fd_high):
+           try:
+               os.close(fd)
+           except OSError:
+               pass
+     #+END_EXAMPLE
+     
+**** os. *device_encoding* (fd)
+     如果FD为终端的文件描述符，返回其编码形式；否则返回None。
+     #+BEGIN_SRC python :session
+       import os
+       import sys
+       fd = os.open('files/emma.txt', os.O_RDONLY)
+       print(os.device_encoding(fd))
+       print(os.device_encoding(sys.stdin.fileno()))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> None
+     - UTF-8
+     #+END_SRC
+
+**** os. *dup* (fd)
+     返回FD的副本，不会被子进程继承。
+
+     在Windows中，（0:stdin、1:stdout、2:stderr）会被子进程继承。
+
+     #+BEGIN_SRC python :session
+       import os
+       fd = os.open('files/emma.txt', os.O_RDONLY)
+       fd1 = os.dup(fd)
+       print(fd, fd1)
+       os.read(fd, 1)
+       os.read(fd1, 1)
+       os.closerange(fd, fd1 + 1)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> 27 28
+     - b'1'
+     - b'0'
+     #+END_SRC
+
+**** os. *dup2* (fd, fd2, inheritable=True)
+     将FD复制成FD2，如果必要关闭FD。可设置INHERITABLE参数指定FD2是否可
+     被子进程继承。
+     
+     #+BEGIN_SRC python :session
+       import os
+
+       print('files/a.txt中的内容：')
+       with open('files/a.txt') as f:
+           print(repr(f.read()))
+
+       print('files/b.txt中的内容：')
+       with open('files/b.txt') as f:
+           print(repr(f.read()))
+
+       fda = os.open('files/a.txt', os.O_RDONLY)
+       fdb = os.open('files/b.txt', os.O_RDONLY)
+
+       os.read(fda, 2)
+       print('将fdb指向fda后，fdb就相当于fda：')
+       print(fda, fdb)
+       os.dup2(fda, fdb)
+       os.read(fda, 2)
+
+       os.close(fda)
+       os.close(fdb)
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> files/a.txt中的内容：
+     - ... ... '1\n2\n3\n'
+     - files/b.txt中的内容：
+     - ... ... 'a\nb\nc\n'
+     - >>> >>> >>> b'1\n'
+     - 将fdb指向fda后，fdb就相当于fda：
+     - 27 28
+     - >>> b'2\n'
+     #+END_SRC
+     
+**** os. *fchmod* (fd,mode)
+     
+**** os. *fchown* (fd,uid,gid)
+**** os. *fdatasync* (fd)
+**** os. *fpathconf* (fd,name)
+**** os. *fstat* (fd)
+**** os. *fstatvfs* (fd)
+**** os. *fsync* (fd)
+**** os. *ftruncate* (fd,length)
+**** os. *get_blocking* (fd)
+**** os. *isatty* (fd)
+**** os. *lockf* (fd,cmd,len)
+**** os. *F_LOCK*
+**** os. *F_TLOCK*
+**** os. *F_ULOCK*
+**** os. *F_TEST*
+**** os. *lseek* (fd,pos,how)
+**** os. *SEEK_SET*
+**** os. *SEEK_CUR*
+**** os. *SEEK_END*
+**** os. *open(path,flags,mode=0o777,*,dir_fd=None)
+**** os. *O_RDONLY*
+**** os. *O_WRONLY*
+**** os. *O_RDWR*
+**** os. *O_APPEND*
+**** os. *O_CREATE*
+**** os. *O_EXCL*
+**** os. *O_TRUNC*
+**** os. *O_DSYNC*
+**** os. *O_RSYNC*
+**** os. *O_SYNC*
+**** os. *O_NDELAY*
+**** os. *O_NONBLOCK*
+**** os. *O_NOCTTY*
+**** os. *O_CLOEXEC*
+**** os. *O_BINARY*
+**** os. *O_NOINHERIT*
+**** os. *O_SHORT_LIVED*
+**** os. *O_TEMPORARY*
+**** os. *O_RANDOM*
+**** os. *O_SEQUENTIAL*
+**** os. *O_TEXT*
+**** os. *O_ASYNC*
+**** os. *O_DIRECT*
+**** os. *O_DIRECTORY*
+**** os. *O_NOFOLLOW*
+**** os. *O_NOATIME*
+**** os. *O_PATH*
+**** os. *O_TMPFILE*
+**** os. *O_SHLOCK*
+**** os. *O_EXLOCK*
+**** os. *openpty* ()
+**** os. *pipe* ()
+**** os. *pipe2* (flags)
+**** os. *posix_fallocate* (fd,offset,len)
+**** os. *posix_fadvise* (fd,offset,len,advice)
+**** os. *POSIX_FADV_NORMAL*
+**** os. *POSIX_FADV_SEQUENTIAL*
+**** os. *POSIX_FADV_RANDOM*
+**** os. *POSIX_FADV_NOREUSE*
+**** os. *POSIX_FADV_WILLNEED*
+**** os. *POSIX_FADV_DONTNEED*
+**** os. *pread* (fd,buffersize,offset)
+**** os. *pwrite* (fd,str,offset)
+**** os. *read* (fd,n)
+**** os. *sendfile* (out,in,offset,count)
+**** os. *sendfile* (out,in,count,[headers,][trailers,]flags=0)
+**** os. *set_blocking* (fd,blocking)
+**** os. *SF_NODISKIO*
+**** os. *SF_MNOWAIT*
+**** os. *SF_SYNC*
+**** os. *readv* (fd,buffers)
+**** os. *tcgetpgrp* (fd)
+**** os. *tcsetpgrp* (fd,pg)
+**** os. *ttyname* (fd)
+**** os. *write* (fd,str)
+**** os. *writev* (fd,buffers)
+
 *** 获取命令行大小
 *** 文件描述器继承
 ** 文件和文件夹
+*** os. *access* (path,mode,*,dir_fd=None,effective_ids=False,follow_symlinks=True)
+*** os. *F_OK*
+*** os. *R_OK*
+*** os. *W_OK*
+*** os. *X_OK*
+*** os. *chdir* (path)
+*** os. *chflags* (path,flags,*,follow_symlinks=True)
+*** os. *chmod* (path,mode,*,dir_fd=None,follow_symlinks=True)
+    
+*** os. *chown* (path,uid,gid,*,dir_fd=None,follow_symlinks=True)
+*** os. *chroot* (path)
+*** os. *fchdir* (fd)
+*** os. *getcwd* ()
+*** os. *getcwdb* ()
+*** os. *lchflags* ()
+*** os. *lchmod* (path,mode)
+*** os. *lchown* (path,uid,gid)
+*** os. *link* (src,dst,*,src_dir_fd=None,dst_dir_fd=None,follow_symlinks=True)
+*** os. *lstdir* (path='.')
+*** os. *lstat* (path,*,dir_fd=None)
+*** os. *mkdir* (path,mode=0o777,*,dir_fd=None)
+*** os. *makedirs* (name,mode=0o777,exist_ok=False)
+*** os. *mkfifo* (path,mode=0o666,*,dir_fd=None)
+*** os. *mknod* (path,mode=0o600,device=0,*,dir_fd=None)
+*** os. *major* (device)
+*** os. *minor* (device)
+*** os. *makedev* (major,minor)
+*** os. *pathconf* (path,name)
+*** os. *pathconf_names*
+*** os. *readlink* (path,*,dir_fd=None)
+*** os. *remove* (path,*,dir_fd=None)
+*** os. *removedirs* (name)
+*** os. *rename* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
+*** os. *renames* (old,new)
+*** os. *replace* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
+*** os. *rmdir* (path,*,dir_fd=None)
+*** os. *scandir* (path='.')
+*** class os. *DirEntry*
+**** name
+**** path
+**** inode()
+**** is_dir(*,follow_symlinks=True)
+**** is_file(*,follow_symlinks=True)
+**** is_symlink()
+**** stat(*,follow_symlinks=True)
+*** os. *stat* (path,*,dir_fd=None,follow_symlinks=True)
+*** class os. *stat_result*
+**** st_mode
+**** st_ino
+**** st_dev
+**** st_nlink
+**** st_uid
+**** st_gid
+**** st_size
+**** st_atime
+**** st_mtime
+**** st_ctime
+**** st_atime_ns
+**** st_mtime_ns
+**** st_ctime_ns
+**** st_blocks
+**** st_blksize
+**** st_rdev
+**** st_flags
+**** st_birthtime
+**** st_creator
+**** st_type
+**** st_file_attibutes
+*** os. *stat_float_times* ([newvalue])
+*** os. *statvsf* (path)
+*** os. *supports_dir_fd*
+*** os. *supports_effective_ids*
+*** os. *supports_fd*
+*** os. *supports_follow_symlinks*
+*** os. *symlinks* (src,dst,target_is_directory=False,*,dir_fd=None)
+*** os. *sync* ()
+*** os. *truncate* (path,length)
+*** os. *unlink* (path,*,dir_fd=None)
+*** os. *utime* (path,times=None,*,[ns,]dir_fd=None,follow_symlinks=True)
+*** os. *walk* (top,topdown=True,onerror=None,follow_symlinks=False)
+*** os. *fwalk* (top='.',topdown=True,onerror=None,*,follow_symlinks=False,dir_fd=None)
 *** Linux扩展属性
 ** 进程管理
 ** scheduler接口
@@ -55,26 +883,26 @@
       -h, --help  show this help message and exit
       --sum       整数相加（默认：找到最大值）
    #+END_EXAMPLE
-
+   
    获取最大值或和：
-
+   
    #+BEGIN_EXAMPLE python
     $ python3 argparse_demo.py  1 2 3     4
     4
     $ python3 argparse_demo.py  1 2 3 4 --sum
     10
    #+END_EXAMPLE
-
+   
    传入错误参数：
-
+   
    #+BEGIN_EXAMPLE python
     $ python3 argparse_demo.py  a b c
     usage: argparse_demo.py [-h] [--sum] N [N ...]
     argparse_demo.py: error: argument N: invalid int value: 'a'
    #+END_EXAMPLE
-
+   
    通过下面各小节来理解上面程序。
-
+   
 *** 创建解析器
     第一步为使用argparse创建ArgumentParser对象：
 

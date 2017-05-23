@@ -3830,24 +3830,24 @@
 
 *** classmethod *fromkeys* (seq[,value])
     类方法，返回字典，SEQ中的各个元素成为key值，对应的值都为VALUE。
-    
+
     如果VALUE缺省，则所有值都为None。
-    
+
     #+BEGIN_SRC python :session
       dict.fromkeys('abc')
       dict.fromkeys('abc', [1, 2])
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - {'c': None, 'b': None, 'a': None}
     - {'c': [1, 2], 'b': [1, 2], 'a': [1, 2]}
     #+END_SRC
-    
+
 *** *get* (key[,default])
     返回KEY对应的值，如果KEY不存在则返回DEFAULT对应的值。DEFAULT的默认
     值为None，所以方法不会返回KeyError错误。
-
+    
     #+BEGIN_SRC python :session
       d = {'a': 1, 'b': 2, 'c': 3}
 
@@ -3855,13 +3855,13 @@
       d.get('A', 100)
       print(d.get('A'))
     #+END_SRC
-
+    
     #+RESULTS:
     :
     : >>> 1
     : 100
     : None
-
+    
 *** *items* ()
     返回字典键值对组成的view对象。
 
@@ -3939,9 +3939,9 @@
     此方法在结构历遍字典时非常有用（常用于集合算法）。？？？
 
 *** *setdefault* [key[,default]]
-    如果字典中有KEY，则返回其对应的值。如果无KEY，则添加此键值对，并返
-    回DEFAULT。DEFAULT的默认值为None。
-
+    如果字典中有KEY，则不修改对应键值对，返回其对应的值。如果无KEY，则
+    添加此键值对，并返回DEFAULT。DEFAULT的默认值为None。
+    
     #+BEGIN_SRC python :session
       d = {'a': 1, 'b': 2, 'c': 3}
 
@@ -3954,15 +3954,15 @@
       d.setdefault('Z')
       print(d)
     #+END_SRC
-
+    
     #+RESULTS:
     :
     : >>> 1
-    : {'a': 1, 'b': 2, 'c': 3}
+    : {'a':    1, 'b': 2, 'c': 3}
     : >>> 100
-    : {'A': 100, 'a': 1, 'b': 2, 'c': 3}
+    : {'A':    100, 'a': 1, 'b': 2, 'c': 3}
     : >>> >>> {'A': 100, 'a': 1, 'b': 2, 'Z': None, 'c': 3}
-
+    
 *** *update* ([other])
     更新字典的键值对，覆盖已有键值对，返回值为None。
 
