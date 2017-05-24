@@ -598,9 +598,10 @@ Unix或C，但可用于大多数系统。
            except OSError:
                pass
      #+END_EXAMPLE
-     
+
 **** os. *device_encoding* (fd)
      如果FD为终端的文件描述符，返回其编码形式；否则返回None。
+     
      #+BEGIN_SRC python :session
        import os
        import sys
@@ -608,18 +609,18 @@ Unix或C，但可用于大多数系统。
        print(os.device_encoding(fd))
        print(os.device_encoding(sys.stdin.fileno()))
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> None
      - UTF-8
      #+END_SRC
-
+     
 **** os. *dup* (fd)
      返回FD的副本，不会被子进程继承。
 
      在Windows中，（0:stdin、1:stdout、2:stderr）会被子进程继承。
-
+     
      #+BEGIN_SRC python :session
        import os
        fd = os.open('files/emma.txt', os.O_RDONLY)
@@ -640,7 +641,7 @@ Unix或C，但可用于大多数系统。
 **** os. *dup2* (fd, fd2, inheritable=True)
      将FD复制成FD2，如果必要关闭FD。可设置INHERITABLE参数指定FD2是否可
      被子进程继承。
-     
+
      #+BEGIN_SRC python :session
        import os
 
@@ -659,12 +660,12 @@ Unix或C，但可用于大多数系统。
        print('将fdb指向fda后，fdb就相当于fda：')
        print(fda, fdb)
        os.dup2(fda, fdb)
-       os.read(fda, 2)
+       os.read(fdb, 2)
 
        os.close(fda)
        os.close(fdb)
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> files/a.txt中的内容：
@@ -673,13 +674,29 @@ Unix或C，但可用于大多数系统。
      - ... ... 'a\nb\nc\n'
      - >>> >>> >>> b'1\n'
      - 将fdb指向fda后，fdb就相当于fda：
-     - 27 28
+     - 3 4
      - >>> b'2\n'
      #+END_SRC
-     
+
 **** os. *fchmod* (fd,mode)
-     
+     自Python3.3以后，等价于os.chmod(fd,mode)
+
+     #+BEGIN_EXAMPLE ipython
+       In [147]: ls -l test.txt
+       -rw-r--r-- 1 claudio claudio 0 May 24 11:51 test.txt
+
+       In [148]: fd = os.open('test.txt', os.O_RDONLY)
+
+       In [149]: os.fchmod(fd, stat.S_IRWXO)
+
+       In [150]: os.close(fd)
+
+       In [151]: ls -l test.txt
+       -------rwx 1 claudio claudio 0 May 24 11:51 test.txt*
+     #+END_EXAMPLE
+
 **** os. *fchown* (fd,uid,gid)
+     
 **** os. *fdatasync* (fd)
 **** os. *fpathconf* (fd,name)
 **** os. *fstat* (fd)
@@ -757,7 +774,7 @@ Unix或C，但可用于大多数系统。
 
 *** 获取命令行大小
 *** 文件描述器继承
-** 文件和文件夹
+** 文件和文件夹操作
 *** os. *access* (path,mode,*,dir_fd=None,effective_ids=False,follow_symlinks=True)
 *** os. *F_OK*
 *** os. *R_OK*
@@ -765,7 +782,35 @@ Unix或C，但可用于大多数系统。
 *** os. *X_OK*
 *** os. *chdir* (path)
 *** os. *chflags* (path,flags,*,follow_symlinks=True)
+    *？* ：我的Kali上没有chflags系统调用。
+    
+    #+BEGIN_SRC sh
+      uname -a
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - Linux kali 4.9.0-kali3-amd64 #1 SMP Debian 4.9.18-1kali1 (2017-04-04) x86_64 GNU/Linux
+    #+END_SRC
+    
+    将使用FLAGS设置PATH的flags，FLAGS可使用二进制“或”操作指定多个，选
+    值可从stat模块中获取。
+    
+    支持不跟随软链接。
+    
+    兼容：Unix。
+    
 *** os. *chmod* (path,mode,*,dir_fd=None,follow_symlinks=True)
+    使用MODE设置PATH的权限。MODE可为多个连用参数，也可使用二进制“或”，
+    取值可从stat模块中获取。
+    
+    支持使用文件描述符表示PATH，路径相对于文件夹描述符DIR_FD，以及不跟
+    随软链接。
+    
+    #+BEGIN_QUOTE
+    *注意* ：尽管Windows支持chmod()操作，但只能使用stat.S_IWRITE和
+    stat.S_IREAD常量，其他值被忽视。
+    #+END_QUOTE
     
 *** os. *chown* (path,uid,gid,*,dir_fd=None,follow_symlinks=True)
 *** os. *chroot* (path)
@@ -832,6 +877,22 @@ Unix或C，但可用于大多数系统。
 *** os. *supports_effective_ids*
 *** os. *supports_fd*
 *** os. *supports_follow_symlinks*
+    
+    #+BEGIN_SRC python :session
+      import os
+      for fn in os.supports_follow_symlinks:
+          print(fn)
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... <built-in function stat>
+    - <built-in function utime>
+    - <built-in function chown>
+    - <built-in function link>
+    - <built-in function access>
+    #+END_SRC
+    
 *** os. *symlinks* (src,dst,target_is_directory=False,*,dir_fd=None)
 *** os. *sync* ()
 *** os. *truncate* (path,length)

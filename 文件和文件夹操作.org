@@ -313,7 +313,7 @@
        PurePosixPath('foo')
      #+END_EXAMPLE
 
-     如需向上变量文件系统，建议先调用Path.resolve()方法，以确认软连接
+     如需向上变量文件系统，建议先调用Path.resolve()方法，以确认软链接
      和“..”部分。
 
 **** PurePath. *name*
@@ -672,7 +672,7 @@
      出。
 
 **** Path. *is_symlink* ()
-     如果为软连接返回True，否则返回False。
+     如果为软链接返回True，否则返回False。
 
      如果不存在，返回False；其他如权限错误会向上抛出。
 
@@ -688,20 +688,20 @@
      #+END_SRC
 
 **** Path. *is_socket* ()
-     如果为Unix socket（或为指向Unix socket的软连接），则返回True，否
+     如果为Unix socket（或为指向Unix socket的软链接），则返回True，否
      则返回False。
 
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
      出。
 
 **** Path. *is_fifo* ()
-     如果为FIFO（或为指向FIFO的软连接），则返回True，否则返回False。
+     如果为FIFO（或为指向FIFO的软链接），则返回True，否则返回False。
 
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
      出。
 
 **** Path. *is_block_device* ()
-     如果为块设备（或为指向块设备的软连接），则返回True，否则返回False。
+     如果为块设备（或为指向块设备的软链接），则返回True，否则返回False。
      
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
      出。
@@ -718,7 +718,7 @@
      #+END_SRC
      
 **** Path. *is_char_device* ()
-     如果为字符设备（或为指向字符设备的软连接），则返回True，否则返回
+     如果为字符设备（或为指向字符设备的软链接），则返回True，否则返回
      False。
 
      如果不存在，或为已损坏的软链接，返回False；其他如权限错误会向上抛
@@ -745,11 +745,11 @@
      #+END_EXAMPLE
 
 **** Path. *lchmod* (mode)
-     类似与Path.chmod()，不过如果为软连接，修改的为软连接的权限模式，
+     类似与Path.chmod()，不过如果为软链接，修改的为软链接的权限模式，
      而不是目标文件的权限模式。
 
 **** Path. *lstat* ()
-     类似于Path.lstat()，不过如果为软连接，返回该软链接的文件信息，而
+     类似于Path.lstat()，不过如果为软链接，返回该软链接的文件信息，而
      不是模板文件的信息。
 
 **** Path. *mkdir* (mode=0o777,parents=False,exist_ok=False)
@@ -875,7 +875,7 @@
      #+END_SRC
      
 **** Path. *resolve* ()
-     将路径转换为决定路径，如果为软连接返回指向目标文件/文件夹的路径。
+     将路径转换为决定路径，如果为软链接返回指向目标文件/文件夹的路径。
 
      如果路径不存在，抛出FileNotFoundError错误；如果出现无限循环，抛出
      RunTimeError错误。
@@ -913,7 +913,7 @@
      两个路径需同时存在。
 
 **** Path. *symlink_to* (target,target_is_directory=False)
-     创建软连接。将当前路径作为软连接指向TARGET。
+     创建软链接。将当前路径作为软链接指向TARGET。
 
      在Windows中，TARGET_IS_DIRECTORY需为True（默认为False），在POSIX
      中则会忽视此参数。
@@ -936,7 +936,7 @@
      错误。
      
 **** Path. *unlink* ()
-     删除路径表示的文件或软连接。如果为文件夹，使用Path.rmdir()。
+     删除路径表示的文件或软链接。如果为文件夹，使用Path.rmdir()。
 
 **** Path. *write_bytes* (data)
      以二进制模式打开文件，写入DATA，最后关闭。
@@ -1075,7 +1075,7 @@
 
 *** os.path. *exits* (path)
     如果PATH表示的路径为存在的文件/文件夹，或表示open file descriptor
-    的整数，返回True。如果为被损坏的软连接，返回False。
+    的整数，返回True。如果为被损坏的软链接，返回False。
 
     在一些系统中，如果没有足够权限执行os.stat()，即时文件存在，也会返
     回False。
@@ -1094,7 +1094,7 @@
 
 *** os.path. *lexists* (path)
     如果系统上不能实现os.lstat()，等价于os.path.exists()。即即时时损坏
-    的软连接也会返回True。
+    的软链接也会返回True。
 
 *** os.path. *expanduser* (path)
     在Unix和Windows系统上，返回最前面将~和~user替换为家目录后的结果。
@@ -1276,7 +1276,7 @@
     字符（如果有）后以反斜杠开头。
 
 *** os.path. *isfile* (path)
-    是否为存在的普通文件。会“跟随”软连接，所以如果为指向普通文件的软链
+    是否为存在的普通文件。会“跟随”软链接，所以如果为指向普通文件的软链
     接也会返回True。
 
     #+BEGIN_SRC python :session
@@ -1292,7 +1292,7 @@
     #+END_SRC
 
 *** os.path. *isdir* (path)
-    是否为存在的文件夹。会“跟随”软连接，所有为指向存在文件夹的软连接也
+    是否为存在的文件夹。会“跟随”软链接，所有为指向存在文件夹的软链接也
     会返回True。
 
     #+BEGIN_SRC python :session
@@ -1308,7 +1308,7 @@
     #+END_SRC
 
 *** os.path. *islink* (path)
-    是否为软连接。在不支持软连接的运行环境中，始终返回False。
+    是否为软链接。在不支持软链接的运行环境中，始终返回False。
 
     #+BEGIN_SRC python :session
       from os.path import islink
@@ -1403,7 +1403,7 @@
     #+END_SRC
 
 *** os.path. *realpath* (path)
-    将PATH转换为标准路径，如果为存在的软连接，返回指向目标。
+    将PATH转换为标准路径，如果为存在的软链接，返回指向目标。
 
     #+BEGIN_SRC python :session
       from os.path import realpath
@@ -1827,7 +1827,7 @@
    对应类文件对象。不同时使用INPLACE和OPENHOOK参数。
    
    FileInput实例也可用于with上下文，所有文件在离开with时自动关闭：
-   
+
    #+BEGIN_EXAMPLE python
      with FileInput(files=('spam.txt', 'eggs.txt')) as input:
           process(input)
@@ -1865,7 +1865,7 @@
        fi = fileinput.Fileinput(openhook=fileinput.hook_encoded)
      #+END_EXAMPLE
 
-* stat - 解释stat()函数结果
+* stat - 解释os.*stat()函数结果
   stat模块定义了用于解释os.stat()、os.fstat()和os.lstat()返回结果的常
   量和函数。
   
@@ -1877,17 +1877,17 @@
   
   #+RESULTS:
   #+BEGIN_SRC org
-  - >>> os.stat_result(st_mode=33188, st_ino=24779705, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=6, st_atime=1495439421, st_mtime=1495439408, st_ctime=1495439408)
+  - >>> os.stat_result(st_mode=33188, st_ino=24779705, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=6, st_atime=1495527828, st_mtime=1495439408, st_ctime=1495439408)
   #+END_SRC
   
 ** 判断函数
-   
+
    正常情况下，可使用os.path.is*()函数判断文件类型。当多次判断同一文件
    的属性时，使用这些函数可避免重复调用stat()。还可判断os.path不能处理
    的文件类型，如块类型文件。
-   
+
    *？* ：使用pathlib中的判断方法也能解决所有类型文件的判断问题。
-   
+
    #+BEGIN_SRC python :session
     import os
     import sys
@@ -1910,7 +1910,7 @@
 
     walktree(os.path.expanduser('files'), visitfile)
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
     - >>> >>> >>> ... ... ... ... ... ... ... ... ... ... ... >>> ... ... >>> 访问：files/argparse_demo.py
@@ -1996,7 +1996,7 @@
 *** stat. *S_ISFIFO* (mode)
     如果MODE来自FIFO类型文件（如命名管道），返回非0值。
 *** stat. *S_ISLINK* (mode) ？？？
-    如果MODE来自软连接，返回非0值。
+    如果MODE来自软链接，返回非0值。
 
     #+BEGIN_SRC python :session
       import os
@@ -2062,7 +2062,7 @@
     #+BEGIN_SRC org
     - >>> >>> '-rw-rw-rw-'
     #+END_SRC
-** 对stat()结果进行所有的常量
+** 对stat()结果进行索引的常量
    os.stat()、os.fstat()和os.lstat()的返回结果都是10个元素的元组。下面
    的常量其实都是整数，用于索引元组中的对应元素。
    
@@ -2083,7 +2083,7 @@
 
 *** stat. *ST_INO*
     inode值。
-    
+
     #+BEGIN_SRC python :session
       import os
       import stat
@@ -2099,7 +2099,7 @@
     #+BEGIN_SRC sh :session
       ls files/emma.txt --inode
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - 24779756 files/emma.txt
@@ -2172,12 +2172,12 @@
     #+BEGIN_SRC python :session
       st[stat.ST_SIZE]
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - 2
     #+END_SRC
-
+    
 *** stat. *ST_ATIME*
 *** stat. *ST_MTIME*
 *** stat. *ST_CTIME*
@@ -2209,35 +2209,618 @@
     - 上次修改时间： 2017-05-20
     - 创建时间： 2017-05-20
     #+END_SRC
-** ？？？
+** ST_MODE使用的flags
+   Use of the functions above is more portable than use of the first
+   set of flags:
+   
 *** stat. *S_IFSOCK*
+    Socket。
+*** stat. *S_IFLINK*
+    软链接。
+*** stat. *S_IFREG*
+    普通文件。
+*** stat. *S_IFBLK*
+    块设备文件。
+*** stat. *S_IFDIR*
+    文件夹。
+*** stat. *S_IFCHR*
+    字符型文件。
+*** stat. *S_IFIFO*
+    FIFO。
+*** stat. *S_IFDOOR*
+    Door。
+*** stat. *S_IFPORT*
+    时间端口。
+*** stat. *S_IFWHT*
+    Whiteout。
+
+    #+BEGIN_QUOTE
+    *注意* ：对于S_IFDOOR、S_IFPORT和S_IFWHT，如果系统不支持此类型文件，
+    则定义为0。
+    #+END_QUOTE
     
     #+BEGIN_SRC python :session
       import stat
-      stat.S_IFSOCK
+      flags = ['S_IFSOCK', 'S_IFLNK', 'S_IFREG', 'S_IFBLK',
+               'S_IFDIR', 'S_IFCHR', 'S_IFIFO', 'S_IFDOOR', 'S_IFPORT', 'S_IFWHT']
+      for flag in flags:
+          print('stat.{} = {}'.format(flag, stat.__dict__[flag]))
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
-    - 49152
+    - ... >>> ... ... stat.S_IFSOCK = 49152
+    - stat.S_IFLNK = 40960
+    - stat.S_IFREG = 32768
+    - stat.S_IFBLK = 24576
+    - stat.S_IFDIR = 16384
+    - stat.S_IFCHR = 8192
+    - stat.S_IFIFO = 4096
+    - stat.S_IFDOOR = 0
+    - stat.S_IFPORT = 0
+    - stat.S_IFWHT = 0
     #+END_SRC
+
+** 可作为os.chmod()的MODE参数flag的属性
+*** stat. *S_ISUID*
+    设置UID位。
     
-*** stat. *S_IFLINK*
-*** stat. *S_IFREG*
-*** stat. *S_IFBLK*
-*** stat. *S_IFDIR*
-*** stat. *S_IFCHR*
-*** stat. *S_IFIFO*
-*** stat. *S_IFDOOR*
-*** stat. *S_IFPORT*
-*** stat. *S_IFWHT*
+    #+BEGIN_EXAMPLE ipython
+      In [21]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 09:58 test.txt
+
+      In [22]: os.chmod('test.txt', stat.S_ISUID)
+
+      In [23]: ls -l test.txt
+      ---S------ 1 claudio claudio 0 May 24 09:58 test.txt
+    #+END_EXAMPLE
+
+*** stat. *S_ISGID*
+    设置GID位。此位有几个特殊用途。对于文件件：
+
+    1. 其中创建的文件基础该文件夹的用户组ID，而不是创建该文件的用户组ID。
+    2. 其中创建的子文件夹会自动设置S_ISGID位。
+
+    对于普通文件：
+
+    1. 如果没有设置用户组执行位（S_IXGRP），the set-group-ID bit
+       indicates mandatory file/record locking。
+
+    文件例子：
+
+    #+BEGIN_EXAMPLE python
+      In [40]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:02 test.txt
+
+      In [41]: os.chmod('test.txt', stat.S_ISGID)
+
+      In [42]: ls -l test.txt
+      ------S--- 1 claudio claudio 0 May 24 10:02 test.txt
+    #+END_EXAMPLE
+
+    文件夹例子：
+
+    #+BEGIN_EXAMPLE ipython
+      In [37]: ls -ld test-dir/
+      drwxr-xr-x 2 claudio claudio 4096 May 24 10:02 test-dir//
+
+      In [38]: os.chmod('test-dir/', stat.S_ISGID)
+
+      In [39]: ls -ld test-dir/
+      d-----S--- 2 claudio claudio 4096 May 24 10:02 test-dir//
+    #+END_EXAMPLE
+
+*** stat. *S_ISVTX*
+    Sticky位。如果设置在文件夹上，其中的文件重命名和删除只能由该文件拥
+    有者、文件夹拥有者和授权进程操作。
+
+    #+BEGIN_EXAMPLE ipython
+      In [56]: ls -ld test-dir
+      drwxr-xr-x 2 claudio claudio 4096 May 24 10:16 test-dir/
+
+      In [57]: os.chmod('test-dir/', stat.S_ISVTX)
+
+      In [58]: ls -ld test-dir
+      d--------T 2 claudio claudio 4096 May 24 10:16 test-dir/
+    #+END_EXAMPLE
     
+*** stat. *S_IRWXU*
+    所有者的权限mask。
+
+    #+BEGIN_EXAMPLE python
+      In [62]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:19 test.txt
+
+      In [63]: os.chmod('test.txt', stat.S_IRWXU)
+
+      In [64]: ls -l test.txt
+      -rwx------ 1 claudio claudio 0 May 24 10:19 test.txt*
+    #+END_EXAMPLE
+
+*** stat. *S_IRUSR*
+*** stat. *S_IWUSR*
+*** stat. *S_IXUSR*
+    拥有者的读、写和执行权限。
+
+    #+BEGIN_EXAMPLE ipython
+      In [76]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:23 test.txt
+
+      In [77]: os.chmod('test.txt', stat.S_IRUSR)
+
+      In [78]: ls -l test.txt
+      -r-------- 1 claudio claudio 0 May 24 10:23 test.txt
+
+      In [79]: os.chmod('test.txt', stat.S_IWUSR)
+
+      In [80]: ls -l test.txt
+      --w------- 1 claudio claudio 0 May 24 10:23 test.txt
+
+      In [81]: os.chmod('test.txt', stat.S_IXUSR)
+
+      In [82]: ls -l test.txt
+      ---x------ 1 claudio claudio 0 May 24 10:23 test.txt*
+    #+END_EXAMPLE
+
+*** stat. *S_IRWXG*
+    用户组的权限mask。
+    
+    #+BEGIN_EXAMPLE ipython
+      In [85]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:28 test.txt
+
+      In [86]: os.chmod('test.txt', stat.S_IRWXG)
+
+      In [87]: ls -l test.txt
+      ----rwx--- 1 claudio claudio 0 May 24 10:28 test.txt*
+    #+END_EXAMPLE
+
+*** stat. *S_IRGRP*
+*** stat. *S_IWGRP*
+*** stat. *S_IXGRP*
+    用户组的读、写和执行权限。
+
+    #+BEGIN_EXAMPLE ipython
+      In [92]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:31 test.txt
+
+      In [93]: os.chmod('test.txt', stat.S_IRGRP)
+    
+      In [94]: ls -l test.txt
+      ----r----- 1 claudio claudio 0 May 24 10:31 test.txt
+
+      In [95]: os.chmod('test.txt', stat.S_IWGRP)
+
+      In [96]: ls -l test.txt
+      -----w---- 1 claudio claudio 0 May 24 10:31 test.txt
+    
+      In [97]: os.chmod('test.txt', stat.S_IXGRP)
+
+      In [98]: ls -l test.txt
+      ------x--- 1 claudio claudio 0 May 24 10:31 test.txt*
+    #+END_EXAMPLE
+
+*** stat. *S_IRWXO*
+    其他用户的权限mask。
+*** stat. *S_IROTH*
+*** stat. *S_IWOTH*
+*** stat. *S_IXOTH*
+    其他用户的读、写和执行权限。
+
+    #+BEGIN_EXAMPLE ipython
+      In [102]: ls -l test.txt
+      -rw-r--r-- 1 claudio claudio 0 May 24 10:33 test.txt
+
+      In [103]: os.chmod('test.txt', stat.S_IROTH)
+
+      In [104]: ls -l test.txt
+      -------r-- 1 claudio claudio 0 May 24 10:33 test.txt
+
+      In [105]: os.chmod('test.txt', stat.S_IWOTH)
+
+      In [106]: ls -l test.txt
+      --------w- 1 claudio claudio 0 May 24 10:33 test.txt
+
+      In [107]: os.chmod('test.txt', stat.S_IXOTH)
+
+      In [108]: ls -l test.txt
+      ---------x 1 claudio claudio 0 May 24 10:33 test.txt*
+    #+END_EXAMPLE
+
+*** stat. *S_ENFMT*
+*** stat. *S_IREAD*
+*** stat. *S_IWRITE*
+*** stat. *S_IEXEC*
+    上面4个为[[https://en.wikipedia.org/wiki/Version_7_Unix][Unix V7]]的权限位。
+** 可作为os.chflags()FLAGS参数的值。
+
+   #+BEGIN_QUOTE
+   *？* ：我的Kali不支持chflags系统调用。
+   #+END_QUOTE
+
+*** stat. *UF_NODUMP*
+    不dump文件。
+*** stat. *UF_IMMUTABLE*
+    可能不允许被修改。
+*** stat. *UF_APPEND*
+    可能只允许追加内容。
+*** stat. *UF_OPAQUE* ？？？
+    The directory is opaque when viewed through a union stack。
+*** stat. *UF_NOUNLINK*
+    文件可能不允许被重命名和删除。
+*** stat. *UF_COMPRESSED*
+    文件以压缩形式存储（Mac OS X 10.6+）。
+*** stat. *UF_HIDDEN*
+    在GUI环境中文件不显示（Mac OS X 10.5+）。
+*** stat. *SF_ARCHIVED*
+    文件可以被归档。
+
+*** stat. *SF_IMMUTABLE*
+    文件可能不允许被修改。
+*** stat. *SF_APPEND*
+    文件可能只允许追加内容。
+*** stat. *SF_NOUNLINK*
+    文件可能不允许被重命名和删除。
+*** stat. *SF_SNAPSHOT*
+    为快照文件。
+** Windows中用于测试st_file_attributes中位的常量。（待续）
+
+   #+BEGIN_SRC python :session
+     import os
+     print(os.name)
+     print(os.stat('files/emma.txt'))
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - posix
+   - os.stat_result(st_mode=33206, st_ino=24779756, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=2, st_atime=1495593867, st_mtime=1495266124, st_ctime=1495266124)
+   #+END_SRC
+
 * filcmp - 文件和文件夹对比
 * tempfile - 创建临时文件/文件夹
-
 * glob - Unix风格路径扩张
 * fnmatch - Unix文件名模式匹配
 * linecache - 随机操作文本行
 * shutil - 高阶文件操作
+  shutil模块提供了复制和删除多个文件/文件夹的高阶操作。如需操作单个文
+  件，使用os模块。
+  
+  #+BEGIN_QUOTE
+  *警告* ：即时使用shutil.copy()和shutil.copy2()也不能完全复制所有文件
+  的元数据。
+  
+  - POSIX平台上：文件的拥有者、拥有者用户组和ACL丢失。
+  - Mac OS：resource fork和其他元数据丢失。即resources丢失，以及创建者
+    信息出现偏差。？？？
+  - Windows：文件拥有者、ACL和其他数据流丢失。？？？
+  #+END_QUOTE
+  
+** 文件和文件夹操作
+*** shutil. *copyfileobj* (fsrc,fdst[,lenth])
+    将“类文件对象”FSRC中的内容复制到“类文件对象”FDST中。
+    
+    LENGTH参数如果提供，则表示缓存大小。如果为负数，表示不从缓存中读取
+    数据；默认会在缓存中读取数据，以免造成内存耗尽。
+    
+    如果当前FSRC中文件指针不为0，则从当前位置开始复制数据。
+    
+    #+BEGIN_SRC sh :session
+      cat files/a.txt
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 1
+    - 2
+    - 3
+    #+END_SRC
+    
+    #+BEGIN_SRC sh :session
+      cat files/b.txt
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - a
+    - b
+    - c
+    #+END_SRC
 
+    #+BEGIN_SRC python :session
+      import shutil
+      fo_src = open('files/a.txt')
+      fo_dst = open('files/b.txt', 'a')
+      shutil.copyfileobj(fo_src, fo_dst)
+      fo_src.close()
+      fo_dst.close()
+    #+END_SRC
+    
+    #+BEGIN_SRC sh :session
+      cat files/b.txt
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - a
+    - b
+    - c
+    - 1
+    - 2
+    - 3
+    #+END_SRC
+
+*** shutil. *copyfile* (src,dst,*,follow_symlinks=True)
+    将名为SRC文件中的内容（如元数据）复制到名为DST的文件中。SRC和DST都
+    为字符串。如果SRC和DST为同一文件，抛出shutil.SameFileError错误。
+
+    DST所在的文件夹需有可写权限，否则抛出OSError错误。如果DST已存在，
+    则替换。特殊文件如字符型和块型文件不能使用此函数复制。
+
+    如果FOLLOW_SYMLINKS为False，且SRC为软链接，复制的是软链接本身，而
+    不是软链接指向的目标文件。
+
+    #+BEGIN_SRC python :session
+      import shutil
+      src = 'files/a.txt'
+      dst = 'files/b.txt'
+      shutil.copyfile(src, dst)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> 'files/b.txt'
+    #+END_SRC
+
+**** exception shutil. *SameFileError*
+     copyfile()中SRC和DST为同一文件时抛出的错误类型，为Error的子类。
+
+*** shutil. *copymode* (src,dst,*,follow_symlinks=True)
+    将SRC的权限位复制到DST上。文件的内容、拥有者、拥有者用户组不被影响。
+    SRC和DST都为字符串。
+    
+    如果FOLLOW_SYMLINKS为False，操作的为软链接本身，而非指向的目标文件。
+    并不是所有系统都支持修改软链接，具体可参考copystat()函数。如果复制
+    失败不会报错。
+    
+    #+BEGIN_EXAMPLE ipython
+      In [188]: ls -l a.txt b.txt
+      -rwx------ 1 claudio claudio 6 May 24 15:32 a.txt*
+      -rw-rw-rw- 1 claudio claudio 6 May 20 15:42 b.txt
+
+      In [189]: shutil.copymode('b.txt', 'a.txt')
+
+      In [190]: ls -l a.txt b.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:32 a.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 20 15:42 b.txt
+    #+END_EXAMPLE
+    
+*** shutil. *copystat* (src,dst,*,follow_symlinks=True)
+    将SRC的权限位、上次访问时间、上次修改时间和flags复制到DST。在Linux
+    中，还会尽可能复制“扩展属性”。不会修改文件内容、所有者、所有者用户
+    组。SRC和DST都为指定路径的字符串。
+    
+    如果FOLLOW_SYMLINKS为False，为操作软链接，而非指向文件。
+    
+    #+BEGIN_QUOTE
+    *注意* ：并不是所有系统都支持检查和修改软链接。可使用Python获取支
+    持情况：
+    
+    - 如果os.chmod在os.supports_follow_symlinks中，copystat()可修改软
+      链接权限位。
+    - 如果os.utime在os.supports_follow_symlinks中，copystat()可修改软
+      链接上次访问时间和修改时间。
+    - 如果os.chflags在os.supports_follow_symlinks中，copystat()可修改
+      软链接的flags。（不是所有系统都支持。）
+
+    如果系统中一些上述功能缺少，修改软链接时copystat()会尽量修改能修改
+    的部分，从不因失败报错。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.supports_follow_symlinks
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - {<built-in function stat>, <built-in function utime>, <built-in function chown>, <built-in function link>, <built-in function access>}
+    #+END_SRC
+
+    #+END_QUOTE
+
+    #+BEGIN_EXAMPLE ipython
+      In [174]: ls -l a.txt
+      -rw-r--r-- 1 claudio claudio 6 May 22 15:50 a.txt
+
+      In [175]: os.chmod('a.txt', stat.S_IRWXU)
+
+      In [176]: ls -l a.txt b.txt
+      -rwx------ 1 claudio claudio 6 May 22 15:50 a.txt*
+      -rw-r--r-- 1 claudio claudio 6 May 24 15:07 b.txt
+
+      In [177]: shutil.copystat('a.txt', 'b.txt')
+
+      In [178]: ls -l a.txt b.txt
+      -rwx------ 1 claudio claudio 6 May 22 15:50 a.txt*
+      -rwx------ 1 claudio claudio 6 May 22 15:50 b.txt*
+    #+END_EXAMPLE
+    
+*** shutil. *copy* (src,dst,*,follow_symlinks=True)
+    将SRC文件复制为DST文件，或复制到DST文件夹中。SRC和DST都需为字符串。
+    如果DST为文件夹，则将SRC复制到文件夹中，且使用SRC的basename作为新
+    文件名，返回新文件的路径字符串。
+
+    如果FOLLOW_SYMLINKS为False，且SRC为软链接，则DST也为软链接；如果为
+    True，DST为SRC指向的目标文件。
+    
+    copy()复制文件内数据和文件权限位，其他如文件创建和修改时间等元数据
+    不会复制。如需复制所有文件元数据，参考copy2()。
+    
+    如使用copy()不会修改新文件最后修改时间：
+
+    #+BEGIN_EXAMPLE ipython
+      In [206]: ls -l a.txt b.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:32 a.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:46 b.txt
+
+      In [207]: shutil.copy('a.txt', 'b.txt')
+      Out[207]: 'b.txt'
+
+      In [208]: ls -l a.txt b.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:32 a.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:46 b.txt
+    #+END_EXAMPLE
+
+    而使用copy2()则会使两者最后修改时间相同：
+
+    #+BEGIN_EXAMPLE ipython
+      In [209]: shutil.copy2('a.txt', 'b.txt')
+      Out[209]: 'b.txt'
+
+      In [210]: ls -l a.txt b.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:32 a.txt
+      -rw-rw-rw- 1 claudio claudio 6 May 24 15:32 b.txt
+    #+END_EXAMPLE
+
+*** shutil. *copy2* (src,dst,*,follow_symlinks=True)
+    除copy()的功能外，还会使用copystat()尽可能复制文件元数据。
+    
+*** shutil. *ignore_patterns* (*patterns)
+    工厂函数，返回作为copytree()的IGNORE参数的可调用对象。即忽视匹配
+    glob风格PATTERN的文件和文件夹。
+    
+*** shutil. *copytree* (src,dst,symlinks=False,ignore=None,copy_function=copy2,ignore_dangling_symlinks=False)
+    将文件夹SRC递归复制到文件夹DST，返回DST路径字符串。DST文件夹需不存
+    在，如果父路径不存在，自动创建。对应权限和时间数据，文件夹和子文件
+    夹使用copystat()复制，单个使用copy2()复制。
+    
+    #+BEGIN_EXAMPLE ipython
+      In [236]: ls -l dir1
+      total 4
+      drwxr-xr-x 2 claudio claudio 4096 May 24 15:59 dir-in/
+      -rw-r--r-- 1 claudio claudio    0 May 24 15:59 test.txt
+
+      In [237]: shutil.copytree('dir1', 'dir2')
+      Out[237]: 'dir2'
+
+      In [238]: ls -l dir2
+      total 4
+      drwxr-xr-x 2 claudio claudio 4096 May 24 15:59 dir-in/
+      -rw-r--r-- 1 claudio claudio    0 May 24 15:59 test.txt
+
+      in [239]: shutil.copytree('dir1', 'DIR/dir2')
+      Out[239]: 'DIR/dir2'
+
+      In [240]: ls -l DIR
+      total 4
+      drwxr-xr-x 3 claudio claudio 4096 May 24 15:59 dir2/
+    #+END_EXAMPLE
+    
+    如果SYMLINKS参数为True，软链接及其元数据也会复制到新的文件夹；如果
+    为False，则是复制软链接指向的文件及其元数据到新文件夹。
+    
+    如果SYMLINKS参数为False，且软链接指向的文件不存在，复制时会将抛出
+    错误添加到由错误组成的链表中，在整个复制过程结束后抛出。如需忽视此
+    错误，可设置IGNORE_DANGLING_SYMLINKS参数为True。不过，在不支持
+    os.symlink()的系统中，没有任何效果。
+    
+    如果设置参数IGNORE，须为接受copytree()执行过程中的当前文件夹路径，
+    以及当前文件夹执行os.listdir()结果的链表，返回值为由当前文件夹路径
+    和文件组成的链表，此链表中的内容被忽视。也可使用
+    shutil.ignore_patterns()工厂函数返回值。源码为：
+    
+    #+BEGIN_EXAMPLE python
+      def ignore_patterns(*patterns):
+          """Function that can be used as copytree() ignore parameter.
+          Patterns is a sequence of glob-style patterns
+          that are used to exclude files"""
+          def _ignore_patterns(path, names):
+              ignored_names = []
+              for pattern in patterns:
+                  ignored_names.extend(fnmatch.filter(names, pattern))
+              return set(ignored_names)
+          return _ignore_patterns
+    #+END_EXAMPLE
+    
+    举例：忽视后缀为.txt的文件。
+    
+    #+BEGIN_EXAMPLE ipython
+      In [250]: ls -l dir1
+      total 4
+      drwxr-xr-x 2 claudio claudio 4096 May 24 15:59 dir-in/
+      -rw-r--r-- 1 claudio claudio    0 May 24 15:59 test.txt
+
+      In [251]: shutil.copytree('dir1', 'dir2', ignore=shutil.ignore_patterns('*.txt'))
+      Out[251]: 'dir2'
+
+      In [252]: ls -l dir2
+      total 4
+      drwxr-xr-x 2 claudio claudio 4096 May 24 15:59 dir-in/
+    #+END_EXAMPLE
+    
+*** shutil. *rmtree* (path,ignore_errors=False,onerror=None)
+**** rmtree. *avoid_symlink_attacks*
+
+     #+BEGIN_SRC python :session
+       import shutil
+       shutil.rmtree.avoids_symlinks_attacks
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - Traceback (most recent call last):
+     -   File "<stdin>", line 1, in <module>
+     - AttributeError: 'function' object has no attribute 'avoids_symlinks_attacks'
+     #+END_SRC
+
+*** shutil. *move* (src,dst,copy_function=copy2)
+*** shutil. *disk_usage* (path)
+
+    #+BEGIN_SRC python :session
+      import shutil
+      shutil.disk_usage('/home/claudio/Documents')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - usage(total=488081694720, used=28461260800, free=434803576832)
+    #+END_SRC
+*** shutil. *chown* (path,user=None,group=None)
+*** shutil. *which* (cmd,mode=os.F_OK|os.X_OK,path=None)
+
+    #+BEGIN_SRC python :session
+      import shutil
+      shutil.which('emacs')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/usr/bin/emacs'
+    #+END_SRC
+*** exception shutil. *Error*
+*** copytree举例
+*** rmtree举例
+** 归档操作
+*** shutil. *make_archive* (base_name,format[,root_dir[,base_dir[,verbose[,dry_run[,owner[,group[,logger]]]]]]])
+*** shutil. *get_archive_formats* ()
+*** shutil. *register_archive_format* (name,function[,extra_args[,description]])
+*** shutil. *unregister_archive_format* (name)
+*** shutil. *unpack_archive* (filename[,extra_dir[,format]])
+*** shutil. *register_unpack_format* (name,extensions,function[,extra_args[,description]])
+*** shutil. *unregister_unpack_format* (name)
+*** shutil. *get_unpack_formats* ()
+*** 归档举例
+** 获取输出终端大小
+*** shutil. *get_terminal_size* (fallback=(columns,lines))
+
+    #+BEGIN_SRC python :session
+      import shutil
+      shutil.get_terminal_size()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - os.terminal_size(columns=80, lines=0)
+    #+END_SRC
+    
 * macpath - “Mac OS 9”路径处理函数 （待续）
