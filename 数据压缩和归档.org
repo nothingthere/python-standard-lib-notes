@@ -1,0 +1,11 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-05-25 23:51:51
+# Commentary:
+#+TITLE: 数据压缩和归档
+
+* zlib - 兼容gzip的压缩
+* gzip - gzip文件压缩自持
+* bz2 - bizp2压缩支持
+* lzma - 使用LZMA算法压缩文件
+* zipfile - 操作ZIP压缩文件
+* tarfile - 读写归档文件

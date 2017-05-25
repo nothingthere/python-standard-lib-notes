@@ -808,9 +808,9 @@
 
 **** Path. *read_text* (encoding=None,errors=None)
      返回路径文件中解码有的内容。
-     
+
      可选参数与open()函数含义相同。
-     
+
      #+BEGIN_SRC python :session
        from pathlib import Path
        p = Path('~/dict.txt').expanduser()
@@ -818,20 +818,20 @@
        p.read_bytes()
        p.read_text()
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> 6
      - b'\xe6\x96\x87\xe6\x9c\xac\xe6\x96\x87\xe4\xbb\xb6\xe5\x86\x85\xe5\xae\xb9'
      - '文本文件内容'
      #+END_SRC
-     
+
 **** Path. *rename* (target)
      将路径文件/文件夹重命名为TARGET。在Unix系统下，如果TARGET存在且为
      文件，并有权限，会无条件重命名。
-
+     
      TARGET可为字符串，也可为另一个路径对象。
-
+     
      #+BEGIN_SRC python :session
        from pathlib import Path
 
@@ -842,14 +842,14 @@
        p.exists()
        target.read_text()
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> >>> 4
      - >>> False
      - '1111'
      #+END_SRC
-
+     
 **** Path. *replace* (target)
      重命名当前文件/文件夹路径。如果target指向已存在文件/文件夹，无条
      件替换。
@@ -873,7 +873,7 @@
      - >>> False
      - '1111'
      #+END_SRC
-     
+
 **** Path. *resolve* ()
      将路径转换为决定路径，如果为软链接返回指向目标文件/文件夹的路径。
 
@@ -1042,7 +1042,7 @@
     一种，且不能为空，否则抛出ValueError错误。
 
     不同于commonprefix，此函数的返回值为有效路径。
-    
+
     #+BEGIN_SRC python :session
       from os.path import commonpath
       commonpath(['/usr/lib', '/usr/local/lib'])
@@ -1057,7 +1057,7 @@
 
 *** os.path. *commonprefix* (list)
     逐个字符比较，获取最长相同路径字符串，如果LIST为空，返回空。
-    
+
     不同于commonpath函数，此函数返回值可能不是有效路径。
 
     #+BEGIN_SRC python :session
@@ -2515,11 +2515,11 @@
     - 2
     - 3
     #+END_SRC
-    
+
     #+BEGIN_SRC sh :session
       cat files/b.txt
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - a
@@ -2535,11 +2535,11 @@
       fo_src.close()
       fo_dst.close()
     #+END_SRC
-    
+
     #+BEGIN_SRC sh :session
       cat files/b.txt
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - a
@@ -2578,11 +2578,11 @@
 *** shutil. *copymode* (src,dst,*,follow_symlinks=True)
     将SRC的权限位复制到DST上。文件的内容、拥有者、拥有者用户组不被影响。
     SRC和DST都为字符串。
-    
+
     如果FOLLOW_SYMLINKS为False，操作的为软链接本身，而非指向的目标文件。
     并不是所有系统都支持修改软链接，具体可参考copystat()函数。如果复制
     失败不会报错。
-    
+
     #+BEGIN_EXAMPLE ipython
       In [188]: ls -l a.txt b.txt
       -rwx------ 1 claudio claudio 6 May 24 15:32 a.txt*
@@ -2688,7 +2688,7 @@
 *** shutil. *ignore_patterns* (*patterns)
     工厂函数，返回作为copytree()的IGNORE参数的可调用对象。即忽视匹配
     glob风格PATTERN的文件和文件夹。
-    
+
 *** shutil. *copytree* (src,dst,symlinks=False,ignore=None,copy_function=copy2,ignore_dangling_symlinks=False)
     将文件夹SRC递归复制到文件夹DST，返回DST路径字符串。DST文件夹需不存
     在，如果父路径不存在，自动创建。对应权限和时间数据，文件夹和子文件
@@ -2726,7 +2726,7 @@
     
     如果设置参数IGNORE，须为接受copytree()执行过程中的当前文件夹路径，
     以及当前文件夹执行os.listdir()结果的链表，返回值为由当前文件夹路径
-    和文件组成的链表，此链表中的内容被忽视。也可使用
+    和文件组成的链表，此链表中的文件路径被忽视。也可使用
     shutil.ignore_patterns()工厂函数返回值。源码为：
     
     #+BEGIN_EXAMPLE python
@@ -2759,34 +2759,88 @@
     #+END_EXAMPLE
     
 *** shutil. *rmtree* (path,ignore_errors=False,onerror=None)
+    删除整个文件夹；PATH需为表示文件夹路径的字符串（不能为指向文件夹的
+    软链接）。
+
+    如果IGNORE_ERRORS参数为True，任何删除文件时抛出的错误将被忽视；如
+    果为False，函数执行过程中所有抛出的错误会添加到一个链表中，最后由
+    ONERROR参数（可调用对象处理）。
+
+    如果提供ONERROR参数，须为接受三个参数的可调用对象：fn、path,
+    excinfo。其中：
+    
+    - fn：抛出错误的函数；由系统和Python实现决定。
+    - path：传递个fn的路径参数。
+    - excinfo：sys.exc_info()返回结果。
+
+    ONERRORS抛出的结果不被捕获。
+
 **** rmtree. *avoid_symlink_attacks*
+
+     表明Python在当前系统中的实现，是否支持防止 [[http://www.freebuf.com/vuls/49641.html][软链接攻击]] 版本的
+     rmtree()：
 
      #+BEGIN_SRC python :session
        import shutil
-       shutil.rmtree.avoids_symlinks_attacks
+       shutil.rmtree.avoids_symlink_attacks
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
-     - Traceback (most recent call last):
-     -   File "<stdin>", line 1, in <module>
-     - AttributeError: 'function' object has no attribute 'avoids_symlinks_attacks'
+     - True
      #+END_SRC
-
+     
 *** shutil. *move* (src,dst,copy_function=copy2)
-*** shutil. *disk_usage* (path)
+    递归将文件/文件夹（SRC）移至DST，返回最终路径字符串。
+
+    如果DST为已存在的文件夹，则将SRC移至DST中；如果存在，但不是文件夹，
+    则根据os.rename()的语法进行操作（一般为默认删除原来文件）。
+    
+    如果DST存在于同一文件系统，实际上调用的时os.rename()。否则，会使用
+    COPY_FUNCTION参数指定的函数将复制到DST，然后再删除。
+    
+    如果SRC为软链接，会将SRC指向的目标文件复制为DST或移至DST中，然后删
+    除SRC。
+
+    如果指定COPY_FUNCTION参数，需为接受src和dst（将src复制到dst）两个
+    参数的函数，但在os.rename()不能使用的情况下才调用。如果SRC为文件夹，
+    默认的，会调用copy_tree()函数，COPY_FUNCTION也会用于copy_tree()的
+    同名参数。在不能复制元数据的情况系，可选用copy()。
+
+*** shutil. *disk_usage* (path) ？？？
+    返回PATH路径下的磁盘使用情况，返回值为namedtuple，分别为总量，已使
+    用大小和剩余大小。
 
     #+BEGIN_SRC python :session
       import shutil
-      shutil.disk_usage('/home/claudio/Documents')
+      shutil.disk_usage('/home/claudio/Desktop/Python/')
+      shutil.disk_usage('/home/claudio/Desktop/Emacs/')
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - usage(total=488081694720, used=28461260800, free=434803576832)
+    - usage(total=488081694720, used=28870664192, free=434394173440)
+    - usage(total=488081694720, used=28870664192, free=434394173440)
     #+END_SRC
+
+    兼容：Unix,Windows。
+
 *** shutil. *chown* (path,user=None,group=None)
+    改变PATH指定文件/文件夹的拥有者或/和拥有者用户组。
+
+    USER和GROUP需至少指定一个，可以是ID，也可以是名称。
+
+    os.chown()为其内部实现函数。
+
+    兼容：Unix。
+
 *** shutil. *which* (cmd,mode=os.F_OK|os.X_OK,path=None)
+    返回命令CMD对应的可执行文件路径。如果没有找到，返回None。
+
+    MODE参数为os.access()使用的权限掩码，默认为存在且可执行。
+
+    如果没提供PATH参数，则使用os.environ中“PATH”对应值，如果不能获取
+    “PATH”则使用os.defpath。
 
     #+BEGIN_SRC python :session
       import shutil
@@ -2797,8 +2851,15 @@
     #+BEGIN_SRC org
     - '/usr/bin/emacs'
     #+END_SRC
+
+    Windows中：（待续）。
+
 *** exception shutil. *Error*
+    在操作多个文件时，所有抛出错误组成的exception集合。对于copytree()，
+    exception的参数为3元素元组（srcname,dstname,exception）。
+
 *** copytree举例
+    
 *** rmtree举例
 ** 归档操作
 *** shutil. *make_archive* (base_name,format[,root_dir[,base_dir[,verbose[,dry_run[,owner[,group[,logger]]]]]]])
@@ -2817,10 +2878,10 @@
       import shutil
       shutil.get_terminal_size()
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - os.terminal_size(columns=80, lines=0)
     #+END_SRC
-    
+
 * macpath - “Mac OS 9”路径处理函数 （待续）

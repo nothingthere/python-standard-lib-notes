@@ -184,10 +184,10 @@ Unix或C，但可用于大多数系统。
     #+END_SRC
 
     兼容：绝大多数Unix，Windows。
-
+    
 *** os. *getenvb* (key,default=None)
     同getenv()，返回值为bytes对象。
-
+    
     只有os.supports_bytes_environ返回True时才支持。
 
     兼容：绝大多数Unix。
@@ -221,8 +221,14 @@ Unix或C，但可用于大多数系统。
     #+BEGIN_SRC org
     - 1000
     #+END_SRC
-
+    
     兼容：Unix。
+    
+**** 有效用户/用户组ID和实际用户/用户组ID。 [[http://www.cnblogs.com/kunhu/p/3699883.html][@流云揽月]]
+     
+     - 实际用户/用户组ID：即登录时的用户/用户组ID。
+     - 有效用户/用户组ID：可以简单理解为执行当前程序的用户/用户组ID。
+       
 *** os. *geteuid* ()
     返回当前进程的用户ID。
 
@@ -245,7 +251,7 @@ Unix或C，但可用于大多数系统。
       import os
       os.getgid()
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - 1000
@@ -776,43 +782,90 @@ Unix或C，但可用于大多数系统。
 *** 文件描述器继承
 ** 文件和文件夹操作
 *** os. *access* (path,mode,*,dir_fd=None,effective_ids=False,follow_symlinks=True)
-*** os. *F_OK*
-*** os. *R_OK*
-*** os. *W_OK*
-*** os. *X_OK*
+    使用真实用户/用户组ID范围PATH。大多数操作会使用有效用户/用户组ID，
+    所有此函数可用在设置了suid/sgid的环境中测试“申请用户（invoking
+    user）？？？”是否有特点访问权限。
+    
+    MODE参数需为：F_OK测试路径对应文件是否存在，并与R_OK、W_OK和X_OK使
+    用比特或操作连用。
+    
+    如果能成功访问返回True，否则返回False。
+    
+    #+BEGIN_QUOTE
+    *注意* ：在使用open()真正打开文件前，使用access()判断某个用户是否
+    有权限会造成安全漏洞。因为用户可利用测试权限和打开文件的短暂间隙访
+    问文件。错误的写法为：
+
+    #+BEGIN_EXAMPLE python
+      if os.access('myfle'. os.R_OK):
+         with open('myfle') as fp:
+              return fp.read()
+      return 'some default data'
+    #+END_EXAMPLE
+
+    正确的写法为：
+
+    #+BEGIN_EXAMPLE python
+      try:
+          fp = open('myfile')
+      except PermissionError:
+          return 'some default data'
+      else:
+          with fp:
+               return fp.read()
+    #+END_EXAMPLE
+    #+END_QUOTE
+    
+    #+BEGIN_QUOTE
+    *注意* ：即时access()测试成功，I/O操作也可能失败。比如操作网络文件
+    系统文件时，其权限模式与POSIX的权限bit模式不同。
+    #+END_QUOTE
+    
+**** os. *F_OK*
+**** os. *R_OK*
+**** os. *W_OK*
+**** os. *X_OK*
+     用于access的mode参数，分别用于测试路径是否：存在、可读、可写、可
+     执行。
+     
 *** os. *chdir* (path)
 *** os. *chflags* (path,flags,*,follow_symlinks=True)
     *？* ：我的Kali上没有chflags系统调用。
-    
+
     #+BEGIN_SRC sh
       uname -a
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - Linux kali 4.9.0-kali3-amd64 #1 SMP Debian 4.9.18-1kali1 (2017-04-04) x86_64 GNU/Linux
     #+END_SRC
-    
+
     将使用FLAGS设置PATH的flags，FLAGS可使用二进制“或”操作指定多个，选
     值可从stat模块中获取。
-    
+
     支持不跟随软链接。
-    
+
     兼容：Unix。
     
 *** os. *chmod* (path,mode,*,dir_fd=None,follow_symlinks=True)
     使用MODE设置PATH的权限。MODE可为多个连用参数，也可使用二进制“或”，
     取值可从stat模块中获取。
-    
+
     支持使用文件描述符表示PATH，路径相对于文件夹描述符DIR_FD，以及不跟
     随软链接。
-    
+
     #+BEGIN_QUOTE
     *注意* ：尽管Windows支持chmod()操作，但只能使用stat.S_IWRITE和
     stat.S_IREAD常量，其他值被忽视。
     #+END_QUOTE
-    
+
 *** os. *chown* (path,uid,gid,*,dir_fd=None,follow_symlinks=True)
+    改变PATH指定文件/文件夹的拥有者或拥有者用户组，如果不改变其中一项，
+    可将其设置为-1。
+
+    shutil.chown()即可接受ID，也可接受字符串名称作为参数。
+
 *** os. *chroot* (path)
 *** os. *fchdir* (fd)
 *** os. *getcwd* ()
@@ -833,11 +886,74 @@ Unix或C，但可用于大多数系统。
 *** os. *pathconf* (path,name)
 *** os. *pathconf_names*
 *** os. *readlink* (path,*,dir_fd=None)
+    返回软链接路径PATH指向文件的路径字符串。返回结果可为相对路径，也可
+    为绝对路径（与创建时指定路径相同？？？）。如果为相对路径，使用
+    os.path.join(os.path.dirname(PATH), result)作为返回值。
+    
+    如果PATH为字符串对象，返回值也为字符串对象，可能抛出
+    UnicodeDecodeError错误；如果为bytes对象，返回值也为bytes对象。
+    
+    也支持文件夹描述符相对路径。
+    
+    兼容：Unix，Windows。
+    
 *** os. *remove* (path,*,dir_fd=None)
 *** os. *removedirs* (name)
 *** os. *rename* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
+    将文件/文件夹SRC重命名为DST。如果DST为已存在文件夹，抛出OSError错
+    误了；如果为已存在的文件，则默认替换（有权限的情况下）；在Windows
+    中，不管DST是已存在的文件还是文件夹，都会抛出OSError错误。
+
+    在Unix中，如果SRC和DST为不同文件系统文件，执行会失败。
+
+    如需跨平台重命名文件/文件夹，可使用os.replace()。
+
+    #+BEGIN_EXAMPLE ipython
+      In [110]: os.makedirs('test/test1/test2')
+
+      In [111]: pathlib.Path('test/test1/test2/test.txt').touch()
+
+      In [112]: os.rename('test/', 'test-renamed')
+
+      In [113]: ls test-renamed/
+      test1/
+
+      In [114]: ls test-renamed/test1/
+      test2/
+
+      In [115]: ls test-renamed/test1/test2/
+      test.txt
+    #+END_EXAMPLE
+
 *** os. *renames* (old,new)
+    递归重命名文件/文件夹。与rename()不同的是，如果需要，会创建中间文
+    件夹，重命名完成后OLD中最右边的子文件夹会使用removedis()删除。
+
+    #+BEGIN_EXAMPLE ipython
+      In [118]: os.makedirs('test/test1/test2')
+
+      In [119]: pathlib.Path('test/test1/test2/test.txt').touch()
+
+      In [120]: os.renames('test/test1/', 'testA/testB')
+
+      In [121]: ls test/
+
+      In [122]: ls testA
+      testB/
+
+      In [123]: ls testA/testB/
+      test2/
+
+      In [124]: ls testA/testB/test2/
+      test.txt
+    #+END_EXAMPLE
+
 *** os. *replace* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
+    os.rename()的支持跨平台版本。
+    
+    *？* ：[[https://bugs.python.org/issue27886][os.rename和os.replace的区别]] 。看了还是没明白，然后还引出一
+    个新问题：Path.rename()又有何区别。
+    
 *** os. *rmdir* (path,*,dir_fd=None)
 *** os. *scandir* (path='.')
 *** class os. *DirEntry*
@@ -877,13 +993,13 @@ Unix或C，但可用于大多数系统。
 *** os. *supports_effective_ids*
 *** os. *supports_fd*
 *** os. *supports_follow_symlinks*
-    
+
     #+BEGIN_SRC python :session
       import os
       for fn in os.supports_follow_symlinks:
           print(fn)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - ... ... <built-in function stat>
@@ -892,8 +1008,9 @@ Unix或C，但可用于大多数系统。
     - <built-in function link>
     - <built-in function access>
     #+END_SRC
-    
+
 *** os. *symlinks* (src,dst,target_is_directory=False,*,dir_fd=None)
+    
 *** os. *sync* ()
 *** os. *truncate* (path,length)
 *** os. *unlink* (path,*,dir_fd=None)
@@ -903,8 +1020,8 @@ Unix或C，但可用于大多数系统。
 *** Linux扩展属性
 ** 进程管理
 ** scheduler接口
-** 其他系统信息
-** 其他函数
+** 各种系统信息
+** 各种函数
 * io
 * time
 * argparse - 解析命令行参数、选择和子命令
@@ -944,7 +1061,7 @@ Unix或C，但可用于大多数系统。
       -h, --help  show this help message and exit
       --sum       整数相加（默认：找到最大值）
    #+END_EXAMPLE
-   
+
    获取最大值或和：
    
    #+BEGIN_EXAMPLE python

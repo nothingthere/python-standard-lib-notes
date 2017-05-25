@@ -3770,7 +3770,7 @@
      折叠单个段落TEXT，使每行最多有WIDTH个字符。所有选择都从
      TextWrapper实例的的属性中获取。返回字符串链表，每个字符串元素不含
      换行符。如果没有任何内容，返回空链表。
-
+     
 **** *fill* (text)
      折叠单个段落TEXT，返回折叠后的字符串。
 
@@ -3778,48 +3778,49 @@
   ASCII、Unicode和UTF-8的简介，参考 [[http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html][阮一峰的博客]] 。
 ** 函数
 *** unicodedate. *lookup* (name)
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
-
       unicodedata.lookup('END OF TEXT')
       unicodedata.lookup('ETX')
-
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : >>> '\x03'
-    : '\x03'
-
+    #+BEGIN_SRC org
+    - '\x03'
+    - '\x03'
+    #+END_SRC
+    
 *** unicodedate. *name* (chr[,default])
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.name('a')
       unicodedata.name('一')
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : 'LATIN SMALL LETTER A'
-    : 'CJK UNIFIED IDEOGRAPH-4E00'
-
+    #+BEGIN_SRC org
+    - 'LATIN SMALL LETTER A'
+    - 'CJK UNIFIED IDEOGRAPH-4E00'
+    #+END_SRC
+    
 *** unicodedate. *decimal* (chr[,default])
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.decimal('1')
       unicodedata.decimal('一', 1)
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : 1
-    : 1
-
+    #+BEGIN_SRC org
+    - 1
+    - 1
+    #+END_SRC
+    
 *** unicodedate. *digit* (char[,default])
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.digit('1')
@@ -3827,10 +3828,11 @@
     #+END_SRC
     
     #+RESULTS:
-    :
-    : 1
-    : 7
-
+    #+BEGIN_SRC org
+    - 1
+    - 7
+    #+END_SRC
+    
 *** unicodedate. *numeric* (chr[,default])
 
     #+BEGIN_SRC python :session
@@ -3838,7 +3840,7 @@
       unicodedata.numeric('1')
       unicodedata.numeric('叁')
     #+END_SRC
-    
+
     #+RESULTS:
     :
     : 1.0
@@ -3915,29 +3917,31 @@
 *** unicodedate. *normalize* (from,unistr)
 ** 属性
 *** unicodedate. *unidate_version*
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.unidata_version
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : '8.0.0'
-
+    #+BEGIN_SRC org
+    - '8.0.0'
+    #+END_SRC
+    
 *** unicodedate. *ucd_3_2_0*
-
+    
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.ucd_3_2_0
     #+END_SRC
-
+    
     #+RESULTS:
-    :
-    : <unicodedata.UCD object at 0x7f945959e968>
-
+    #+BEGIN_SRC org
+    - <unicodedata.UCD object at 0x7fb68ab5b7d8>
+    #+END_SRC
+    
 ** 举例
-   
+
    #+BEGIN_EXAMPLE python
      >>> import unicodedata
      >>> unicodedata.lookup('LEFT CURLY BRACKET')
@@ -3955,7 +3959,7 @@
      >>> unicodedata.category('\u0660')
      'Nd'
    #+END_EXAMPLE
-   
+
 * stringprep
 * readline
 * rlconpleter
