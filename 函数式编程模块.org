@@ -5,7 +5,7 @@
 
 * itertools - 创建高效逆变iterator的函数
   - 返回无限循环iterator的函数：
-
+    
     | 函数    | 参数         | 结果                                | 举例                               |
     |---------+--------------+-------------------------------------+------------------------------------|
     | count() | start[,step] | start,start+step, start+2*step,...  | count(10) --> 10 11 12 ...         |
@@ -13,7 +13,7 @@
     | repeat  | elem[,n]     | elem,elem,elem,...无限循环或循环N次 | repeat(10, 3) -> 10 10 10          |
     
   - 耗尽最短序列结束的函数：
-
+    
     | 函数                  | 参数                   | 结果                                 | 举例                                                     |
     |-----------------------+------------------------+--------------------------------------+----------------------------------------------------------|
     | accumulate()          | p[,func]               | p0,p0+p1,p0+p1+p2,...                | accumulate([1,2,3]) --> 1 3 6                            |
@@ -200,13 +200,13 @@
 
 *** itertools. *combinations* (iterable,r)
     返回ITERABLE中长度为R的子序列组成的迭代器，其中子序列为元组。
-
-    结合按ITERABLE中元素的顺序进行。所以，如果ITERABLE以排序，则各元组
+    
+    结合按ITERABLE中元素的顺序进行。所以，如果ITERABLE已排序，则各元组
     也排序好。
-
+    
     每个元素以其在ITERABLE中的位置区分，而非其值。所以，如果每个元素没
     有重复，则返回值中的每个元组中也没重复。
-
+    
     #+BEGIN_SRC python :session
       from itertools import combinations
       list(combinations('abc', 2))
@@ -215,18 +215,17 @@
       list(combinations(range(4), 3))
       list(combinations(range(4), 4))
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
-    - [('a', 'b'), ('a', 'c'), ('b', 'c')]
-    - [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')]
+    - >>> [('a', 'b'), ('a', 'c'), ('b', 'c')]
     - [('a', 'b', 'c')]
     - >>> [(0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3)]
     - [(0, 1, 2, 3)]
     #+END_SRC
-
+    
     基本上等价于：？？？
-
+    
     #+BEGIN_SRC python :eval never
       def combinations(iterable, r):
           pool = tuple(iterable)
@@ -246,9 +245,9 @@
                   indices[j] = indices[j - 1] + 1
               yield tuple(pool[i] for i in indices)
     #+END_SRC
-
+    
     也等价于去除permutations()结果中没按原来元素排序的元素：
-
+    
     #+BEGIN_SRC python :session
       from itertools import combinations, permutations
       list(combinations('abc', 2))
@@ -261,17 +260,17 @@
               if sorted(indices) == list(indices):
                   yield tuple(pool[i] for i in indices)
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - [('a', 'b'), ('a', 'c'), ('b', 'c')]
     - [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')]
     #+END_SRC
-
+    
 *** itertools. *combinations_with_replacement* (iterable, r)
     返回ITERABLE长度为R的子序列，所有子序列都应按ITERABLE原来的顺序排
     列。与combinations()方法不同的是，自身元素可重复。
-    
+
     #+BEGIN_SRC python :session
       from itertools import combinations_with_replacement
       list(combinations_with_replacement('abc', 2))
@@ -658,7 +657,7 @@
       list(zip('abc', [1, 2, 3, 4]))
       list(zip_longest('abc', [1, 2, 3, 4], fillvalue='Z'))
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> [('a', 1), ('b', 2), ('c', 3), (None, 4)]
@@ -687,10 +686,12 @@
    代对象一次抛到内存中，从而减少内存开销。每个函数代码量少，以此减少
    中间变量，并遵循了“函数式”风格。
    
+   [[file:~/python/ClaudioFunctionalUtils.py]]
+   
 * functools - 操作可调用对象的高阶函数
   此模块提供操作函数或返回函数的高阶函数。对此模块而言，任何可被调用的
   对象都可作函数对待。
-  
+
 ** 函数
 *** functools. *cmp_to_key* (func)
     将传统的比较函数（接受两个参数，返回大于、小于或等于0作为大小比较），
@@ -725,7 +726,7 @@
 
           return K
     #+END_SRC
-    
+
 *** @functools. *lru_cache* (maxsize=128,typed=False)
     装饰器函数，用于缓存函数对象，缓存最近最多MAXSIZE大小的调用结果。
     一般使用在周期性多次调用同一参数的函数上，如fib函数和多次打开相同

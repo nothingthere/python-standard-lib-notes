@@ -2723,12 +2723,12 @@
     错误添加到由错误组成的链表中，在整个复制过程结束后抛出。如需忽视此
     错误，可设置IGNORE_DANGLING_SYMLINKS参数为True。不过，在不支持
     os.symlink()的系统中，没有任何效果。
-    
+
     如果设置参数IGNORE，须为接受copytree()执行过程中的当前文件夹路径，
     以及当前文件夹执行os.listdir()结果的链表，返回值为由当前文件夹路径
     和文件组成的链表，此链表中的文件路径被忽视。也可使用
     shutil.ignore_patterns()工厂函数返回值。源码为：
-    
+
     #+BEGIN_EXAMPLE python
       def ignore_patterns(*patterns):
           """Function that can be used as copytree() ignore parameter.
@@ -2741,9 +2741,9 @@
               return set(ignored_names)
           return _ignore_patterns
     #+END_EXAMPLE
-    
+
     举例：忽视后缀为.txt的文件。
-    
+
     #+BEGIN_EXAMPLE ipython
       In [250]: ls -l dir1
       total 4
@@ -2757,24 +2757,24 @@
       total 4
       drwxr-xr-x 2 claudio claudio 4096 May 24 15:59 dir-in/
     #+END_EXAMPLE
-    
+
 *** shutil. *rmtree* (path,ignore_errors=False,onerror=None)
     删除整个文件夹；PATH需为表示文件夹路径的字符串（不能为指向文件夹的
     软链接）。
-
+    
     如果IGNORE_ERRORS参数为True，任何删除文件时抛出的错误将被忽视；如
     果为False，函数执行过程中所有抛出的错误会添加到一个链表中，最后由
     ONERROR参数（可调用对象处理）。
-
+    
     如果提供ONERROR参数，须为接受三个参数的可调用对象：fn、path,
     excinfo。其中：
     
-    - fn：抛出错误的函数；由系统和Python实现决定。
+    - fn：抛出错误时执行的函数；由系统和Python实现决定。
     - path：传递个fn的路径参数。
     - excinfo：sys.exc_info()返回结果。
-
-    ONERRORS抛出的结果不被捕获。
-
+      
+    ONERROR抛出的结果不被捕获。
+    
 **** rmtree. *avoid_symlink_attacks*
 
      表明Python在当前系统中的实现，是否支持防止 [[http://www.freebuf.com/vuls/49641.html][软链接攻击]] 版本的
@@ -2784,21 +2784,21 @@
        import shutil
        shutil.rmtree.avoids_symlink_attacks
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - True
      #+END_SRC
-     
+
 *** shutil. *move* (src,dst,copy_function=copy2)
     递归将文件/文件夹（SRC）移至DST，返回最终路径字符串。
 
     如果DST为已存在的文件夹，则将SRC移至DST中；如果存在，但不是文件夹，
     则根据os.rename()的语法进行操作（一般为默认删除原来文件）。
-    
+
     如果DST存在于同一文件系统，实际上调用的时os.rename()。否则，会使用
     COPY_FUNCTION参数指定的函数将复制到DST，然后再删除。
-    
+
     如果SRC为软链接，会将SRC指向的目标文件复制为DST或移至DST中，然后删
     除SRC。
 
@@ -2859,29 +2859,207 @@
     exception的参数为3元素元组（srcname,dstname,exception）。
 
 *** copytree举例
+    下例为copytree()函数的大致源码。可用来理解此模块中其他几个函数的用
+    法：
+
+    #+BEGIN_EXAMPLE python
+      def copytree_(src, dst, symlinks=False):
+          names = os.listdir(src)
+          os.makedirs(dst)
+          errors = []
+          for name in names:
+              srcname = os.path.join(src, name)
+              dstname = os.path.join(dst, name)
+              try:
+                  if symlinks and os.path.islink(srcname):
+                      linkto = os.readlink(srcname)
+                      os.symlink(linkto, dstname)
+                  elif os.path.isdir(srcname):
+                      copytree_(srcname, dstname, symlinks)
+                  else:
+                      cop2(srcname, dstname)
+              except OSError as why:
+                  errors.append((srcname, dstname, str(why)))
+              except Error as err:
+                  errors.extend(err.args[0])
+          try:
+              copystat(src, dst)
+          except OSError as why:
+              if why.winerror is None:
+                  errors.extend((src, dst, str(why)))
+          if errors:
+              raise Error(errors)
+    #+END_EXAMPLE
+    
+    使用ignore_patters()工厂函数可过滤不想复制的内容。
+    
+    #+BEGIN_EXAMPLE python
+      from shutil import copytree, ignore_patterns
+
+      copytree(source, destination, ignore=ignore_patterns('*.pyc', 'tmp*'))
+    #+END_EXAMPLE
+    
+    还可定制ignore函数，使其不过滤任何文件，只提供当前文件夹信息：
+    
+    #+BEGIN_EXAMPLE python
+      from shutil import copytree
+      import logging
+
+      def _logpath(path, names):
+          logging.info('正在处理文件夹： {}'.format(path))
+          return [] # 不过滤任何内容
+
+      copytree.(source, destination, ignore=_logpath)
+    #+END_EXAMPLE
     
 *** rmtree举例
+    如何在Windows中删除没有可写权限文件夹中的文件。
+    
+    #+BEGIN_EXAMPLE python
+      import os, stat, shutil
+
+      def remove_readonly(fun, path, _):
+          '清除自读权限，再次尝试删除。'
+          os.chmod(path, stat.S_IWRITE)
+          func(path)
+
+      shutil.rmtree(directory, onerror=remove_readonly)
+    #+END_EXAMPLE
+    
 ** 归档操作
+   提供压缩和归档文件的高阶函数。依赖于zipfile和tarfile两个模块。
+   
 *** shutil. *make_archive* (base_name,format[,root_dir[,base_dir[,verbose[,dry_run[,owner[,group[,logger]]]]]]])
+    创建归档文件（如.zip和.tar），返回归档文件名称。
+
+    BASE_NAME：将创建的归档文件名称，不需提供后缀。
+
+    FORMAT：归档文件格式，如："zip"（依赖于zlib模块）、"tar"和"gztar"
+    （依赖于gztar模块）、"bztar"（依赖于bz2模块）或"xztar"（依赖于lzma
+    模块）。
+
+    ROOT_DIR：为归档文件最终所处文件夹；比如通常将当前路径更改为
+    ROOT_DIR再创建归档文件。
+    
+    BASE_DIR：开始归档的文件夹。BASE_DIR会成为所有归档文件和文件夹的路
+    径前缀。
+
+    ROOT_DIR和BASE_DIR都默认为当前文件夹。
+
+    DRY_RUN：如果为True，不会创建归档文件，但操作还是会执行，并被记录
+    到LOGGER。
+    
+    OWNER和GROUP：用于创建归档文件。默认为当前用户和用户组。
+
+    LOGGER：需为兼容 [[https://www.python.org/dev/peps/pep-0282/][PEP 282]] 的对象，通常为logging.Logger。
+    
+    VERBOSE：已废除。
+    
 *** shutil. *get_archive_formats* ()
-*** shutil. *register_archive_format* (name,function[,extra_args[,description]])
+    返回支持的归档格式，结果为2元组(name, description)组成的链表。
+
+    #+BEGIN_SRC python :session
+      import shutil
+      shutil.get_archive_formats()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - [('bztar', "bzip2'ed tar-file"), ('gztar', "gzip'ed tar-file"), ('tar', 'uncompressed tar file'), ('xztar', "xz'ed tar-file"), ('zip', 'ZIP file')]
+    #+END_SRC
+
+    shutil默认提供的格式有：
+
+    - zip：ZIP文件（依赖zlib模块）。
+    - tar：未压缩的tar文件。
+    - gztar：采用gzip压缩后的归档文件（依赖于zlib模块）。
+    - bztar：采用bzip2压缩后的归档文件（依赖于bz2模块）。
+    - xztar：采用xz压缩后的归档文件（依赖于lzma模块）。
+
+    可使用register_archive_format()函数注册自己的格式，或修改现有格式
+    的操作函数。
+
+*** shutil. *register_archive_format* (name,function[,extra_args[,description]]) （待续）
+    在get_archive_formats()结果的基础上添加归档格式和对应操作函数。
+
 *** shutil. *unregister_archive_format* (name)
+    将格式NAME从支持的格式中移除。
+
 *** shutil. *unpack_archive* (filename[,extra_dir[,format]])
-*** shutil. *register_unpack_format* (name,extensions,function[,extra_args[,description]])
+    解压归档文件，FILENAME为归档文件的全路径。
+
+    EXTRACT_DIR为解压后文件的放置位置。默认为当前文件夹。
+
+    FORMAT为归档格式中的一种："zip"、"tar"、"gztar"、"bztar"或"xztar"，
+    或为register_unpack_format()注册的格式。如果没有有提供，
+    unpack_archive()会根据文件后缀检查对应格式是否注册。如果没找到则抛
+    出ValueError错误。
+
+*** shutil. *register_unpack_format* (name,extensions,function[,extra_args[,description]]) （待续）
+    注册解压格式和对应操作函数。
 *** shutil. *unregister_unpack_format* (name)
+    将NAME中解压格式支持中移除。
 *** shutil. *get_unpack_formats* ()
+    获取支持的解压格式。结果为3元素元组(name, extensions, description)
+    组成的链表。
+
+    #+BEGIN_SRC python :session
+      import shutil
+      shutil.unregister_unpack_format('bztar')
+      shutil.get_unpack_formats()
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> [('gztar', ['.tar.gz', '.tgz'], "gzip'ed tar-file"), ('tar', ['.tar'], 'uncompressed tar file'), ('xztar', ['.tar.xz', '.txz'], "xz'ed tar-file"), ('zip', ['.zip'], 'ZIP file')]
+    #+END_SRC
+
 *** 归档举例
+    归档家目录下的.ssh文件夹。
+
+    #+BEGIN_EXAMPLE
+      >>> from shutil import make_archive
+      >>> import os
+      >>> archive_name = os.path.expanduser(os.path.join('~', 'myarchive'))
+      >>> root_dir = os.path.expanduser(os.path.join('~', '.ssh'))
+      >>> make_archive(archive_name, 'gztar', root_dir)
+      '/home/claudio/myarchive.tar.gz'
+    #+END_EXAMPLE
+
+    结果为：
+
+    #+BEGIN_EXAMPLE
+      claudio@host:~$ tar ztvf myarchive.tar.gz
+      drwx------ claudio/claudio   0 2017-02-12 18:51 ./
+      -rw-r--r-- claudio/claudio 404 2017-02-12 18:49 ./id_rsa.pub
+      -rw-r--r-- claudio/claudio 2210 2017-03-30 21:01 ./known_hosts
+      -rw------- claudio/claudio 1679 2017-02-12 18:49 ./id_rsa
+    #+END_EXAMPLE
+
 ** 获取输出终端大小
 *** shutil. *get_terminal_size* (fallback=(columns,lines))
-
+    获取终端窗口大小。
+    
+    如果有系统变量COLUMNS和LINES，则检查其值，如果定义且为正整数，就使
+    用该值。
+    
+    当没有定义这两个系统变量时，the terminal connected to
+    sys.__stdout__ is queried by invoking os.get_terminal_size()。？？？
+    
+    如果上述方法都请求失败，可能为系统不支持，或当前进程并没有连接在终
+    端上。此时使用FALLBACK参数值返回，默认为(80, 24)，即大多数终端模拟
+    器的默认尺寸。
+    
+    返回值为namedtuple，类型为os.terminal_size。
+    
     #+BEGIN_SRC python :session
       import shutil
       shutil.get_terminal_size()
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - os.terminal_size(columns=80, lines=0)
     #+END_SRC
-
+    
 * macpath - “Mac OS 9”路径处理函数 （待续）

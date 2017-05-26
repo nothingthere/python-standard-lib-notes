@@ -1010,6 +1010,13 @@ Unix或C，但可用于大多数系统。
     #+END_SRC
 
 *** os. *symlinks* (src,dst,target_is_directory=False,*,dir_fd=None)
+    创建名为DST的软链接，指向SRC。
+    
+    TARGET_IS_DIRECTORY参数在Windows以外的系统上被忽视。
+    
+    Windows：（待续）
+    
+    兼容：Unix，Windows。
     
 *** os. *sync* ()
 *** os. *truncate* (path,length)
