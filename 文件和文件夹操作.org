@@ -2485,30 +2485,30 @@
 * shutil - 高阶文件操作
   shutil模块提供了复制和删除多个文件/文件夹的高阶操作。如需操作单个文
   件，使用os模块。
-  
+
   #+BEGIN_QUOTE
   *警告* ：即时使用shutil.copy()和shutil.copy2()也不能完全复制所有文件
   的元数据。
-  
+
   - POSIX平台上：文件的拥有者、拥有者用户组和ACL丢失。
   - Mac OS：resource fork和其他元数据丢失。即resources丢失，以及创建者
     信息出现偏差。？？？
   - Windows：文件拥有者、ACL和其他数据流丢失。？？？
   #+END_QUOTE
-  
+
 ** 文件和文件夹操作
 *** shutil. *copyfileobj* (fsrc,fdst[,lenth])
     将“类文件对象”FSRC中的内容复制到“类文件对象”FDST中。
-    
+
     LENGTH参数如果提供，则表示缓存大小。如果为负数，表示不从缓存中读取
     数据；默认会在缓存中读取数据，以免造成内存耗尽。
-    
+
     如果当前FSRC中文件指针不为0，则从当前位置开始复制数据。
-    
+
     #+BEGIN_SRC sh :session
       cat files/a.txt
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - 1
