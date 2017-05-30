@@ -2437,7 +2437,7 @@
    #+BEGIN_QUOTE
    *？* ：我的Kali不支持chflags系统调用。
    #+END_QUOTE
-
+   
 *** stat. *UF_NODUMP*
     不dump文件。
 *** stat. *UF_IMMUTABLE*
@@ -2477,7 +2477,7 @@
    - os.stat_result(st_mode=33206, st_ino=24779756, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=2, st_atime=1495593867, st_mtime=1495266124, st_ctime=1495266124)
    #+END_SRC
 
-* filcmp - 文件和文件夹对比
+* filcmp - 文件和文件夹对比 （待续）
 * tempfile - 创建临时文件/文件夹
   此模块的作用为创建临时文件/文件夹，兼容所有支持临时文件/文件夹的系统。
   TemporaryFile、NamedTemporaryFile、TemporaryDirectory和
@@ -2614,34 +2614,34 @@
 *** tempfile. *gettempprefix* ()
 *** tempfile. *gettempprefixb* ()
     临时文件夹前缀。
-
+    
 *** tempfile. *tempdir*
     全局变量，缓存gettempdir()搜索结果。可直接设置，但不推荐。定制可通
     过各个函数的DIR参数实现。
-
+    
     当设置为非None值后，会成为本模块中所有函数DIR参数的默认值。
-
+    
     如果设置为None或unset，调用上面除gettempprefix()外的函数会同
     gettempdir()执行顺序一样初始化。
-
+    
 ** 举例
    
    #+BEGIN_EXAMPLE python
      import tempfile
-
+   
      # 创建临时文件，并写入数据
      fp = tempfile.TemporaryFile()
      fp.write(b'hello, world!')
      # 读取数据
      fp.seek(0)
      print(fp.read())
-
+   
      # 使用上下文管理器创建临时文件
      with tempfile.TemporaryFile() as fp:
          fp.write(b'hello world!')
          fp.seek(0)
          print(fp.read())
-
+   
      # 此时临时文件关闭并自动删除
 
      # 使用上下文管理器创建临时文件夹
@@ -2650,12 +2650,127 @@
 
      # 文件夹中的内容及文件夹被删除
    #+END_EXAMPLE
-   
+
 ** 已废除函数和常量
 *** tempfile. *mktemp* (suffix='',prefix='tmp',dir=None)
-* glob - Unix风格路径扩张
-* fnmatch - Unix文件名模式匹配
-* linecache - 随机操作文本行
+* glob - Unix风格“路径”扩张
+  根据Unix shell规则，查找所有满足匹配的路径，但结果顺序不定。不会扩张
+  “~”，但可扩张*、?和使用[]包裹的字符。实际上是调用了os.listdir()和
+  fnmatch.fnmatch()，不使用subshell。与fnmatch.fnmath()不同，glob将以
+  “.”开始的文件名特殊对待。如需扩张“~”和系统变量，使用
+  os.path.expanduser()和os.path.expandvars()。
+  
+  如需匹配特殊字符本身，可将其置于[]内。如[?]匹配'?'。
+  
+** glob. *glob* (pathname,*,recursive=False)
+   返回匹配PATHNAME文件路径字符串组成的链表。PATHNAME可以为绝对路径字
+   符串（如/usr/src/**/*.py），也可为相对路径（如../../Tools/*/*.gif），
+   可含shell风格的通配符，已损坏的软链接也包含在结果中。
+
+   如果RECURSIVE参数为True，则PATHNAME中的**会匹配任何文件，以及0个或
+   多个文件夹和子文件夹。如果同时PATHNAME以os.sep结尾，则只匹配文件夹
+   和子文件夹。
+
+** glob. *iglob* (pathname,recursive=False)
+   与glob()结果相同，只是返回值为iterator，不将结果写入内容。
+** glob. *escape* (pathname)
+   去转义（escape）所有特殊字符（?、 * 、[）。drive/UNC sharepoit中的
+   特殊字符不去转义，如Windows中，escape('//?/c:/Quo vadis?.txt')返回
+   结果为'//?/c:/Quo vadia[?].txt'。
+
+   #+BEGIN_SRC python :session
+     import glob
+     glob.escape('?*[')
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - '[?][*][[]'
+   #+END_SRC
+
+** 举例
+   
+   假设当前文件夹中有文件1.gif、2.txt和card.gf，子文件夹sub，其中含文
+   件3.txt。
+   
+   #+BEGIN_EXAMPLE python
+     >>> import glob
+     >>> glob.glob('./[0-9].*')
+     ['./2.txt', './1.gif']
+     >>> glob.glob('*.gif')
+     ['card.gif', '1.gif']
+     >>> glob.glob('?.gif')
+     ['1.gif']
+     >>> glob.glob('**/*.txt')
+     ['sub/3.txt']
+     >>> glob.glob('**/*.txt', recursive=True)
+     ['2.txt', 'sub/3.txt']
+     >>> glob.glob('./**/', recursive=True)
+     ['./', './sub/']
+     >>> glob.glob('./**/')
+     ['./sub/']
+   #+END_EXAMPLE
+   
+* fnmatch - Unix“文件名”模式匹配
+  此模块提供Unix shell风格的通配符匹配文件，区别于正则。支持的特殊字符
+  有：
+
+  | 模板   | 含义                  |
+  |--------+-----------------------|
+  | *      | 匹配所有              |
+  | ?      | 匹配单个字符          |
+  | [seq]  | 匹配seq中任意一个字符 |
+  | [!seq] | 不匹配seq中任何字符   |
+
+  如需将特殊字符作为普通字符，将其包含在方括号中。如'[?]'匹配'?'。
+
+  *注意* ：
+
+  - 路径分隔符"/"不为特殊字符。
+  - 点“.”也不为特殊字符。
+
+** fnmatch. *fnmatch* (filename,pattern)
+   测试FILENAME是否匹配PATTERN字符串，返回True或False。
+
+   如果操作系统不区分大小写，两个参数都全会转换为大写/小写后再比较。不
+   管系统是否区分大小写，可使用fnmatchcase()进行区分大小写的比较。
+
+   如下例打印当前文件夹中以'.txt'为后缀的文件：
+
+   #+BEGIN_EXAMPLE python
+     import fnmatch
+     import os
+
+     for file in os.listdir('.'):
+         if fnmatch.fnmatch(file, '*.txt'):
+            print(file)
+   #+END_EXAMPLE
+
+** fnmatch. *fnmatchcase* (filename,pattern)
+   强制区分大小写的fnmatch()版本。
+** fnmatch. *filter* (names,pattern)
+   返回链表NAMES中匹配PATTERN的子集，基本上等价于：
+
+   #+BEGIN_EXAMPLE python
+     [n for n in names if fnmatch(n, pattern)]
+   #+END_EXAMPLE
+
+   不过效率更高。
+
+** fnmatch. *translate* (pattern)
+   将shell风格的PATTERN转换为正则字符串，可被re.match()使用：
+
+   #+BEGIN_EXAMPLE python
+     import fnmatch
+     import re
+
+     regex = fnmatch.translate('*.txt')
+     print(regex)
+     reobj = re.compile(regex)
+     print(reobj.match('foobar.txt'))
+   #+END_EXAMPLE
+
+* linecache - 随机访问文本行 （待续）
 * shutil - 高阶文件操作
   shutil模块提供了复制和删除多个文件/文件夹的高阶操作。如需操作单个文
   件，使用os模块。
