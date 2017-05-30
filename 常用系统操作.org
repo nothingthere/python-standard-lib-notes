@@ -23,7 +23,6 @@ Unix或C，但可用于大多数系统。
     #+RESULTS:
     #+BEGIN_SRC org
     - posix
-    - posix.uname_result(sysname='Linux', nodename='kali', release='4.9.0-kali3-amd64', version='#1 SMP Debian 4.9.18-1kali1 (2017-04-04)', machine='x86_64')
     #+END_SRC
     
     另外，还有sys.platform模块，以及os.uname()获取系统详细信息：
@@ -43,19 +42,19 @@ Unix或C，但可用于大多数系统。
     
 ** 文件名、命令行参数和环境变量
    在Python中，文件名、命令行参数和环境变量都使用字符串表示。在一些系
-   统中，传给操作系统前，会对这些字符串编码和解码。这时，Python文件系
-   统编码编码这些字符串：
-
+   统中，传给操作系统前，会对这些字符串编码和解码。这时，Python使用文
+   件系统编码编码这些字符串：
+   
    #+BEGIN_SRC python :session
      import sys
      print(sys.getfilesystemencoding())
    #+END_SRC
-
+   
    #+RESULTS:
    #+BEGIN_SRC org
-   - utf-8
+   - >>> utf-8
    #+END_SRC
-
+   
 ** 获取进程参数
    下面这些函数和数据表示当前进程和用户信息：
 *** os. *ctermid* ()
@@ -549,13 +548,13 @@ Unix或C，但可用于大多数系统。
 
 ** 文件描述符（File Descriptor）操作
    下面的函数使用文件描述符操作I/O流。
-   
+
    文件描述符为小整数，与当前进程打开文件数相关。比如，标注输入流描述
    符为0，标准输出流为1，标准错误流为2。以后，每打开一个文件，此数字递
    增，并对应当前打开文件。在Unix中，sockets和pip都会有对应文件描述符。
-   
+
    io.fileno()可获取文件对象对应的文件描述符：
-   
+
    #+BEGIN_SRC python :session
      import sys
      sys.stdin.fileno()
@@ -564,7 +563,7 @@ Unix或C，但可用于大多数系统。
      with open('files/emma.txt') as f:
          print(f.fileno())
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
    - 0
@@ -685,14 +684,14 @@ Unix或C，但可用于大多数系统。
      - 3 4
      - >>> b'2\n'
      #+END_SRC
-
+     
 **** os. *fchmod* (fd,mode)
      自Python3.3以后，等价于os.chmod(FD, MODE)
-     
+
      #+BEGIN_EXAMPLE ipython
        In [147]: ls -l test.txt
        -rw-r--r-- 1 claudio claudio 0 May 24 11:51 test.txt
-
+     
        In [148]: fd = os.open('test.txt', os.O_RDONLY)
 
        In [149]: os.fchmod(fd, stat.S_IRWXO)
@@ -702,106 +701,181 @@ Unix或C，但可用于大多数系统。
        In [151]: ls -l test.txt
        -------rwx 1 claudio claudio 0 May 24 11:51 test.txt*
      #+END_EXAMPLE
-     
+
 **** os. *fchown* (fd,uid,gid)
      自Python3.3后，等价于ps.chown(FD, MODE)。
-     
-**** os. *fdatasync* (fd)
-**** os. *fpathconf* (fd,name)
-**** os. *fstat* (fd)
-**** os. *fstatvfs* (fd)
-**** os. *fsync* (fd)
-**** os. *ftruncate* (fd,length)
-**** os. *get_blocking* (fd)
-**** os. *isatty* (fd)
-**** os. *lockf* (fd,cmd,len)
-**** os. *F_LOCK*
-**** os. *F_TLOCK*
-**** os. *F_ULOCK*
-**** os. *F_TEST*
-**** os. *lseek* (fd,pos,how)
-**** os. *SEEK_SET*
-**** os. *SEEK_CUR*
-**** os. *SEEK_END*
-**** os. *open(path,flags,mode=0o777,*,dir_fd=None)
-**** os. *O_RDONLY*
-**** os. *O_WRONLY*
-**** os. *O_RDWR*
-**** os. *O_APPEND*
-**** os. *O_CREATE*
-**** os. *O_EXCL*
-**** os. *O_TRUNC*
-**** os. *O_DSYNC*
-**** os. *O_RSYNC*
-**** os. *O_SYNC*
-**** os. *O_NDELAY*
-**** os. *O_NONBLOCK*
-**** os. *O_NOCTTY*
-**** os. *O_CLOEXEC*
-**** os. *O_BINARY*
-**** os. *O_NOINHERIT*
-**** os. *O_SHORT_LIVED*
-**** os. *O_TEMPORARY*
-**** os. *O_RANDOM*
-**** os. *O_SEQUENTIAL*
-**** os. *O_TEXT*
-**** os. *O_ASYNC*
-**** os. *O_DIRECT*
-**** os. *O_DIRECTORY*
-**** os. *O_NOFOLLOW*
-**** os. *O_NOATIME*
-**** os. *O_PATH*
-**** os. *O_TMPFILE*
-**** os. *O_SHLOCK*
-**** os. *O_EXLOCK*
-**** os. *openpty* ()
-**** os. *pipe* ()
-**** os. *pipe2* (flags)
-**** os. *posix_fallocate* (fd,offset,len)
-**** os. *posix_fadvise* (fd,offset,len,advice)
-**** os. *POSIX_FADV_NORMAL*
-**** os. *POSIX_FADV_SEQUENTIAL*
-**** os. *POSIX_FADV_RANDOM*
-**** os. *POSIX_FADV_NOREUSE*
-**** os. *POSIX_FADV_WILLNEED*
-**** os. *POSIX_FADV_DONTNEED*
-**** os. *pread* (fd,buffersize,offset)
-**** os. *pwrite* (fd,str,offset)
-**** os. *read* (fd,n)
-**** os. *sendfile* (out,in,offset,count)
-**** os. *sendfile* (out,in,count,[headers,][trailers,]flags=0)
-**** os. *set_blocking* (fd,blocking)
-**** os. *SF_NODISKIO*
-**** os. *SF_MNOWAIT*
-**** os. *SF_SYNC*
-**** os. *readv* (fd,buffers)
-**** os. *tcgetpgrp* (fd)
-**** os. *tcsetpgrp* (fd,pg)
-**** os. *ttyname* (fd)
-**** os. *write* (fd,str)
-**** os. *writev* (fd,buffers)
 
-*** 获取命令行大小
-*** 文件描述器继承
-** 文件和文件夹操作
-   在Unix系统中，下面大多数函数支持以下一种或多种特性：
-   
-   - 使用文件描述符：对于一些函数，PATH参数既可以是字符串也可以是文件
-     描述符。（对于POSIX系统，实际上是调用的f...版本的对应函数。）
+**** os. *fdatasync* (fd)
+     强制将写入FD的内容同步到磁盘。不强制更新元数据。
+
+     兼容：Unix。
+**** os. *fpathconf* (fd,name) （待续）
+**** os. *fstat* (fd)
+     自Python3.3后，等价于os.stat(fd)。
+**** os. *fstatvfs* (fd)
+     自Python3.3后，等价于os.statvfs(fd)
+**** os. *fsync* (fd)
+     强制将对FD的写同步到磁盘。Unix中，底层为系统调用fsync；Windows中，
+     为系统调用MS_commit()。
      
-     可使用os.supports_fd查看支持文件描述符作为文件路径参数的函数，如
-     果没有此常量，抛出NotImplementedError错误：
+     如果启动一个已buffered的文件对象f，首先调用f.flush()，再调用
+     os.fsync(f.fileno)，可确保所有与f相关的缓存写入磁盘。
+
+**** os. *ftruncate* (fd,length)
+     自Python3.3后，等价于os.truncate(fd,length)。
+**** os. *get_blocking* (fd) （待续）
+**** os. *isatty* (fd)
+     如果FD为已打开的tty形式设备返回True，否则返回False。
      
      #+BEGIN_SRC python :session
        import os
-       os.supports_fd
+       import sys
+       fd = sys.stdin.fileno()
+       os.isatty(fd)
      #+END_SRC
      
      #+RESULTS:
      #+BEGIN_SRC org
+     - >>> >>> True
+     #+END_SRC
+
+**** os. *lockf* (fd,cmd,len) （待续）
+***** os. *F_LOCK*
+***** os. *F_TLOCK*
+***** os. *F_ULOCK*
+***** os. *F_TEST*
+**** os. *lseek* (fd,pos,how)
+     将当前文件描述符FD的对应文件的指针设置为相当于HOW处的POS位置。HOW
+     的取值可为：
+
+     - os.SEEK_SET或0：相当于文件起始位置。
+     - os.SEEK_CUR或1：相对于当前位置。
+     - os.SEEK_END或2：相对于文件末尾位置。
+
+     返回从文件起始位置按byte计算的位置。
+
+***** os. *SEEK_SET*
+***** os. *SEEK_CUR*
+***** os. *SEEK_END*
+      lseek()函数参数，取值分别为0、1和2。
+
+**** os. *open* (path,flags,mode=0o777,*,dir_fd=None)
+     打开字符串PATH指定文件，通过FLAGS设置flags，MODE设置权限（与系统
+     umask值一起计算），返回新打开文件对应的文件描述符。返回文件描述符
+     不可被子进程继承。
+     
+     FLAGS和MODE参数使用方法可参考C run-time documentation？？？；FLAG
+     常量（如os.O_RDONLY和os.O_WRONLY）定义在os模块中。在Windows系统中，
+     以二进制打开文件需添加O_BINARY。
+     
+     支持“路径相对于文件夹描述符指定目录”。
+     
+     #+BEGIN_QUOTE
+     *注意* ：此函数主要用于底层I/O操作。一般情况下，使用内置函数
+     open()即可；将文件描述符包装成文件对象，使用os.fdopen()。
+     #+END_QUOTE
+     
+     下面为FLAGS参数可取值，使用比特或操作组合：
+***** Unix和Windows都有效的常量
+****** os. *O_RDONLY*
+****** os. *O_WRONLY*
+****** os. *O_RDWR*
+****** os. *O_APPEND*
+****** os. *O_CREATE*
+****** os. *O_EXCL*
+****** os. *O_TRUNC*
+***** 只有Unix中才有效的常量
+****** os. *O_DSYNC*
+****** os. *O_RSYNC*
+****** os. *O_SYNC*
+****** os. *O_NDELAY*
+****** os. *O_NONBLOCK*
+****** os. *O_NOCTTY*
+****** os. *O_CLOEXEC*
+***** 只有Windows中才有效的常量
+****** os. *O_BINARY*
+****** os. *O_NOINHERIT*
+****** os. *O_SHORT_LIVED*
+****** os. *O_TEMPORARY*
+****** os. *O_RANDOM*
+****** os. *O_SEQUENTIAL*
+****** os. *O_TEXT*
+***** 扩展，但只有在C库中有定义才有效的常量
+****** os. *O_ASYNC*
+****** os. *O_DIRECT*
+****** os. *O_DIRECTORY*
+****** os. *O_NOFOLLOW*
+****** os. *O_NOATIME*
+****** os. *O_PATH*
+****** os. *O_TMPFILE*
+****** os. *O_SHLOCK*
+****** os. *O_EXLOCK*
+**** os. *openpty* () （待续）
+**** os. *pipe* () （待续）
+**** os. *pipe2* (flags) （待续）
+**** os. *posix_fallocate* (fd,offset,len) （待续）
+**** os. *posix_fadvise* (fd,offset,len,advice) （待续）
+***** os. *POSIX_FADV_NORMAL*
+***** os. *POSIX_FADV_SEQUENTIAL*
+***** os. *POSIX_FADV_RANDOM*
+***** os. *POSIX_FADV_NOREUSE*
+***** os. *POSIX_FADV_WILLNEED*
+***** os. *POSIX_FADV_DONTNEED*
+**** os. *pread* (fd,buffersize,offset)
+     在文件描述符FD中，从OFFSET处读取内容，最多读取BUFFERSIZE个bytes。
+     文件指针保持不变。
+**** os. *pwrite* (fd,str,offset)
+     向文件描述符FD中，从OFFSET位置开始，写入bytes对象STR。文件指针位
+     置保持不变。
+**** os. *read* (fd,n)
+     从文件描述符FD中读取至多N个bytes，以bytes对象形式返回读取内容。如
+     果达到FD末尾，返回空bytes对象。
+
+     #+BEGIN_QUOTE
+     *注意* ：此函数只用于底层I/O操作，只能用于os.open()或os.pipe()返
+     回的文件描述符。如需读取open()、popen()、fdopen()或sys.stdin文件
+     对象内容，使用read()或readline()方法。
+     #+END_QUOTE
+
+**** os. *sendfile* (out,in,offset,count)
+**** os. *sendfile* (out,in,count,[headers,][trailers,]flags=0) （待续）
+**** os. *set_blocking* (fd,blocking) （待续）
+***** os. *SF_NODISKIO*
+***** os. *SF_MNOWAIT*
+***** os. *SF_SYNC*
+**** os. *readv* (fd,buffers) （待续）
+**** os. *tcgetpgrp* (fd) （待续）
+**** os. *tcsetpgrp* (fd,pg) （待续）
+**** os. *ttyname* (fd) （待续）
+**** os. *write* (fd,str) （待续）
+**** os. *writev* (fd,buffers) （待续）
+*** 获取命令行大小
+    参考shutil.get_terminal_size()。
+**** os. *get_terminal_size* (fd=STDOUT_FILENO)
+**** class os.terminal_size
+***** columns
+***** lines
+*** 文件描述器继承 （待续）
+** 文件和文件夹操作
+   在Unix系统中，下面大多数函数支持以下一种或多种特性：
+
+   - 使用文件描述符作为路径：对于一些函数，PATH参数既可以是字符串也可
+     以是文件描述符。（对于POSIX系统，实际上是调用的f...版本的对应函
+     数。）
+
+     可使用os.supports_fd查看支持文件描述符作为文件路径参数的函数，如
+     果没有此常量，抛出NotImplementedError错误：
+
+     #+BEGIN_SRC python :session
+       import os
+       os.supports_fd
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
      - >>> {<built-in function execve>, <built-in function stat>, <built-in function pathconf>, <built-in function chmod>, <built-in function truncate>, <built-in function statvfs>, <built-in function chdir>, <built-in function listdir>, <built-in function utime>, <built-in function chown>}
      #+END_SRC
-     
+
      如果函数还支持DIR_FD或FOLLOW_SYMLINKS参数，使用文件描述符作为PATH
      参数时再设置这两个参数为True将抛出错误：
 
@@ -817,7 +891,7 @@ Unix或C，但可用于大多数系统。
      -   File "<stdin>", line 1, in <module>
      - TypeError: access: illegal type for path parameter
      #+END_SRC
-     
+
    - 路径相对于文件夹描述符：如果DIR_FD参数不为None，则需为文件夹描述
      符。当前函数的路径参数将相对于此文件夹。如果PATH参数为绝对路径，
      此参数值忽略。（对于POSIX系统，实际上会调用...at或f...at版本对应
@@ -825,7 +899,7 @@ Unix或C，但可用于大多数系统。
 
      可查看os.supports_dir_fd参数获取支持此参数的函数，如果没有此常量
      抛出NotImplementedError错误：
-
+     
      #+BEGIN_SRC python :session
        import os
        os.supports_dir_fd
@@ -836,63 +910,63 @@ Unix或C，但可用于大多数系统。
      - {<built-in function stat>, <built-in function rmdir>, <built-in function chmod>, <built-in function rename>, <built-in function readlink>, <built-in function mkdir>, <built-in function open>, <built-in function mkfifo>, <built-in function utime>, <built-in function symlink>, <built-in function chown>, <built-in function link>, <built-in function mknod>, <built-in function unlink>, <built-in function access>}
      #+END_SRC
      
-   - 不跟随软连接：如果FOLLOW_SYMLINKS参数为False，且PATH为软链接，测
+   - 不跟随软连接：如果FOLLOW_SYMLINKS参数为False，且PATH为软链接，则
      函数操作对象为该软链接，而非软链接指向的文件。（对应POSIX系统，实
      际上是调用的l...版本的对应函数。）
-
+     
      可使用os.supports_follow_symlinks查看支持的函数，如果没有此常量，
      抛出NotImplementedError错误：
-
+     
      #+BEGIN_SRC python :session
        import os
        os.supports_follow_symlinks
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - {<built-in function stat>, <built-in function utime>, <built-in function chown>, <built-in function link>, <built-in function access>}
      #+END_SRC
      
 *** os. *access* (path,mode,*,dir_fd=None,effective_ids=False,follow_symlinks=True)
-    使用真实用户/用户组ID范围PATH。大多数操作会使用有效用户/用户组ID，
+    使用真实用户/用户组ID检查PATH。大多数操作会使用有效用户/用户组ID，
     所有此函数可用在设置了suid/sgid的环境中测试“申请用户（invoking
-    user）？？？”是否有特点访问权限。
-    
+    user）？？？”是否有特定访问权限。
+
     MODE参数需为：F_OK测试路径对应文件是否存在，并与R_OK、W_OK和X_OK使
     用比特或操作连用。
-    
+
     如果能成功访问返回True，否则返回False。
-    
+
     如果EFFECTIVE_IDS参数为True，access()会使用有效用户/用户组ID查看权
     限。可能某些系统不支持此参数，可使用os.supports_effective_ids查看，
     如果没有此常量抛出NotImplementedError错误：
-    
+
     #+BEGIN_SRC python :session
       import os
       os.supports_effective_ids
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - {<built-in function access>}
     #+END_SRC
-    
-    此函数支持“路径相对于文件夹描述符”和“不跟随软链接”。
 
+    此函数支持“路径相对于文件夹描述符”和“不跟随软链接”。
+    
     #+BEGIN_QUOTE
     *注意* ：在使用open()真正打开文件前，使用access()判断某个用户是否
     有权限会造成安全漏洞。因为用户可利用测试权限和打开文件的短暂间隙访
     问文件。错误的写法为：
-
+    
     #+BEGIN_EXAMPLE python
       if os.access('myfle'. os.R_OK):
          with open('myfle') as fp:
               return fp.read()
       return 'some default data'
     #+END_EXAMPLE
-
+    
     正确的写法为：
-
+    
     #+BEGIN_EXAMPLE python
       try:
           fp = open('myfile')
@@ -990,7 +1064,7 @@ Unix或C，但可用于大多数系统。
 *** os. *lchflags* (path,flags)
     自Python3.3后等价于os.chflags(PATH,FLAGS,follow_symlinks=False)。
     即不跟随软链接。
-
+    
 *** os. *lchmod* (path,mode)
     即os.chmod()不跟随软链接的版本，自Python3.3后等价于
     os.chmod(PATH,MODE,follow_symlinks=False)。
@@ -998,7 +1072,7 @@ Unix或C，但可用于大多数系统。
 *** os. *lchown* (path,uid,gid)
     即os.chown()的不跟随软链接版本，等价于
     os.chown(PATH,UID,GID,follow_symlinks=False)。
-
+    
 *** os. *link* (src,dst,*,src_dir_fd=None,dst_dir_fd=None,follow_symlinks=True)
     创建名为DST的 *硬链接* ，指向SRC。
 
@@ -1011,27 +1085,66 @@ Unix或C，但可用于大多数系统。
     
     PATH可为字符串，也可为bytes对象。如果为bytes对象，返回链表的元素也
     为bytes对象，其他任何情况都为字符串。
-    
+
     支持“使用文件夹描述符表示路径”。
     
     #+BEGIN_QUOTE
     *注意* ：将字符串文件名转换为bytes对象，最好使用os.fsencode()函数。
     #+END_QUOTE
-    
+
     #+BEGIN_QUOTE
     *另见* ：os.scandir()可获取每个文件更详细的信息。
     #+END_QUOTE
-    
+
 *** os. *lstat* (path,*,dir_fd=None)
+    Python3.3后，等价于
+    os.stat(PATH,dir_fd=DIR_FD,follow_symlinks=False)，即os.stat()不跟
+    随软链接版本。返回结果也为stat_result对象。
+
+    支持“文件描述符作为路径”。
+
 *** os. *mkdir* (path,mode=0o777,*,dir_fd=None)
+    创建名为PATH的文件夹，使用MODE参数设置权限。
+
+    如果文件夹已存在，抛出FileExistsError错误。
+
+    在支持umask（如Unix）的系统中，会将MODE值与系统umask值进行比特^操
+    作作为最终权限值，如果结果不是3位8进制数，含义由系统决定。在忽视
+    MODE参数的系统中，需使用os.chmod()手动设置文件夹权限。
+
+    此函数支持“文件描述符作为路径”。
+
+    如需创建临时文件夹，可参考tempfile中的mkdtmp()函数。
+
 *** os. *makedirs* (name,mode=0o777,exist_ok=False)
+    递归创建文件夹。与mkdir()相似，不过会创建不存在的父文件夹。
+
+    MODE参数会传递给mkdir()函数，所以用法相同。
+
+    如果EXIST_OK参数为False（默认），且需创建的文件夹已存在，则抛出
+    OSError错误。
+
+    #+BEGIN_QUOTE
+    *注意* ：可能不会正确处理NAME中含os.padir的情况。
+    #+END_QUOTE
+
+    可正确处理UNC路径。？？？
+    
 *** os. *mkfifo* (path,mode=0o666,*,dir_fd=None)
-*** os. *mknod* (path,mode=0o600,device=0,*,dir_fd=None)
-*** os. *major* (device)
-*** os. *minor* (device)
-*** os. *makedev* (major,minor)
-*** os. *pathconf* (path,name)
-*** os. *pathconf_names*
+    与系统调用mkfifo相同，创建一个名为PATH的FIFO（命名管道），权限为
+    MODE与系统umask值使用比特^计算的结果。
+
+    支持“文件描述符作为路径”。
+
+    可使用os.unlink()删除。
+
+*** os. *mknod* (path,mode=0o600,device=0,*,dir_fd=None) （待续）
+    参考Linux的mknod系统调用？？？
+*** os. *major* (device) （待续）
+*** os. *minor* (device) （待续）
+*** os. *makedev* (major,minor) （待续）
+*** os. *pathconf* (path,name) （待续）
+*** os. *pathconf_names* （待续）
 
     #+BEGIN_SRC python :session
       import os
@@ -1051,12 +1164,25 @@ Unix或C，但可用于大多数系统。
     如果PATH为字符串对象，返回值也为字符串对象，可能抛出
     UnicodeDecodeError错误；如果为bytes对象，返回值也为bytes对象。
 
-    也支持文件夹描述符相对路径。
+    也支持“文件夹描述符相对路径目录”。
 
     兼容：Unix，Windows。
 
 *** os. *remove* (path,*,dir_fd=None)
+    删除PATH指定的文件。如果PATH指向文件夹，抛出OSError错误。删除文件
+    夹可使用os.rmdir()。
+
+    支持“文件夹描述符作为相对路径目录”。
+
+    语义上等价于os.unlink().
+
+    Windows中，尝试删除正在被使用的文件会抛出错误；Unix在，所在文件夹
+    的接口被删除，但该文件所在内存只有在文件不再被使用后才能重新使
+    用。？？？
+
 *** os. *removedirs* (name)
+    递归删除文件夹。同os.rmdir()一样，只能删除空文件夹。从最深的子文件
+    夹开始逐个删除，直到遇到不是空文件为止。
 *** os. *rename* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
     将文件/文件夹SRC重命名为DST。如果DST为已存在文件夹，抛出OSError错
     误了；如果为已存在的文件，则默认替换（有权限的情况下）；在Windows
@@ -1078,7 +1204,7 @@ Unix或C，但可用于大多数系统。
 
       In [114]: ls test-renamed/test1/
       test2/
-
+    
       In [115]: ls test-renamed/test1/test2/
       test.txt
     #+END_EXAMPLE
@@ -1089,9 +1215,9 @@ Unix或C，但可用于大多数系统。
     
     #+BEGIN_EXAMPLE ipython
       In [118]: os.makedirs('test/test1/test2')
-    
+
       In [119]: pathlib.Path('test/test1/test2/test.txt').touch()
-    
+
       In [120]: os.renames('test/test1/', 'testA/testB')
 
       In [121]: ls test/
@@ -1105,7 +1231,7 @@ Unix或C，但可用于大多数系统。
       In [124]: ls testA/testB/test2/
       test.txt
     #+END_EXAMPLE
-
+    
 *** os. *replace* (src,dst,*,src_dir_fd=None,dst_dir_fd=None)
     os.rename()的支持跨平台版本。
 
@@ -1113,22 +1239,139 @@ Unix或C，但可用于大多数系统。
     个新问题：Path.rename()又有何区别。
 
 *** os. *rmdir* (path,*,dir_fd=None)
+    删除PATH指定的文件夹。只能删除空文件夹，否则抛出OSError错误。如需
+    删除整个文件树，可使用shutil.rmtree()。
+
+    支持“相对于文件夹描述符指定路径”。
+
 *** os. *scandir* (path='.')
+    返回PATH指向文件夹的DirEntry可迭代对象。其中文件夹内容顺序不定，且
+    不包含"."和".."。
+    
+    如需使用文件名和文件属性信息，用scandir()替代listdir()可大幅提高效
+    率。因为在扫描文件夹时，DirEntry对象会尽可能保留系统提高的文件信息。
+    所有DirEntry的方法都可能执行系统调用，但is_dir()和is_file()通常只
+    在用来判断软链接时才进行；DirEntry.stat()在Unix中总是会执行系统调
+    用，但在Windows中只会执行一次。
+    
+    Unix中，PATH可为字符串对象，也可为bytes对象（使用fsendode()和
+    fsdecode()编码和解码）。Windows中，PATH只能为字符串对象。在两类系
+    统中，DirEntry的name和path属性值类型与PATH类型相同。
+    
+    下例为简单的scandir()实例：显示不以“.”开始的文件名。其中
+    entry.is_file()一般情况下不会执行系统调用：
+    
+    #+BEGIN_EXAMPLE python
+      for entry in os.scandir(path):
+          if not entry.name.statswith('.') and entry.is_file():
+             print(entry.name)
+    #+END_EXAMPLE
+    
+    #+BEGIN_QUOTE
+    *注意* ：以Unix为基础的系统中，scandir()实际使用了系统的
+    opendir()和readdir()函数；在Windows中，则是使用了Win32的
+    FindFirstFileW和FindNextFileW函数。
+    #+END_QUOTE
+    
 *** class os. *DirEntry*
+    scandir()返回结果对象，暴露文件夹的路径和其他文件属性。
+    
+    scandir()会在不额外进行系统调用的情况下提供尽可能多的信息。当进行
+    stat()或lstat()系统调用时，DirEntry会缓存结果。
+    
+    DirEntry并不适合于存储长时间的数据结构？？？。如果已知文件的元数据
+    有改动，或使用DirEntry时距调用scandir()已经间隔较长时间，可使用
+    os.stat(entry.path)获取最新数据。
+    
+    由于DirEntry的方法可以进行系统调用，所以可能抛出OSError错误。如需
+    精细控制这些错误，可在调用DirEntry方法是捕捉。
+    
+    DirEntry有下面方法和属性：
+    
 **** name
+     子项目文件名，相对于scandir()PATH参数指定文件夹。
+
+     为字符串类型还是bytes对象，取决于scandir()的PATH参数。如果为bytes
+     对象，可使用os.fsdecode()函数解码。
 **** path
+     返回子项目全路径，等价于os.path.join(scandir_path, entry.name)，
+     其中scandir_path为scandir()的PATH参数。只有当scandir()的PATH参数
+     为决对路径时，才为决定路径。
+
+     为字符串类型还是bytes对象，取决于scandir()的PATH参数。如果为bytes
+     对象，可使用os.fsdecode()函数解码。
+
 **** inode()
+     返回子项目的inode数值。
+
+     结果会缓存在DirEntry对象上，可使用os.stat(entry.path,
+     follow_symlinks=False).st_ino获取最新值。
+
+     第一次调用为非缓存调用，Windows会执行系统调用，Unix则不会。
+
 **** is_dir(*,follow_symlinks=True)
+     如果子项目为文件夹或指向文件夹的软链接返回True，其他任何文件、执
+     行其他任何文件，或不存在返回False。
+
+     如果FOLLOW_SYMLINKS为False，只有当子项目为文件夹时才返回True。
+
+     FOLLOW_SYMLINKS为True和False的返回结果会分别缓存在DirEntry对象上。
+     如需获取最新结果，可对子项目先调用os.stat()，再调用stat.S_ISDIR()。
+
+     第一次调用时，大多数情况下不会执行系统调用。尤其是对应非软链接的
+     子项目，Windows和Unix都不会进行系统调用；但Unix中个别文件系统除外，
+     如网络文件系统中dirent.d_type == DT_UNKNOWN时。如果子项目为软链接，
+     且FOLLOW_SYMLINKS参数为True，则进行系统调用。
+
+     此方法可能会抛出OSError，如PermissionError，但FileNotFoundError错
+     误会被捕捉但不抛出。
+
 **** is_file(*,follow_symlinks=True)
+     如果子项目为文件或指向文件的软链接，返回True；其他任何文件形式或
+     不存在则返回False。
+
+     如果FOLLOW_SYMLINKS参数为False，只有当子项目为文件时才返回True，
+     其他任何情况返回False。
+
+     返回结果会缓存到DirEntry对象上。缓存方法、系统调用方式和错误抛出
+     方式与is_dir()相同。
 **** is_symlink()
+     如果子项目为软链接（即使为已损坏软链接）返回True，其他任何情况或
+     不存在则返回False。
+
+     结果会缓存在DirEntry对象上。调用os.path.islink()可获取最新结果。
+
+     第一次调用时，大多数情况下不会执行系统调用。尤其Windows和Unix都不
+     会进行系统调用；但Unix中个别文件系统除外，如网络文件系统中
+     dirent.d_type == DT_UNKNOWN时。
+
+     此方法可能会抛出OSError，如PermissionError，但FileNotFoundError错
+     误会被捕捉但不抛出。
+
 **** stat(*,follow_symlinks=True)
+     返回子项目的stat_result结果对象。默认跟随软链接，如需获取软链接的
+     stat信息，可设置FOLLOW_SYMLINKS参数为False。
+     
+     Unix中，此方法总是会进行系统调用；Windows中，只有当
+     FOLLOW_SYMLINKS参数为True，且子项目为软链接时才进行系统调用。
+     
+     Windows中，返回结果stat_result的st_ino、st_dev和st_nlink属性总是
+     为0，可调用os.stat()获取这些属性。
+     
+     FOLLOW_SYMLINKS为True和False的调用结果会分别缓存在DirEntry对象上。
+     可调用os.stat()获取最新信息。
+     
+     *注意* ：DirEntry的属性和方法，与pathlib.Path的属性和方法联系紧密，
+     尤其时name属性、is_dir()、is_file()、is_symlink()和stat()方法含义
+     完全相同。
+     
 *** os. *stat* (path,*,dir_fd=None,follow_symlinks=True)
     获取文件或文件描述符的状态信息。等价于对PATH系统调用stat。PATH可以
     为字符串、bytes对象或文件描述符。返回stat_result对象。
 
     此函数一般会跟随软链接，如需取消此功能声明FOLLOW_SYMLINKS参数为
     False，或使用os.lstat()。
-    
+
     支持“文件描述符表示路径”或“不跟随软链接”。
 
     举例：
@@ -1153,7 +1396,11 @@ Unix或C，但可用于大多数系统。
 *** class os. *stat_result*
     属性基本上包含系统调用stat返回值的对象，为os.stat()、os.fstat()和
     os.lstat()的返回结果形式。
-    
+
+    stat模块定义了提前stat结构体的函数和常量。
+
+    为向后兼容，stat_result实例可作为元组访问，索引访问结果为整数。
+
 **** st_mode
      文件模式：文件类型和模式位（权限）。
 **** st_ino
@@ -1168,34 +1415,146 @@ Unix或C，但可用于大多数系统。
 **** st_gid
      拥有者用户组标识。
 **** st_size
+     普通文件或软链接，为文件内容byte大小。对应软链接，为路径字符串大
+     小，且不含结尾的null比特。
+**** 时间戳
+     #+BEGIN_QUOTE
+     *注意* ：st_atime、st_mtime和st_ctime的精度取决于操作系统和文件系
+     统。比如使用FAT或FAT32文件系统的Windows，st_mtime有2秒的精度，
+     st_atime只有1天的精度。具体可查看操作系统文档。
      
-**** st_atime
-**** st_mtime
-**** st_ctime
-**** st_atime_ns
-**** st_mtime_ns
-**** st_ctime_ns
-**** st_blocks
-**** st_blksize
-**** st_rdev
-**** st_flags
-**** st_birthtime
-**** st_creator
-**** st_type
-**** st_file_attibutes
+     同样，尽管st_atime_ns、st_mtime_ns和st_ctime_ns总是以纳秒为单位，
+     但许多系统不支持纳秒精度。在支持纳秒精度的系统中，st_atime、
+     st_mtime和st_ctime浮点数不能表示纳秒精度，如需获取准确时间戳，可
+     使用纳秒版本属性。
+     #+END_QUOTE
+***** st_atime
+      最后访问时间。
+***** st_mtime
+      最近一次内容被修改时间。
+***** st_ctime
+      由系统决定：
+      
+      - Unix：元数据最后修改时间。
+      - Windows：文件创建时间。（以秒为单位）
+        
+***** st_atime_ns
+      最后访问时间，以整数表示的纳秒。
+***** st_mtime_ns
+      最后修改时间，以整数表示的纳秒。
+***** st_ctime_ns
+      由系统决定：
+      
+      - Unix：元数据最后修改时间。
+      - Windows：文件创建时间，以整数表示的纳秒。
+**** Unix特有属性 ？？？
+***** st_blocks ？？？
+      为文件分配的512-bytes块。当文件有holes时，可能小于st_size/512。
+***** st_blksize
+***** st_rdev
+***** st_flags
+**** Mac OS特有属性（待续）
+***** st_birthtime
+***** st_creator
+***** st_type
+**** Windows特有属性（待续）
+***** st_file_attibutes
 *** os. *stat_float_times* ([newvalue])
-*** os. *statvsf* (path)
-*** os. *supports_dir_fd*
-*** os. *supports_effective_ids*
-*** os. *supports_fd*
-*** os. *supports_follow_symlinks*
+    决定stat_result对象表示时间戳是是否用浮点数。如果NEWVALUE为True，
+    以后调用os.stat()的返回值中时间戳都用浮点数表示；如果为False，以后
+    调用结果中的时间戳都用整数表示；如果缺省，则返回当前设置。
 
+    #+BEGIN_SRC python :session
+      import os
+      os.stat_float_times
+    #+END_SRC
+    
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - <built-in function stat_float_times>
+    #+END_SRC
+
+    为与Python旧版本兼容，将stat_result作为元组访问，获取的时间戳总是
+    整数。
+
+    目前，Python默认使用浮点数形式。如果应用不能正确处理浮点数时间戳，
+    可使用此函数设置。
+
+    时间戳精度由系统决定。一些系统中的精度为秒，另一些系统中小数部分会
+    默认为0。
+
+    建议只在程序启动时，即__main__模块中设置此值；库文件不得改变此值。
+
+*** os. *statvsf* (path) （待续）
+*** os. *supports_dir_fd*
+    set对象，含os模块中允许使用dir_fd参数的函数，即支持“文件夹描述符作
+    为相对路径根目录”的函数。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.supports_dir_fd
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> {<built-in function stat>, <built-in function rmdir>, <built-in function chmod>, <built-in function unlink>, <built-in function rename>, <built-in function readlink>, <built-in function mkdir>, <built-in function open>, <built-in function mkfifo>, <built-in function utime>, <built-in function symlink>, <built-in function chown>, <built-in function link>, <built-in function mknod>, <built-in function access>}
+    #+END_SRC
+
+    可使用in操作判断指定函数是否支持：
+
+    #+BEGIN_EXAMPLE python
+      os.stat in os.supports_dir_fd
+    #+END_EXAMPLE
+
+*** os. *supports_effective_ids*
+    set对象。如果os.access()可使用effective_ids参数，则该参数包含在其
+    中，否则返回结果为空set对象。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.supports_effective_ids
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - {<built-in function access>}
+    #+END_SRC
+
+    可使用in操作符查看os.access是否支持该参数：
+
+    #+BEGIN_EXAMPLE python
+      os.access in os.supports_effective_ids
+    #+END_EXAMPLE
+
+*** os. *supports_fd*
+    set对象，含所有os模块中支持“使用文件描述符作为路径”的函数。
+
+    #+BEGIN_SRC python :session
+      import os
+      os.supports_fd
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - {<built-in function stat>, <built-in function execve>, <built-in function pathconf>, <built-in function chmod>, <built-in function truncate>, <built-in function statvfs>, <built-in function chdir>, <built-in function listdir>, <built-in function utime>, <built-in function chown>}
+    #+END_SRC
+
+    可使用in操作符查看指定函数是否支持：
+
+    #+BEGIN_EXAMPLE python
+      os.chdir in os.supports_fd
+    #+END_EXAMPLE
+    
+*** os. *supports_follow_symlinks*
+    set对象，含os模块中所有可使用follow_symlinks参数的函数，即支持“不
+    跟随软链接”特性的函数。
+    
     #+BEGIN_SRC python :session
       import os
       for fn in os.supports_follow_symlinks:
           print(fn)
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - ... ... <built-in function stat>
@@ -1205,26 +1564,322 @@ Unix或C，但可用于大多数系统。
     - <built-in function access>
     #+END_SRC
 
+    可使用in操作符查看特定函数是否支持此特性：
+
+    #+BEGIN_EXAMPLE python
+      os.stat in os.supports_follow_symlinks
+    #+END_EXAMPLE
+
 *** os. *symlinks* (src,dst,target_is_directory=False,*,dir_fd=None)
     创建名为DST的软链接，指向SRC。
 
     TARGET_IS_DIRECTORY参数在Windows以外的系统上被忽视。
-    
+
     Windows：（待续）
-    
+
     兼容：Unix，Windows。
     
-*** os. *sync* ()
+*** os. *sync* () ？？？
+    强制将所有写入内容同步到磁盘。
+
+    兼容：Unix。
 *** os. *truncate* (path,length)
+    将PATH指定文件删减到最多LENGTH个bytes大小。
+
+    支持“文件描述符作为文件路径”。
+    
+    兼容：Unix、Windows。
 *** os. *unlink* (path,*,dir_fd=None)
+    删除PATH指定的文件。语义上等价于os.remove()。与传统Unix的同名命令
+    含义相同，都是删除文件。
+    
+    具体用法可参考os.remove()函数。
 *** os. *utime* (path,times=None,*,[ns,]dir_fd=None,follow_symlinks=True)
+    设置PATH指定文件的最后访问时间（atime）和最后修改时间（mtime）。
+
+    可使用可选参数TIMES或NS，用法如下：
+
+    - 如果指定NS，需为2元素元组，形式为(atime_ns,mtime_ns)，其中每个值
+      为表示纳秒的整数。
+    - 如果指定TIMES，须为2元素元组，形式为(atime,mtime)，其中每个值为
+      表示秒的浮点数。
+    - 如果两个参数都缺省，相当于ns=(atime_ns,mtime_ns)，使用当前时间。
+    - 两个参数不能同时指定。
+
+    文件夹路径是否可作为PATH参数，取决于当前文件系统是否将文件夹实现为
+    文件（如Windows就不能）。
+
+    *注意* ：此函数设置时间后，以后调用os.stat()可能不会准确返回对应值，
+    精度取决于操作系统。最好的办法是指定NS参数，使用os.stat()获取时使
+    用stat_result的st_atime_ns和st_mtime_ns属性。
+
+    此函数支持“文件描述符作为路径”、“相对于文件夹描述符指定的文件夹”和“不
+    跟随软链接”。
+
 *** os. *walk* (top,topdown=True,onerror=None,follow_symlinks=False)
+    通过自上而下/自下而上递归文件树，生成文件夹中的文件名。对于自
+    TOP（含TOP）文件树中的每个文件夹，yield一个3元素元组
+    (dirpath,dirnames,filenames)。
+
+    dirpath为字符串，表示当前文件夹的路径；dirnames为链表，含dirpath文
+    件夹中所有子文件夹（不含"."和".."）；filenames为链表，含dirpath文
+    件夹中除文件夹外所有所有文件。如需获取dirpath中文件/文件夹的全路径，
+    可使用os.path.join(dirpath,name)。
+    
+    如果TOPDOWN参数为True（默认），从顶层文件夹开始；如果为False，则从
+    最深层文件夹开始。不管为False还是True，或在yield当前文件夹的元组前
+    获取子文件？？？。
+
+    当TOPDOWN为True时，可赋值当前dirnames（如使用del或赋值截断），此后
+    walk只在dirnames中剩余的文件夹中递归。如果TOPDOWN为False，修改
+    dirnames没有任何效果。 *？* ：测试没有任何效果。
+
+    默认情况下，调用listdir()（Python3.5开始，已使用os.scandir()代替
+    os.listdir()）抛出的错误会被忽视。如果设置可选参数ONERROR，需为接
+    受一个OSError实例的参数的函数。可用于放弃递归，或报告错误但继续递
+    归。exception对象的filename属性为filenames的的元素。
+
+    默认情况下，不会跟随指向文件夹的软链接。可通过FOLLOW_SYMLINKS参数
+    修改。但设置为True后，可能造成无限循环，如软链接指向已访问的文件夹。
+
 *** os. *fwalk* (top='.',topdown=True,onerror=None,*,follow_symlinks=False,dir_fd=None)
-*** Linux扩展属性
-** 进程管理
-** scheduler接口
+    与walk()的不同点有：
+
+    1. 各个文件夹中yield的为4元素元组：
+       (dirpath,dirnames,filenames,dirfd)，前三个元素与walk相同，最后
+       一个元素为表示第一个元素dirpath的文件夹描述符。
+    2. 不仅支持“不跟随软链接”，还支持“路径相对于文件夹描述符指定的根目
+       录”。
+
+*** Linux扩展属性 （待续）
+    下面的函数只在Linux中有效。
+**** os. *getxattr* (path,attibute,*,follow_symlinks=True)
+**** os. *listxattr* (path=None,*,follow_symlinks=True)
+**** os. *removexattr* (path,attribute,*,follow_symlinks=True)
+**** os. *setxattr* (path,attribute,value,flags=0,follow_symlinks=True)
+**** os. *XATTR_SIZE_MAX*
+**** os. *XATTR_CREATE*
+**** os. *XATTR_REPLACE*
+
+** 进程管理 （待续）
+** scheduler接口 （待续）
 ** 各种系统信息
+*** Unix特有
+**** os. *confstr* (name) （待续）
+**** os. *confstr_names*
+
+     #+BEGIN_SRC python :session
+       import os
+       os.confstr_names
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - {'CS_LFS64_LDFLAGS': 1005, 'CS_XBS5_LP64_OFF64_LIBS': 1110, 'CS_XBS5_LPBIG_OFFBIG_LIBS': 1114, 'CS_XBS5_LP64_OFF64_LINTFLAGS': 1111, 'CS_XBS5_LPBIG_OFFBIG_LINTFLAGS': 1115, 'CS_XBS5_ILP32_OFF32_CFLAGS': 1100, 'CS_XBS5_LPBIG_OFFBIG_CFLAGS': 1112, 'CS_XBS5_ILP32_OFFBIG_LDFLAGS': 1105, 'CS_GNU_LIBPTHREAD_VERSION': 3, 'CS_LFS_LIBS': 1002, 'CS_LFS64_CFLAGS': 1004, 'CS_XBS5_ILP32_OFF32_LINTFLAGS': 1103, 'CS_LFS_CFLAGS': 1000, 'CS_LFS64_LINTFLAGS': 1007, 'CS_LFS64_LIBS': 1006, 'CS_XBS5_ILP32_OFFBIG_LINTFLAGS': 1107, 'CS_LFS_LDFLAGS': 1001, 'CS_LFS_LINTFLAGS': 1003, 'CS_XBS5_ILP32_OFFBIG_CFLAGS': 1104, 'CS_XBS5_ILP32_OFF32_LIBS': 1102, 'CS_XBS5_LP64_OFF64_LDFLAGS': 1109, 'CS_XBS5_LPBIG_OFFBIG_LDFLAGS': 1113, 'CS_PATH': 0, 'CS_XBS5_ILP32_OFFBIG_LIBS': 1106, 'CS_GNU_LIBC_VERSION': 2, 'CS_XBS5_LP64_OFF64_CFLAGS': 1108, 'CS_XBS5_ILP32_OFF32_LDFLAGS': 1101}
+     #+END_SRC
+
+**** os. *cpu_count* ()
+     返回当前系统的CPU数量，如果不能读取，返回None。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.cpu_count()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - 4
+     #+END_SRC
+
+**** os. *getloadavg* () ？？？
+
+     #+BEGIN_SRC python :session
+       import os
+       os.getloadavg()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - (0.13, 0.05, 0.01)
+     #+END_SRC
+
+**** os. *sysconf* (name) ？？？
+**** os. *sysconf_names* ？？？
+
+     #+BEGIN_SRC python :session
+       import os
+       os.sysconf_names
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - {'SC_FSYNC': 15, 'SC_COLL_WEIGHTS_MAX': 40, 'SC_UIO_MAXIOV': 60, 'SC_REALTIME_SIGNALS': 9, 'SC_AVPHYS_PAGES': 86, 'SC_THREAD_ATTR_STACKSIZE': 78, 'SC_PII_OSI': 57, 'SC_EQUIV_CLASS_MAX': 41, 'SC_NL_NMAX': 122, 'SC_XBS5_LP64_OFF64': 127, 'SC_BC_DIM_MAX': 37, 'SC_CHAR_MAX': 102, 'SC_XOPEN_REALTIME': 130, 'SC_MEMLOCK_RANGE': 18, 'SC_XBS5_ILP32_OFF32': 125, 'SC_THREAD_DESTRUCTOR_ITERATIONS': 73, 'SC_SSIZE_MAX': 110, 'SC_MEMORY_PROTECTION': 19, 'SC_THREADS': 67, 'SC_2_VERSION': 46, 'SC_CLK_TCK': 2, 'SC_XOPEN_LEGACY': 129, 'SC_PII_XTI': 54, 'SC_BC_SCALE_MAX': 38, 'SC_XOPEN_XPG4': 100, 'SC_MQ_PRIO_MAX': 28, 'SC_THREAD_PRIO_INHERIT': 80, 'SC_PAGE_SIZE': 30, 'SC_SEM_NSEMS_MAX': 32, 'SC_UCHAR_MAX': 115, 'SC_SEM_VALUE_MAX': 33, 'SC_XOPEN_XCU_VERSION': 90, 'SC_2_C_BIND': 47, 'SC_NL_SETMAX': 123, 'SC_SHRT_MAX': 113, 'SC_XOPEN_UNIX': 91, 'SC_2_CHAR_TERM': 95, 'SC_BC_BASE_MAX': 36, 'SC_XOPEN_SHM': 94, 'SC_RTSIG_MAX': 31, 'SC_EXPR_NEST_MAX': 42, 'SC_XBS5_LPBIG_OFFBIG': 128, 'SC_THREAD_PRIORITY_SCHEDULING': 79, 'SC_PAGESIZE': 30, 'SC_XOPEN_VERSION': 89, 'SC_SHARED_MEMORY_OBJECTS': 22, 'SC_WORD_BIT': 107, 'SC_NL_MSGMAX': 121, 'SC_MQ_OPEN_MAX': 27, 'SC_SYNCHRONIZED_IO': 14, 'SC_SAVED_IDS': 8, 'SC_T_IOV_MAX': 66, 'SC_SCHAR_MAX': 111, 'SC_NL_ARGMAX': 119, 'SC_PII_OSI_M': 65, 'SC_MAPPED_FILES': 16, 'SC_PII_SOCKET': 55, 'SC_CHAR_MIN': 103, 'SC_THREAD_THREADS_MAX': 76, 'SC_THREAD_PROCESS_SHARED': 82, 'SC_PII_INTERNET_DGRAM': 62, 'SC_2_FORT_DEV': 49, 'SC_POLL': 58, 'SC_CHAR_BIT': 101, 'SC_2_LOCALEDEF': 52, 'SC_2_UPE': 97, 'SC_NZERO': 109, 'SC_INT_MIN': 105, 'SC_PII_OSI_COTS': 63, 'SC_PHYS_PAGES': 85, 'SC_PRIORITY_SCHEDULING': 10, 'SC_TIMER_MAX': 35, 'SC_2_FORT_RUN': 50, 'SC_RE_DUP_MAX': 44, 'SC_VERSION': 29, 'SC_TIMERS': 11, 'SC_LONG_BIT': 106, 'SC_PII_INTERNET_STREAM': 61, 'SC_PASS_MAX': 88, 'SC_SCHAR_MIN': 112, 'SC_XOPEN_XPG3': 99, 'SC_SHRT_MIN': 114, 'SC_THREAD_STACK_MIN': 75, 'SC_BC_STRING_MAX': 39, 'SC_AIO_PRIO_DELTA_MAX': 25, 'SC_USHRT_MAX': 118, 'SC_SIGQUEUE_MAX': 34, 'SC_2_C_DEV': 48, 'SC_THREAD_ATTR_STACKADDR': 77, 'SC_XOPEN_REALTIME_THREADS': 131, 'SC_SELECT': 59, 'SC_THREAD_SAFE_FUNCTIONS': 68, 'SC_THREAD_KEYS_MAX': 74, 'SC_CHARCLASS_NAME_MAX': 45, 'SC_PRIORITIZED_IO': 13, 'SC_PII_INTERNET': 56, 'SC_2_SW_DEV': 51, 'SC_NGROUPS_MAX': 3, 'SC_XOPEN_ENH_I18N': 93, 'SC_XOPEN_CRYPT': 92, 'SC_ULONG_MAX': 117, 'SC_GETPW_R_SIZE_MAX': 70, 'SC_ATEXIT_MAX': 87, 'SC_NPROCESSORS_ONLN': 84, 'SC_SEMAPHORES': 21, 'SC_PII_OSI_CLTS': 64, 'SC_TZNAME_MAX': 6, 'SC_IOV_MAX': 60, 'SC_THREAD_PRIO_PROTECT': 81, 'SC_JOB_CONTROL': 7, 'SC_AIO_MAX': 24, 'SC_NPROCESSORS_CONF': 83, 'SC_ASYNCHRONOUS_IO': 12, 'SC_NL_TEXTMAX': 124, 'SC_INT_MAX': 104, 'SC_ARG_MAX': 0, 'SC_MEMLOCK': 17, 'SC_LINE_MAX': 43, 'SC_PII': 53, 'SC_UINT_MAX': 116, 'SC_AIO_LISTIO_MAX': 23, 'SC_LOGIN_NAME_MAX': 71, 'SC_2_C_VERSION': 96, 'SC_OPEN_MAX': 4, 'SC_MESSAGE_PASSING': 20, 'SC_MB_LEN_MAX': 108, 'SC_DELAYTIMER_MAX': 26, 'SC_XBS5_ILP32_OFFBIG': 126, 'SC_NL_LANGMAX': 120, 'SC_GETGR_R_SIZE_MAX': 69, 'SC_CHILD_MAX': 1, 'SC_TTY_NAME_MAX': 72, 'SC_STREAM_MAX': 5, 'SC_XOPEN_XPG2': 98}
+     #+END_SRC
+
+*** 路径相关（兼容所有系统）
+**** os. *curdir*
+     当前文件夹，等价于os.path.curdir。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.curdir
+       os.path.curdir
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '.'
+     - '.'
+     #+END_SRC
+
+**** os. *pardir*
+     父文件夹，等价于os.path.pardir。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.pardir
+       os.path.pardir
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '..'
+     - '..'
+     #+END_SRC
+
+**** os. *sep*
+     操作系统路径间隔符，等价于os.path.sep。
+
+     已知此常量并不足以解析和拼接路径，还得使用os.path.split()和
+     os.path.join()。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.sep
+       os.path.sep
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '/'
+     - '/'
+     #+END_SRC
+
+**** os. *altsep*
+     操作系统额外的路径间隔符，等价于os.path.altsep。如果系统无额外路
+     径间隔符，返回None。
+
+     Windows中，为斜杠，sep为反斜杠。
+
+     #+BEGIN_SRC python :session
+       import os
+       print(os.altsep)
+       print(os.path.altsep)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - None
+     - None
+     #+END_SRC
+
+**** os. *extsep*
+     文件名与后缀的连接字符，等价于os.path.extsep。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.extsep
+       os.path.extsep
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '.'
+     - '.'
+     #+END_SRC
+
+**** os. *pathsep*
+     如$PATH环境变量中用于间隔路径的字符，等价于os.path.pathsep。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.pathsep
+       os.path.pathsep
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ':'
+     - ':'
+     #+END_SRC
+
+**** os. *defpath*
+     当系统中无环境变量$PATH时，exec*p和spawn*p函数的路径搜索备用，等
+     价于os.path.defpath。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.defpath
+       os.path.defpath
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - ':/bin:/usr/bin'
+     - ':/bin:/usr/bin'
+     #+END_SRC
+
+**** os. *linesep*
+     系统换行符。
+
+     *注意* ：在以文本模式写入文件时，不管系统类型，都应使用"\n"，而不
+     使用此值。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.linesep
+     #+END_SRC
+     
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '\n'
+     #+END_SRC
+
+**** os. *devnull*
+     null设备路径位置，等价于os.path.devnull。
+
+     #+BEGIN_SRC python :session
+       import os
+       os.devnull
+       os.path.devnull
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - '/dev/null'
+     - '/dev/null'
+     #+END_SRC
+
+**** setdlopenflags()和getdlopenflags()使用的flags （待续）
+***** os. *RTLD_LAZY*
+***** os. *RTLD_NOW*
+***** os. *RTLD_GLOBAL*
+***** os. *RTLD_LOCAL*
+***** os. *RTLD_NODELETE*
+***** os. *RTLD_NOLOAD*
+***** os. *RTLD_DEEPBIND*
 ** 各种函数
+*** os. *urandom* (n)
+    返回有N个bytes的随机bytes对象，用于加密。
+    
+    根据系统实现生成随机数据，不可预测，可用于加密应用。随机质量取决于
+    系统实现。
+    
+    Linux中，使用getrandom()系统调用；Unix中，会向/dev/urandom发送请求；
+    Windows中，使用CryptGenRandom()系统调用。
+    
+    如需使用系统提供的随机数字生成器，可使用random.SystemRandom()。
+    
 * io
 * time - 时间获取和格式转换
 * argparse - 解析命令行参数、选择和子命令
