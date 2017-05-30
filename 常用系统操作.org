@@ -2,59 +2,60 @@
 # Created: 2017-05-03 17:18:04
 # Commentary:
 #+TITLE: 常用系统服务
+
 本章介绍模块的接口适用于绝大多数操作系统，如文件和时钟。接口主要基于
 Unix或C，但可用于大多数系统。
 
 * os - 各种操作系统接口
-  
+
   #+BEGIN_QUOTE
   *注意* ：当不能访问文件名或路径，或其他参数类型正确，但不被操作系统
   接受时，此模块中所有函数都抛出OSError错误。
   #+END_QUOTE
-  
+
   - exception os. *error* ： 内置OSError别名。
   - os. *name* ：操作系统类型。目前支持的名称有：posix、nt、ce、java。
-    
+
     #+BEGIN_SRC python :session
       import os
       print(os.name)
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - posix
     #+END_SRC
-    
+
     另外，还有sys.platform模块，以及os.uname()获取系统详细信息：
-    
+
     #+BEGIN_SRC python :session
       import sys
       import os
       print(sys.platform)
       print(os.uname())
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> linux
     - posix.uname_result(sysname='Linux', nodename='kali', release='4.9.0-kali3-amd64', version='#1 SMP Debian 4.9.18-1kali1 (2017-04-04)', machine='x86_64')
     #+END_SRC
-    
+
 ** 文件名、命令行参数和环境变量
    在Python中，文件名、命令行参数和环境变量都使用字符串表示。在一些系
    统中，传给操作系统前，会对这些字符串编码和解码。这时，Python使用文
    件系统编码编码这些字符串：
-   
+
    #+BEGIN_SRC python :session
      import sys
      print(sys.getfilesystemencoding())
    #+END_SRC
-   
+
    #+RESULTS:
    #+BEGIN_SRC org
    - >>> utf-8
    #+END_SRC
-   
+
 ** 获取进程参数
    下面这些函数和数据表示当前进程和用户信息：
 *** os. *ctermid* ()

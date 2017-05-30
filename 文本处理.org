@@ -3927,19 +3927,19 @@
     #+BEGIN_SRC org
     - '8.0.0'
     #+END_SRC
-    
+
 *** unicodedate. *ucd_3_2_0*
-    
+
     #+BEGIN_SRC python :session
       import unicodedata
       unicodedata.ucd_3_2_0
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - <unicodedata.UCD object at 0x7fb68ab5b7d8>
     #+END_SRC
-    
+
 ** 举例
 
    #+BEGIN_EXAMPLE python
@@ -3960,6 +3960,6 @@
      'Nd'
    #+END_EXAMPLE
 
-* stringprep
-* readline
-* rlconpleter
+* stringprep （待续）
+* readline （待续）
+* rlconpleter （待续）

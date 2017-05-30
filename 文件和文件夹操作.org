@@ -2454,7 +2454,7 @@
     在GUI环境中文件不显示（Mac OS X 10.5+）。
 *** stat. *SF_ARCHIVED*
     文件可以被归档。
-    
+
 *** stat. *SF_IMMUTABLE*
     文件可能不允许被修改。
 *** stat. *SF_APPEND*
@@ -2476,30 +2476,84 @@
    - posix
    - os.stat_result(st_mode=33206, st_ino=24779756, st_dev=2049, st_nlink=1, st_uid=1000, st_gid=1000, st_size=2, st_atime=1495593867, st_mtime=1495266124, st_ctime=1495266124)
    #+END_SRC
-   
+
 * filcmp - 文件和文件夹对比
 * tempfile - 创建临时文件/文件夹
-** 模块函数
+  此模块的作用为创建临时文件/文件夹，兼容所有支持临时文件/文件夹的系统。
+  TemporaryFile、NamedTemporaryFile、TemporaryDirectory和
+  SpooledTemporaryFile为高阶接口，可自动清除临时文件/文件夹，可用于上
+  下文管理器。mkstemp()和mkdtemp()为底层接口，需手动清除。
+
+  所有用户可调用函数和构造器，都允许通过参数指定临时文件/文件夹地址和
+  名称。此模块生成的文件名使用随机字符，可安全用于共享临时文件夹。为向
+  后兼容，参数顺序有些许奇怪，建议使用关键字参数。
+
+** 此模块所有用户可调用函数和构造器
 *** tempfile. *TemporaryFile* (mode='w+b',buffering=None,encoding=None,newline=None,suffix=None,prefix=None,dir=None)
+    返回“类文件对象”，可用于存储临时数据。以安全方式创建文件，使用
+    mkstemp()相同的权限规则。关闭后自动清除（含垃圾回收后自动清除）。
+    在Unix中，临时文件所在的文件夹不会创建，或在文件关闭后自动删除。其
+    他系统不支持此特性，不可依赖此函数在文件系统中创建的文件名。
+
+    可用于上下文管理器中，当退出上下文管理器，或删除返回的文件对象后，
+    临时文件自动清除。
+
+    MODE参数默认为'w+b'，所以可同时支持读和写模式，二进制模式保证所有
+    平台上存储行为一致。BUFFERING、ENCODING和NEWLINE参数实际上是传递给
+    open()函数。
+
+    DIR、PREFIX和SUFFIX与mkstemp()同名参数用法相同。
+
+    在POSIX平台上，返回结果为真正的文件对象；在其他平台下，为“类文件对
+    象”，其file属性为实际文件对象。
+
+    Linux内核3.11后，会自动使用os.O_TMPFILE flag。
+
 *** tempfile. *NamedTemporaryFile* (mode='w+b',buffering=None,encoding=None,newline=None,suffix=None,prefix=None,dir=None,delete=None)
+    除在文件系统中有可见文件名外（在Unix中，the directory entry is
+    unlinked），与TemporaryFile()完全相同。文件名可通过返回值的name属
+    性获取，是否可使用open()再次打开取决于操作系统（在Unix中可行，在
+    Windows NT及以后版本不行）。返回对象总是“类文件对象”，实际文件对象
+    可通过file属性获取，可同普通文件对象一样用于with上下文管理器。如果
+    DELETE属性为True（默认），文件对象关闭后自动删除。
+
 *** tempfile. *SpooledTemporaryFile* (mode='w+b',buffering=None,encoding=None,newline=None,suffix=None,prefix=None,dir=None)
+    除数据直到超过MAX_SIZE前，或返回文件对象上调用fileno()方法前，都存
+    储在内存中外，与TemporaryFile()完全相同。
+    
+    此外，返回的“类文件对象”有一个额外方法rollover()，不管大小，将文件
+    数据全部写入（rollover）到磁盘中。
+    
+    返回值为“类文件对象”，_file属性为io.BatesIO或io.StringIO对象（取决
+    于二进制还是文本模式打开），或真正文件对象（是否调用rollover()）方
+    法。可同普通文件对象一样用于with上下文管理器。
+    
 *** tempfile. *TemporaryDirectory* (suffix=None,prefix=None,dir=None)
+    使用mkdtemp()相同的规则，安全创建文件夹。返回对象可用于上下文管理
+    器。山下文管理器退出，或返回对象被回收后，临时文件夹及其中内容全部
+    清除。
+    
+    可通过返回对象的name属性获取文件夹名称。当在with上下文管理器中使用
+    时，as后变量的值为此name属性值。
+    
+    可通过cleanup()方法手动清除文件夹。
+    
 *** tempfile. *mkstemp* (suffix=None,prefix=None,dir=None,text=False)
     以尽可能安全的方式创建临时文件。如果系统对os.open()有os.O_EXCL
     flag实现，则There are no race conditions in the file’s creation。
     只有创建此文件的用户对该文件有读和写权限；如果系统使用权限位表示文
     件是否可执行，则任何用户都没有执行权限。文件描述符不被子进程继承。
-    
+
     不同于TemporaryFile()，使用完临时文件后，使用mkstemp()的用户有责任
     将其删除。
-    
+
     如果SUFFIX参数不为None，新建临时文件以该参数值作为后缀，否则没有后
     缀。mkstemp()不会在文件名后后缀间添加点，如果需要，直接添加在
     SUFFIX参数值的最前面。
-    
+
     如果PREFIX参数不为None，则新建文件夹以其参数值作为前缀，否则使用默
     认前缀。gettempprefix()和gettempprefixb()可返回默认前缀：
-    
+
     #+BEGIN_SRC python :session
       import tempfile
       tempfile.gettempprefix()
@@ -2543,10 +2597,60 @@
 
 *** tempfile. *gettempdir* ()
 *** tempfile. *gettempdirb* ()
+    返回放置临时文件的文件夹。是本模块中所有函数的DIR参数的默认值。
+    
+    搜索顺序为：
+    
+    1. 环境变量TMPDIR指定文件夹。
+    2. 环境变量TEMP指定文件夹。
+    3. 环境变量TMP指定文件夹。
+    4. 操作系统决定：
+       - Windows：顺序为，C:\TEMP，C:\TMP和\TEMP。
+       - 其他系统：顺序为：/tmp，/var/tmp和/usr/tmp。
+    5. 当前文件夹。
+
+    搜索结果会被缓存。
+
 *** tempfile. *gettempprefix* ()
 *** tempfile. *gettempprefixb* ()
+    临时文件夹前缀。
+
 *** tempfile. *tempdir*
+    全局变量，缓存gettempdir()搜索结果。可直接设置，但不推荐。定制可通
+    过各个函数的DIR参数实现。
+
+    当设置为非None值后，会成为本模块中所有函数DIR参数的默认值。
+
+    如果设置为None或unset，调用上面除gettempprefix()外的函数会同
+    gettempdir()执行顺序一样初始化。
+
 ** 举例
+   
+   #+BEGIN_EXAMPLE python
+     import tempfile
+
+     # 创建临时文件，并写入数据
+     fp = tempfile.TemporaryFile()
+     fp.write(b'hello, world!')
+     # 读取数据
+     fp.seek(0)
+     print(fp.read())
+
+     # 使用上下文管理器创建临时文件
+     with tempfile.TemporaryFile() as fp:
+         fp.write(b'hello world!')
+         fp.seek(0)
+         print(fp.read())
+
+     # 此时临时文件关闭并自动删除
+
+     # 使用上下文管理器创建临时文件夹
+     with tempfile.TemporaryDirectory() as tmpdirname:
+         print('创建临时文件夹：', tmpdirname)
+
+     # 文件夹中的内容及文件夹被删除
+   #+END_EXAMPLE
+   
 ** 已废除函数和常量
 *** tempfile. *mktemp* (suffix='',prefix='tmp',dir=None)
 * glob - Unix风格路径扩张
