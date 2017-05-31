@@ -614,7 +614,7 @@
 
 **** Path. *exists* ()
      当前路径是否指向一个存在的文件/文件夹：
-     
+
      #+BEGIN_EXAMPLE python
        >>> Path('.').exists()
        True
@@ -632,13 +632,13 @@
      #+END_QUOTE
 **** Path. *expanduser* ()
      返回扩展~和~user后的新路径对象。与os.path.expanduer()返回值相同。
-
+     
      #+BEGIN_EXAMPLE python
        >>> p = PosixPath('~/dict.txt')
        >>> p.expanduser()
        PosixPath('/home/claudio/dict.txt')
      #+END_EXAMPLE
-
+     
 **** Path. *glob* (pattern)
      返回路径中匹配glob形式PATTERN的所有文件路径组成的链表。
 

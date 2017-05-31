@@ -718,7 +718,7 @@ Unix或C，但可用于大多数系统。
 **** os. *fsync* (fd)
      强制将对FD的写同步到磁盘。Unix中，底层为系统调用fsync；Windows中，
      为系统调用MS_commit()。
-     
+
      如果启动一个已buffered的文件对象f，首先调用f.flush()，再调用
      os.fsync(f.fileno)，可确保所有与f相关的缓存写入磁盘。
 
@@ -727,14 +727,14 @@ Unix或C，但可用于大多数系统。
 **** os. *get_blocking* (fd) （待续）
 **** os. *isatty* (fd)
      如果FD为已打开的tty形式设备返回True，否则返回False。
-     
+
      #+BEGIN_SRC python :session
        import os
        import sys
        fd = sys.stdin.fileno()
        os.isatty(fd)
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> True
@@ -748,13 +748,13 @@ Unix或C，但可用于大多数系统。
 **** os. *lseek* (fd,pos,how)
      将当前文件描述符FD的对应文件的指针设置为相当于HOW处的POS位置。HOW
      的取值可为：
-
+     
      - os.SEEK_SET或0：相当于文件起始位置。
      - os.SEEK_CUR或1：相对于当前位置。
      - os.SEEK_END或2：相对于文件末尾位置。
-
+       
      返回从文件起始位置按byte计算的位置。
-
+     
 ***** os. *SEEK_SET*
 ***** os. *SEEK_CUR*
 ***** os. *SEEK_END*
@@ -764,18 +764,18 @@ Unix或C，但可用于大多数系统。
      打开字符串PATH指定文件，通过FLAGS设置flags，MODE设置权限（与系统
      umask值一起计算），返回新打开文件对应的文件描述符。返回文件描述符
      不可被子进程继承。
-     
+
      FLAGS和MODE参数使用方法可参考C run-time documentation？？？；FLAG
      常量（如os.O_RDONLY和os.O_WRONLY）定义在os模块中。在Windows系统中，
      以二进制打开文件需添加O_BINARY。
-     
+
      支持“路径相对于文件夹描述符指定目录”。
-     
+
      #+BEGIN_QUOTE
      *注意* ：此函数主要用于底层I/O操作。一般情况下，使用内置函数
      open()即可；将文件描述符包装成文件对象，使用os.fdopen()。
      #+END_QUOTE
-     
+
      下面为FLAGS参数可取值，使用比特或操作组合：
 ***** Unix和Windows都有效的常量
 ****** os. *O_RDONLY*
@@ -1872,16 +1872,267 @@ Unix或C，但可用于大多数系统。
 ** 各种函数
 *** os. *urandom* (n)
     返回有N个bytes的随机bytes对象，用于加密。
-    
+
     根据系统实现生成随机数据，不可预测，可用于加密应用。随机质量取决于
     系统实现。
-    
+
     Linux中，使用getrandom()系统调用；Unix中，会向/dev/urandom发送请求；
     Windows中，使用CryptGenRandom()系统调用。
-    
+
     如需使用系统提供的随机数字生成器，可使用random.SystemRandom()。
+
+* io - 操作文本流的核心工具 （未完，待续）
+** 概述
+   Python主要依靠io模块提供操作不同类型I/O的工具。有3中I/O主要类型：
+   text I/O、binary I/O和raw I/O。它们为通用类型，任何属于其中类型的具
+   体对象称为“文件对象”。“文件对象”也常被称为“流”或“类文件对象”。
+
+   不管为哪种类型，具体的“流对象”有许多特性：只读或只写。也允许定位到
+   任意位置，或只允许顺序访问（如socket或管道）。
+
+   所有类型流都密切处理被给予的数据，如将字符串对象传递给二进制流的
+   write()方法会抛出TypeError错误，将bytes对象传递给文本流的write()方
+   法也会抛出TypeError错误。
+
+*** Text I/O
+    文本流接受和返回字符串对象。编码和解码，以及换行符都透明？？？。
+
+    创建文本流最简单的方法为使用open()函数，可选ENCODING参数：
+
+    #+BEGIN_EXAMPLE python
+      f = open('myfile.txt', 'r', encoding='utf-8')
+    #+END_EXAMPLE
+
+    在内存中，文本流可等同与StringIO对象：
+
+    #+BEGIN_EXAMPLE python
+      f = io.StringIO('some initial text data')
+    #+END_EXAMPLE
+
+*** Binary I/O
+    二进制I/O（也称为buffered I/O），接受“类bytes对象”参数，返回bytes
+    对象。不会进行编码、解码和系统特定换行符转换。可用于任何非文本数据
+    流，也可用于手动处理文本数据。
+
+    创建二进制流最简单的方式为在open()时使用“b”模式：
+
+    #+BEGIN_EXAMPLE python
+      f = open('myfile.jpg', 'rb')
+    #+END_EXAMPLE
+
+    内存中，二进制流可以BytesIO对象表示：
+
+    #+BEGIN_EXAMPLE python
+      f = io.BytesIO(b'some initial binary data: \x00\x01')
+    #+END_EXAMPLE
     
-* io
+    其他库也可以提供创建二进制或文本流的功能，如socket.socket.makefile。
+
+*** Raw I/O
+    Raw I/O（也称为unbufferd I/O），一般用于在底层创建二进制和文本流；
+    很少在代码中使用。不过也可使用open()创建：
+
+    #+BEGIN_EXAMPLE python
+      f = open('myfile.jpg', 'rb', buffering=0)
+    #+END_EXAMPLE
+
+** 高阶模块接口
+*** io. *DEFAULT_BUFFER_SIZE*
+    本模块中所有buffered I/O类使用的默认缓存大小。open()函数使用文件的
+    blksize作为缓存大小：
+
+    #+BEGIN_SRC python :session
+      import io
+      import os
+      os.stat('.').st_blksize
+      io.DEFAULT_BUFFER_SIZE
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> 4096
+    - 8192
+    #+END_SRC
+
+*** io. *open* (file,mode='r',buffering=-1,encoding=None,errors=None,newline=None,closefd=True,opener=None)
+    内置函数open()的别名。
+*** io. *BlockingIOError*
+    内置exception BlockingIOError的兼容别名。
+*** io. *UnsupportedOperation*
+    继承于OSError和ValueError，当对流对象操作不支持时抛出。
+*** 内存流
+    字符串对象和“类bytes对象”也可能被作为文件对象进行读写操作。如对于
+    字符串，StringIO对象可作为以文本模式打开的文件对象；BytesIO可作为
+    以二进制模式打开的文件对象。都支持完整的读写操作，以及随机访问不同
+    位置数据的功能。
+** 类层级 
+   各种I/O流通过类层级实现。首先为各种ABC类，用于指定流的类型；然后具
+   体类提供标准流的实现。
+   
+   #+BEGIN_QUOTE
+   *注意* ：ABC基础类提供帮助具体类实现不同方法的实现。如
+   BufferedIOBase提供了未优化的readinto()和readlin()实现。
+   #+END_QUOTE
+   
+   在I/O类层级的顶层为IOBase，定义了流的基础接口。但需注意，对流的读和
+   写并没有分离：具体实现如果不支持某操作，可抛出unsupportedOperation
+   错误。
+   
+   RawIOBase基础类基础IOBase，处理流的字节读写。FileIO继承RawIOBase，
+   提供文件与操作系统文件系统的接口。
+   
+   BufferedIOBase处理原始字节流（RawIOBase）的缓存。其子类
+   Bufferedwriter、BufferedReader和BufferedRWPair提供读、写和可同时读
+   和写接口。BufferedRandom提供随机访问流字节的接口。BytesIO继承于
+   BufferedIOBase，为字节形式的内存流。
+   
+   TextIOBase继承于IOBase，用于处理字节以文本表示的流，对字符串进行编
+   码和解码。TextIOWrapper继承于TextIOBase，为buffered原始流
+   （BufferedIOBase）提供文本接口。最后为StringIO，为文本形式的内存流。
+   
+   参数使用方式并不是规范的一部分，只有open()函数才建议使用关键字参数。
+   
+   以下为io模块提供的ABC基础类：
+   
+   | ABC            | 继承自 | 抽象方法                    | 混入方法                                               |
+   |----------------+--------+-----------------------------+--------------------------------------------------------|
+   | IOBase         |        | fileno,seek和truncate       | close,closed,__enter__,__exit__,flush,isatty,__iter__, |
+   |                |        |                             | __next__,readable,readline,readlines,seekable,tell,    |
+   |                |        |                             | writable和writelines                                   |
+   | RawIOBase      | IOBase | readinto和write             | 所有IOBase的混入方法，再加上read和readall              |
+   | BufferedIOBase | IOBase | detach,read,read1和write    | 所有IOBase的混入方法，再加上readinto                   |
+   | TextIOBase     | IOBase | detach,read,readline和write | 所有IOBase的混入方法，再加上encoding,errors和newlines  |
+   
+*** I/O基础类
+**** class io. *IOBase*
+     所有I/O类的基础类，处理字节流，没有公共构造器。
+
+     此类提供许多方法的空抽象实现，子类可选择性重置这些方法；默认实现
+     表示一个不能读、写和随机访问的文件。
+
+     即使由于签名不同，IOBase没有声明read()、readinto()或write()方法，
+     具体实现应将这些方法视为实现的一部分。当不支持某个方法调用时，实
+     现可抛出ValueError（或UnsupportedOperation）错误。
+
+     对文件二进制形式读写时使用的基础数据类型为bytes对象，其他“类bytes
+     对象”也可作为方法参数；文本I/O类使用字符串类型作为基础操作数据。
+
+     IOBase支持迭代协议，可通过迭代获取流中的文本行。
+
+     IOBase也支持上下文管理器，可用于with语句。当with退出时，即时有错
+     误抛出文件对象也被关闭。
+
+     #+BEGIN_EXAMPLE python
+       with open('spam.txt', 'w') as file:
+            file.write('Spam and eggs!')
+     #+END_EXAMPLE
+
+     IOBase提供下面的数据属性和方法：
+
+***** close()
+      flush并关闭流。如果已关闭，此方法没有任何效果。当文件关闭后，任
+      何操作（如读取和写入）都会抛出ValueError错误。
+
+      为方便起见，允许多次调用此函数，但仅第一次有实际作用。
+
+***** closed
+      如果流已关闭，返回True。
+***** fileno()
+      返回当前流的文件描述符（如果有）。如果IO对象没使用文件描述符，抛
+      出OSError错误。
+
+***** flush()
+      对于只读和非阻塞流没有任何效果。
+***** isatty()
+      是否为交互式流。（如与tty设备连接的流）
+
+***** readable()
+      是否可读取。如果为False，使用read()方法时抛出OSError错误。
+***** readline(size=-1)
+      从流中读取并返回一行数据。如果指定SIZE参数，最多读取SIZE个字节。
+
+      对于二进制文件，换行符总是b'\n'；对于文本文件，使用open()中相同
+      的换行符。
+
+***** readlins(hint=-1)
+      读取流中的所有行，返回读取结果组成的链表。如果指定HIT参数，如果
+      已读取内容超过HIT个字节，不再读取下一行。
+
+      可使用for line in file: ...替换file.readlines()。
+
+***** seek(offset[,whence])
+      将文件指针位置相对于WHENCE，置于OFFSET处。WHENCE默认为SEEK_SET，
+      即文件起始位置。WHENCE的取值可为：
+
+      - io.SEEK_SET或0：流起始位置（默认）；OFFSET需为0或正数。
+      - io.SEEK_CUR或1：当前位置；OFFSET可为负数。
+      - io.SEEK_END或2：末尾；OFFSET需为0或负数。
+
+      返回新的绝对位置。
+
+***** seekable()
+      是否支持随机位置访问。如果为False，使用seek()、tell()或
+      truncate()方法会抛出OSError错误。
+
+***** tell()
+      返回当前位置。
+***** truncate(size=None)
+      将流大小设置为SIZE大小，当缺省SIZE参数时，为删除当前位置后的所有
+      内容。也可增加流的大小，大多数系统中，额外增加的字节为0。
+
+      返回最终大小。
+
+***** writable()
+      是否可写。如果为False，调用truncate()和write()方法抛出OSError错
+      误。
+***** writelines(lines)
+      将LINES写入流中。不会自动添加换行符，一般在LINES的每个元素中提供。
+***** __del__()
+      准备结果文件对象。IOBase提供此方法的默认实现，即调用close()方法。
+
+**** class io. *RawIOBase*
+     raw二进制I/O基础类，继承于IOBase，没有公共构造器。
+
+     raw二进制I/O主要提供操作OS设备或API的底层实现，并不尝试包装成为高
+     阶操作（由Buffered I/O和文本I/O完成）。
+
+     除IOBase提供的方法和属性外，RawIOBase还提供下面方法：
+
+***** read(size=-1)
+      最多读取SIZE个字节并返回。如果SIZE缺省或为-1，实际为调用
+      readall()，否则最多执行一次系统调用。如果操作系统返回字节数少于
+      SIZE，则可以返回少于SIZE个字节。
+
+      如果返回0个字节，且SIZE不为0，表示EOF。如果流以非阻塞模式读取，
+      且没有字节，则返回None。
+
+***** readall()
+      读取和返回流中直到EOF的字节，如果需要会执行多次系统调用。
+***** readinto(b)
+      将字节读入可写的“类bytes对象”B，返回读取字节数。如果流以非阻塞模
+      式读取，且没有字节，则返回None。
+
+***** write(b)
+      将“类bytes对象”B写入当前raw流，返回写入的字节数。取决于当前raw
+      I/O类型，尤其当为非阻塞模式时，写入的字节数可能小于B的字节数。如
+      果当前raw I/O为非阻塞模式，且没写入任何字节，返回None。此方法在
+      调用完成后可能释放或修改B对象，所以在实现中只能在调用期间使用B。
+
+**** class io. *BufferedIOBase* （待续）
+     二进制流类，支持一些缓存实现，继承于IOBase，没有公共构造器。
+     
+     与RawIOBase主要的区别为，read()、readinto()和write()方法会尝试尽
+     可能多地消耗输入和输出，从而造成可能执行多次系统调用。
+***** raw
+***** detach()
+***** read(size=-1)
+***** read1(size=-1)
+***** readinto1(b)
+***** write(b)
+*** Raw File I/O
+*** Buffered流
+*** 文本I/O
+** 性能
 * time - 时间获取和格式转换
 * argparse - 解析命令行参数、选择和子命令
   argparse模块提供易用的命令行接口。程序定义所需参数后，argparse可解析
@@ -2598,14 +2849,14 @@ Unix或C，但可用于大多数系统。
        #+BEGIN_SRC python :session
          import argparse
          parser = argparse.ArgumentParser()
-         parser.add_argument('--verbose', '-v', action='count')
+         parser.add_argument('--verborse', '-v', action='count')
          parser.parse_args(['-vvvv', '-v'])
        #+END_SRC
        
        #+RESULTS:
        #+BEGIN_SRC org
        - >>> _CountAction(option_strings=['--verbose', '-v'], dest='verbose', nargs=0, const=None, default=None, type=None, choices=None, help=None, metavar=None)
-       - Namespace(verbose=5)
+       - Namespace(verborse=5)
        #+END_SRC
        
      - help：？？？
@@ -2618,7 +2869,7 @@ Unix或C，但可用于大多数系统。
          parser.add_argument('--version', action='version', version='%(prog)s 2.0')
          parser.parse_args(['--version'])
        #+END_SRC
-
+       
      如需定制action，可将此参数值设置为Action的子类或有相同接口的对象。
      建议方法是重置Action的__call__和__init__方法：
      
@@ -2640,7 +2891,7 @@ Unix或C，但可用于大多数系统。
        args = parser.parse_args('1 --foo 2'.split())
        print(args)
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> ... ... ... ... ... ... ... ... >>> >>> >>> FooAction(option_strings=['--foo'], dest='foo', nargs=None, const=None, default=None, type=None, choices=None, help=None, metavar=None)
