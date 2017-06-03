@@ -1,0 +1,214 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-06-02 11:40:31
+# Commentary:
+#+TITLE: 并发执行
+* threading
+* multiprocessing
+* concurrent包
+* concurrent.future
+* subprocess
+  subprocess模块用于产生新进程，连接自己的输出/输入/错误流管道，并获取
+  返回码。此模块旨在替换几个旧模块和函数：
+  
+  #+BEGIN_EXAMPLE python
+    os.system
+    os.spawn*
+  #+END_EXAMPLE
+  
+** 使用subprocess模块
+   如需激活子进程，建议尽量使用run()函数；如需更高阶定制，可直接使用底
+   层的Popen接口。
+   
+   run()函数在Python3.5时才新增，如需向后兼容，参考后面的“旧高阶API”。
+   
+*** subprocess. *run* (args,*,stdin=None,input=None,stderr=None,shell=False,timeout=None,check=False)
+    执行ARGS指定的命令，等待执行结束，返回CompleteProcess实例。
+
+    参数使用方法参考后面的“常用参数”。用法基本上与Popen构造器的参数用
+    法相同，timeout、input和check除外。实际上，本函数所有参数都传递给
+    Popen接口。
+
+    默认情况下，不会捕获标准输出和标准错误流。如需捕获，传递PIPI作为
+    STDOUT/STDERR参数值。
+
+    TIMEOUT参数实际上传递给Popen.communicate()函数。如果超时，子基础被
+    干掉，然后等待。子进程被终止后，TimeExpired错误会重新抛出。
+
+    INPUT参数也会传递给Popen.communicate()函数，作为子进程的标准输入流。
+    如果使用，须为比特序列，或使用参数UNIVERSAL_NEWLINES=True的情况下
+    可为字符串。使用后，内部的Popen对象会自动将STDIN参数设置为PIPE，就
+    可能不使用本函数的STDIN参数。
+
+    如果CHECK参数为true，且子进程返回码（exit code）不为0，则抛出
+    CalledProcessError错误。从抛出Exception的属性可获取本函数参数，退
+    出码，如果捕获的stdout和stderr。
+
+    举例：
+
+    #+BEGIN_EXAMPLE sh
+      >>> subprocess.run(['ls', '-l']) # 不捕获输出，只是打印
+      total 0
+      -rw-r--r-- 1 claudio claudio 0 Jun  3 15:53 text.txt
+      CompletedProcess(args=['ls', '-l'], returncode=0)
+      >>> subprocess.run('exit 1', shell=True)
+      CompletedProcess(args='exit 1', returncode=1)
+      >>> subprocess.run('exit 1', shell=True, check=True)
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        File "/usr/lib/python3.5/subprocess.py", line 398, in run
+        output=stdout, stderr=stderr)
+      >>> subprocess.run(['ls', '-l', '/dev/null'], stdout=subprocess.PIPE) # 捕获输出
+      CompletedProcess(args=['ls', '-l', '/dev/null'], returncode=0, stdout=b'crw-rw-rw- 1 root root 1, 3 Jun  2 10:27 /dev/null\n')
+    #+END_EXAMPLE
+
+*** class subprocess. *CompletedProcess*
+    run()函数返回值，表示该子进程已经执行完成。有下面属性。
+
+**** args
+     传递给run()函数执行的命令，可能是字符串也可能为链表。
+
+**** returncode
+     子进程返回码，0表示子进程成功执行完成。
+
+     POSIX中，如果为数值-N，表示子进程被信号N终止。
+
+**** stdout
+     从子进程标准输出流捕获的内容，一般为bytes对象，如果run()使用参数
+     universal_newlines=True参数，则为字符串。
+
+**** stderr
+     从子进程标准错误流捕获的内容，一般为bytes对象，如果run()使用参数
+     universal_newlines=True参数，则为字符串。
+**** check_returncode()
+     如果returncode不为0，抛出CalledProcessError错误，否则返回None。
+
+*** subprocess. *DEVNULL*
+    可用于Popen的STDIN、STDOUT和STDERR参数的特殊值，表示使用特殊文件
+    os.devnull。
+
+*** subprocess. *PIPE*
+    可用于Popen的STDIN、STDOUT和STDERR参数的特殊值，表示对应标准流会打
+    开一个管道。与Popen.communicate()一起使用更有用。
+
+*** subprocess. *STDOUT*
+    用于Popen的stderr参数的特殊值，表示标准错误流重定向到标准输出流。
+
+*** exception subprocess. *SubprocessError*
+    本模块所有exception的基础类。
+
+*** exception subprocess. *TimeoutExpired*
+    SubprocessError的子类，当等待子进程超时时抛出。有如需属性：
+**** cmd
+     激活子进程的命令。
+**** timeout
+     超时时长秒数。
+**** output
+     子进程输出（如果被run()或check_output()捕获），否则为None。
+**** stdout
+     output的别名，为保证与stderr语义一致。
+**** stderr
+     子进程标准错误流（如果被run()捕获），否则为None。
+
+*** exception subprocess. *CalledProcessError*
+    SubprocessError子类，当进程被check_all()或check_ooutput()执行返回
+    非0返回码时抛出。
+
+**** returncode
+     子进程返回码。如果子进程因信号退出，则为表示信号的负数。
+**** cmd
+     激活子进程的命令。
+
+**** output
+     子进程输出（如果被run()或check_output()捕获），否则为None。
+**** stdout
+     output的别名，为保证与stderr语义一致。
+**** stderr
+     子进程标准错误流（如果被run()捕获），否则为None。
+
+*** 常用参数
+    为支持不同的使用场景，Popen构造器和run()函数使用大量可选参数。大多
+    数情况下，许多参数可省略使用默认值，常用的参数如下：
+
+**** ARGS
+     执行命令，可为字符，也可为命令和参数组成的序列（如链表）。首选序
+     列，这样可方便处理命令参数的转义和添加引号（如允许命令参数为有空
+     格的字符串）。如果为单个字符串，要么SHELL参数需为True，要么执行命
+     令不得带任何参数。
+
+**** STDIN、STDOUT和STDERR
+     表示命令执行的标准输入流、输出流和错误流定向方式。可选值为
+     subprocess.PIPE、subprocess.DEVNULL、已存在的文件描述符（正数）、
+     已存在的文件对象或None。PIPE表示会为子进程打开一个管道。DEVNULL表
+     示使用os.devnull文件。默认为None，表示不对标准流进行任何重定向。
+     子进程文件处理继承于父进程。此外，STDERR可设置为subprocess.STDOUT，
+     将标准错误流重定向到标准输出流。
+
+**** UNIVERSAL_NEWLINES
+     如果UNIVERSAL_NEWLINES为False，则stdin、stdout和stderr都使用二进
+     制模式，不会自动转换换行符。
+
+     如果UNIVERSAL_NEWLINES为True，则文件对象以文本模式打开，使用
+     locale.getpreferredecodiong(False)编码和解码。对应stdin，换行符
+     "\n"自动转换为os.linesep；对于stdout，所有输入的换行符都转换为
+     "\n"。
+
+     #+BEGIN_QUOTE
+     *注意* ：Popen.communicate()不会自动更新Popen.stdin、Popen.stdout
+     和Popen.stderr不会的换行符属性。
+     #+END_QUOTE
+
+**** SHELL
+     当SHELL属性为，命令会在shell环境中执行。即可使用shell本身的特性，
+     如管道、文件名通配符、环境变量扩张、家目录"~"扩张等特性。不过，
+     Python已提供类似shell的特性，如glob、fnmath、os.path.expanduser()
+     等。
+
+     #+BEGIN_QUOTE
+     *注意* ：参考后文“安全”小节有关shell=True时的说明。
+     #+END_QUOTE
+
+     下面为使用shell=True后使用家目录扩张的例子：
+
+     #+BEGIN_EXAMPLE ipython
+       In [60]: subprocess.run(['ls', '~'])
+       ls: cannot access '~': No such file or directory
+       Out[60]: CompletedProcess(args=['ls', '~'], returncode=2)
+
+       In [61]: subprocess.run(['ls', '~'], shell=True)
+       Backup    Documents  Music           Pictures   Templates  Videos
+       bin        Downloads  myarchive.tar.gz  Public  test
+       Desktop  dwhelper   PDF                               python    test.txt
+       Out[61]: CompletedProcess(args=['ls', '~'], returncode=0)
+     #+END_EXAMPLE
+
+*** POPEN构造器
+    本模块的底层使用Popen类实现，可利用此类更灵活定制run()等函数不能处
+    理的情况。
+    
+**** class subprocess. *Popen* (args,bufsize=-1,executable=None,stdin=None,stdout=None,stderr=None,preexec_fn=None,close_fds=True,shell=False,cwd=None,env=None,universal_newline=False,startupinfo=None,creationflags=0,restore_signals=True,start_new_session=False,pass_fds=())
+     在程序中执行新进程。在POSIX中，使用与os.execvp()类似方法执行子程
+     序；Windows中，调用系统CreateProcess()函数。参数使用方法如下：
+     
+     - args：为序列或字符串。默认情况下，如果args为序列，则第一个元素
+       为需执行的命令；如果为字符串，则依赖不同系统类型，可参考后面关
+       于shell和executable参数的介绍。 *首选使用序列，而非字符串。*
+       
+       在POSIX中，如果args为字符串，会将字符串解释为可支持程序的路径，
+       如"/bin/ls"。但不能更任何参数。
+       
+*** Exceptions
+** 安全
+** Popen对象
+** Windows Popen帮助
+*** 常量
+** 旧的高阶API
+** 使用subprocess模块替换旧函数
+** 遗留Shell激活函数
+** 注意点
+*** 在Windows中将参数序列转换为字符串
+    
+* sched
+* queue
+* dummy_threading
+* _thread
+* _dummy_thread

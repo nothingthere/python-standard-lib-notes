@@ -1,0 +1,20 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-06-03 23:22:56
+# Commentary:
+#+TITLE: 程序框架
+
+* turtle - 画图
+* cmd - 支持单行命令解释
+* shlex - 简单语义分析
+  可参考 [[https://pymotw.com/2/shlex/][@pymotw]]
+  
+  shlex模块可使用Unix shell的语法，使实现语义分析器更简单。可用来实现
+  minilanguages，如智能解析引号。
+  
+** 模块函数
+*** shlex. *split* (s,comments=False,posix=True)
+*** shlex. *quote* (s)
+*** class shlex. *shlex* (instream=None,infile=None,posix=False)
+    
+** shlex对象
+** 解析规则
