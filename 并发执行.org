@@ -18,9 +18,9 @@
 ** 使用subprocess模块
    如需激活子进程，建议尽量使用run()函数；如需更高阶定制，可直接使用底
    层的Popen接口。
-   
+
    run()函数在Python3.5时才新增，如需向后兼容，参考后面的“旧高阶API”。
-   
+
 *** subprocess. *run* (args,*,stdin=None,input=None,stderr=None,shell=False,timeout=None,check=False)
     执行ARGS指定的命令，等待执行结束，返回CompleteProcess实例。
 
@@ -184,29 +184,161 @@
 *** POPEN构造器
     本模块的底层使用Popen类实现，可利用此类更灵活定制run()等函数不能处
     理的情况。
-    
+
 **** class subprocess. *Popen* (args,bufsize=-1,executable=None,stdin=None,stdout=None,stderr=None,preexec_fn=None,close_fds=True,shell=False,cwd=None,env=None,universal_newline=False,startupinfo=None,creationflags=0,restore_signals=True,start_new_session=False,pass_fds=())
      在程序中执行新进程。在POSIX中，使用与os.execvp()类似方法执行子程
      序；Windows中，调用系统CreateProcess()函数。参数使用方法如下：
-     
+
      - args：为序列或字符串。默认情况下，如果args为序列，则第一个元素
        为需执行的命令；如果为字符串，则依赖不同系统类型，可参考后面关
        于shell和executable参数的介绍。 *首选使用序列，而非字符串。*
-       
+
        在POSIX中，如果args为字符串，会将字符串解释为可支持程序的路径，
        如"/bin/ls"。但不能更任何参数。
-       
+
+       #+BEGIN_SRC python :session
+         import shlex
+         import subprocess
+         commad_line = '''/usr/bin/viking -input eggs.txt -output "spam spam.txt" -cmd "echo '$MONEY'"'''
+         args = shlex.split(commad_line)
+         print(args)
+         p = subprocess.Popen(args)
+       #+END_SRC
+
+       #+RESULTS:
+       #+BEGIN_SRC org
+       - >>> >>> >>> ['/usr/bin/viking', '-input', 'eggs.txt', '-output', 'spam spam.txt', '-cmd', "echo '$MONEY'"]
+       #+END_SRC
+
+       在Windows中，如果args为序列，会转换为字符串，因为系统调用时使用
+       的CreateProcess()函数接受字符串参数。
+
+     - shell：默认为False，指定是否使用shell执行程序。如果为True，建议
+       使用字符串对象作为args参数值。
+
+       *（待续）不建议使用shell=True*
+
+     - bufsize：与open()函数的bufsize含义相同，用于创建
+       stdin/stdout/stderr管道对象：
+
+       - 0：表示不使用缓存。
+       - 1：行缓存（仅在universal_newlines=True，如文本模式中有用）。
+       - 任何其他正数：使用与该数值接近的缓存大小。
+       - 负数（默认）：使用系统默认缓存大小：io.DEFAULT_BUFFER_SIZE。
+
+     - executable：不常用，待续。
+
+     - stdin、stdout和stderr：见run()函数。
+
+     - preexec_fn：可调用对象，在至今才执行前执行。仅在POSIX中有效。不
+       安全。
+
+     - close_fds
+
+     - pass_fds
+
+     - cwd
+
+     - restore_signals
+
+     - start_new_session
+
+     - env
+
+     - universal_newlines
+
+     - startupinfo
+
 *** Exceptions
 ** 安全
-** Popen对象
-** Windows Popen帮助
+   避免使用shell=True，当使用时，使用shlex.quote()转义命令。
+** Popen对象 （待续）
+** Windows Popen帮助 （待续）
 *** 常量
 ** 旧的高阶API
+*** subprocess. *call* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
+    等价于：
+
+    #+BEGIN_EXAMPLE python
+      run(...).returncode
+    #+END_EXAMPLE
+
+*** subprocess. *check_all* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
+    等价于：
+
+    #+BEGIN_EXAMPLE python
+      run(..., check=True)
+    #+END_EXAMPLE
+
+*** subprocess. *check_output* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
+    等价于：
+
+    #+BEGIN_EXAMPLE python
+      run(..., check=True, stdout=PIPE).stdout
+    #+END_EXAMPLE
+
 ** 使用subprocess模块替换旧函数
-** 遗留Shell激活函数
-** 注意点
+*** 替换/bin/sh的反引号
+
+    #+BEGIN_EXAMPLE sh
+      output=`mycmd myarg`
+    #+END_EXAMPLE
+
+    可替换为：
+
+    #+BEGIN_EXAMPLE python
+      output = check_output(['mycmd', 'myarg'])
+    #+END_EXAMPLE
+
+*** 替换管道
+
+    #+BEGIN_EXAMPLE sh
+      oputput=`dmesg | grep hda`
+    #+END_EXAMPLE
+
+    可替换为：
+
+    #+BEGIN_EXAMPLE python
+      p1 = Popen(['dmesg'], stdout=PIPE)
+      p2 = Popen(['grep', 'hda'], stdin=p1.stdout, stdout=PIPE)
+      p1.stdout.close() # 保证p1在p2退出时接受SIGPIE
+      output=p2.communicate()[0]
+    #+END_EXAMPLE
+
+    如果输如可信任，可直接使用shell的管道：
+
+    #+BEGIN_EXAMPLE python
+      output = check_output('dmesg | grep hda', shell=True)
+    #+END_EXAMPLE
+
+*** 替换os.system()函数
+
+    #+BEGIN_EXAMPLE python
+      sts = os.system('mycmd' + ' myarg')
+      # 替换为
+      sts = call('mycmd' + ' myarg', shell=True)
+    #+END_EXAMPLE
+
+    更实际的例子为：
+
+    #+BEGIN_EXAMPLE python
+      try:
+          retcode = call('mycmd', + ' myarg', shell=True)
+          if rtcode < 0:
+             print('子进程被信号中断', -rtcode, file=sys.stderr)
+          else:
+             print('子进程返回', rtcode, file=sys.stderr)
+      except OSError as e:
+          print('执行失败：', e, file=sys.stderr)
+    #+END_EXAMPLE
+
+*** 替换os.spawn类函数
+*** 替换os.popen()、os.popen2()和os.popen3()
+*** 替换popen2模块的函数
+** 遗留Shell激活函数 （待续）
+** 注意点 （待续）
 *** 在Windows中将参数序列转换为字符串
-    
+
 * sched
 * queue
 * dummy_threading

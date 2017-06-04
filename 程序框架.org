@@ -13,8 +13,199 @@
   
 ** 模块函数
 *** shlex. *split* (s,comments=False,posix=True)
+    使用类似shell的语法划分字符串S。
+
+    #+BEGIN_SRC python :session
+      import shlex
+      shlex.split('rm "somefile;rm -rf ~"')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ['rm', 'somefile;rm -rf ~']
+    #+END_SRC
+
+    如果COMMENTS参数为False（默认），则不解析注释。底层为将shlex实例的
+    commenters属性设置为空字符串。
+
+    #+BEGIN_SRC python :session
+      import shlex
+      shlex.split('rm "somefile:rm -rf -" #我是注释')
+      shlex.split('rm "somefile:rm -rf -" #我是注释', comments=True)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ['rm', 'somefile:rm -rf -', '#我是注释']
+    - ['rm', 'somefile:rm -rf -']
+    #+END_SRC
+
+    默认使用POSIX模式，可设置POSIX参数为False不使用此模式（？？？）：
+
+    #+BEGIN_SRC python :session
+       import shlex
+       shlex.split('rm "somefile:rm -rf -" #我是注释', posix=True)
+       shlex.split('rm "somefile:rm -rf -" #我是注释', comments=True, posix=False)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+     - ['rm', 'somefile:rm -rf -', '#我是注释']
+     - ['rm', '"somefile:rm -rf -"']
+    #+END_SRC
+
 *** shlex. *quote* (s)
+    返回按照shell转义规则转义字符串S的结果。返回结果可放心用于shell命
+    令的token。
+
+    如下面不安全的方式：
+
+    #+BEGIN_SRC python :session
+      filename = 'somefile;rm -rf ~'
+      command = 'ls -l {}'.format(filename)
+      print(command)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ls -l somefile;rm -rf ~
+    #+END_SRC
+
+    使用quote()可消除安全漏洞：
+
+    #+BEGIN_SRC python :session
+      import shlex
+      command = 'ls -l {}'.format(shlex.quote(filename))
+      print(command)
+      remote_command = 'ssh home {}'.format(shlex.quote(command))
+      print(remote_command)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ls -l 'somefile;rm -rf ~'
+    - >>> ssh home 'ls -l '"'"'somefile;rm -rf ~'"'"''
+    #+END_SRC
+
 *** class shlex. *shlex* (instream=None,infile=None,posix=False)
-    
+    shlex实例或子类为语义分析对象。如果指定INSTREAM初始参数，则为字符
+    读取来源，须为具有read()和readline()方法的“类文件/流对象”，或字符
+    串；如果不指定，则为sys.stdin。第二个可选参数为文件名字符串，用于
+    初始化shlex对象的infile属性。如果INSTREAM参数缺省，或为sys.stdin，
+    则INFILE参数也默认为"stdin"。POSIX参数如果为False（默认），则shlex
+    对象使用兼容模式，如果为True，则尽量采用与POSIX shell相同的规则解
+    析。
+
+    #+BEGIN_SRC python :session
+      import shlex
+      for token in shlex.shlex(instream='rm "somefile;rm -rf !"'):
+          print(token)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... rm
+    - "somefile;rm -rf !"
+    #+END_SRC
+
 ** shlex对象
-** 解析规则
+   方法和属性：
+*** 方法
+**** shlex. *get_token* ()
+     返回一个token。如果token是使用push_token()添加到堆上的，则将其从
+     堆上移除；否则从inputstream中读取。如果遇到文本末，则返回shlex对
+     象的eof属性值（POSIX模式中为None，非POSIX模式中为空字符串）。
+
+     #+BEGIN_SRC python :session
+       import shlex
+       obj = shlex.shlex(instream='ls -l "somefile;rm -rf ~"', posix=True)
+       for i in range(3):
+           print(obj.get_token())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ... ... ls
+     - -
+     - l
+     #+END_SRC
+
+**** shlex. *push_token* (str)
+     将STR字符串添加到堆上。
+
+     #+BEGIN_SRC python :session
+       import shlex
+       obj = shlex.shlex(instream='ls -l "somefile;rm -rf ~"', posix=True)
+       obj.push_token('cat')
+       for i in range(3):
+           print(obj.get_token())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... cat
+     - ls
+     - -
+     #+END_SRC
+
+**** shlex. *read_token* ()
+     读取原始token，忽视push_token()向堆上添加的内容。（不常用）
+
+     #+BEGIN_SRC python :session
+       import shlex
+       obj = shlex.shlex(instream='ls -l "somefile;rm -rf ~"', posix=True)
+       obj.push_token('cat')
+       for i in range(3):
+           print(obj.read_token())
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... ls
+     - -
+     - l
+     #+END_SRC
+
+**** shlex. *sourcehook* (filename) （待续）
+**** shlex. *push_source* (newstream,newfile=None)
+**** shlex. *pop_source* ()
+**** shlex. *error_leader* (infile=None,lineno=None)
+*** 公共实例变量 （待续）
+**** shlex. *commenters*
+**** shlex. *wordchars*
+**** shlex. *whitespace*
+**** shlex. *escape*
+**** shlex. *quotes*
+**** shlex. *escapedquotes*
+**** shlex. *whitespace_split*
+**** shlex. *infile*
+**** shlex. *instream*
+**** shlex. *source*
+**** shlex. *lineno*
+**** shlex. *token*
+**** shlex. *eof*
+     用来决定文本终止的token。在非POSIX模式中为空字符串，在POSIX模式中
+     为None。
+
+     #+BEGIN_SRC python :session
+       import shlex
+       posix = shlex.shlex(posix=True)
+       non_posix = shlex.shlex()
+       print(posix.eof)
+       print('{!r}'.format(non_posix.eof))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> None
+     - ''
+     #+END_SRC
+
+** 解析规则 （待续）
+*** 非POSIX模式
+    - 不会区别对待引号内的字符（如Do"Not"Separate解析为单个单词
+      Do"Not"Separate）。
+      
+*** POSIX模式
+    - 去除引号，但不分割单词（如Do"Not"Separate解析为单个单词
+      DoNotSeparate）。
