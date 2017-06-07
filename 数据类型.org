@@ -1095,24 +1095,24 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      
      #+RESULTS:
      #+BEGIN_SRC org
-     - >>> >>> >>> Point(x=11, y=22)
+     - >>> >>> >>> >>> Point(x=11, y=22)
      #+END_SRC
      
 **** somenamedtuple._asdict()
      将namedtuple对象返回为OrderedDict对象：
-     
+
      #+BEGIN_SRC python :session
        from collections import namedtuple
        P = namedtuple('P', 'x, y')
        p1 = P._make([11, 22])
        print(p1._asdict())
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> OrderedDict([('x', 11), ('y', 22)])
      #+END_SRC
-     
+
 **** somenamedtuple._replace(kwargs)
      替换KWARGS指定的元素和值，返回新的namedtuple对象：
 
@@ -1136,7 +1136,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
 **** somenamedtuple._fields
      返回由域名组成的元组。可用于查看，或利用已有的namedtuple创建新的
      namedtuple。
-
+     
      #+BEGIN_SRC python :session
        from collections import namedtuple
        Color = namedtuple('Color', 'red green, blue')
@@ -1146,7 +1146,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
        print(Point._fields)
        print(Pixel._fields)
      #+END_SRC
-
+     
      #+RESULTS:
      #+BEGIN_SRC org
      - >>> >>> >>> ('red', 'green', 'blue')
@@ -1156,34 +1156,34 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
      
 *** 举例
     可使用getattr()获取域名对应值：
-    
+
     #+BEGIN_SRC python :session
       from collections import namedtuple
       Point = namedtuple('Point', 'x y')
       p = Point(1, 2)
       getattr(p, 'x')
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - >>> >>> 1
     #+END_SRC
-    
+
     利用字典初始化实例：
-    
+
     #+BEGIN_SRC python :session
       d = {'x': 11, 'y': 22}
       print(Point(**d))
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - Point(x=11, y=22)
     #+END_SRC
-    
+
     由于namedtuple本身为一般的Python类，所以可通过声明子类添加和更改功
     能。
-    
+
     #+BEGIN_SRC python :session
       from collections import namedtuple
 
@@ -2527,14 +2527,11 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       from weakref import ref
       s = {1, 2, 3}
 
-
       def about_to_del1(obj):
           print('1：弱引用对象：{} 被删除'.format(obj))
 
-
       def about_to_del2(obj):
           print('2：弱引用对象：{} 被删除'.format(obj))
-
 
       x = ref(s, about_to_del1)
       y = ref(s, about_to_del2)
@@ -2549,18 +2546,18 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> >>> >>> >>> ... ... >>> >>> ... ... >>> >>> >>> >>> >>> True
-    - >>> 2：弱引用对象：<weakref at 0x7f0203be5598; dead> 被删除
-    - 1：弱引用对象：<weakref at 0x7f0203be5638; dead> 被删除
+    - >>> >>> >>> ... ... >>> >>> ... ... >>> >>> >>> >>> >>> True
+    - >>> 2：弱引用对象：<weakref at 0x7fb73b013458; dead> 被删除
+    - 1：弱引用对象：<weakref at 0x7fb73b013548; dead> 被删除
     - 被引用对象不再存活后：
-    - <weakref at 0x7f0203be5638; dead> <weakref at 0x7f0203be5598; dead>
+    - <weakref at 0x7fb73b013548; dead> <weakref at 0x7fb73b013458; dead>
     - None None
     #+END_SRC
-
+    
     #+BEGIN_QUOTE
     是一个可继承的子类，而非工厂函数。
     #+END_QUOTE
-
+    
 **** __callback__
      自读属性，返回弱引用对象创建时的CALLBACK参数。如果没有CALLBACK参
      数，或被引用对象不再存在，此属性值为None。
@@ -2591,7 +2588,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     callble类型为ProxyType或CallableProxyType。不管被引用对象是否可哈
     希，返回的代理对象都不可哈希。
     
-    #+BEGIN_SRC python
+    #+BEGIN_SRC python :eval never
       from weakref import proxy
       s = {1, 2, 3}
 
@@ -2609,10 +2606,6 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
       print('被引用对象不再存活后：')
 
       print(x, y)
-    #+END_SRC
-    
-    #+RESULTS:
-    #+BEGIN_SRC org
     #+END_SRC
     
     #+BEGIN_SRC python
@@ -2633,7 +2626,7 @@ bytes/bytearray外（其中str类型用于存储Unicode字符串，bytes用于�
     
 *** weakref. *getweakrefcount* (obj)
     返回一个对象被弱引用和代理的次数。
-    
+
     #+BEGIN_SRC python :session
       from weakref import *
       s = set([1, 2, 3])

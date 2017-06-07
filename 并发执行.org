@@ -2,6 +2,9 @@
 # Created: 2017-06-02 11:40:31
 # Commentary:
 #+TITLE: 并发执行
+
+[[file:~/Desktop/Python/resources/site/docs.python.org/3.5/library/concurrency.html][本地页面]]
+
 * threading
 * multiprocessing
 * concurrent包
@@ -9,12 +12,12 @@
 * subprocess
   subprocess模块用于产生新进程，连接自己的输出/输入/错误流管道，并获取
   返回码。此模块旨在替换几个旧模块和函数：
-  
+
   #+BEGIN_EXAMPLE python
     os.system
     os.spawn*
   #+END_EXAMPLE
-  
+
 ** 使用subprocess模块
    如需激活子进程，建议尽量使用run()函数；如需更高阶定制，可直接使用底
    层的Popen接口。
@@ -31,17 +34,17 @@
     默认情况下，不会捕获标准输出和标准错误流。如需捕获，传递PIPI作为
     STDOUT/STDERR参数值。
 
-    TIMEOUT参数实际上传递给Popen.communicate()函数。如果超时，子基础被
+    TIMEOUT参数实际上传递给Popen.communicate()函数。如果超时，子进程被
     干掉，然后等待。子进程被终止后，TimeExpired错误会重新抛出。
 
     INPUT参数也会传递给Popen.communicate()函数，作为子进程的标准输入流。
-    如果使用，须为比特序列，或使用参数UNIVERSAL_NEWLINES=True的情况下
-    可为字符串。使用后，内部的Popen对象会自动将STDIN参数设置为PIPE，就
-    可能不使用本函数的STDIN参数。
+    如果使用，须为比特序列，或参数UNIVERSAL_NEWLINES=True的情况下可为
+    字符串。使用后，内部的Popen对象会自动将STDIN参数设置为PIPE，就可能
+    不使用本函数的STDIN参数。
 
     如果CHECK参数为true，且子进程返回码（exit code）不为0，则抛出
-    CalledProcessError错误。从抛出Exception的属性可获取本函数参数，退
-    出码，如果捕获的stdout和stderr。
+    CalledProcessError错误。如果捕获的stdout和stderr，从抛出Exception
+    的属性可获取本函数参数，以及退出码等信息。
 
     举例：
 
@@ -91,13 +94,41 @@
     开一个管道。与Popen.communicate()一起使用更有用。
 
 *** subprocess. *STDOUT*
-    用于Popen的stderr参数的特殊值，表示标准错误流重定向到标准输出流。
+    用于Popen的stderr参数的特殊值，当stderr=subprocess.STDOUT时，可将
+    标准错误流重定向到标准输出流。
 
 *** exception subprocess. *SubprocessError*
     本模块所有exception的基础类。
 
 *** exception subprocess. *TimeoutExpired*
     SubprocessError的子类，当等待子进程超时时抛出。有如需属性：
+
+    #+BEGIN_SRC python :session
+      import subprocess
+      import sys
+      DECODING = sys.getdefaultencoding()
+      try:
+          subprocess.run(['ping', 'bing.com'], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, timeout=2)
+      except subprocess.TimeoutExpired as time_why:
+          print('cmd：', time_why.cmd)
+          print('timeout：', time_why.timeout)
+          print('output：', time_why.output.decode(DECODING))
+          print('stdout：', time_why.stdout.decode(DECODING))
+          print('stderr：', time_why.stderr.decode(DECODING))
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> ... ... ... ... ... ... ... ... ... cmd： ['ping', 'bing.com']
+    - timeout： 2
+    - output： PING bing.com (204.79.197.200) 56(84) bytes of data.
+    - 64 bytes from bing.com (204.79.197.200): icmp_seq=2 ttl=116 time=49.1 ms
+    - stdout： PING bing.com (204.79.197.200) 56(84) bytes of data.
+    - 64 bytes from bing.com (204.79.197.200): icmp_seq=2 ttl=116 time=49.1 ms
+    - stderr：
+    #+END_SRC
+
 **** cmd
      激活子进程的命令。
 **** timeout
@@ -112,6 +143,29 @@
 *** exception subprocess. *CalledProcessError*
     SubprocessError子类，当进程被check_all()或check_ooutput()执行返回
     非0返回码时抛出。
+
+    #+BEGIN_SRC python :session
+      import subprocess
+
+      try:
+          proc = subprocess.run(
+              ['ls', 'not-exists'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+      except subprocess.CalledProcessError as why:
+          print('returncode：', why.returncode)
+          print('cmd：', why.cmd)
+          print('output：', why.output)
+          print('stdout：', why.stdout)
+          print('stderr：', why.stderr)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... ... ... ... ... ... ... ... returncode： 2
+    - cmd： ['ls', 'not-exists']
+    - output： b''
+    - stdout： b''
+    - stderr： b"ls: cannot access 'not-exists': No such file or directory\n"
+    #+END_SRC
 
 **** returncode
      子进程返回码。如果子进程因信号退出，则为表示信号的负数。
@@ -216,7 +270,18 @@
      - shell：默认为False，指定是否使用shell执行程序。如果为True，建议
        使用字符串对象作为args参数值。
 
-       *（待续）不建议使用shell=True*
+       *不建议使用shell=True*
+
+       在POSIX中，当shell=True时，默认使用/bin/sh。ARGS为字符串，将直
+       接执行字符串指定的命令，即字符换需与在命令行中直接输入的一样，
+       比如引号和转义文件名中的空格的斜杠；如果ARGS为序列，则第一个元
+       素表示命令，其余元素表示该命令的参数，即等价于：
+
+       #+BEGIN_EXAMPLE python
+         Popen(['/bin/sh', '-c', args[0], args[1], ...])
+       #+END_EXAMPLE
+
+       Windows中：（待续）
 
      - bufsize：与open()函数的bufsize含义相同，用于创建
        stdin/stdout/stderr管道对象：
@@ -226,33 +291,197 @@
        - 任何其他正数：使用与该数值接近的缓存大小。
        - 负数（默认）：使用系统默认缓存大小：io.DEFAULT_BUFFER_SIZE。
 
-     - executable：不常用，待续。
+     - executable：很少使用。当shell=False时，表示替换ARGS指定的命令。
 
      - stdin、stdout和stderr：见run()函数。
 
      - preexec_fn：可调用对象，在至今才执行前执行。仅在POSIX中有效。不
        安全。
 
-     - close_fds
+     - close_fds：默认为True，表示当子进程执行完毕后，文件描述符0、1和
+       2将关闭（只在POSIX中有效）。
 
-     - pass_fds
+     - pass_fds：
 
-     - cwd
+     - cwd：
 
      - restore_signals
 
      - start_new_session
 
-     - env
+     - env：指定执行子进程时环境变量的映射。默认为None，即使用当前进程
+       的环境变量。
 
-     - universal_newlines
+     - universal_newlines：当为True时，stdin、stdout和stderr都以文本模
+       式打开。默认为False，即以二进制模式打开。
 
      - startupinfo
 
+     Popen对象支持with上下文管理器，当exit时，标准文件描述符被关闭，进
+     程被等待：
+
+     #+BEGIN_EXAMPLE python
+       with Popen(['ifconfig'], stdout=PIPE) as proc:
+            log.write(proc.stdout.read())
+     #+END_EXAMPLE
+
 *** Exceptions
+    当新进程开始执行后，抛出的所有错误会被父进程重新抛出。此外，抛出的
+    错误有child_traceback属性，为子进程traceback信息的字符串（？？？怎
+    么查看）。
+
+    最常见的错误为OSError，比如尝试执行不存在的命令。如果要处理抛出错
+    误，需将其包含在内：
+
+    #+BEGIN_EXAMPLE python
+      try:
+          subprocess.run(['ls', 'qwd'], stderr=subprocess.PIPE, check=True)
+      except subprocess.CalledProcessError as proc_why:
+          pass
+      except OSError as os_why:
+          print(os_why)
+    #+END_EXAMPLE
+
+    当在Popen中使用无效参数时，会抛出ValueError错误。
+
+    当调用check_all()和check_output()的返回码不为0时，会抛出
+    CalledProcessError。
+
+    本模块中所有函数和方法都接受timeout参数，如call()和
+    Popen.communicate()，当超时时，会抛出TimeExpired错误。
+
+    本模块中所有错误都继承于SubprocessError。
+
 ** 安全
-   避免使用shell=True，当使用时，使用shlex.quote()转义命令。
-** Popen对象 （待续）
+   使用本模块中的函数时，所有字符，包括shell元字符都可安全传入子进程。
+   但当shell=True时，需保证为空格和元字符添加引号，避免 [[https://en.wikipedia.org/wiki/Code_injection#Shell_injection][shell注入]] 。
+
+   避免使用shell=True，当使用时，使用shlex.quote()转义命令，转义空格和
+   shell元字符。
+
+** Popen对象
+   Popen实例有以下方法和属性：
+
+*** Pope. *poll* ()
+    检查子进程是否终止。设置和返回returncode属性。？？？
+
+    #+BEGIN_SRC python :session
+      from subprocess import Popen
+      with Popen(['ls']) as proc:
+          print(proc.poll())
+          proc.kill()
+    #+END_SRC
+
+*** Pope. *wait* (timeout=None)
+    等待子进程终止。设置和返回returncode属性。
+
+    如果进程在TIMEOUT参数指定的秒数内没有终止，抛出TimeoutExpired错误。
+    可安全捕获此错误，然后在使用wait()方法。
+
+    #+BEGIN_QUOTE
+    *注意* ：当使用stdout=PIPE或stderr=PIPE，且子进程想管道输出内容过
+    多，导致阻塞操作心态管道接受更多数据时，会造成“锁死”。使用
+    Popen.communicate可避免此情况发生。？？？
+    #+END_QUOTE
+
+    #+BEGIN_QUOTE
+    *注意* ：此函数使用非阻塞调用和短休眠。如需使用同步等待，可参考
+    asyncio.create_subprocess_exec。
+    #+END_QUOTE
+
+*** Pope. *communicate* (input=None,timeout=None)
+    与子进程交流：向stdin发送数据。从stdout和stderr读取数据，直到遇到
+    EOF。等待子进程结束。
+
+    返回值为(stdout_data, stderr_data)组成的元组，都为bytes对象。如果
+    universal_newlines参数为True，则为字符串。
+
+    input：可选参数，为向子进程发送的数据，如果为None则不发送数据。须
+    为bytes对象，如果universal_newlines为True，则为字符串。
+
+    如需指定input参数，向stdin发送数据，则创建Popen实例时，需声明
+    stdin=PIPE；同样，如需从返回元组中获取数据，则需声明stdout=PIPE和
+    stderr=PIPE，否则只能获取None。
+
+    timeout：如果子进程在TIMEOUT参数指定的时间内为终止，则抛出
+    TimeoutExpired错误。捕获此错误，再重新使用communicate()方法不会丢
+    失任何输出数据。
+
+    如果抛出TimeoutExpired错误后子进程还没被干掉，需手动干掉，再接受
+    communicate()操作：
+
+    #+BEGIN_EXAMPLE python
+      proc = subprocess.Popen(...)
+      try:
+          outs, errs = proc.communicate(timeout=15)
+      except TimeoutExpired:
+             proc.kill()
+             outs, errs = proc.communicate()
+    #+END_EXAMPLE
+
+    #+BEGIN_QUOTE
+    *注意* ：此方法读取的数据会存储在内存中，所以当数据量大或无限时，
+    不要使用此方法。
+    #+END_QUOTE
+
+*** Pope. *send_signal* (signal)
+    向子进程发生SIGNAL信号。
+*** Pope. *terminate* ()
+    停止子进程。在POSIX中为发送SIGTERM，在Windows中，则是调用Win32 API
+    的TerminateProcess()函数。
+
+*** Pope. *kill* ()
+    干掉子进程。在POSIX中为发送SIGKILL信号，在Windows中等价于terminate()。
+*** Pope. *args*
+    传入Popen的ARGS参数，为序列或字符串。
+*** Pope. *stdin*
+    如果stdin参数为PIPE，则此属性为可写流对象（与open()函数返回值相同）。
+    如果universal_newlines参数为True，则为文本流，否则为二进制流。
+
+    如果stdin参数为None，则此属性值也为None。
+
+    #+BEGIN_SRC python :session
+      from subprocess import *
+      with Popen(['cat'], stdout=PIPE, stdin=PIPE) as proc:
+          proc.stdin.write(b'123')
+          print(proc.communicate())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... 3
+    - (b'123', None)
+    #+END_SRC
+
+*** Pope. *stdout*
+    如果stdout参数为PIPE，则此属性为可读流对象（与open()函数返回值相
+    同）。读取此流对象的返回值为子进程的输出值。如果universal_newlines
+    参数为True，则为你文本流，否则为二进制流。
+
+    如果stdout参数为None，则此属性值也为None。
+
+*** Pope. *stderr*
+    如果stderr参数为PIPE，则此属性为可读流对象（与open()函数返回值相
+    同）。读取此流对象的返回值为子进程的输出值。如果universal_newlines
+    参数为True，则为你文本流，否则为二进制流。
+
+    如果stderr参数为None，则此属性值也为None。
+
+    #+BEGIN_QUOTE
+    *警告* ：避免OS的管道被填满，造成阻塞子进程，进而“锁死”，应使用
+    communicate()，而非.stdin.write、stdout.read或stderr.read。
+    #+END_QUOTE
+
+*** Pope. *pid*
+    返回子进程ID，如果shell=True，则是shell进程的ID。
+
+*** Pope. *returncode*
+    子进程返回码，由poll()和wait()设置（间接由communicate()设置）。
+
+    None表示进程还没终止。
+
+    负数-N，表示进程被信号N终止，（仅POSIX有效）。
+
 ** Windows Popen帮助 （待续）
 *** 常量
 ** 旧的高阶API
@@ -341,6 +570,7 @@
 
 * sched
 * queue
-* dummy_threading
-* _thread
-* _dummy_thread
+* 支持上面模块服务的底层模块
+** dummy_threading
+** _thread
+** _dummy_thread

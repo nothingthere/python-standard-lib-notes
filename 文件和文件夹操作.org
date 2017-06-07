@@ -580,10 +580,10 @@
        >>> os.path.expanduser('~')
        '/home/claudio'
      #+END_EXAMPLE
-     
+
 **** Path. *stat* ()
      与os.stat()返回值相似，返回路径对象的具体信息。
-
+     
      #+BEGIN_EXAMPLE python
        >>> p = Path('dict.txt')
        >>> p.stat()
@@ -599,7 +599,7 @@
        >>> p.stat().st_size
        472
      #+END_EXAMPLE
-
+     
 **** Path. *chmod* (mode)
      更改文件模式和权限，类似于os.chmod()。
 
@@ -1040,21 +1040,21 @@
 *** os.path. *commonpath* (paths)
     返回PATHS中最长的相同子路径。PATHS只能同时为绝对路径和相对路径中的
     一种，且不能为空，否则抛出ValueError错误。
-    
+
     不同于commonprefix，此函数的返回值为有效路径。
-    
+
     #+BEGIN_SRC python :session
       from os.path import commonpath
       commonpath(['/usr/lib', '/usr/local/lib'])
     #+END_SRC
-    
+
     #+RESULTS:
     #+BEGIN_SRC org
     - '/usr'
     #+END_SRC
-    
+
     兼容：Unix、Windows
-    
+
 *** os.path. *commonprefix* (list)
     逐个字符比较，获取最长相同路径字符串，如果LIST为空，返回空。
 
@@ -1076,22 +1076,22 @@
 *** os.path. *exits* (path)
     如果PATH表示的路径为存在的文件/文件夹，或表示open file descriptor
     的整数，返回True。如果为被损坏的软链接，返回False。
-
+    
     在一些系统中，如果没有足够权限执行os.stat()，即时文件存在，也会返
     回False。
-
+    
     #+BEGIN_SRC python :session
       import os.path
       os.path.exists('~')
       os.path.exists(os.path.expanduser('~'))
     #+END_SRC
-
+    
     #+RESULTS:
     #+BEGIN_SRC org
     - False
     - True
     #+END_SRC
-
+    
 *** os.path. *lexists* (path)
     如果系统上不能实现os.lstat()，等价于os.path.exists()。即即时时损坏
     的软链接也会返回True。
@@ -2771,7 +2771,7 @@
    #+END_EXAMPLE
 
 * linecache - 随机访问文本行 （待续）
-* shutil - 高阶文件操作
+* shutil - 高阶文件操作o
   shutil模块提供了复制和删除多个文件/文件夹的高阶操作。如需操作单个文
   件，使用os模块。
 

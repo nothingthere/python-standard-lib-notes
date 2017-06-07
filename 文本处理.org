@@ -928,25 +928,25 @@
 
 *** \
     转义特殊字符，如*、?和+等；或标记特殊序列（special sequence）。
-
+    
     为避免过多书写过多反斜杠，强烈建议除简单的正则表达式外，都使用“原
     始字符串”。
-
+    
     #+BEGIN_SRC python :session
       import re
 
       re.findall('\\\\', '\\')
       re.findall(r'\\', '\\')
     #+END_SRC
-
+    
     #+RESULTS:
     :
     : >>> ['\\']
     : ['\\']
-
+    
 *** []
     匹配字符组。
-    
+
     - 匹配其中的任意一个字符：
 
       #+BEGIN_SRC python :session
@@ -958,7 +958,7 @@
       #+RESULTS:
       :
       : >>> ['b', 'a', 'n', 'a', 'n', 'a']
-      
+
     - 匹配字符范围，如需在其中匹配“-”本身，则需将其转义，如[a\-z]或放
       在第一个或最后一个位置。
 
@@ -1190,7 +1190,7 @@
        m = re.search('(?<=-)\w+', 'spam-egg')
        print(m.group(0))
      #+END_SRC
-     
+
      #+RESULTS:
      :
      : >>> egg
@@ -1242,17 +1242,18 @@
     
 **** \number
      反向索引。不能使用8进制数，最大数值99。
-     
+
      #+BEGIN_SRC python :session
        import re
        m = re.search(r'(.+) \1', '55 5')
        m.group(0)
      #+END_SRC
-     
+
      #+RESULTS:
-     :
-     : >>> '5 5'
-     
+     #+BEGIN_SRC org
+     - >>> '5 5'
+     #+END_SRC
+
 **** \A
      匹配字符串起始位置。
 **** \b
@@ -1759,14 +1760,16 @@
        import re
 
        def dash2camal(matchobj):
+           # print(matchobj.group(0)[1])
            return matchobj.group(0)[1].upper()
 
        re.sub('_\w', dash2camal, 'this_is_variable_name')
      #+END_SRC
      
      #+RESULTS:
-     :
-     : >>> ... ... >>> 'thisIsVariableName'
+     #+BEGIN_SRC org
+     - >>> ... ... ... >>> 'thisIsVariableName'
+     #+END_SRC
      
      COUNT为最多的替换个数，需为非负数。如果缺省或为0，表示替换所有。
      如果没有匹配内容，当只有前面没有匹配内容时才替换？？？：
@@ -2151,17 +2154,17 @@
      
 **** match. *groups* (default=None)
      返回元组，由所有单独分组匹配内容组成。
-     
+
      #+BEGIN_SRC python :session
        import re
        m = re.match(r'(\d+)\.(\d+)', '3.14159')
        m.groups()
      #+END_SRC
-     
+
      #+RESULTS:
      :
      : >>> ('3', '14159')
-     
+
      如果正则中有分组不匹配任何内容，可使用DEFAULT参数指定其值，默认值
      为None：
 
@@ -2207,18 +2210,18 @@
        m2.groupdict('Phd')
        m2.groupdict()
      #+END_SRC
-
+     
      #+RESULTS:
      :
      : >>> >>> {'first_name': 'Malcolm', 'last_name': 'Reynolds'}
      : >>> ... >>> >>> {'first_name': 'Malcolm', 'suffix': 'Phd', 'last_name': 'Reynolds'}
      : {'first_name': 'Malcolm', 'suffix': None, 'last_name': 'Reynolds'}
-
+     
 **** match. *start* ([group])
 **** match. *end* ([group])
      返回GROUP匹配内容的首尾索引。如果正则分组存在，但不匹配任何字符串，
      则返回-1。
-     
+
      #+BEGIN_SRC python :session
        import re
 
@@ -2229,7 +2232,7 @@
        m.start(1), m.end(1)
        m.start(2), m.end(2)
      #+END_SRC
-     
+
      #+RESULTS:
      :
      : >>> >>> ('Michael', None)

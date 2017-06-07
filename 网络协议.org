@@ -1,0 +1,339 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-06-04 14:10:55
+# Commentary:
+#+TITLE: 网络协议和支持
+
+* webbrowser
+* cgi
+* cgitb
+* wsgiref
+* urllib
+  urllib插件集合了多个处理URL的模块：
+
+  - urllib.request：打开和读取URL。
+  - urllib.error：含urllib.request可能抛出的错误。
+  - urllib.parse：解析URL。
+  - urllib.robotparser：解析robots.txt文件
+
+* urllib.request - 可扩展的URL打开库
+  urllib.request模块定义了用来打开URL（大部分为HTTP）的类和函数，涵盖
+  分析权限、重定向和cookie等功能。
+  
+  #+BEGIN_QUOTE
+  *另见* ：如需使用高阶HTTP客户端接口，可参考 [[http://docs.python-requests.org/en/master/][Package Request]] 。
+  #+END_QUOTE
+  
+** 模块函数和类
+*** 函数
+**** urllib.request. *urlopen* (url,data=None,[timeout,]*,cafile=None,capath=None,context=None)
+     打开URL，URL可为字符串，也可为Request对象。
+
+     DATA：参见urllib.request.Request的参数说明。
+
+     urllib.request模块使用HTTP/1.1，并在头信息中包含Connection:close。
+
+     TIMEOUT：可选参数，指定尝试连接的最长时间，如果缺省使用默认全局设
+     置。只对HTTP、HTTPS和FTP连接有效。
+
+     CONTEXT：须为ssl.SSLContext实例。
+
+     CAFILE和FAPATH：（待续）
+
+     CADEFAULT：忽视。 *？*
+
+     返回对象可用于上下文管理器，主要方法有：
+
+     - geturl()：返回实际请求的URL，常用于检查是否跟随重定向链接。
+     - info()：返回页面的元数据，如头信息，形式为
+       email.message_from_string() ，可参考 [[https://www.cs.tut.fi/~jkorpela/http.html][HTTP头信息概述]] 。
+     - getcode()：返回相应状态码，如200、404等。
+
+     （待续。。。）
+
+**** urllib.request. *install_opener* (opener)
+     
+**** urllib.request. *build_opener* ([handler,...])
+**** urllib.request. *pathname2url* (path)
+**** urllib.request. *url2pathname* (path)
+**** urllib.request. *getproxies* ()
+*** 类
+**** class urllib.request. *Request* (url,data=None,headers={},origin_req_host=None,unverifiable=False,method=None)
+     此类为对URL请求的抽象实现。
+
+     url：参数须为包含有效请求URL的字符串。
+
+     date：参数须为bytes对象，用于指定发送到服务器的额外数据，为None表
+     示无额外数据，目前只有HTTP请求使用额外数据。当提供此参数时，会使
+     用POST请求，而非GET请求。格式须为
+     application/x-www-form-urlencoded。可使用urllib.parse.urlencode()
+     函数将2元素元组组成的序列或映射转换为此格式的ASCII字符串形式。
+
+     HEADERS：须为字典对象，相当于对各键值对调用add_header()方法。通常
+     用来定制User-Agent头信息，因为有些服务器只接受常见浏览器访问。如
+     Mozilla Firefox自动添加的User-Agent头信息为"Mozilla/5.0 (X11; U;
+     Linux i686) Gecko/20071127 Firefox/2.0.0.11"，而urllib自动添加的
+     头信息为"Python-urllib/2.*"。再比如设置Content-Type头信息：
+
+     #+BEGIN_EXAMPLE python
+       {"Content-Type": "application/x-www-form-urlencoded"}
+     #+END_EXAMPLE
+
+     METHOD：字符串，用于指定HTTP请求方式，如GET。如果使用，存储在
+     method属性中，可用get_method()方法获取。子类可能设置自己默认的
+     method属性。
+
+     ORIGIN_REQ_HOST和UNVERIFIABLE：用于处理第三方HTTP cookies（待续）
+
+     - ORIGIN_REQ_HOST：
+     - UNVERIFIABLE：
+
+**** class urllib.request. *OpenerDirector*
+**** class urllib.request. *BaseHandler*
+**** class urllib.request. *HTTPDefaultErrorHandler*
+**** class urllib.request. *HTTPRedirectHanlder*
+**** class urllib.request. *HTTPCookieProcessors* (cookiejar=None)
+**** class urllib.request. *ProxyHandler* (proxies=None)
+**** class urllib.request. *HTTPPasswordMgr*
+**** class urllib.request. *HTTPPasswordMgrWithDefaultRealm*
+**** class urllib.request. *HTTPPasswordMgrWithPriorAuth*
+**** class urllib.request. *AbstractBasicAuthHandler* (password_mgr=None)
+**** class urllib.request. *HTTPBasicAuthHandler* (password_mgr=None)
+**** class urllib.request. *ProxyBasicAuthHandler* (password_mgr=None)
+**** class urllib.request. *AbstractDigestAuthHandler* (password_mgr=None)
+**** class urllib.request. *HTTPDigestAuthHandler* (password_mgr=None)
+**** class urllib.request. *HTTPHandler*
+**** class urllib.request. *FileHandler*
+**** class urllib.request. *DataHandler*
+**** class urllib.request. *FTPHandler*
+**** class urllib.request. *CacheFTPHandler*
+**** class urllib.request. *UnknownHanlder*
+**** class urllib.request. *HTTPErrorProcessor*
+
+** Request对象
+   下面为urllib.request.Request对象的的公共接口，所有子类可能重载。
+
+*** Request. *full_url*
+*** Request. *type*
+*** Request. *host*
+*** Request. *origin_req_host*
+*** Request. *selector*
+*** Request. *data*
+*** Request. *unverifiable*
+*** Request. *method*
+*** Request. *get_method* ()
+*** Request. *add_header* ()
+*** Request. *add_unredirected_header* (key,header)
+*** Request. *has_header* (header)
+    为请求添加头信息。目前只在HTTP请求中有效。如果添加了相同键值，覆盖
+    原来键值对。
+
+    #+BEGIN_SRC python :session
+      from urllib.request import Request
+      req = Request('http:/www.bing.com')
+      req.header_items()
+      req.add_header('name', 'claudio')
+      req.add_header('name', 'CLAUDIO')
+      req.header_items()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> []
+    - >>> >>> [('Name', 'CLAUDIO')]
+    #+END_SRC
+
+*** Request. *remove_header* (header)
+*** Request. *get_full_url* ()
+*** Request. *set_proxy* (host,type)
+*** Request. *get_header* (header_name,default=None)
+*** Request. *header_items* ()
+
+** OpenerDirectory对象
+** BaseHandler对象
+** HTTPRedirectHandler对象
+** HTTPCookieProcessor对象
+** ProxyHandler对象
+** HTTPPasswordMgr对象
+** HTTPPasswordMgrWithPriorAuth对象
+** AbstractBasicAuthHandler对象
+** HTTPBasicAuthHandler对象
+** ProxyBasicAuthHandler对象
+** AbstractDigestAuthHandler对象
+** HTTPDigestAuthHandler对象
+** ProxyDigestAuthHandler对象
+** HTTPHandler对象
+** HTTPSHandler对象
+** FileHandler对象
+** DataHandler对象
+** FTPHandler对象
+** CacheFTPHandler对象
+** UnknownHandler对象
+** HTTPErrorProcessor对象
+** 举例
+** 遗留接口
+** urllib.request的局限
+* urllib.response
+* urlllib.parse
+** 解析URL
+** 解析ASCII编码的字节
+** URL加引号
+   使用为URL添加引号的函数，可转换特殊字符以及编码非ASCII文本，使程序
+   数据转换为安全的URL成分。也可逆向操作。
+
+*** urllib.parse. *quote* (string,safe='/',encoding=None,errors=None)
+    将STRING（字符串或bytes对象）中的特殊字符转换为%xx形式的转义字符。
+    不转义字母、数字和字符'_.-'。默认情况下，此函数转换URL中的路径部分。
+
+    可选参数SAFE用于指定不需转义的ASCII特殊字符，默认为'/'。
+
+    可选参数ENCODING和ERRORS与str.encode()同名参数相同。当STRING为
+    bytes对象时，不得指定这两个参数。
+
+    quote(string,safe,encoding,errors)等价于
+    quote_from_bytes(string.encoding(encoding,errors),safe)。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import quote
+      quote('/El Niño/')
+      quote('/El Niño/', safe='')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/El%20Ni%C3%B1o/'
+    - '%2FEl%20Ni%C3%B1o%2F'
+    #+END_SRC
+
+*** urllib.parse. *quote_plus* (string,safe='',encoding=None,errors=None)
+    类似与quote()函数，不过会将空格转换为加号，可用于将HTML表单值转换
+    为URL成分。原字符串/bytes对象中的加号会转义，除非在SAFE参数中指定
+    不转义。另外，SAFE参数默认值为空。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import quote_plus
+      quote_plus('/El Niño')
+      quote_plus('/El Niño+PLUS')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '%2FEl+Ni%C3%B1o'
+    - '%2FEl+Ni%C3%B1o%2BPLUS'
+    #+END_SRC
+
+*** urllib.parse. *quote_from_bytes* (bytes,safe='/')
+    类似于quote()函数，不过只接受bytes对象。不进程任何编码。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import quote_from_bytes
+      quote_from_bytes(b'a&\xef')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 'a%26%EF'
+    #+END_SRC
+
+*** urllib.parse. *unquote* (string,encoding='utf-8',errors='replace')
+    将%%x形式的转义字符转换为单个字符。可选参数与bytes.decode()函数的
+    同名参数相同。
+
+    STRING参数需为字符串。
+
+    ENCODING默认为utf-8；ERRORS默认为replace，使用placeholder字符替换
+    表示无效序列。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import unquote
+      unquote('/El%20Ni%C3%B1o/')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/El Niño/'
+    #+END_SRC
+
+*** urllib.parse. *unquote_plus* (string,encoding='utf-8',errors='replace')
+    类似于unquote()，只是会将加号转换为空格。
+
+    STRING参数需为字符串对象。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import unquote_plus, unquote
+      unquote('/El+Ni%C3%B1o/')
+      unquote_plus('/El+Ni%C3%B1o/')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - '/El+Niño/'
+    - '/El Niño/'
+    #+END_SRC
+
+*** urllib.parse. *unquote_to_bytes* (string)
+    将%xx形式的转义字符转换为普通字符，返回bytes对象。
+
+    STRING可为字符串，也可为bytes对象。如果为字符串，使用UTF-8将非
+    ASCII字符转换为二进制字符。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import unquote_to_bytes
+      unquote_to_bytes('/El%20Ni%C3%B1o/')
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - b'/El Ni\xc3\xb1o/'
+    #+END_SRC
+
+*** urllib.parse. *urlencode* (query,dosep=False,safe='',encoding=None,errors=None,quote_via=quote_plus)
+    转换映射对象或2元素元组（可由字符串或bytes对象）组成的序列。如果转
+    换结果要用于urlopen()的date参数用于POST请求，需再转换为bytes对象。
+
+    转换结果为使用&连接的key=value键值对，两者都经过quote_via参数指定
+    的函数添加引号（默认为quote_plus）。
+
+    如需转换嵌套键值对，需将DOSEQ参数设置为True。
+
+    encoding、errors参数都传递给QUOTE_VIA参数指定的函数（在其参数为字
+    符串时才有用。）。
+
+    #+BEGIN_SRC python :session
+      from urllib.parse import urlencode, quote_from_bytes
+      urlencode([('search', 'python'), ('version', '3')])
+      urlencode({b'search': b'python', b'version': b'3'}, quote_via=quote_from_bytes)
+      urlencode({'search': 'python', 'version': {'1': 'a', '2': 'b'}}, doseq=True)
+      urlencode({'search': 'python', 'version': {'1': 'a', '2': 'b'}}, doseq=False)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 'search=python&version=3'
+    - 'search=python&version=3'
+    - 'search=python&version=1&version=2'
+    - 'search=python&version=%7B%271%27%3A+%27a%27%2C+%272%27%3A+%27b%27%7D'
+    #+END_SRC
+
+* urllib.error
+* urllib.robotparser
+* http
+* http.client
+  此模块定义实现客户端HTTP和HTTPS协议的类，通常不直接使用，而是使用
+  urllib.request模块处理请求。
+
+* ftplib
+* poplib
+* imaplib
+* nntpib
+* smtplib
+* smtpd
+* telnetlib
+* uuid
+* socketserver
+* http.server
+* http.cookies
+* http.cookiejar
+* xmlrpc
+* xmlrpc.client
+* xmlrpc.server
+* ipaddress
