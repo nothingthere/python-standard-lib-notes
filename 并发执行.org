@@ -485,28 +485,84 @@
 ** Windows Popen帮助 （待续）
 *** 常量
 ** 旧的高阶API
+   Python3.5前，下面3个函数旧API函数。现在可使用run()替换，但很多现有
+   的代码都使用他们。
+
 *** subprocess. *call* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
-    等价于：
+    执行ARGS指定的命令，等待执行结束，返回returncode属性。
+
+    除不支持input和check参数外，等价于：
 
     #+BEGIN_EXAMPLE python
       run(...).returncode
     #+END_EXAMPLE
 
+    除TIMEOUT参数外，此函数的所有参数都传递给Popen接口。
+
+    #+BEGIN_QUOTE
+    *注意* ： 不要使用stdout=PIPE或stderr=PIPE。当OS管道没有被读取，且
+    此函数产生的数据填满管道后，会造成阻塞。
+    #+END_QUOTE
+
 *** subprocess. *check_all* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
-    等价于：
+    执行ARGS指定的命令，等待命令完成。如果返回码为0，返回，否则抛出
+    CalledProcessError错误。可从CalledProcessError中获取returncode属性。
+
+    除不支持input参数外，等价于：
 
     #+BEGIN_EXAMPLE python
       run(..., check=True)
     #+END_EXAMPLE
 
+    除TIMEOUT参数外，此函数的所有参数都传递给Popen接口。
+
+    #+BEGIN_QUOTE
+    *注意* ： 不要使用stdout=PIPE或stderr=PIPE。当OS管道没有被读取，且
+    此函数产生的数据填满管道后，会造成阻塞。
+    #+END_QUOTE
+
 *** subprocess. *check_output* (args,*,stdin=None,stdout=None,stderr=None,shell=False,timeout=None)
-    等价于：
+    执行命令，返回执行输出。
+
+    如果返回码不为0，则抛出CalledProcessError。可通过
+    CalledProcessError的returncode和output属性分别获取返回码和输出内容。
+
+    除不支持input参数外，大多数参数都传递给run()函数的接口。等价于：
 
     #+BEGIN_EXAMPLE python
       run(..., check=True, stdout=PIPE).stdout
     #+END_EXAMPLE
 
+    返回结果为bytes对象，编码形式依赖于命令执行环境。所以应该在应用层
+    级上解码。？？？
+
+    设置universal_newlines=True后，可使返回字符串。
+
+    如需捕获stderr，可声明参数stderr=subprocess.STDOUT：
+
+    #+BEGIN_SRC python :session
+      import subprocess
+      subprocess.check_output(
+          'ls none_exists_file; exit 0',
+          stderr=subprocess.STDOUT,
+          shell=True)
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - ... ... ... b"ls: cannot access 'none_exists_file': No such file or directory\n"
+    #+END_SRC
+
 ** 使用subprocess模块替换旧函数
+
+   #+BEGIN_QUOTE
+   *注意* ： 本节中所有被替换的函数如果不能找到执行命令，都不会抛出错
+   误；而替换函数会抛出OSError错误。
+
+   此外，使用check_output()替换的版本中，如果执行返回码不为0，会抛出
+   CalledProcessError错误，可使用output属性获取具体内容。
+   #+END_QUOTE
+
 *** 替换/bin/sh的反引号
 
     #+BEGIN_EXAMPLE sh
@@ -530,7 +586,7 @@
     #+BEGIN_EXAMPLE python
       p1 = Popen(['dmesg'], stdout=PIPE)
       p2 = Popen(['grep', 'hda'], stdin=p1.stdout, stdout=PIPE)
-      p1.stdout.close() # 保证p1在p2退出时接受SIGPIE
+      p1.stdout.close() # 保证p1在p2退出时接受SIGPIPE信号
       output=p2.communicate()[0]
     #+END_EXAMPLE
 
@@ -561,10 +617,10 @@
           print('执行失败：', e, file=sys.stderr)
     #+END_EXAMPLE
 
-*** 替换os.spawn类函数
-*** 替换os.popen()、os.popen2()和os.popen3()
-*** 替换popen2模块的函数
-** 遗留Shell激活函数 （待续）
+*** 替换os.spawn类函数 （待续）
+*** 替换os.popen()、os.popen2()和os.popen3() （待续）
+*** 替换popen2模块的函数 （待续）
+** 遗留Shell激活函数 （存在于2.x中，可能不安全，待续）
 ** 注意点 （待续）
 *** 在Windows中将参数序列转换为字符串
 

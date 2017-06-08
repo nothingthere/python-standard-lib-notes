@@ -2120,7 +2120,7 @@ Unix或C，但可用于大多数系统。
 
 **** class io. *BufferedIOBase* （待续）
      二进制流类，支持一些缓存实现，继承于IOBase，没有公共构造器。
-     
+
      与RawIOBase主要的区别为，read()、readinto()和write()方法会尝试尽
      可能多地消耗输入和输出，从而造成可能执行多次系统调用。
 ***** raw
@@ -2138,6 +2138,7 @@ Unix或C，但可用于大多数系统。
   argparse模块提供易用的命令行接口。程序定义所需参数后，argparse可解析
   sys.argv获取。argparse模块还可自动生成帮助和使用信息，且当参数无效时
   显示错误信息。
+
 
 ** 例子
    如接受一系列整数获取最大值或和：
@@ -2715,7 +2716,7 @@ Unix或C，但可用于大多数系统。
 ** add_argument()方法
 ** ArgumentParser. *add_argument* (name of flags...[,action][,nargs][,const][,default][,type][,choices][,required][,help][,metavar][,dest])
    定义如歌解析单个命令行参数。各参数简要描述如下：
-   
+
      - name or flags： 一个或多个字符串。如“foo”、“--foo”或“-f”
      - action：当命令行中出现此参数时的基本操作。
      - nargs：指定消耗的命令行参数个数。
@@ -2727,9 +2728,9 @@ Unix或C，但可用于大多数系统。
      - help：对此选项的简要描述。
      - metavar：在“Usage”信息中此选项的名字。
      - dest：parse_args()返回值对应的属性。
-       
+
      下面为详细介绍：
-     
+
 **** name或flags
      一个或单个字符串，以“-”前缀开始时表示命令行可选参数，无前缀表示命
      令行必选参数。
