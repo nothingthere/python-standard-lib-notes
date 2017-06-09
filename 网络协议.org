@@ -3,6 +3,8 @@
 # Commentary:
 #+TITLE: 网络协议和支持
 
+[[file:~/Desktop/Python/resources/site/docs.python.org/3.5/library/internet.html][本地页面]]
+
 * webbrowser
 * cgi
 * cgitb
@@ -18,15 +20,15 @@
 * urllib.request - 可扩展的URL打开库
   urllib.request模块定义了用来打开URL（大部分为HTTP）的类和函数，涵盖
   分析权限、重定向和cookie等功能。
-  
+
   #+BEGIN_QUOTE
   *另见* ：如需使用高阶HTTP客户端接口，可参考 [[http://docs.python-requests.org/en/master/][Package Request]] 。
   #+END_QUOTE
-  
+
 ** 模块函数和类
 *** 函数
 **** urllib.request. *urlopen* (url,data=None,[timeout,]*,cafile=None,capath=None,context=None)
-     打开URL，URL可为字符串，也可为Request对象。
+     打开URL，URL可为字符串，也可为urllib.request.Request对象。
 
      DATA：参见urllib.request.Request的参数说明。
 
@@ -51,7 +53,6 @@
      （待续。。。）
 
 **** urllib.request. *install_opener* (opener)
-     
 **** urllib.request. *build_opener* ([handler,...])
 **** urllib.request. *pathname2url* (path)
 **** urllib.request. *url2pathname* (path)
@@ -108,7 +109,6 @@
 **** class urllib.request. *CacheFTPHandler*
 **** class urllib.request. *UnknownHanlder*
 **** class urllib.request. *HTTPErrorProcessor*
-
 ** Request对象
    下面为urllib.request.Request对象的的公共接口，所有子类可能重载。
 

@@ -5,8 +5,257 @@
 
 [[file:~/Desktop/Python/resources/site/docs.python.org/3.5/library/concurrency.html][本地页面]]
 
-* threading
-* multiprocessing
+本章介绍的模块可实现并发执行代码。是否选用并发执行取决于程序需求，榨干
+CPU性能还是IO性能，协作多任务还是优先多任务。
+
+* threading - 以线程为基础并发
+  本模块建立在底层_thread模块上，提供操作线程的高阶接口。还可参见queue
+  模块。
+
+  如果缺少_thread模块，则不能使用threading模块，此时可使用
+  dummy_threading模块作为替代品。
+
+** 模块函数
+*** threading. *active_count* ()
+    当前存活的Thread对象数量，等于threading.enumerate()调用结果的长度。
+
+    #+BEGIN_SRC python :session
+      import threading
+      print('当前Thread对象数量：', threading.active_count())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> 当前Thread对象数量： 1
+    #+END_SRC
+
+*** threading. *current_thread* ()
+    返回当前Thread对象，与控制调用环境的线程相关。如果调用函数在不为通过
+    threading模块创建，则返回功能优先的“虚假”线程对象。？？？
+*** threading. *get_ident* ()
+    返回当前线程的“身份”，为非0整数。此数值并没有直接的实际含义，主要
+    用来作为一个“魔法cookie”。比如用来索引线程相关的字典。当线程退出，
+    另一个线程创建时，线程“身份”可能被垃圾回收。
+
+    #+BEGIN_SRC python :session
+      import threading
+      print(threading.current_thread())
+      print(threading.get_ident())
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - <_MainThread(MainThread, started 140638126053120)>
+    - 140638126053120
+    #+END_SRC
+
+*** threading. *enumerate* ()
+    返回当前所有存活线程注册的链表。
+
+    包含：后台线程（daemonic threads）、current_thread()创建的“虚假”线
+    程、以及主线程。
+
+    不包括：已经被终止的线程，还没开始执行的线程。
+
+*** threading. *main_thread* ()
+    返回主线程Thread对象。普通情况下，当Python解释器开启时就启动主线程。
+
+*** threading. *settrace* (func) ？？？
+    为所有threading模块创建的线程添加跟踪函数（“trace function”）。在
+    执行run()方法前，FUNC参数会传递给sys.settrace()函数。
+
+*** threading. *setprofile* (func)
+    为所有threading模块创建的线程添加profile函数。在执行run()方法前，
+    FUNC参数会传递给sys.setprofile()函数。
+
+*** threading. *stack_size* ([size])
+    返回创建新线程时，线程使用的stack大小。
+
+    size：可选参数，指定以后创建线程时分配的stack大小。默认为0，即使用
+    系统默认配置。如果设置，则需为>=32,768（32KiB）。如果不支持设置，
+    则抛出RuntimeError错误；如果数值无效，则抛出ValueError错误，不做修
+    改。目前支持的最小stack为32KiB。
+
+    设置时，对系统有依赖。（待续）
+
+** 模块常量
+*** threading. *TIMEOUT_MAX*
+    本模块中函数/构造器TIMEOUT参数允许的最大值，如Lock.acquire()、
+    Rlock.acquire()和Condition.wait()等。如果超过此值，则抛出
+    OverflowError错误。
+
+** 线程本地变量 ？？？
+   线程本地变量，其值只在线程中有效。使用threading.local（或子类），可
+   创建线程本地变量。
+
+   #+BEGIN_EXAMPLE python
+     mydata = threading.local()
+     mydata.x = 1
+   #+END_EXAMPLE
+
+   实例的值在不同线程中相互独立。
+
+*** class threading. *local*
+    表示线程本地变量数据的类。
+
+    具体用法可参考_threading_local模块的文档。
+
+** Thread对象
+   Thread类表示独立允许的线程活动。有两种办法创建线程：
+
+   1. 在构造器中传递可调用对象。
+   2. 使用子类，重置run()方法。
+      声明Thread子类时，只能重置__init__()和run()方法。
+
+   当创建Thread对象后，只有调用其start()方法才能激活线程。激活后在独立
+   的线程中运行run()方法。
+
+   当线程启动后，则表示线程“存活”。当run()方法执行结束——正常结束或抛出
+   错误没被处理，则线程“终止”。可使用is_alive()方法判断线程使用“存活”。
+
+   线程可调用join()方法，调用后，直到调用join()方法的线程的join()方法
+   执行结束后，才会执行当前线程中的代码。
+
+   Thread对象具有name属性，可在构造器中指定，此属性可写。
+
+   当线程声明为“后台线程”时，即声明构造器的daemon参数为True，如果主线
+   程退出时，“后台线程”还没执行完，也会随之退出。可通过修改Thread对象
+   的daemon属性，或在构造器中声明。是否为“后台线程”，默认继承于创建它
+   的线程。
+
+   #+BEGIN_SRC python :session
+     import threading as td
+     import time
+
+     def job():
+         time.sleep(2)
+         print('执行子线程函数。')
+
+     def multi_thread():
+         t1 = td.Thread(target=job, daemon=True)
+         t1.start()
+         # t1.join()
+
+     multi_thread()
+     print('主线程执行结束')
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> ... ... ... >>> ... ... ... ... >>> >>> 主线程执行结束
+   #+END_SRC
+
+   #+BEGIN_QUOTE
+   *注意* ： “后台线程”退出可能非常“唐突”，如不能合理释放资源（如已打
+   开文件和数据库事务）。如需优雅退出“后台线程”，可使其“非后台化”，并
+   使用合适的信号机制，如后面介绍的threading.Event对象。
+   #+END_QUOTE
+
+   总是有一个“主线程”，即控制Python程序的初始线程，从不为“后台线程”。
+
+   有可能会自动创建“虚拟线程对象（dummy thread objects）”。他们为“外部
+   线程（alien threads）”，在threading模块外创建，如直接从C代码创建。
+   “虚拟线程”功能有限，且总是“存活”，并且为“后台线程”，不能调用join()
+   方法，不能被删除。
+
+*** class threading. *Thread* (group=None,target=None,name=None,args=(),kwargs={},*,daemon=None)
+
+    *使用此构造器时，只能使用关键字参数。* 各参数的含义为：
+
+    group：需为None，为以后支持ThreadGroup实现扩展预留的参数。
+
+    target：可调用对象，被run()方法激活。默认为None，即不进行任何调用。
+
+    name：线程名称。构造时默认创建"Thread-N"，其中N为十进制数。
+
+    args：target指定可调用对象的参数，默认为()。
+
+    kwargs：字典对象，target指定可调用对象的关键字参数，默认为{}。
+
+    daemon：明确声明新建线程是否为“后台线程”。如果为None（默认值），
+    则根据创建线程的线程是否为“后台线程”而定。
+
+    如果子类重载此构造器，则需保证在__init__()声明中，做任何事前声明
+    Thread.__init__()。
+
+**** start()
+     激活线程。
+
+     只能调用一次。目的时将Thread对象的run()方法放置在新建的线程中执行。
+
+     如果调用多次，则抛出RuntimeError错误。
+
+**** run()
+     表示线程活动的方法。
+
+     可在子类中重置此方法。标准的run()方法会调用构造器中target参数指定
+     的可调用对象，并让其调用args和kwargs指定的参数。
+
+**** join(timeout=None)
+     等待直到线程执行结束。使所在线程中的代码，直到该线程的join()方法
+     调用终止（正常结束、抛出错误不被处理、超过timeout指定时间）后才执
+     行。
+
+     timeout：如果不为None，须为指定秒数的浮点数。由于join()方法总是返
+     回None，所以如果使用timeout参数，需使用is_alive()方法判断子线程是
+     否依然“存活”，再决定是否重新调用join()方法。
+
+     当timeout参数为None或缺省时，所有代码会被阻塞至子线程执行结束后才
+     执行。
+
+     一个线程对象可调用多次join()方法。
+
+     如果对可能造成“锁死”的线程对象调用join()方法，会抛出RuntimeError
+     错误。如果在调用start()方法前调用join()方法，也会抛出RuntimeError
+     错误。
+
+     #+BEGIN_SRC python :session
+       import threading as td
+       import time
+
+       def job():
+           time.sleep(2)
+           print('子线程执行结束。')
+
+       def multi_thread():
+           t1 = td.Thread(target=job)
+           t1.start()
+           t1.join(1)
+           print('子线程是否存活：', t1.is_alive())
+           if t1.is_alive():
+               t1.join()
+
+       multi_thread()
+       print('主线程执行结束')
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> >>> ... ... ... >>> >>> ... ... ... ... ... ... ... >>> >>> 子线程是否存活： True
+     - 子线程执行结束。
+     - 主线程执行结束
+     #+END_SRC
+
+**** name
+
+**** getName()
+**** setName()
+**** ident
+**** is_alive()
+**** daemon
+**** isDeamon()
+**** setDaemon()
+
+** Lock对象
+** Rlock对象
+** Condition对象
+** Semaphore对象
+*** Semaphore举例
+** Event对象
+** Timer对象
+** Barrier对象
+** 在with上下文管理器中使用locks、conditions和semaphores
+* multiprocessing - 以进程为基础的并发
 * concurrent包
 * concurrent.future
 * subprocess
