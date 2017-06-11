@@ -9,6 +9,9 @@
 CPU性能还是IO性能，协作多任务还是优先多任务。
 
 * threading - 以线程为基础并发
+  threading模块主要用来同时运行I/O操作频繁的任务，如需利用多核CPU，可
+  参考multiprocessing模块。
+
   本模块建立在底层_thread模块上，提供操作线程的高阶接口。还可参见queue
   模块。
 
@@ -45,15 +48,15 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
     #+RESULTS:
     #+BEGIN_SRC org
-    - <_MainThread(MainThread, started 140638126053120)>
-    - 140638126053120
+    - <_MainThread(MainThread, started 140373658789632)>
+    - 140373658789632
     #+END_SRC
 
 *** threading. *enumerate* ()
     返回当前所有存活线程注册的链表。
 
     包含：后台线程（daemonic threads）、current_thread()创建的“虚假”线
-    程、以及主线程。
+    程（dummy thread）、以及主线程。
 
     不包括：已经被终止的线程，还没开始执行的线程。
 
@@ -64,11 +67,11 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     为所有threading模块创建的线程添加跟踪函数（“trace function”）。在
     执行run()方法前，FUNC参数会传递给sys.settrace()函数。
 
-*** threading. *setprofile* (func)
+*** threading. *setprofile* (func) ？？？
     为所有threading模块创建的线程添加profile函数。在执行run()方法前，
     FUNC参数会传递给sys.setprofile()函数。
 
-*** threading. *stack_size* ([size])
+*** threading. *stack_size* ([size]) ？？？
     返回创建新线程时，线程使用的stack大小。
 
     size：可选参数，指定以后创建线程时分配的stack大小。默认为0，即使用
@@ -83,6 +86,16 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     本模块中函数/构造器TIMEOUT参数允许的最大值，如Lock.acquire()、
     Rlock.acquire()和Condition.wait()等。如果超过此值，则抛出
     OverflowError错误。
+
+    #+BEGIN_SRC python :session
+      import threading
+      threading.TIMEOUT_MAX
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - 9223372036.0
+    #+END_SRC
 
 ** 线程本地变量 ？？？
    线程本地变量，其值只在线程中有效。使用threading.local（或子类），可
@@ -105,7 +118,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
    1. 在构造器中传递可调用对象。
    2. 使用子类，重置run()方法。
-      声明Thread子类时，只能重置__init__()和run()方法。
+
+      *声明Thread子类时，只能重置__init__()和run()方法。*
 
    当创建Thread对象后，只有调用其start()方法才能激活线程。激活后在独立
    的线程中运行run()方法。
@@ -175,8 +189,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     daemon：明确声明新建线程是否为“后台线程”。如果为None（默认值），
     则根据创建线程的线程是否为“后台线程”而定。
 
-    如果子类重载此构造器，则需保证在__init__()声明中，做任何事前声明
-    Thread.__init__()。
+    *如果子类重载此构造器，则需保证在__init__()声明中，做任何事前声明
+    Thread.__init__()。*
 
 **** start()
      激活线程。
@@ -188,7 +202,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 **** run()
      表示线程活动的方法。
 
-     可在子类中重置此方法。标准的run()方法会调用构造器中target参数指定
+     可在子类中重置此方法；标准的run()方法会调用构造器中target参数指定
      的可调用对象，并让其调用args和kwargs指定的参数。
 
 **** join(timeout=None)
@@ -231,22 +245,62 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
      #+RESULTS:
      #+BEGIN_SRC org
-     - >>> >>> >>> ... ... ... >>> >>> ... ... ... ... ... ... ... >>> >>> 子线程是否存活： True
+     - >>> >>> ... ... ... >>> ... ... ... ... ... ... ... >>> 子线程是否存活： True
      - 子线程执行结束。
      - 主线程执行结束
      #+END_SRC
 
 **** name
-
+     用来辨别线程的字符串，没有实际含义。多个线程可有相同名字。初始名
+     字由构造器自动生成。
 **** getName()
 **** setName()
+     name属性的旧API。
 **** ident
+     “线程身份”，如果线程还没启动则为None，如果已启动则为非0整数。当一
+     个线程退出，另一个线程启动时，此“身份”可能被重新利用。即时线程退
+     出后，也可获取。
+
 **** is_alive()
+     如果线程为“存活”状态，则返回True。
+
+     在run()方法开始执行前，run()方法结束前，都返回True。模块函数
+     enumerate()返回内容只含当前“存活”线程。
+
 **** daemon
+     表示是否为“后台线程”的布尔值。如果赋值，则需在调用start()方法前，
+     否则抛出RuntimeError错误。默认继承于创建该线程是否为“后台线程”，
+     主线程不为“后台线程”，所以在主线程中创建的线程默认daemon=False。
+
+     当没有非“后台线程”存活时，整个Python程序退出。
+
 **** isDeamon()
 **** setDaemon()
+     daemon属性的旧API。
 
 ** Lock对象
+   一个原始的lock为一个同步原始，当锁定后，不属于任何一个特点线程。在
+   Python中，此类型为目前最底层的同步原始，由_thread扩展模块直接实
+   现。？？？
+
+   一个原始lock有两种状态：“locked（锁定）”和“unlocked（去锁定）”。有
+   两个基本发股份：acquire()和release()。当“去锁定”后，使用acquire()可
+   将状态改变为“锁定”状态，并立即返回。当“锁定”后，acquire()会使当前线
+   程一直阻塞，直到另一个线程中调用release()方法，将其“解锁”，然后可重
+   新调用acquire()将其“锁定”并返回。release()方法只能在“锁定”状态下调
+   用，否则抛出RuntimeError错误。
+
+   支持上下文管理器协议。
+
+   当在多个线程中调用acquire()锁定线程后，再调用release()方法时只能解
+   锁一个线程；具体解锁哪一个根据Python实现不定。
+
+*** class threading. *Lock*
+    实现原始lock对象的类。当对某个线程锁定后，直到调用release()才释放
+    （任何线程可操作此释放行为）。
+
+**** acquire(blocking=True,timeout=-1)
+**** release()
 ** Rlock对象
 ** Condition对象
 ** Semaphore对象
