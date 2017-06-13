@@ -8,7 +8,8 @@
 本章介绍的模块可实现并发执行代码。是否选用并发执行取决于程序需求，榨干
 CPU性能还是IO性能，协作多任务还是优先多任务。
 
-* threading - 以线程为基础并发
+* threading - 以线程为基础并发   [[http://yoyzhou.github.io/blog/2013/02/28/python-threads-synchronization-locks/][@yoyzhou（可能Event小节有bug，去掉sleep(...)可发现）]]
+
   threading模块主要用来同时运行I/O操作频繁的任务，如需利用多核CPU，可
   参考multiprocessing模块。
 
@@ -279,6 +280,11 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      daemon属性的旧API。
 
 ** Lock对象
+
+   #+BEGIN_QUOTE
+   [[http://www.cszhi.com/20130528/python-threading.html][@cszhi]] ：使用“互斥锁”可保护多个线程访问的公共资源，使各线程不抢夺。
+   #+END_QUOTE
+
    一个原始的lock为一个同步原始，当锁定后，不属于任何一个特点线程。在
    Python中，此类型为目前最底层的同步原始，由_thread扩展模块直接实
    现。？？？
@@ -300,15 +306,220 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     （任何线程可操作此释放行为）。
 
 **** acquire(blocking=True,timeout=-1)
+     获取锁，阻塞或非阻塞。
+
+     当blocking参数设置为True时（默认），阻塞直到解锁，然后设置为“锁定”状
+     态返回True。？？？
+
+     当blocking参数为False时，不阻塞。？？？
+
+     当使timeout参数为浮点数正数时，阻塞对多timeout指定的秒数，期间不
+     能获取“锁”。如果timeout参数为-1，表示无限期等待。当bloking参数为
+     False时，不得指定timeout参数。
+
+     如果成功获取“锁”，返回True，否则返回False（如超过timeout指定时间）。
+
 **** release()
+     释放“锁”，可在任何线程中调用，不必是获取“锁”的那个线程。
+
+     当“锁”被锁定时，将其解锁。如果多个线程正阻塞等待解锁，只能解锁其
+     中一个。
+
+     当在没锁定的“锁”上调用时，抛出RuntimeError错误。
+
+     无返回值。
+
 ** Rlock对象
+
+   #+BEGIN_QUOTE
+   [[http://python.jobbole.com/81546/][@伯乐在线]] Rlock与lock的主要区别为：Rlock允许在同一线程中多次被
+   acquire()，lock则不允许。使用Rlock时，acquire()和release()应成对出
+   现，才能释放所有“锁”。
+   #+END_QUOTE
+
+   可重入锁，“同步基础（synchronization primitive）”，可被单个线程获取
+   多次。使用“拥有则线程”和“递归层级”的概念，以及lock的锁定/解锁状态。
+   在锁定状态下，一些线程拥有锁；在解锁状态下，没有线程拥有锁。
+
+   如需锁定锁，线程可调用acquire()方法，当线程拥有锁后就返回。如需解锁
+   锁，线程可调用release()方法。acquire()/release()调用对可嵌套，最外
+   层release()可将锁设置为解锁状态，使其线程可调用acquire()获取锁。
+
+   可重入锁支持上下文管理协议。
+
+*** class threading. *Rlock*
+    实现可重入锁对象的类。可重入锁可被获取他的线程释放。当某个线程获取
+    一个可重入锁后，同一个线程可在不阻塞的情况下再次获取，且该线程需在
+    每次获取后将其释放。
+
+    Rlock实际上为工厂函数，返回当前平台上效率最高的具体Rlock类（返回实
+    例）。
+
+**** acquire(blocking=True,timeout=-1) ？？？
+     获取锁，阻塞或非阻塞。
+
+     当不带任何参数时：如果当前线程已经拥有锁，则增加一个递归层级，立
+     即返回；如果锁被另一个线程拥有，阻塞直到该锁被释放。一旦锁被释放
+     （不被另一个线程拥有），立即获得所有权，增加一个递归层级并返回。
+     如果有多个线程等待锁被释放，则每次释放后只有一个线程能够获取锁，
+     无返回值。
+
+     当blocking参数为True时（默认），与不带参数时相同，并返回True。
+
+     当blocking参数为False时，不阻塞。但如果调用后造成阻塞，则立即返回
+     False；否则与不带任何参数相同，并返回True。
+
+     如果指定表示秒数的浮点数参数timeout，则阻塞最多timeout指定时长，
+     期间其他线程不能获取锁。如果成功获取锁，返回True，如果超过timeout
+     时长，则返回False。
+
+**** release()
+     释放锁，将递归层级减少一层。如果减少至0，则此时锁不被锁定（不被任
+     何线程拥有），如果任何其他线程线程正被阻塞等待解锁，则只允许其中
+     一个获取锁。如果减少后还不为0，则锁保持锁定，并贵调用此方法的线程
+     所有。
+
+     只有在拥有锁的线程中才能调用。当锁没被锁定时调用此方法抛出
+     RuntimeError错误。
+
+     无返回值。
 ** Condition对象
+*** class threading. *Condition* (lock=none)
+    实现条件变量对象的类。一个条件变量可使一个或多个线程等待，直到接到
+    另一个线程的通知。
+
+    如果lock参数不为None，则需为Lock或Rlock对象，用作底层的锁。否则自
+    动创建Rlock对象作为底层锁。
+
+**** acquire(*args)
+     获取锁。此方法调用底层锁的acquire()方法，返回该方法的返回值。
+**** release()
+     释放锁。此方法调用底层锁的release()方法，无返回值。
+
+**** wait(timeout=None)
+     等待（阻塞）直到接到通知或超过timeout直到时间。如果在没有获取锁的
+     线程中调用，抛出RuntimeError错误。
+
+     此方法释放底层锁，然后阻塞直到被同一条件变量，在另一个线程中调用
+     notify()或notify_all()方法唤醒，或超过timeout时长。一旦唤醒或超过
+     timeout时长，重新获得锁并返回。
+
+     timeout参数需为指定秒数的浮点数。
+
+     当底层锁为Rlock对象时，释放锁时，并不是使用Condition对象自身的
+     release()方法，因为如果被多次递归获取，没有办法释放锁。实际上，使
+     用Rlock对象的release()方法。这样，即时锁被多次递归获取，也可释放。
+     重新获取锁时，再使用Rlock的接口恢复。
+
+     除非指定timeout参数并超时，此方法始终返回True。
+
+**** wait_for(predicate,timeout=None)
+     等待直到predicate可调用对象返回True。可指定timeout参数限定等待时
+     长。
+
+     相当于重复调用wait()直到predicte返回值为True，或超时。返回值为最
+     后一次调用predicate的返回值，如果超时返回False。
+
+     如果忽视timeout参数功能，此方法大致等价于：
+
+     #+BEGIN_EXAMPLE python
+       while not predicate():
+             cv.wait()
+     #+END_EXAMPLE
+
+     所以，与wait()的规则相同：当调用此方法时，必须拥有锁，然后返回后
+     在重新获取锁。predicate在拥有锁时执行。
+
+**** notify(n=1)
+     默认情况下，唤醒使用相同条件变量等待的线程。如果调用线程当时不拥
+     有你锁，则抛出RuntimeError错误。
+
+     此方法可唤醒使用相同条件变量等待的最多n个线程；如果没有线程处于等
+     待状态，相当于“空操作”。
+
+     目前的实现中，如果至少有n个线程正在等待，则会准确唤醒n个线程。然
+     而，依赖此特性并不安全。以后的实现可能会唤醒多于n个的线程。
+
+     #+BEGIN_QUOTE
+     *注意* ： 直到可重新获取锁前，被唤醒的线程并不是真正从Condition对
+     象的wait()方法返回。因为notify()并没有释放锁，而是调用线程。
+     #+END_QUOTE
+
+**** notify_all()
+     唤醒所有使用该条件变量等待的线程。类似于notify()方法，不过是将所
+     有等待的线程唤醒。如果调用线程当时不拥有锁，则抛出RuntimeError错
+     误。
+
 ** Semaphore对象
+*** class threading. *Semaphore* (value=1)
+**** acquire(blocking=True,timeout=None)
+**** release()
+*** class threading. *BoundedSemaphore* (value=1)
 *** Semaphore举例
 ** Event对象
+   进程间最简单的交流机制：一个线程设置时间信号，其他线程等待该信号。
+
+*** class threading. *Event*
+    实现Event实例的类。
+
+    一个Event对象管理内部的flag，此flag可调用set()方法设置为True，使用
+    clear()方法设置为False。调用wait()方法会阻塞至此flag值为True为止。
+    flag初始值为False。
+
+**** is_set()
+     当且仅当flag为True时返回True。
+**** set()
+     设置flag为True，在调用wait()方法的线程中，当flag为True时不再阻塞。
+
+**** clear()
+     设置flag为False，在调用wait()方法的线程中，直到再次调用set()方法
+     前会一直阻塞。
+
+**** wait(timeout=None)
+     在线程中调用后，阻塞直到flag为True。如果本来就为True，则立即返回。
+     否则阻塞直到另一个线程调用set()方法将flag设置为True，或阻塞超过
+     timeout指定秒数。
+
+     如果设置timeout参数，须为指定秒数的浮点数。
+
+     不管在阻塞前还是阻塞后，只要flag为True，则此方法返回True。所以如
+     果没有指定timeout参数，此方法始终返回True。
+
 ** Timer对象
+*** class threading. *Timer* (interval,function,args=None,kwargs=None)
+**** cancel()
 ** Barrier对象
+*** class threading. *Barrier* (parties,action=None,timeout=None)
+**** wait(timeout=None)
+**** reset()
+**** abort()
+**** parties
+**** n_waiting
+**** broken
+*** exception threading. *BrokenBarrierError*
+
 ** 在with上下文管理器中使用locks、conditions和semaphores
+   本模块中只要有acquire()和release()方法的对象，都可用在with上下文管
+   理器中。进入时执行release()，退出时执行release()。所以：
+
+   #+BEGIN_EXAMPLE python
+     with some_block:
+          # do something...
+   #+END_EXAMPLE
+
+   等价于：
+
+   #+BEGIN_EXAMPLE python
+     some_lock.acuqire()
+     try:
+         # do something...
+     finally:
+         some_lock.release()
+   #+END_EXAMPLE
+
+   目前，实例支持上下文管理器的类有：Lock、Rlock、Condition、Semaphore
+   和BoundedSemaphore。
+
 * multiprocessing - 以进程为基础的并发
 * concurrent包
 * concurrent.future
