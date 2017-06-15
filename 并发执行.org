@@ -8,7 +8,12 @@
 本章介绍的模块可实现并发执行代码。是否选用并发执行取决于程序需求，榨干
 CPU性能还是IO性能，协作多任务还是优先多任务。
 
-* threading - 以线程为基础并发   [[http://yoyzhou.github.io/blog/2013/02/28/python-threads-synchronization-locks/][@yoyzhou（可能Event小节有bug，去掉sleep(...)可发现）]]
+* threading - 以线程为基础并发
+  参考：
+
+  1. [[http://yoyzhou.github.io/blog/2013/02/28/python-threads-synchronization-locks/][@yoyzhou（可能Event小节有bug，去掉sleep(...)可发现）]]
+  2. [[http://www.cnblogs.com/huxi/archive/2010/06/26/1765808.html][@AstralWind]]
+  3. [[http://www.ywlib.com/archives/19.html][@一闻自习室]]
 
   threading模块主要用来同时运行I/O操作频繁的任务，如需利用多核CPU，可
   参考multiprocessing模块。
@@ -450,12 +455,70 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      有等待的线程唤醒。如果调用线程当时不拥有锁，则抛出RuntimeError错
      误。
 
-** Semaphore对象
+** Semaphore（信号量）对象
+   计算机科学中最早的同步原始之一。
+
+   信号量管理一个内部计数器，调用acquire()方法后减一，调用release()方
+   法后加一。由于计数器永远不会小于0，所以当调用acquire()时，如果发现
+   计数器值为0，则等待直到其他线程调用release()方法。
+
+   支持with上下文管理器。
+
 *** class threading. *Semaphore* (value=1)
+    实现信号量对象的类。管理一个内部计数器。
+
+    value：内部计数器的初始值，默认为1，如果指定值小于0，则抛出
+    ValueError错误。
+
 **** acquire(blocking=True,timeout=None)
+     获取信号量。
+
+     当不带参数时：如果内部计数器大于0，则将计数器减一并立即返回。如果
+     为0，则阻塞直到其他线程调用release()方法将计数器调用加一。如果多
+     次调用acquire()后阻塞，调用一次release()只能唤醒单个，且内部实现
+     随机选择。如果不阻塞则返回True。
+
+     blocking为False时：不阻塞，房blocking为True时如果阻塞则返回False；
+     否则与不带任何参数相同。
+
+     timeout不为None时：阻塞最多指定秒数。如果不带参数不会阻塞，则返回
+     True，如果在指定时间内不能获取则返回False。
+
 **** release()
+     释放信号量，将内部计数器增加1。如果当前计数器为0，且其他线程正等
+     待，则唤醒其中一个等待的线程。
+
 *** class threading. *BoundedSemaphore* (value=1)
+    实现“有限信号量”（Bounded Semaphore）的类。与Semaphore不同之处为：
+    当调用release()方法将内部计数器加一后，如果超过value参数指定的初始
+    值，则抛出ValueError错误。
+
 *** Semaphore举例
+    信号量常用于守护能力有限的资源访问，如数据库服务器。在任何资源大小
+    固定的情况下，需使用“有限信号量”。在启动任何工作线程前，需在主线程
+    中初始化信号量。
+
+    #+BEGIN_EXAMPLE python
+      max_connections = 5
+      # ...
+      pool_sema = BoundedSemaphore(value=max_connections)
+    #+END_EXAMPLE
+
+    一旦启动，工作线程如需访问数据库服务器，可调用信号量对象的
+    release()和acquire()方法。
+
+    #+BEGIN_EXAMPLE python
+      with pool_sema:
+           conn = connectdb()
+           try:
+              # ... 使用数据库连接
+           finally:
+              conn.close()
+    #+END_EXAMPLE
+
+    使用“有限信号量”，可防止无意间release()调用次数超过acquire()调用次
+    数的情况。
+
 ** Event对象
    进程间最简单的交流机制：一个线程设置时间信号，其他线程等待该信号。
 
@@ -486,6 +549,17 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      果没有指定timeout参数，此方法始终返回True。
 
 ** Timer对象
+
+   #+BEGIN_EXAMPLE python
+     from threading import Timer
+
+     def hello():
+         print('hello, world')
+
+     t = Timer(2, hello)
+     t.start()
+   #+END_EXAMPLE
+
 *** class threading. *Timer* (interval,function,args=None,kwargs=None)
 **** cancel()
 ** Barrier对象
