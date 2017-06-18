@@ -44,7 +44,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 *** threading. *get_ident* ()
     返回当前线程的“身份”，为非0整数。此数值并没有直接的实际含义，主要
     用来作为一个“魔法cookie”。比如用来索引线程相关的字典。当线程退出，
-    另一个线程创建时，线程“身份”可能被垃圾回收。
+    另一个线程创建时，线程“身份”可能被垃圾回收，并被重新使用。
 
     #+BEGIN_SRC python :session
       import threading
@@ -79,7 +79,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
 *** threading. *stack_size* ([size]) ？？？
     返回创建新线程时，线程使用的stack大小。
-
+    
     size：可选参数，指定以后创建线程时分配的stack大小。默认为0，即使用
     系统默认配置。如果设置，则需为>=32,768（32KiB）。如果不支持设置，
     则抛出RuntimeError错误；如果数值无效，则抛出ValueError错误，不做修
@@ -141,20 +141,21 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    当线程声明为“后台线程”时，即声明构造器的daemon参数为True，如果主线
    程退出时，“后台线程”还没执行完，也会随之退出。可通过修改Thread对象
    的daemon属性，或在构造器中声明。是否为“后台线程”，默认继承于创建它
-   的线程。
+   的线程。 *声明daemon=True的线程，不能调用join()方法。*
 
    #+BEGIN_SRC python :session
      import threading as td
      import time
 
      def job():
-         time.sleep(2)
+         time.sleep(0.1)
          print('执行子线程函数。')
 
      def multi_thread():
-         t1 = td.Thread(target=job, daemon=True)
-         t1.start()
-         # t1.join()
+         threads = []
+         for i in range(10):
+             t = td.Thread(target=job, daemon=True)
+             t.start()
 
      multi_thread()
      print('主线程执行结束')
@@ -162,7 +163,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
    #+RESULTS:
    #+BEGIN_SRC org
-   - >>> >>> ... ... ... >>> ... ... ... ... >>> >>> 主线程执行结束
+   - >>> >>> ... ... ... >>> ... ... ... ... ... >>> >>> 主线程执行结束
    #+END_SRC
 
    #+BEGIN_QUOTE
@@ -188,7 +189,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
     name：线程名称。构造时默认创建"Thread-N"，其中N为十进制数。
 
-    args：target指定可调用对象的参数，默认为()。
+    args：target指定可调用对象的参数，默认为()，如果为单元素元组，须为
+    (arg0,)形式。
 
     kwargs：字典对象，target指定可调用对象的关键字参数，默认为{}。
 
@@ -264,7 +266,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      name属性的旧API。
 **** ident
      “线程身份”，如果线程还没启动则为None，如果已启动则为非0整数。当一
-     个线程退出，另一个线程启动时，此“身份”可能被重新利用。即时线程退
+     个线程退出，另一个线程启动时，此“身份”可能被重新利用。即使线程退
      出后，也可获取。
 
 **** is_alive()
@@ -295,11 +297,11 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    现。？？？
 
    一个原始lock有两种状态：“locked（锁定）”和“unlocked（去锁定）”。有
-   两个基本发股份：acquire()和release()。当“去锁定”后，使用acquire()可
-   将状态改变为“锁定”状态，并立即返回。当“锁定”后，acquire()会使当前线
-   程一直阻塞，直到另一个线程中调用release()方法，将其“解锁”，然后可重
-   新调用acquire()将其“锁定”并返回。release()方法只能在“锁定”状态下调
-   用，否则抛出RuntimeError错误。
+   两个基本方法：acquire()和release()。当“去锁定”后，使用acquire()可将
+   状态改变为“锁定”状态，并立即返回。当“锁定”后，acquire()会使当前线程
+   一直阻塞，直到另一个线程中调用release()方法，将其“解锁”，然后可重新
+   调用acquire()将其“锁定”并返回。release()方法只能在“锁定”状态下调用，
+   否则抛出RuntimeError错误。
 
    支持上下文管理器协议。
 
@@ -338,12 +340,12 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
    #+BEGIN_QUOTE
    [[http://python.jobbole.com/81546/][@伯乐在线]] Rlock与lock的主要区别为：Rlock允许在同一线程中多次被
-   acquire()，lock则不允许。使用Rlock时，acquire()和release()应成对出
+   acquire()，Lock则不允许。使用Rlock时，acquire()和release()应成对出
    现，才能释放所有“锁”。
    #+END_QUOTE
 
    可重入锁，“同步基础（synchronization primitive）”，可被单个线程获取
-   多次。使用“拥有则线程”和“递归层级”的概念，以及lock的锁定/解锁状态。
+   多次。使用“拥有者线程”和“递归层级”的概念，以及lock的锁定/解锁状态。
    在锁定状态下，一些线程拥有锁；在解锁状态下，没有线程拥有锁。
 
    如需锁定锁，线程可调用acquire()方法，当线程拥有锁后就返回。如需解锁
@@ -381,7 +383,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 **** release()
      释放锁，将递归层级减少一层。如果减少至0，则此时锁不被锁定（不被任
      何线程拥有），如果任何其他线程线程正被阻塞等待解锁，则只允许其中
-     一个获取锁。如果减少后还不为0，则锁保持锁定，并贵调用此方法的线程
+     一个获取锁。如果减少后还不为0，则锁保持锁定，并且调用此方法的线程
      所有。
 
      只有在拥有锁的线程中才能调用。当锁没被锁定时调用此方法抛出
@@ -437,7 +439,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
 **** notify(n=1)
      默认情况下，唤醒使用相同条件变量等待的线程。如果调用线程当时不拥
-     有你锁，则抛出RuntimeError错误。
+     有锁，则抛出RuntimeError错误。
 
      此方法可唤醒使用相同条件变量等待的最多n个线程；如果没有线程处于等
      待状态，相当于“空操作”。
@@ -549,6 +551,13 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      果没有指定timeout参数，此方法始终返回True。
 
 ** Timer对象
+   直到经过指定时长时才执行。Timer为Thread子类，所以也相当于创建一个线
+   程。
+
+   与Thread()实例相同，也是调用start()方法激活线程。可在等待过程中，调
+   用cancel()方法停止。 *实际等待时长可能不与指定时长完全相等。*
+
+   比如：
 
    #+BEGIN_EXAMPLE python
      from threading import Timer
@@ -561,17 +570,108 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    #+END_EXAMPLE
 
 *** class threading. *Timer* (interval,function,args=None,kwargs=None)
-**** cancel()
-** Barrier对象
-*** class threading. *Barrier* (parties,action=None,timeout=None)
-**** wait(timeout=None)
-**** reset()
-**** abort()
-**** parties
-**** n_waiting
-**** broken
-*** exception threading. *BrokenBarrierError*
+    创建一个计时器，在interval时长后执行function函数，函数参数args和
+    kwargs参数执行。args和kwargs参数的默认值分别为空链表和空字典。
 
+**** cancel()
+     停止计时器，取消将执行的函数。仅在等待过程中有效。
+
+** Barrier对象
+   为多个需互相等待的线程提供同步原始。没个需互相等待的线程中调用
+   wait()方法，阻塞直到调用次数达到指定个数，此时所有线程同步释放。
+
+   对于相同数量的线程，Barrier对象可重复使用。
+
+   如下面同步启动客户端和服务器的例子：
+
+   #+BEGIN_SRC python :session
+     import time
+     from threading import Barrier, Thread
+
+     b = Barrier(2)
+
+     def server():
+         b.wait()
+         print('server启动')
+
+     def client():
+         b.wait()
+         print('client启动')
+
+     server_td = Thread(target=server)
+     client_td = Thread(target=client)
+
+     server_td.start()
+     time.sleep(0.1)
+     print('客户端启动启动前')
+     client_td.start()
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> >>> >>> >>> >>> ... ... ... >>> >>> ... ... ... >>> >>> >>> >>> >>> >>> >>> 客户端启动启动前
+   - client启动
+   - server启动
+   #+END_SRC
+
+*** class threading. *Barrier* (parties,action=None,timeout=None)
+    创建Barrier对象，使用parties参数指定等待线程个数。
+
+    action：可调用对象（默认为None），当所有等待线程同步释放时，由其中
+    一个调用。
+
+    timeout：如果wait()方法中的timeout参数为None，则使用此参数值作为默
+    认值。
+
+**** wait(timeout=None)
+     在需等待的线程中调用。当调用此方法的线程个数达到parties参数指定个
+     数时，这些线程同步释放。
+
+     timeout：当提供时，覆盖构造器的timeout参数。
+
+     返回值为0到parties-1间的整数，表示还有多少个线程需调用此方法才能
+     同步释放。可用于在指定线程中执行特殊行为：
+
+     #+BEGIN_EXAMPLE python
+       i = barrier.wait()
+       if i == 0:
+          # 只需最后一个线程执行的内容->
+          print('这是最后一个需等待的线程')
+     #+END_EXAMPLE
+
+     如果构造器中指定action参数，则所有线程同步释放前其中一个会调用该
+     参数值。如果此调用抛出错误，则Barrier对象被只有损坏状态。
+
+     如果等待时长超过timeout指定时长，则Barrier对象被置于损坏状态。
+
+     当有其他线程处理等待状态时，如果Barrier对象已损坏或被重置，调用此
+     方法可能抛出BrokenBarrierError错误。
+
+**** reset()
+     将Barrier对象置于初始状态。任何正等待的线程将接受一个
+     BrokenBarrierError错误抛出。
+
+     Note that using this function may can require some external
+     synchronization if there are other threads whose state is
+     unknown. If a barrier is broken it may be better to just leave it
+     and create a new one.
+
+**** abort()
+     将Barrier对象置于损坏状态。此后再调用wait()方法将失败，并抛出
+     BrokenBarrierError错误。
+
+     比如，如果其中一个线程需放弃执行，防止应用锁死。？？？
+
+     更好的方法时在其中一个线程中调用wait()方法时指定timeout参数。？？？
+
+**** parties
+     总共需等待的线程个数。
+**** n_waiting
+     当前等待的线程个数。
+**** broken
+     如果为损坏状态，返回True。
+*** exception threading. *BrokenBarrierError*
+    RuntimeError子类，当Barrier对象重置或损坏时抛出。
 ** 在with上下文管理器中使用locks、conditions和semaphores
    本模块中只要有acquire()和release()方法的对象，都可用在with上下文管
    理器中。进入时执行release()，退出时执行release()。所以：

@@ -1,0 +1,20 @@
+# Author: Claudio <3261958605@qq.com>
+# Created: 2017-06-16 17:09:32
+# Commentary:
+#+TITLE:标记型语言处理
+
+[[file:~/Desktop/Python/resources/site/docs.python.org/3.5/library/markup.html][本地页面]]
+
+* html - 超文本语言支持
+* html.parser - 简单的HTML和XHTML解析
+* html.entities
+* XML处理模块
+* xml.etree.ElementTree
+* xml.dom
+* xml.dom.minidom
+* xml.dom.pulldom
+* xml.sax
+* xml.sax.handler
+* xml.sax.saxutils
+* xml.sax.xmlreader
+* xml.parsers.expat
