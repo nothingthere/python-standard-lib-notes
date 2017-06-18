@@ -1840,7 +1840,7 @@ Unix或C，但可用于大多数系统。
        import os
        os.linesep
      #+END_SRC
-     
+
      #+RESULTS:
      #+BEGIN_SRC org
      - '\n'
@@ -1869,7 +1869,7 @@ Unix或C，但可用于大多数系统。
 ***** os. *RTLD_NODELETE*
 ***** os. *RTLD_NOLOAD*
 ***** os. *RTLD_DEEPBIND*
-** 各种函数
+** 其他
 *** os. *urandom* (n)
     返回有N个bytes的随机bytes对象，用于加密。
 

@@ -695,6 +695,457 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    和BoundedSemaphore。
 
 * multiprocessing - 以进程为基础的并发
+
+** 简介
+   multiprocessing模块使用与threading模块类似的API启动新进程。此模块支
+   持本地和远程并发，使用子进程替换线程，有效回避了Global Interpreter
+   Lock（GIL，全局解释器锁），从而可充分发挥多个处理器的功能。在Unix和
+   Windows中都可使用。
+
+   multiprocessing模块还实现了threading模块没有的API，其中最主要的为
+   Pool类，可将数据分发到多个进程中，同步执行输入数据。如：
+
+   #+BEGIN_SRC python :session
+     from multiprocessing import Pool
+
+     def foo(x):
+         return x * x
+
+     if __name__ == '__main__':
+         with Pool(5) as p:
+             print(p.map(foo, [1, 2, 3]))
+   #+END_SRC
+
+   #+RESULTS:
+   #+BEGIN_SRC org
+   - >>> ... ... >>> ... ... ... [1, 4, 9]
+   #+END_SRC
+
+*** Process类
+    类似于threading.Thread类，multiprocessing.Process创建新Process对象，
+    并使用start()方法激活新进程：
+
+    #+BEGIN_SRC python :session
+      from multiprocessing import Process
+
+      def f(name):
+          print('hello', name)
+
+      if __name__ == '__main__':
+          p = Process(target=f, args=('bob',))
+          p.start()
+          p.join()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> ... ... >>> ... ... ... ... hello bob
+    #+END_SRC
+
+    如需获取进程的ID，可结合os模块使用：
+
+    #+BEGIN_SRC python :session
+      import os
+      from multiprocessing import Process
+
+      def info(title):
+          print(title)
+          print('模块名称：', __name__)
+          print('父进程：', os.getppid())
+          print('当前进程：', os.getpid())
+
+      def f(name):
+          info(name)
+          print('hello', name)
+
+      if __name__ == '__main__':
+          info('主进程')
+          processes = []
+          for i in range(2):
+              p = Process(target=f, args=('claudio',))
+              processes.append(p)
+              p.start()
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_SRC org
+    - >>> >>> >>> ... ... ... ... ... >>> >>> ... ... ... >>> >>> ... ... ... ... ... ... ... 主进程
+    - 模块名称： __main__
+    - 父进程： 1462
+    - 当前进程： 2262
+    - claudio
+    - 模块名称： __main__
+    - 父进程： 2262
+    - 当前进程： 6005
+    - hello claudio
+    - claudio
+    - 模块名称： __main__
+    - 父进程： 2262
+    - 当前进程： 6006
+    - hello claudio
+    #+END_SRC
+
+    为何需使用if __name__ == '__main___'，可参考后面的“编程指南”章节。
+
+*** 上下文和启动方法
+    根据所在平台不同，multiprocessing模块支持下面3中进程启动方法：
+
+    - spawn：
+
+      父进程启动一个全新的Python解释器。子进程仅继承足够运行新进程
+      run()方法的资源。不继承不需要的文件描述符和处理器。较后面两种方
+      法相当慢。
+
+      Unix和Windows中都可使用，为Windows的默认方法。
+
+    - fork：
+
+      父进程使用os.fork()方法fork Python解释器。当子进程刚启动时，与父
+      进程完全相同。父进程的所有资源都被子进程继承。fork多线程进程会出
+      现问题。？？？
+
+      仅在Unix中可用。Unix中的默认方法。
+
+    - forkserver：
+
+      使用此方法后，会开启一个服务器进程。此后，当需创建进程时，父进程
+      会连接服务器并请求fork一个新进程。服务器只是一个单线程，可安全使
+      用os.fork()方法。不继承非必须资源。
+
+      在支持Unix管道间可传递文件描述符的Unix系统中有效。
+
+    在Unix中使用spawn和forkserver方法启动进程时，还会同时启动一个“信号
+    量（semaphore）”跟踪进程，用于跟踪子进程创建的未连接命名信号量。当
+    所有进程退出时，信号量跟踪器删除所有未连接信号量连接。通常不会有未连
+    接的命名信号量，但当子进程被信号杀死，则会出现“泄露的”信号量。（删
+    除未连接信号量非常有必要，因为系统只允许有限个数，且除非重启，不会
+    自动删除。）
+
+    如需改变启动方法，只能在if __name__ == '__main__'语句中调用
+    set_start_method()方法：
+
+    #+BEGIN_EXAMPLE python
+      import multiprocessing as mp
+
+      def foo(q):
+          q.put('hello')
+
+      if __name__ == '__main__':
+          mp.set_start_method('spawn')
+          q = mp.Queue()
+          p = mp.Process(target=foo, args=(q,))
+          p.start()
+          print(q.get())
+          p.join()
+    #+END_EXAMPLE
+
+    同一个程序中只允许调用一次set_start_method()方法。
+
+    不过，可使用get_context()方法获取上下文对象。上下文对象具有
+    multiprocessing模块相同的API，可实现单个程序中使用多种启动方法。
+
+    #+BEGIN_EXAMPLE python
+      import multiprocessing as mp
+
+      def foo(q):
+          q.put('hello')
+
+      if __name__ == '__main__':
+          ctx = mp.get_context('spawn')
+          q = ctx.Queue()
+          p = ctx.Process(target=foo, args=(q,))
+          p.start()
+          print(q.get())
+          p.join()
+    #+END_EXAMPLE
+
+    不过，一个上下文中的特点对象可能不与另一个上下文兼容。比如，使用
+    fork方法启动进程中创建的“锁”不能用于使用spawn或forkserver方法创建
+    的进程中。
+
+    如果某个库需使用特定启动方法，最好使用get_context()。
+
+*** 进程间交换数据对象
+    multiprocessing模块提供下面两种方法来实现进程间通信：
+
+**** 消息队列
+     Queue类，基本上为queue.Queue类的克隆。如：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Process, Queue
+
+       def f(q):
+           q.put([42, None, 'hello'])
+
+       if __name__ == '__main__':
+           q = Queue()
+           p = Process(target=f, args=(q,))
+           p.start()
+           print(q.get())
+           p.join()
+     #+END_EXAMPLE
+
+     消息队列在线程和进程中都可安全使用。
+
+**** 管道
+     Pipe()函数返回一对连接对象，它们被被管道连接（默认为双向）。如：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Pipe, Process
+
+       def f(conn):
+           conn.send([42, None, 'hello'])
+           conn.close()
+
+       if __name__ == '__main__':
+           parent_conn, child_conn = Pipe()
+
+           p = Process(target=f, args=(child_conn,))
+           p.start()
+           print(parent_conn.recv())
+           p.join()
+     #+END_EXAMPLE
+
+     Pipe()返回的一对连接对象表示管道两端。每个都想都有send()和recv()
+     等方法。如果多个进程（或线程）尝试同时在管道的同一段读/写数据，可
+     能会造成数据毁坏；同时读/写不同断则不会。
+
+*** 进程间同步
+    multiprocessing模块拥有threading模块的所有同步原始。比如，可利用
+    “互斥锁”保证某个时刻只有单个进程输出内容：
+
+    #+BEGIN_EXAMPLE python
+      from multiprocessing import Lock, Process
+
+      def f(l, i):
+          with l:
+              print('hello world', i)
+
+      if __name__ == '__main__':
+          lock = Lock()
+          for num in range(10):
+              Process(target=f, args=(lock, num)).start()
+    #+END_EXAMPLE
+
+    如果不使用“互斥锁”，输出顺序不定。
+
+*** 进程间分享状态
+    正如前面所言，并发编程时最好尽量避免状态分享。使用多进程时尤是如此。
+
+    不过，如果真正需要共享数据时，可使用multiprocessing模块提供的下面
+    两种方法：
+
+**** 内存共享
+     可利用Value和Array将共享数据存储在内存中。比如：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Array, Process, Value
+
+       def f(n, a):
+           n.value = 3.14
+           for i, _ in enumerate(a):
+               a[i] = -a[i]
+
+       if __name__ == '__main__':
+           num = Value('d', 0.0)
+           arr = Array('i', range(10))
+
+           p = Process(target=f, args=(num, arr))
+           p.start()
+           p.join()
+
+           print(num.value)
+           print(arr[:])
+     #+END_EXAMPLE
+
+     输出结果为：
+
+     #+BEGIN_EXAMPLE python
+       3.14
+       [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+     #+END_EXAMPLE
+
+     'd'和'i'分别为num和arr用于array模块的类型代码：'d'表示双精度浮点
+     数，'i'表示整数。此类共享数据在线程和进程中都可安全使用。
+
+     如需更灵活使用贡献内存，可使用multiprocessing.sharedctypes模块，
+     支持在共享内存中创建任意C类型数据。
+
+**** 服务器进程
+     Manager()返回的管理器对象控制单个服务器进程，该进程中用于持有的Python
+     对象，并允许其他进程使用代理操作。
+
+     管理器对象支持的类型有：list、dict、Namespace、Lock、Rlock、
+     Semaphore、BoundedSemaphore、Condition、Event、Barrier、Queue、
+     Value和Array。比如：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Manager, Process
+
+       def f(d, l):
+           d[1] = '1'
+           d['2'] = 2
+           d[0.25] = None
+           l.reverse()
+
+       if __name__ == '__main__':
+           with Manager() as manager:
+               d = manager.dict()
+               l = manager.list(range(10))
+
+               p = Process(target=f, args=(d, l))
+               p.start()
+               p.join()
+
+               print(d)
+               print(l)
+     #+END_EXAMPLE
+
+     输出结果为：
+
+     #+BEGIN_EXAMPLE python
+       {0.25: None, 1: '1', '2': 2}
+       [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+     #+END_EXAMPLE
+
+     由于可支持各种类型的数据，服务器进程管理器比内存共享更灵活。且当
+     个管理器可被不同电脑上的进程通过网络共享。不过，速度不及内存共享。
+
+*** 将多个工作单元进程作为一个整体
+    类Pool表示多个进程工作单位组成的进程池，可将多个任务以不同方式分配
+    给多个进程工作单位。如：
+
+    #+BEGIN_EXAMPLE python
+      import os
+      import time
+      from multiprocessing import Pool, TimeoutError
+
+      def f(x): return x * x
+
+      if __name__ == '__main__':
+          # 开启4个工作单位进程
+          with Pool(processes=4) as pool:
+              # 打印"[0, 1, 4,...81]"
+              print(pool.map(f, range(10)))
+
+              # 打印上一例的所有结果，不过以任意顺序
+              for i in pool.imap_unordered(f, range(10)):
+                  print(i)
+
+              # 同步执行“f(20)”
+              res = pool.apply_async(f, (20,))  # 仅在“单个”进程中执行
+              print(res.get(timeout=1))        # 结果：400
+
+              # 同步执行os.getpid()
+              res = pool.apply_async(os.getpid, ())  # 仅在“单个”进程中执行
+              print('当前进程ID：', os.getpid())
+              print(res.get(timeout=1))             # 打印该进程ID
+
+              # 开启多个同步计算，”可能”使用多进程
+              multi_results = [pool.apply_async(os.getpid, ()) for i in range(4)]
+              print([res.get(timeout=1)for res in multi_results])
+
+              # 让单个工作单位休眠10秒
+              res = pool.apply_async(time.sleep, (10,))
+              try:
+                  print(res.get(timeout=0.2))
+              except TimeoutError:
+                  print('多进程中有某个进程超时')
+
+              print('某个进程超时时，其他工作单位任在继续执行。')
+
+          # 上下文管理器结束执行后，进程池也被关闭
+          print('进程池关闭，不再有效。')
+    #+END_EXAMPLE
+
+    #+BEGIN_QUOTE
+    *注意* ： 进程池的方法只能在创建该进程池的进程中调用。
+
+    *注意* ：只能在if __name__ == '__main__'语句中使用进程池。（不能在
+    解释器中使用。）
+    #+END_QUOTE
+
+** 参考
+*** Process类和错误抛出
+    multiprocessing模块的接口几乎同threading模块的相同。
+**** multiprocessing. *Process* (group=None,target=None,name=None,args=(),kwargs={},*,daemon=None)
+
+***** 与Thread实例相同的方法属性
+****** run()
+****** start()
+****** join([timeout])
+****** name
+****** is_alive()
+****** daemon
+***** 与Thread实例不同的方法和属性
+****** pid
+****** exitcode
+****** authkey
+****** sentinel
+****** terminate()
+**** exception multiprocessing. *ProcessError*
+**** exception multiprocessing. *BufferTooShort*
+**** exception multiprocessing. *AuthenticationError*
+**** exception multiprocessing. *TimeoutError*
+
+*** Pipe和Queue
+
+**** multiprocessing. *Pipe* ([duplex])
+**** class multiprocessing. *Queue* ([maxsize])
+***** 与queue.Queue相同的方法
+****** qsize()
+****** empty()
+****** full()
+****** put(obj[,block[,timeout]])
+****** put_nowait(obj)
+****** get([block[,timeout]])
+****** get_nowait()
+***** queue.Queue中没有的方法
+****** close()
+****** join_thread()
+****** cancel_join_thread()
+**** class multiprocessing. *JoinableQueue* ([maxsize])
+***** task_done()
+***** join()
+
+*** 其他
+**** multiprocessing. *active_children* ()
+**** multiprocessing. *cpu_count* ()
+**** multiprocessing. *current_process* ()
+**** multiprocessing. *freeze_support* ()
+**** multiprocessing. *get_all_start_methods* ()
+**** multiprocessing. *get_context* (method=None)
+**** multiprocessing. *get_start_method* (allow_none=False)
+**** multiprocessing. *set_executable* ()
+**** multiprocessing. *set_start_method* (method)
+
+*** Connection对象
+**** class multiprocessing. *Connection*
+***** send (obj)
+***** recv()
+***** fileno()
+***** close()
+***** poll([timeout])
+***** send_bytes([maxlength])
+***** recv_bytes_inti(buffer[,offset])
+*** 同步原始
+*** 共享C类型库
+**** multiprocessing.sharedctypes模块
+*** 管理器
+**** 定制管理器
+**** 使用远程管理器
+*** 代理对象
+**** 清空
+*** 进程“池”
+*** 监听器和客户端
+**** 地址格式
+*** 授权键（Authentication keys）
+*** Logging
+*** multiprocessing.dummy模块
+** 编程手册
+*** 所有启动方法
+*** spawn和forkserver启动方法
+** 举例
 * concurrent包
 * concurrent.future
 * subprocess
