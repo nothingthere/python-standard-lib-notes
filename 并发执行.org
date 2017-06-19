@@ -695,15 +695,14 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    和BoundedSemaphore。
 
 * multiprocessing - 以进程为基础的并发
-
 ** 简介
    multiprocessing模块使用与threading模块类似的API启动新进程。此模块支
    持本地和远程并发，使用子进程替换线程，有效回避了Global Interpreter
    Lock（GIL，全局解释器锁），从而可充分发挥多个处理器的功能。在Unix和
    Windows中都可使用。
 
-   multiprocessing模块还实现了threading模块没有的API，其中最主要的为
-   Pool类，可将数据分发到多个进程中，同步执行输入数据。如：
+   multiprocessing模块还实现了threading模块没有的API，其中最主要为Pool
+   类，可将数据分发到多个进程中，同步执行输入数据。如：
 
    #+BEGIN_SRC python :session
      from multiprocessing import Pool
@@ -734,12 +733,14 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
       if __name__ == '__main__':
           p = Process(target=f, args=('bob',))
           p.start()
-          p.join()
+          # p.join()
+          print('主进程执行结束')
     #+END_SRC
 
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>> ... ... >>> ... ... ... ... hello bob
+    - >>> ... ... >>> ... ... ... ... ... 主进程执行结束
+    - hello bob
     #+END_SRC
 
     如需获取进程的ID，可结合os模块使用：
@@ -793,8 +794,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     - spawn：
 
       父进程启动一个全新的Python解释器。子进程仅继承足够运行新进程
-      run()方法的资源。不继承不需要的文件描述符和处理器。较后面两种方
-      法相当慢。
+      run()方法的资源。不继承不需要的文件描述符和处理功能。较后面两种
+      方法相当慢。
 
       Unix和Windows中都可使用，为Windows的默认方法。
 
@@ -907,8 +908,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      #+END_EXAMPLE
 
      Pipe()返回的一对连接对象表示管道两端。每个都想都有send()和recv()
-     等方法。如果多个进程（或线程）尝试同时在管道的同一段读/写数据，可
-     能会造成数据毁坏；同时读/写不同断则不会。
+     等方法。如果多个进程（或线程）尝试同时在管道的同一端读/写数据，可
+     能会造成数据毁坏；同时读/写不同端则不会。
 
 *** 进程间同步
     multiprocessing模块拥有threading模块的所有同步原始。比如，可利用
@@ -1069,74 +1070,545 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 *** Process类和错误抛出
     multiprocessing模块的接口几乎同threading模块的相同。
 **** multiprocessing. *Process* (group=None,target=None,name=None,args=(),kwargs={},*,daemon=None)
+     Process对象表示在新进程中的执行活动。Process类具有
+     threading.Thread类的所有等价方法。
+
+     构造器中只能使用关键字参数。
+
+     group：需为None，仅为兼容threading.Thread的API。
+
+     target：可调用对象。被Process实例的run()方法激活。
+
+     name：进程名称。
+
+     args：元组，作为target可调用对象的参数。
+
+     kwargs：字典，作为target可调用对象的关键字参数。
+
+     daemon：设置进程是否为后台执行。默认为None，表示继承于创建此进程
+     的进程。
+
+     *如果子类重置构造器，需首先声明Process.__init__()。*
 
 ***** 与Thread实例相同的方法属性
 ****** run()
+       表示进程获得的方法。
+
+       可在子类中重载。标准run()方法会调用构造器中的target参数值，并将
+       args和kwargs参数作为参数。
+
 ****** start()
+       激活进程。
+
+       每个Process实例只能调用一次。安排run()方法在新进程中执行。
+
 ****** join([timeout])
+       如果可选参数timeout为None（默认），则阻塞至join()方法调用结束；
+       如果timeout参数为正数，阻塞最多timeout指定时长。如果执行结束或
+       超时，此方法返回值都为None。可使用进程的exitcode属性检查是否执
+       行结束。
+
+       可多次调用。
+
+       一个进程不能在自身中调用join()方法，否则会造成锁死。在调用
+       start()方法前调用此方法会抛出错误。
+
 ****** name
+       进程名称。为鉴定进程的字符串，没有实际含义。多个进程可能被赋予
+       相同名称。
+
+       初始名称由构造器自动赋予。如果缺省name参数，则赋值
+       “Process-N1,N2...Nk”，其中Nk为第k可进程。
+
 ****** is_alive()
+       返回布尔值表示进程是否存活。
+
+       可大致认为，至start()方法返回，进程执行结束前，进程对象都处于存
+       活状态。
+
 ****** daemon
+       表示进程是否后台执行的布尔值。设置需在调用start()方法前。
+
+       初始值默认继承于创建新进程的进程。
+
+       当进程退出时，会尝试终止其中创建的所有后台子进程。
+
+       后台进程中不允许创建子进程。否则，后台进程的父进程退出后，会让
+       其子进程成为孤儿进程。此外， *没有* Unix后台进程或服务，只是所
+       有非后台进程退出，所有后台进程都被终止。
+
 ***** 与Thread实例不同的方法和属性
 ****** pid
+       返回进程ID。子进程启动前，值为None。
 ****** exitcode
+       子进程退出码。如果子进程还没终止，则为None。如果为负数-N，则表
+       示子进程被信号N终止。
 ****** authkey
-****** sentinel
-****** terminate()
-**** exception multiprocessing. *ProcessError*
-**** exception multiprocessing. *BufferTooShort*
-**** exception multiprocessing. *AuthenticationError*
-**** exception multiprocessing. *TimeoutError*
+       子进程的“授权键（authentication key）”，为bytes对象。
 
+       当multiprocessing模块初始化后，会使用os.urandom()为主进程赋值随
+       机字符串。
+
+       当Process对象创建时，基础父进程的授权键。不过，可通过设置authey
+       属性更改。
+****** sentinel ？？？
+       数字，表示一个系统处理对象，当进程结束时转变为“准备”状态。
+
+       如需在使用multiprocessing.connection.wait()时等待多个事件，可使
+       用此值。否则，调用join()方法更简单。
+
+       Windows中，可与WaitForSingleObject和WaitForMultipleObjects家族
+       API连用；Unix中，为文件描述符，可与select模块连用。
+
+****** terminate()
+       终止进程。Unix中，底层为发送SIGTERM信号；Windows中，执行
+       TerminateProcess()。注意，退出处理函数和finally语句等不会执行。
+
+       注意：子进程不会被终止，而是成为孤儿进程。
+
+       #+BEGIN_QUOTE
+       *警告* ：如果在使用管道或消息队列的进程中调用此方法，可能破坏管
+       道或消息队列，使其不能被其他进程使用。同样，如果进程获取了锁或
+       信号量，调用此方法可能造成其他进程锁死。
+       #+END_QUOTE
+
+***** 其他
+      start()、join()、is_alive()、terminate()和exitcode只能在创建该进
+      程中的进程中调用。
+
+      Process对象的一些方法举例：
+
+      #+BEGIN_EXAMPLE python
+        >>> import multiprocessing, time, signal
+        >>> p = multiprocessing.Process(target=time.sleep, args=(1000,))
+        >>> print(p, p.is_alive())
+        <Process(Process-1, initial)> False
+        >>> p.start()
+        >>> print(p, p.is_alive())
+        <Process(Process-1, started)> True
+        >>> p.terminate()
+        >>> time.sleep(0.1)
+        >>> print(p, p.is_alive())
+        <Process(Process-1, stopped[SIGTERM])> False
+        >>> p.exitcode == -signal.SIGTERM
+        True
+        >>> p.exitcode
+        -15
+      #+END_EXAMPLE
+
+**** exception multiprocessing. *ProcessError*
+     multiprocessing模块中所有抛出错误的基础类。
+**** exception multiprocessing. *BufferTooShort*
+     当调用Connection.recv_bytes_into()时，提供的buffer对象太小不足以
+     读取消息时抛出的错误。
+
+     如果e为BufferTooShort的实例，则e.args[0]为以bytes对象表示的消息值。
+
+**** exception multiprocessing. *AuthenticationError*
+     当出现授权错误时的抛出。
+**** exception multiprocessing. *TimeoutError*
+     当所有支持timeout参数的函数，等待超时时的抛出。
 *** Pipe和Queue
+    当进行多进程编程时，一般采用消息传递实现进程间通信，而避免使用任何
+    同步原始，如互斥锁。
+
+    两个进程间进行消息传递可使用Pipe()，多消费者-多生产者模式则使用消
+    息队列。
+
+    Queue、SimpleQueue和JoinableQueue为多消费者和多生产者模式的FIFO形
+    式队列，基于类queue.Queue。区别在于multiprocessing.Queue缺少
+    task_done()和join()方法。
+
+    如果使用JoinableQueue， *必须* 在每获取一个队列元素后调用
+    task_done()方法，否则用于计数未完成任务的信号量会持续增加，最终导
+    致溢出并抛出错误。
+
+    可利用Managers实现共享队列。
+
+    #+BEGIN_QUOTE
+    *注意* ： 当队列请求超时时，multiprocessing模块通畅抛出queue.Empty
+    和queue.Full错误。但他们并不存在于multiprocessing模块的命名空间中，
+    所以需手动从queue模块中导入。
+    #+END_QUOTE
+
+    #+BEGIN_QUOTE
+    *注意* ：当一个对象被添加到队列上时，该对象被pickled，后台线程稍后
+    将pickled后的数据添加到底层管道中。
+
+    1. 当一个对象被添加到空队列上时，在empty()方法返回False和
+       get_nowait()不抛出queue.Empty错误前，可能有极短时长的延迟。
+    2. 如果多个进程同时操作队列元素，可能队列接受元素的顺序与预期不同。
+       但是，同一个进程添加元素的顺序与添加顺序保持一致。
+    #+END_QUOTE
+
+    #+BEGIN_QUOTE
+    *警告* ：如果正在操作multiprocessing.Queue的进程被
+    Process.terminate()或os.kill()杀死，队列中的数据可能被破坏。也就可
+    能造成其他进程再使用这些队列时抛出异常。
+    #+END_QUOTE
+
+    #+BEGIN_QUOTE ？？？
+    *警告* ：如果一个线程已经向队列中添加元素（没调用
+    JoinableQueue.cancel_join_thread），则直到所有缓存元素添加到管道
+    中前，该进程不可能退出。
+
+    也就意味着，除非保证所有添加到队列中的元素都被消耗，尝试join此类进
+    程可能造成锁死。同样，如果该子进程为非后台进程，当父进程退出时尝试
+    join其所有非后台子线程时，可能造成父进程挂起。
+    #+END_QUOTE
+
+    队列用于进程间交流用法，可参考后文“举例”中最后一例。
+
+    #+BEGIN_QUOTE
+    *注意* ： multiprocessing模块中的队列实现类需操作系统实现共享信号
+    量。否则，尝试实例化下面的队列类会抛出ImportError错误。
+    #+END_QUOTE
 
 **** multiprocessing. *Pipe* ([duplex])
+     返回一对Connection对象（conn1, conn2），表示管道两端。
+
+     duplex：如果为True（默认），则管道具有双向性；如果为False，则
+     conn1只能用于接受消息，conn2只能用于发送消息。
+
 **** class multiprocessing. *Queue* ([maxsize])
+     利用管道和少量互斥锁/信号量实现的进程共享队列。当一个进程开始向队
+     列中添加数据时，会开启一个供给线程，将缓存中的数据对象转义到管道
+     中。
+
+     当获取/添加超时时，使用queue模块中的queue.Empty/queue.Full抛出错
+     误。
+
+     实现了queue.Qeueu中除task_done()和join()外的所有方法。
+
 ***** 与queue.Queue相同的方法
 ****** qsize()
-****** empty()
-****** full()
-****** put(obj[,block[,timeout]])
-****** put_nowait(obj)
-****** get([block[,timeout]])
-****** get_nowait()
-***** queue.Queue中没有的方法
-****** close()
-****** join_thread()
-****** cancel_join_thread()
-**** class multiprocessing. *JoinableQueue* ([maxsize])
-***** task_done()
-***** join()
+       返回队列近似值大小。由于所线程/多进程的语义，此数值并不可靠。
 
+       在没有实现sem_getvalue()的Unix系统中，如Mac OS X，可能抛出
+       NotImplementedError错误。
+
+****** empty()
+       如果队列中没有元素，则返回True。由于所线程/多进程的语义，此数值
+       并不可靠。
+
+****** full()
+       如果队列中元素个数达到上限，则返回True。由于所线程/多进程的语义，
+       此数值并不可靠。
+
+****** put(obj[,block[,timeout]])
+       同queue.Queue.put()。
+
+****** put_nowait(obj)
+       同queue.Queue.put_nowait()。
+
+****** get([block[,timeout]])
+       同queue.Queue.get()。
+****** get_nowait()
+       同queue.Queue.get_nowait()。
+
+***** queue.Queue中没有的方法
+      下面为queue.Queue实例没有的方法，不常使用。
+****** close()
+       表示当前进程不会再向队列中添加任何数据。一旦将所有缓存数据添加
+       到管道中后，后台线程就关闭。当队列被垃圾回收时自动调用。
+
+****** join_thread()
+       join后台线程。只能在调用close()方法后调用。会阻塞至后台线程退出，
+       保证所有缓存数据都写入管道中。
+
+       默认情况下，如果进程不为创建队列的进程，则在退出时会尝试join后
+       台线程。该线程可调用cancel_join_thread()方法使join_thread()不做
+       任何操作。
+
+****** cancel_join_thread()
+       防止join_thread()方法阻塞。即当进程退出时，防止自动join后台线程。
+
+       此方法命名为allow_exit_without_flush()更确切。可能会导致队列数
+       据丢失，一般不会使用。如需当前进程立即退出，不等待队列数据写入
+       管道，不关心数据是否丢失时可用。
+
+**** class multiprocessing. *SimpleQueue*
+     简化的multiprocessing.Queue，与锁定管道十分接近。
+
+***** empty()
+      如果队列为空则返回True。
+***** get()
+      从队列中移除并返回元素。
+***** put(item)
+      向item添加到队列中。
+**** class multiprocessing. *JoinableQueue* ([maxsize])
+     multiprocessing.Queue的子类，添加了task_done()和join()方法。
+
+***** task_done()
+      同queue.Queue.task_done()。
+***** join()
+      同queue.Queue.join()。
 *** 其他
 **** multiprocessing. *active_children* ()
-**** multiprocessing. *cpu_count* ()
-**** multiprocessing. *current_process* ()
-**** multiprocessing. *freeze_support* ()
-**** multiprocessing. *get_all_start_methods* ()
-**** multiprocessing. *get_context* (method=None)
-**** multiprocessing. *get_start_method* (allow_none=False)
-**** multiprocessing. *set_executable* ()
-**** multiprocessing. *set_start_method* (method)
+     返回当前进程中所有存活的子进程对象组成的链表。
 
+     有将所有完成执行的进程join的副作用。
+**** multiprocessing. *cpu_count* ()
+     返回系统中CPU个数。可能会抛出NotImplementedError错误。
+
+     #+BEGIN_QUOTE
+     *另见* ：os.cpu_count()。
+     #+END_QUOTE
+
+**** multiprocessing. *current_process* ()
+     返回表示当前进程的Process对象。
+
+     类似于threading.current_thread()。
+**** multiprocessing. *freeze_support* ()
+     仅在Windows中有效，（待续）。
+**** multiprocessing. *get_all_start_methods* ()
+     返回所有支持的启动方法组成的链表，默认启动方法为第一个元素。
+
+     Windows中，只有'spawn'。
+
+     Unix中，总是有'fork'和'spawn'，其中'fork'为默认值。
+
+     #+BEGIN_SRC python :session
+       from multiprocessing import get_all_start_methods
+       get_all_start_methods()
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> ['fork', 'spawn', 'forkserver']
+     #+END_SRC
+
+**** multiprocessing. *get_context* (method=None)
+     返回与multiprocessing模块具有相同API的上下文对象。
+
+     method：如果为None则使用默认上下文。否则须
+     为'fork'、'spawn'或'forkserver'。如果不支持指定方法，则抛出
+     ValueError错误。
+
+     #+BEGIN_SRC python :session
+       import multiprocessing
+       len(set(dir(multiprocessing.get_context())) ^ set(dir(multiprocessing)))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - 42
+     #+END_SRC
+
+**** multiprocessing. *get_start_method* (allow_none=False)
+     返回用于启动进程的方法名称。
+
+     allow_none：如果启动方法还没被固定，且allow_none参数为False，则启
+     动方法固定为默认方法，且返回对应名称；如果启动方法还没被固定，且
+     allow_none参数为True，则返回None。
+
+     返回值可以为'fork'、'spawn'、'forkserver'或None。'fork'为Unix系统
+     的默认返回值，'spawn'为Windows系统的默认返回值。
+
+     #+BEGIN_SRC python :session
+       from multiprocessing import get_start_method
+       get_start_method()
+       get_start_method(allow_none=True)
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - 'fork'
+     - 'fork'
+     #+END_SRC
+
+**** multiprocessing. *set_executable* ()
+     设置启动子进程时使用的Python解释器路径。（默认为sys.executable）。
+
+     如开启新进程前使用：
+
+     #+BEGIN_EXAMPLE python
+       set_executable(os.path.join(sys.exec_prefix, 'pythonw.exe'))
+     #+END_EXAMPLE
+
+**** multiprocessing. *set_start_method* (method)
+     设置启动新进程的方法。method参数可为'fork'、'spawn'和'forkserver'。
+
+     只能调用一次，且只能在if __name__ == '__main__'语句中调用。
+
+     #+BEGIN_QUOTE
+     *注意* ： multiprocessing模块 *没有* 与threading模块对应的方法有：
+
+     - threading.active_count()
+     - threading.enumerate()
+     - threading.settrace()
+     - threading.setprofile()
+     - threading.Timer
+     - threading.local
+     #+END_QUOTE
 *** Connection对象
+    Connection对象允许发送和接受可pickable的对象和字符串。可被视作使用
+    消息连接的“套接口（socket）”。
+
+    连接对象通常使用Pipe()创建——另见“监听和客户端”小节。
+
 **** class multiprocessing. *Connection*
 ***** send (obj)
+      向管道另一端发送数据，另一端需用recv()方法接收。
+
+      obj需为pickable的对象。如果pickle对象对象（约32MB+，由系统决定）
+      可能抛出ValueError错误。
+
 ***** recv()
+      返回管道另一端使用send()方法发送的数据。如果另一端没有发送数据，
+      阻塞至有为止。如果另一端没有发送数据且已关闭，抛出EOFError错误。
+
 ***** fileno()
+      返回管道两端连接对象对应的文件描述符或“句柄（handle）”。
 ***** close()
+      关闭管道任何一端连接对象。
+
+      当连接对象被垃圾回收时，自动调用。
 ***** poll([timeout])
-***** send_bytes([maxlength])
-***** recv_bytes_inti(buffer[,offset])
+      返回表示是否有可读取数据的布尔值。
+
+      timeout：如果缺省，则立即返回；如果为正数，则为对多阻塞秒数；如
+      果为None，则一直轮询至有数据可读取为止。
+
+      注意，使用multiprocessing.connect.wait()使多个连接对象同一单次轮
+      询。？？？
+
+***** send_bytes(buffer[,offset[,size]])
+      将“类bytes对象”作为完整消息发送。
+
+      offset：如果指定，从buffer中此参数值指定的位置开始读取。
+
+      size：如果指定，从buffer中读取此参数值指定字节数发送。
+
+      如果pickle对象对象（约32MB+，由系统决定）可能抛出ValueError错误。
+
+***** recv_bytes([maxlength])
+      从管道连接另一端发送的数据中读取，并返回bytes数据。如果不能读取
+      任何数据，阻塞至有数据读取为止。如果不能读取任何数据，且管道另一
+      端已关闭，则抛出EOFError错误。
+
+      maxlength：如果指定，且读取消息数据大小大于该上限，则抛出OSError
+      错误，且此管道连接不再可读。
+
+***** recv_bytes_into(buffer[,offset])
+      从管道另一端发送的数据读取，将读取内容写入buffer中，返回写入字节
+      数。如果不能读取任何数据，阻塞至有数据读取为止。如果不能读取任何
+      数据，且管道另一端已关闭，则抛出EOFError错误。
+
+      buffer：须为可写“类bytes对象”。
+
+      offset：如果指定，则写入操作从buffer中此参数指定位置开始。需为非
+      负整数，且小于buffer字节数。
+
+      如果buffer太小，不能写入，则抛出BufferTooShort错误，完整的消息内
+      容可从抛出对象的e的e.args[0]元素中获取。
+
+      从Python3.3开始：连接对象本身也可通过Connection.send()和
+      Connection.recv()在进程中传递。
+
+**** 举例和警告
+
+     #+BEGIN_EXAMPLE python
+       >>> from multiprocessing import Pipe
+       >>> a, b = Pipe()
+       >>> a.send([1, 'hello', None])
+       >>> b.recv()
+       [1, 'hello', None]
+       >>> b.send_bytes(b'thank you')
+       >>> a.recv_bytes()
+       b'thank you'
+       >>> import array
+       >>> arr1 = array.array('i', range(5))
+       >>> arr2 = array.array('i', [0] * 10)
+       >>> a.send_bytes(arr1)
+       >>> count = b.recv_bytes_into(arr2)
+       >>> arr2
+       array('i', [0, 1, 2, 3, 4, 0, 0, 0, 0, 0])
+       >>> assert count == len(arr1) * arr1.itemsize
+     #+END_EXAMPLE
+
+     #+BEGIN_QUOTE
+     *警告* ：Connection.recv()方法会自动unpickle接受数据，除非接受消
+     息来自信任的进程，否则会有安全风险。
+
+     所以，如果连接对象不是由Pipe()生成，只能在授权操作后使用recv()和
+     send()方法。可参考后面的“授权键”小节。
+     #+END_QUOTE
+
+     #+BEGIN_QUOTE
+     *警告* ：当正试图对管道进行读写时，如果进程被杀死，则很可能破坏管
+     道数据。因为这样就不能判断消息的内容边界。
+     #+END_QUOTE
+
+     #+BEGIN_QUOTE
+     *注意* ： 连接对象支持with上下文，不过不支持with Pipe() as ...。
+     参考后面“监听和客户端”小节。
+     #+END_QUOTE
+
 *** 同步原始
+
+**** class multiprocessing. *Barrier* (parities[,action[,timeout]])
+**** class multiprocessing. *BoundedSemaphore* ([value])
+**** class multiprocessing. *Condition* ([lock])
+**** class multiprocessing. *Event*
+**** class multiprocessing. *Lock*
+***** acquire(block=True,timeout=None)
+***** release()
+**** class multiprocessing. *Rlock*
+***** acquire(block=True,timeout=None)
+***** release()
+**** class multiprocessing. *Semaphore* ([value])
 *** 共享C类型库
+**** multiprocessing. *Value* (typecode_or_type,*args,lock=True)
+**** multiprocessing. *Array* (typecode_or_type,size_or_initializer,*,lock=True)
 **** multiprocessing.sharedctypes模块
+***** multiprocessing.sharedctypes. *RawArray* (typecode_or_type,size_of_initializer)
+***** multiprocessing.sharedctypes. *RawValue* (typecode_or_type,*args)
+***** multiprocessing.sharedctypes. *Array* (typecode_or_type,size_if_initializer,*,lock=True)
+***** multiprocessing.sharedctypes. *Value* (typecode_or_type,*args,lock=True)
+***** multiprocessing.sharedctypes. *copy* (obj)
+***** multiprocessing.sharedctypes. *synchronized* (obj[,lock])
+**** 总结
+
 *** 管理器
+**** 类和方法
+***** multiprocessing. *Manager* ()
+***** multiprocessing.managers. *BaseManager* ([address[,authkey]])
+****** start([initializer[,initagrs]])
+****** get_server()
+****** connect()
+****** shutdown()
+****** register(typeid[,callable[,proxytype[,exposed[,method_to_typeid[,create_method]]]]])
+****** address
+***** multiprocessing.managers. *SyncManager*
+****** Barrier(parties[,action[,timeout]])
+****** BoundedSemaphore([value])
+****** Condition([lock])
+****** Event()
+****** Lock()
+****** Namespace()
+****** Queue([maxsize])
+****** Rlock()
+****** Semaphore([value])
+****** Array(typecode,sequence)
+****** Value(typecode,value)
+****** dict()
+****** dict(mapping)
+****** dict(sequence)
+****** list()
+****** list(sequence)
+***** multiprocessing.managers. *Namespace*
 **** 定制管理器
 **** 使用远程管理器
-*** 代理对象
+*** Proxy对象
+**** class multiprocessing.managers. *BaseProxy*
+***** _callmethod(methodname[,args[,kwds]])
+***** _getvalue()
+***** __repr__()
+***** __str__()
 **** 清空
 *** 进程“池”
+
 *** 监听器和客户端
 **** 地址格式
 *** 授权键（Authentication keys）
@@ -1146,6 +1618,88 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 *** 所有启动方法
 *** spawn和forkserver启动方法
 ** 举例
+
+   如果利用队列向多个进程提交任务，并收集处理结果：
+
+   #+BEGIN_SRC python :eval never
+     import random
+     import time
+     from multiprocessing import Process, Queue, current_process, freeze_support
+
+     #
+     # 工作线程执行函数
+     #
+
+     def worker(input, output):
+         for func, args in iter(input.get, 'STOP'): # 一直迭代，当队列中不存在元素时阻塞，直到获取“STOP”
+             result = calculate(func, args)
+             output.put(result)
+
+     #
+     # 用于计算结果的函数
+     #
+
+     def calculate(func, args):
+         result = func(*args)
+         return '{} 计算得出 {}{} = {}'.format(current_process().name,
+                                           func.__name__, args, result)
+
+     #
+     # 被任务索引的函数
+     #
+
+     def mul(a, b):
+         time.sleep(0.5 * random.random())
+         return a * b
+
+     def plus(a, b):
+         time.sleep(0.5 * random.random())
+         return a + b
+
+     #
+     #
+     #
+
+     def test():
+         NUMBER_OF_PROCESSES = 4
+         TASK1 = [(mul, (i, 7)) for i in range(20)]
+         TASK2 = [(plus, (i, 8))for i in range(10)]
+
+         # 创建队列
+         task_queue = Queue()
+         done_queue = Queue()
+
+         # 提交任务
+         for task in TASK1:
+             task_queue.put(task)
+
+         # 开启工作进程
+         for i in range(NUMBER_OF_PROCESSES):
+             Process(target=worker, args=(task_queue, done_queue)).start()
+
+         # 获取并打印结果：
+         print('非顺序结果：')
+         for i in range(len(TASK1)):
+             print('\t', done_queue.get())
+
+         # 使用put()日安家更多任务
+         for task in TASK2:
+             task_queue.put(task)
+
+         # 显示更多结果
+         print('-' * 10)
+         for i in range(len(TASK2)):
+             print('\t', done_queue.get())
+
+         # 告知所有子进程停止工作
+         for i in range(NUMBER_OF_PROCESSES):
+             task_queue.put('STOP')
+
+     if __name__ == '__main__':
+         freeze_support()
+         test()
+   #+END_SRC
+
 * concurrent包
 * concurrent.future
 * subprocess
@@ -1764,7 +2318,155 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 *** 在Windows中将参数序列转换为字符串
 
 * sched
-* queue
+* queue - 同步队列类
+  queue模块实现了多生产者和多消费者队列。当多个线程需安全交换信息时尤
+  其有用。Queue类实现了所有必须的互斥锁语义。
+
+  本模块实现类3种对象，区别在于获取元素的顺序。在FIFO队列中，先添加的
+  元素先被获取；LIFO队列中，后添加的元素被先获取；在优先队列中，所有元
+  素一致处于排序状态，值最小额元素被先获取（底层利用了heapq模块）。
+
+** 类和Exceptions
+*** class queue. *Queue* (maxsize=0)
+    构造FIFO队列。
+
+    maxsize：整数。表示队列中最多可有多少个元素。当达到上限时，如果尝
+    试向其中插入元素，则阻塞至其中有元素被获取为止。如果值<=0，则表示
+    元素可有无限多个。
+
+*** class queue. *LifoQueue* (maxsize=0)
+    构造LIFO队列。
+
+    maxsize：同Queue。
+
+*** class queue. *PriorityQueue* (maxsize=0)
+    构造优先队列。
+
+    maxsize：同Queue。
+
+    最先获取“最小值”，sorted(list(entries))[0]。其中元素典型的模式为元
+    组：(priority_number, data)。
+
+*** exception queue. *Empty*
+    当使用block=False调用get()方法（或get_nowait()），队列对象中没有元
+    素时抛出。
+
+*** exception queue. *Full*
+    当使用block=False调用put()方法（或put_nowait()），队列对象中元素已
+    到达上限时抛出。
+
+** Queue对象
+*** 普通方法
+**** Queue. *qsize* ()
+     返回队列大小近似值。如果qsize()>0，并不能保证再调用get()不会阻塞，
+     如果qsize()<maxsize，并不能保证再调用put()不会阻塞。
+
+**** Queue. *empty* ()
+     如果队列为空则返回True。如果返回True，并不能保证再调用put()不会阻
+     塞，如果为False，并不能保证再调用get()不会阻塞。
+
+**** Queue. *full* ()
+     如果队列中元素个数达到上限则返回True。如果返回True，并不能保证再
+     调用get()不会阻塞，如果返回False，并不能保证再调用put()不会阻塞。
+
+**** Queue. *put* (item,block=True,timeout=None)
+     向队列中添加元素。
+
+     如果可选参数block=True且timeout=None（默认），且队列中元素个数达
+     到上限，则阻塞至队列中有剩余空间。
+
+     如果timeout参数为正数，则阻塞最多该参数指定时长，如果超时后队列中
+     没有剩余空间，则抛出Full错误。
+
+     当block=False时（忽视timeout参数），如果队列中有剩余空间则立即添加，否则抛出Full错误。
+
+**** Queue. *put_nowait* (item)
+     等价于put(item, block=False)
+**** Queue. *get* (block=True,timeout=None)
+     从队列中移除并返回一个元素。
+
+     如果block=True且timeout=None（默认），且队列中没有元素，则阻塞至
+     队列中有元素为止。
+
+     如果timeout参数为正数，则最多阻塞该参数指定时长。如果超时后队列中
+     依然没有元素，则抛出Empty错误。
+
+     当block=False时（忽视timeout参数），如果队列中有元素则立即返回，
+     否则抛出Empty错误。
+
+**** Queue. *get_nowait* ()
+     等价于get(block=False)
+*** 跟踪方法
+    下面两个方法可用来跟踪队列等待任务是否被后台消费线程完全处理。
+
+**** Queue. *task_done* ()
+     用于提示单个队列任务完成。被队列消费线程使用。当使用get()获取并处
+     理完成一个元素后，再调用task_done()表示对当前元素的处理已完成。
+
+     如果当前join()正阻塞，每次调用后都会检查是否调用次数达到队列中元
+     素个数，如果达到则解除锁定。
+
+     如果调用次数超过向队列中添加的元素个数，则抛出ValueError错误。
+
+**** Queue. *join* ()
+     调用后，阻塞直到队列中所有元素都被消费线程获取并处理。
+
+     每当向队列中添加一个元素时，未完成任务数量增加1；当消费线程调用
+     task_done()后，表示从队列中获取元素并完成处理，未完成任务数量减1。
+     当未完成任务数量减小至0时，join()解除锁定。
+
+     #+BEGIN_EXAMPLE python
+       import queue
+       import threading
+
+       q = queue.Queue()
+
+       do_work = print
+       threads = []
+       worker_threads_num = 4
+
+       def worker():
+           while True:
+               item = q.get()
+               if item is None:
+                   break
+               do_work(item)
+               q.task_done()
+
+       for i in range(worker_threads_num):
+           t = threading.Thread(target=worker)
+           t.start()
+           threads.append(t)
+
+       for item in range(10):
+           q.put(item)
+
+       # 阻塞直到所有任务完成
+       q.join()
+       print('所有任务完成')
+
+       # 停止workers
+
+       for i in range(worker_threads_num):
+           q.put(None)
+
+       for t in threads:
+           t.join()
+           pass
+
+       print('主线程结束')
+     #+END_EXAMPLE
+
+** 其他
+   #+BEGIN_QUOTE
+   *另见* ：
+
+   - class multiprocessing.Queue：用于多进程的队列类。
+
+   - collections.deque：使用append()和popleft()方法可实现，无需“锁”的队列。
+
+   #+END_QUOTE
+
 * 支持上面模块服务的底层模块
 ** dummy_threading
 ** _thread
