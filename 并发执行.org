@@ -292,7 +292,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    [[http://www.cszhi.com/20130528/python-threading.html][@cszhi]] ：使用“互斥锁”可保护多个线程访问的公共资源，使各线程不抢夺。
    #+END_QUOTE
 
-   一个原始的lock为一个同步原始，当锁定后，不属于任何一个特点线程。在
+   一个原始的lock为一个同步原始，当锁定后，不属于任何一个特定线程。在
    Python中，此类型为目前最底层的同步原始，由_thread扩展模块直接实
    现。？？？
 
@@ -344,7 +344,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    现，才能释放所有“锁”。
    #+END_QUOTE
 
-   可重入锁，“同步基础（synchronization primitive）”，可被单个线程获取
+   可重入锁，“同步原始（synchronization primitive）”，可被单个线程获取
    多次。使用“拥有者线程”和“递归层级”的概念，以及lock的锁定/解锁状态。
    在锁定状态下，一些线程拥有锁；在解锁状态下，没有线程拥有锁。
 
@@ -577,7 +577,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      停止计时器，取消将执行的函数。仅在等待过程中有效。
 
 ** Barrier对象
-   为多个需互相等待的线程提供同步原始。没个需互相等待的线程中调用
+   为多个需互相等待的线程提供同步原始。每个需互相等待的线程中调用
    wait()方法，阻塞直到调用次数达到指定个数，此时所有线程同步释放。
 
    对于相同数量的线程，Barrier对象可重复使用。
@@ -640,7 +640,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      #+END_EXAMPLE
 
      如果构造器中指定action参数，则所有线程同步释放前其中一个会调用该
-     参数值。如果此调用抛出错误，则Barrier对象被只有损坏状态。
+     参数值。如果此调用抛出错误，则Barrier对象被置于损坏状态。
 
      如果等待时长超过timeout指定时长，则Barrier对象被置于损坏状态。
 
@@ -794,8 +794,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     - spawn：
 
       父进程启动一个全新的Python解释器。子进程仅继承足够运行新进程
-      run()方法的资源。不继承不需要的文件描述符和处理功能。较后面两种
-      方法相当慢。
+      run()方法的资源。不继承不需要的文件描述符和“句柄（handle）”。较
+      后面两种方法相当慢。
 
       Unix和Windows中都可使用，为Windows的默认方法。
 
@@ -1149,7 +1149,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
        当multiprocessing模块初始化后，会使用os.urandom()为主进程赋值随
        机字符串。
 
-       当Process对象创建时，基础父进程的授权键。不过，可通过设置authey
+       当Process对象创建时，继承父进程的授权键。不过，可通过设置authey
        属性更改。
 ****** sentinel ？？？
        数字，表示一个系统处理对象，当进程结束时转变为“准备”状态。
@@ -1272,7 +1272,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
 **** class multiprocessing. *Queue* ([maxsize])
      利用管道和少量互斥锁/信号量实现的进程共享队列。当一个进程开始向队
-     列中添加数据时，会开启一个供给线程，将缓存中的数据对象转义到管道
+     列中添加数据时，会开启一个供给线程，将缓存中的数据对象转移到管道
      中。
 
      当获取/添加超时时，使用queue模块中的queue.Empty/queue.Full抛出错
@@ -1470,7 +1470,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
       timeout：如果缺省，则立即返回；如果为正数，则为对多阻塞秒数；如
       果为None，则一直轮询至有数据可读取为止。
 
-      注意，使用multiprocessing.connect.wait()使多个连接对象同一单次轮
+      注意，使用multiprocessing.connect.wait()使多个连接对象统一单次轮
       询。？？？
 
 ***** send_bytes(buffer[,offset[,size]])
@@ -1528,7 +1528,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      #+END_EXAMPLE
 
      #+BEGIN_QUOTE
-     *警告* ：Connection.recv()方法会自动unpickle接受数据，除非接受消
+     *警告* ：Connection.recv()方法会自动unpickle接受数据，除非接收消
      息来自信任的进程，否则会有安全风险。
 
      所以，如果连接对象不是由Pipe()生成，只能在授权操作后使用recv()和
@@ -1546,39 +1546,411 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      #+END_QUOTE
 
 *** 同步原始
+    不同于多线程程序，多进程程序中一般没必要使用同步原始。
+
+    可使用Managers创建下面的同步原始。
 
 **** class multiprocessing. *Barrier* (parities[,action[,timeout]])
+     克隆自threading.Barrier。
+
 **** class multiprocessing. *BoundedSemaphore* ([value])
+     与threading.BoundedSemaphore唯一的不同：
+
+     acquire()方法的第一个参数为block，而非blocking，与Lock.acquire()
+     一致。
+
+     #+BEGIN_QUOTE
+     *注意* ： 在Mac OS X中，由于系统没有实现sem_getvalue()，所以与
+     multiprocessing.Semaphore没有区别
+     #+END_QUOTE
+
 **** class multiprocessing. *Condition* ([lock])
+     threading.Condition别名。
+
+     lock：如果指定，须为multiprocessing模块中的Lock或Rlock对象。
+
 **** class multiprocessing. *Event*
+     threading.Event的克隆。
 **** class multiprocessing. *Lock*
+     非递归互斥锁对象：类似于threading.Lock。一旦某个线程/进程获取锁后，
+     其他线程/进程尝试获取时会阻塞，直到被释放；任何线程/进程都可释放。
+     除下面这点外，与threading.Lock完全相同：
+
+     multiprocessing.Lock为工厂函数，返回值为使用默认上下文实例化的
+     multiprocessing.synchronize.Lock对象。
+
+     也支持上下文管理器，可用于with语句中。
+
 ***** acquire(block=True,timeout=None)
+      获取锁，阻塞或不阻塞。
+
+      block如果为True（默认）：阻塞直到互斥锁处于非锁定状态，然后锁
+      定互斥锁并返回True。区别于threading.Lock.acquire()的第一个参数
+      “blocking”。
+
+      block如果为False：不阻塞。如果互斥锁当前处于锁定状态，返回False；
+      如果处于非锁定状态，锁定互斥锁并返回True。
+
+      timeout：如果为非负浮点数，则在获取互斥锁前最多阻塞此参数指定时
+      长；如果为负数，则相当于0；如果为None（默认），则无限期等待。而
+      threading.Lock.acquire()中的timeout参数只有为-1时才无限期阻塞。
+
+      如果block参数为False，则忽视此参数。
+
+      如果成功获取互斥锁则返回True，超时则返回False。
+
 ***** release()
+      释放互斥锁。可被任意进程/线程调用，不一定为原获取互斥锁的进程/线
+      程。
+
+      当互斥锁处于非锁定状态时，抛出ValueError错误；而调用
+      threading.Lock.release()时，如果处于非锁定状态，则抛出
+      RuntimeError错误。
+
 **** class multiprocessing. *Rlock*
+     递归互斥锁：类似于threading.Lock。递归互斥锁必须由获取它的进程/线
+     程释放。进程/线程获取递归互斥锁后，同一个进程/线程可再次获取；释
+     放次数需与获取次数相等。
+
+     注意，multiprocessing.Rlock实际上为工厂函数，返回由
+     multiprocessing.synchronize.Rlock使用默认上下文实例化的对象。
+
+     支持上下文管理器，可用于with语句中。
+
 ***** acquire(block=True,timeout=None)
+      获取递归互斥锁，阻塞或非阻塞。
+
+      如果block参数为True：阻塞直到互斥锁处于解锁状态（不被任何进程/线
+      程拥有），除非互斥锁的拥有者为当前进程/线程。当前进程/线程获取互
+      斥锁拥有权（如果还没有拥有权），且互斥锁的递归层级增加1，并返回
+      True。注意，threading.Rlock.acquire()总的第一个参数为“blocking”。
+
+      如果block参数为False：不阻塞。如果互斥锁当前被其他进程/线程拥有，
+      则当前进程/线程不获取拥有权，且递归层级不增加，并返回False。如果
+      互斥锁不被任何进程/线程拥有，则获取拥有权，互斥锁递归层级加一，
+      返回True。
+
+      timeout：与multiprocessing.Lock.acquire()中的timeout参数用法相同。
+
 ***** release()
+      释放互斥锁，将递归层级减一。如果递归层级变为0，则互斥锁不被任何
+      进程/线程拥有，此时如果有进程/线程等待互斥锁，则将所有权转交到其
+      中一个中。如果递归层级依然不为0，则还被当前进程/线程拥有。
+
+      仅可在拥有者进程/线程中调用此方法。不在拥有者进程/线程中调用，或
+      互斥锁处于非锁定状态，抛出AssertionError错误。而
+      threading.Rlock.release()在此情况下抛出RuntimeError错误。
+
 **** class multiprocessing. *Semaphore* ([value])
-*** 共享C类型库
+     类似于threading.Semaphore。
+
+     与threading.Semaphore的区别为，acquire()方法的的第一个参数为block
+     而非blocking，与multiprocessing.Lock.acquire()保存一致。
+
+     #+BEGIN_QUOTE
+     *注意* ： 在Mac OS X中，不支持sem_timedwait，acquire()时如果指定
+     timeout参数，将使用休眠循环模拟。
+     #+END_QUOTE
+
+     #+BEGIN_QUOTE
+     *注意* ： 如果使用Ctrl-C发送SIGINT信号，当主线程由于调用
+     BoundedSemaphore.acquire()、Lock.acquire()、Rlock.acquire()、
+     Semaphore.acquire()、Condition.acquire()和Condition.wait()处于阻
+     塞状态时，则立即抛出KeyboardInterrupt错误。
+
+     而在threading模块中，处于同样情况的阻塞状态下，会忽视SIGINT信号。
+     #+END_QUOTE
+
+     #+BEGIN_QUOTE
+     *注意* ：multiprocessing模块中的一些功能需操作系统上有实现信号量
+     共享。如果没有实现，则取消multiprocessing.synchronize模块，导入时
+     抛出ImportError错误。
+     #+END_QUOTE
+
+*** 共享ctypes对象
+    可使用子进程可继承的共享内容创建共享数据对象。
+
 **** multiprocessing. *Value* (typecode_or_type,*args,lock=True)
+     返回由共享内容分配的ctypes对象。默认情况下，返回值为为同步包装后
+     的对象。返回值本身可使用value属性访问。
+
+     typecode_or_type：决定返回对象类型。可为ctypes中的类型，也可为
+     array模块中的类型字符。
+
+     *args：作为指定类型的值。
+
+     lock：为True时（默认），为同步访问返回对象新生成一个递归互斥锁。
+     如果为multiprocessing.Lock或multiprocess.Rlock，则用于同步访问返
+     回对象；如果为False，则对返回对象的访问不会被互斥锁保护，所以成为
+     “进程不安全”。
+
+     如+=等对对象进行读写的操作不为“原子操作（atomic）”。如：
+
+     #+BEGIN_EXAMPLE python
+       counter.value += 1
+     #+END_EXAMPLE
+
+     不能保证自动修改共享对象的值。
+
+     如果内部的互斥锁为递归形式（默认），可改为：
+
+     #+BEGIN_EXAMPLE python
+       with counter.get_lock():
+            counter.value += 1
+     #+END_EXAMPLE
+
+     再如下例，如果不使用get_lock()，则不能保证执行结果正确（即100）：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Process, Value
+
+       def f(counter):
+           with counter.get_lock():
+               counter.value = 1 + counter.value
+
+       if __name__ == '__main__':
+           counter = Value('i', 0)
+           processes = []
+           for i in range(100):
+               p = Process(target=f, args=(counter,))
+               processes.append(p)
+               p.start()
+
+           for p in processes:
+               p.join()
+
+           print(counter.value)
+     #+END_EXAMPLE
+
+     注意，lock只能使用关键字参数。
+
 **** multiprocessing. *Array* (typecode_or_type,size_or_initializer,*,lock=True)
+     返回共享内存分配的ctypes数组。默认情况下，返回值实际上为同步包装
+     后的数组。
+
+     typecode_or_type：决定返回数组中元素的类型。可为ctypes中的类型，
+     也可为array模块中指定类型的字符。
+
+     size_or_initializer：如果为正整数，表示数组长度，数组中所有元素初
+     始化为0；如果为序列，则用来初始化数组，其长度决定数组长度。
+
+     lock：如果为True（默认），为访问返回对象新创建一个互斥锁（不为递
+     归互斥锁）；如果为Lock或Rlock对象，用于同步访问返回对象；日狗为
+     False，则对返回对象的访问不自动受互斥锁保护，所以成为“进程不安全”。
+
+     注意，lock只能使用关键字参数。
+
+     注意，可利用ctypes.c_char，结合value和raw属性存储和访问字符串。
+
 **** multiprocessing.sharedctypes模块
+     利用multiprocessing.sharedctypes模块，可让共享内存分配数据对象，
+     供子进程继承。
+
 ***** multiprocessing.sharedctypes. *RawArray* (typecode_or_type,size_of_initializer)
+      返回共享内存分配的ctypes数组。
+
+      typecode_or_type：决定返回数组中元素的类型。可为ctypes中的类型，
+      也可为array模块中类型字符。
+
+      size_or_initializer：如果为正整数，则表示数组长度，数组元素初始
+      化为0；如果为序列，则用来初始化数组，长度由序列长度决定。
+
+      注意：在数组送设置和获取元素可能不为“原子操作”。可使用
+      multiprocessing.sharedctypes.Array来保证对元素的访问被使用互斥锁
+      自动同步。
+
 ***** multiprocessing.sharedctypes. *RawValue* (typecode_or_type,*args)
+      返回共享内存分配的ctypes对象。
+
+      typecode_or_type：决定返回对象的类型，可以为ctypes中的类型，也可
+      为array模块中的类型字符。
+
+      *args：作为指定类型返回对象的值。
+
+      注意，设置和获取返回对象的值可能不为原子操作。可使用
+      multiprocessing.sharedctypes.Value来保证访问被互斥锁同步保护。
+
+      注意，ctypes.c_char拥有value和raw属性，可用来存储和获取字符串。
+
 ***** multiprocessing.sharedctypes. *Array* (typecode_or_type,size_if_initializer,*,lock=True)
+      在RawRarry()基础上添加了lock参数，根据lock参数值，对返回对象实现
+      同步包装，而不是仅返回原始的ctype数组。
+
+      lock：如果为True（默认），创建新互斥锁以同步访问返回对象值；如果
+      为Lock或Rlock对象，则用于同步访问返回对象值；如果为False，则对返
+      回对象的返回不受互斥锁保护，所以“进程不安全”。
+
+      lock仅能作为关键字参数使用。
+
 ***** multiprocessing.sharedctypes. *Value* (typecode_or_type,*args,lock=True)
+      在RawValue()基础上添加了lock参数，根据lock参数值，对返回对象实现
+      同步包装。
+
+      lock：如果为True（默认），创建新互斥锁以同步访问返回对象值；如果
+      为Lock或Rlock对象，则用于同步访问返回对象值；如果为False，则对返
+      回对象的返回不受互斥锁保护，所以“进程不安全”。
+
+      lock仅能作为关键字参数使用。
 ***** multiprocessing.sharedctypes. *copy* (obj)
+      复制ctypes对象obj，作为共享内存分配的ctype对象返回。
+
 ***** multiprocessing.sharedctypes. *synchronized* (obj[,lock])
+      返回经进程安全包装后的ctypes对象obj，使用lock参数指定互斥锁同步
+      化访问。
+
+      lock：如果为None（默认），自动创建multiprocessing.Rlock。
+
+      除被包装对象自身的方法外，下面两个方法：
+
+      1. get_obj：返回被包装对象。
+      2. get_lock：返回互斥锁对象。
+
+      注意，访问被包装后的对象，比访问原始ctypes对象慢很多。
+
+      支持with上下文管理器。
+
 **** 总结
 
-*** 管理器
-**** 类和方法
-***** multiprocessing. *Manager* ()
+     下表为共享内存分配的ctypes对象，与普通ctypes对象的语法区别。（其
+     中MyStruct为ctypes.Structure的子类）：
+
+     | ctypes           | 使用ctype类型的共享ctypes | 使用array模块类型代码的共享ctypes |
+     |------------------+---------------------------+-----------------------------------|
+     | c_double(2.4)    | RawValue(c_double,2.4)    | RawValue('d', 2.4)                |
+     | MyStruct(4,6)    | RawValue(MyStruct, 4,6)   |                                   |
+     | (c_short*7)()    | RawArray(c_short,7)       | RawArray('h',7)                   |
+     | (c_int*3)(9,2,8) | RawArray(c_int,(9,2,8))   | RawArray('i',(9,2,8))             |
+
+     下列中利用子进程修改多个ctypes对象：
+
+     #+BEGIN_EXAMPLE python
+       from ctypes import Structure, c_double
+       from multiprocessing import Lock, Process
+       from multiprocessing.sharedctypes import Array, Value
+
+       class Point(Structure):
+           _fields_ = [('x', c_double), ('y', c_double)]
+
+       def modify(n, x, s, A):
+           with n.get_lock():
+               n.value += 2
+               x.value += 2
+               s.value = s.value.upper()
+               for a in A:
+                   a.x += 2
+                   a.y += 2
+
+       if __name__ == '__main__':
+           lock = Lock()
+           n = Value('i', 2)
+
+           x = Value(c_double, 2.0, lock=lock)
+           s = Array('c', b'hello world', lock=lock)
+           A = Array(Point, [(1.875, -6.25), (-5.75, 2.0), (2.375, 9.5)], lock=lock)
+
+           processes = []
+           for i in range(1000):
+               p = Process(target=modify, args=(n, x, s, A))
+               processes.append(p)
+               p.start()
+
+           for p in processes:
+               p.join()
+
+           print(n.value)
+           print(x.value)
+           print(s.value)
+           print([(a.x, a.y) for a in A])
+     #+END_EXAMPLE
+
+     输出结果为：
+
+     #+BEGIN_EXAMPLE python
+       2002
+       2002.0
+       b'HELLO WORLD'
+       [(2001.875, 1993.75), (1994.25, 2002.0), (2002.375, 2009.5)]
+     #+END_EXAMPLE
+
+*** “管理器（Managers）”
+    使用管理器可实现不同进程间共享数据，包括通过网络在不同主机间共享数
+    据。一个管理器对象会控制一个服务器进程，用于管理共享数据对象。其他
+    进程可通过代理访问这些共享数据。
+
+**** multiprocessing. *Manager* ()
+     返回一个已启动的SyncManager对象，可用于进程间共享数据。返回的管理
+     器对象对应有一个已开启的子进程，并拥有创建共享数据对象和返回对象
+     代理的方法。
+
+     管理器进程会在垃圾回收时，或父进程退出时关闭。
+
+**** multiprocessing.managers模块
+     所有的管理器类都定义在multiprocessing.managers模块中。
+
 ***** multiprocessing.managers. *BaseManager* ([address[,authkey]])
+      创建BaseManager对象。
+
+      一旦创建，需调用start()，或get_server().server_forever()保证管理
+      器对象启动管理器进程。
+
+      address：管理器进程对象监听地址。如果为None，则可监听任意地址。
+
+      authkey：授权键，用于检查访问服务进程是否合法。如果为None，则使
+      用current_process().authkey。如果指定，须为bytes对象。
+
 ****** start([initializer[,initagrs]])
+       为启动管理器启动一个子进程。
+
+       initializer：如果不为None，则子进程启动时会调用
+       initializer(*initargs)。
+
 ****** get_server()
+       返回表示管理器对象控制的实际Server对象。Server对象支持
+       server_forever()方法，且有address属性。
+
+       #+BEGIN_EXAMPLE python
+         >>> from multiprocessing.managers import BaseManager
+         >>> manager = BaseManager(address=('', 50000), authkey=b'abc')
+         >>> server = manager.get_server()
+         >>> server.address
+         ('0.0.0.0', 50000)
+         >>> server.serve_forever()
+       #+END_EXAMPLE
+
 ****** connect()
+       将本地管理器对象与远程管理器进程连接：
+
+       #+BEGIN_EXAMPLE python
+         >>> from multiprocessing.managers import BaseManager
+         >>> manager = BaseManager(address=('127.0.0.1', 50000), authkey=b'abc')
+         >>> manager.connect()
+       #+END_EXAMPLE
+
+       #+BEGIN_QUOTE
+       *注意* ： 需在指定地址上有远程管理器服务运行，否则抛出
+       ConnectionRefusedError错误。
+       #+END_QUOTE
+
 ****** shutdown()
+       停止被管理器使用的进程。只对使用start()方法启动的服务器进程有效。
+
+       可多次调用。
+
 ****** register(typeid[,callable[,proxytype[,exposed[,method_to_typeid[,create_method]]]]])
+       类方法，用于在管理器类上注册数据类型或可调用对象。
+
+       typeid：
+
+       callable：
+
+       proxytype：
+
+       exposed：
+
+       method_to_typeid：
+
+       create_method：
+
 ****** address
 ***** multiprocessing.managers. *SyncManager*
 ****** Barrier(parties[,action[,timeout]])
@@ -1608,11 +1980,40 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 ***** __str__()
 **** 清空
 *** 进程“池”
-
+**** class multiprocessing.pool. *Pool* ([processes[,initilizer[,initagrs[,maxtasksperchild[,context]]]]])
+***** apply(func[,args[,kwds]])
+***** apply_async(func[,args[,kwds[,callbacks[,error_callback]]]])
+***** map(func,iterable[,chunksize])
+***** map_async(func,iterable[,chunksize[,callback[,error_callback]]])
+***** imap(func,iterable[,chunksize])
+***** imap_unordered(func,iterable[,chunksize])
+***** starmap(func,iterable[,chunksize])
+***** starmap_async(func,iterable[,chunksize[,error_back]])
+***** close()
+***** terminate()
+***** join()
+**** class multiprocessing.pool. *AsyncResult*
+***** get([timeout])
+***** wait([timeout])
+***** ready()
+***** successful()
+**** 用法举例
 *** 监听器和客户端
+**** multiprocessing.connection. *deliver_challenger* (connection,authkey)
+**** multiprocessing.connection. *answer_challenge* (connection,authkey)
+**** multiprocessing.connection. *Client* (address[,family[,authenticate[,authkey]]])
+**** multiprocessing.connection. *Listener* ([address[,family[,backlog[,authenticate[,authkey]]]]])
+***** accept()
+***** close()
+***** address
+***** last_accepted
+**** multiprocessing.connection. *wait* (object_list,timeout=None)
+**** 举例
 **** 地址格式
 *** 授权键（Authentication keys）
 *** Logging
+**** multiprocessing. *get_logger* ()
+**** multiprocessing. *log_to_stderr* ()
 *** multiprocessing.dummy模块
 ** 编程手册
 *** 所有启动方法
@@ -1736,8 +2137,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     不使用本函数的STDIN参数。
 
     如果CHECK参数为true，且子进程返回码（exit code）不为0，则抛出
-    CalledProcessError错误。如果捕获的stdout和stderr，从抛出Exception
-    的属性可获取本函数参数，以及退出码等信息。
+    CalledProcessError错误。如果捕获stdout和stderr，从抛出Exception的
+    属性可获取本函数参数，以及退出码等信息。
 
     举例：
 
@@ -1876,13 +2277,13 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     为支持不同的使用场景，Popen构造器和run()函数使用大量可选参数。大多
     数情况下，许多参数可省略使用默认值，常用的参数如下：
 
-**** ARGS
+**** args
      执行命令，可为字符，也可为命令和参数组成的序列（如链表）。首选序
      列，这样可方便处理命令参数的转义和添加引号（如允许命令参数为有空
      格的字符串）。如果为单个字符串，要么SHELL参数需为True，要么执行命
      令不得带任何参数。
 
-**** STDIN、STDOUT和STDERR
+**** stdin、stdout和stderr
      表示命令执行的标准输入流、输出流和错误流定向方式。可选值为
      subprocess.PIPE、subprocess.DEVNULL、已存在的文件描述符（正数）、
      已存在的文件对象或None。PIPE表示会为子进程打开一个管道。DEVNULL表
@@ -1890,7 +2291,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      子进程文件处理继承于父进程。此外，STDERR可设置为subprocess.STDOUT，
      将标准错误流重定向到标准输出流。
 
-**** UNIVERSAL_NEWLINES
+**** universal_newlines
      如果UNIVERSAL_NEWLINES为False，则stdin、stdout和stderr都使用二进
      制模式，不会自动转换换行符。
 
@@ -1904,7 +2305,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
      和Popen.stderr不会的换行符属性。
      #+END_QUOTE
 
-**** SHELL
+**** shell
      当SHELL属性为，命令会在shell环境中执行。即可使用shell本身的特性，
      如管道、文件名通配符、环境变量扩张、家目录"~"扩张等特性。不过，
      Python已提供类似shell的特性，如glob、fnmath、os.path.expanduser()
@@ -2056,11 +2457,12 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
    Popen实例有以下方法和属性：
 
 *** Pope. *poll* ()
-    检查子进程是否终止。设置和返回returncode属性。？？？
+    轮询检查子进程是否终止。设置和返回returncode属性。？？？
 
     #+BEGIN_SRC python :session
       from subprocess import Popen
       with Popen(['ls']) as proc:
+          proc.communicate()
           print(proc.poll())
           proc.kill()
     #+END_SRC
@@ -2316,7 +2718,6 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 ** 遗留Shell激活函数 （存在于2.x中，可能不安全，待续）
 ** 注意点 （待续）
 *** 在Windows中将参数序列转换为字符串
-
 * sched
 * queue - 同步队列类
   queue模块实现了多生产者和多消费者队列。当多个线程需安全交换信息时尤
