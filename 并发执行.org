@@ -1874,8 +1874,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
 *** “管理器（Managers）”
     使用管理器可实现不同进程间共享数据，包括通过网络在不同主机间共享数
-    据。一个管理器对象会控制一个服务器进程，用于管理共享数据对象。其他
-    进程可通过代理访问这些共享数据。
+    据。一个管理器对象控制一个服务器进程，用于管理共享数据对象。其他进
+    程可通过代理访问这些共享数据。
 
 **** multiprocessing. *Manager* ()
      返回一个已启动的SyncManager对象，可用于进程间共享数据。返回的管理
@@ -1897,6 +1897,9 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
       authkey：授权键，用于检查访问服务进程是否合法。如果为None，则使
       用current_process().authkey。如果指定，须为bytes对象。
+
+      支持with上下文管理器，__enter__()开启服务器进程（如果为开启），
+      返回管理器对象，__exit__()调用shutdown()方法。
 
 ****** start([initializer[,initagrs]])
        为启动管理器启动一个子进程。
@@ -1927,7 +1930,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
        #+END_EXAMPLE
 
        #+BEGIN_QUOTE
-       *注意* ： 需在指定地址上有远程管理器服务运行，否则抛出
+       *注意* ： 需在指定地址上有远程管理器对象服务运行，否则抛出
        ConnectionRefusedError错误。
        #+END_QUOTE
 
@@ -1939,167 +1942,1232 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 ****** register(typeid[,callable[,proxytype[,exposed[,method_to_typeid[,create_method]]]]])
        类方法，用于在管理器类上注册数据类型或可调用对象。
 
-       typeid：
+       typeid：“类型识别符”，用于识别共享数据对象的类型，须为字符串。
 
-       callable：
+       callable：可调用对象，用于创建typeid识别符对应的对象。如果管理
+       器对象用于使用connect()方法连接服务器对象，或create_method参数
+       为False，则可缺省。
 
-       proxytype：
+       proxytype：BaseProxy子类，用于为共享数据对象创建与typeid对应的
+       代理。如果为None，则自动创建代理类。
 
-       exposed：
+       exposed：指定允许使用BaseProxy._callmethod()访问的typeid指定对
+       象的方法。如果为None，且proxytype._exposed_存在，则使用
+       proxytype._exposed_。如果不指定，则可访问共享对象的所有“公共方
+       法（任何具有__call__()方法的属性，且不以“_”开头）”。
 
-       method_to_typeid：
+       method_to_typeid：指定暴露方法（返回代理对象）返回值的类型。为
+       名称映射typeid字符串。如果method_to_typeid为None，且
+       proxytype._method_to_typeid_存在，则使用之。无关方法名不存在于此映
+       射的key中，或映射为None，则方法返回的对象被值复制。？？？
 
-       create_method：
+       create_method：决定是否创建typeid对应的方法，用于告知服务器进程
+       创建新共享对象，并返回其代理。默认为True。
 
 ****** address
+       属性，管理器对象的地址。
+
 ***** multiprocessing.managers. *SyncManager*
+      BaseManager子类，用于同步化进程。此类的实例为
+      multiprocessing.Manager()的返回值。
+
+      且支持创建共享链表和字典。
+
 ****** Barrier(parties[,action[,timeout]])
+       创建共享threading.Barrier对象，并返回其代理。
+
 ****** BoundedSemaphore([value])
+       创建共享threading.BoundedSemaphore对象，并返回其代理。
+
 ****** Condition([lock])
+       创建共享threading.Condition对象，并返回其代理。
+
+       lock：如果指定，则须为threading.Lock或threading.Rlock对象。
+
 ****** Event()
+       创建共享threading.Event对象，并返回其代理。
+
 ****** Lock()
+       创建共享threading.Lock对象，并返回其代理。
+
 ****** Namespace()
+       创建共享multiprocessing.managers.Namespace对象，并返回其代理。
+
 ****** Queue([maxsize])
+       创建共享queue.Queue对象，并返回其代理。
+
 ****** Rlock()
+       创建共享threading.Rlock对象，并返回其代理。
+
 ****** Semaphore([value])
+       创建共享threading.Semaphore对象，并返回其代理。
+
 ****** Array(typecode,sequence)
+       创建数组，并返回其代理。
 ****** Value(typecode,value)
+       创建具有可写属性“value”的对象，并返回其代理。
+
 ****** dict()
 ****** dict(mapping)
 ****** dict(sequence)
+       创建共享dict对象，并返回其代理。
 ****** list()
 ****** list(sequence)
+       创建共享list对象，并返回其代理。
+
+       #+BEGIN_QUOTE
+       *注意* ：如果修改字典中mutable类型键值对，或链表中mutable类型的
+       元素，不会通过管理器对象向上传播，因为代理不可能知晓其值何时会
+       改变。如需修改这些值，可通过重新赋值的方式：
+
+       #+BEGIN_EXAMPLE python
+         # 创建代理链表，并添加mutable对象（字典）
+         lproxy = manager.list()
+         lproxy.append({})
+
+         # 修改该字典
+         d = lproxy[0]
+         d['a'] = 1
+         d['b'] = 2
+
+         # 此时，对d的修改并没同步
+         # 但可重新赋值改变代理对象
+         lproxy[0] = d
+       #+END_EXAMPLE
+
+       #+END_QUOTE
+
 ***** multiprocessing.managers. *Namespace*
+      可在SyncManager上注册的类型。
+
+      命名空间对象没有公共方法，但有可写属性。使用print打印会显示所有
+      属性值得。
+
+      但是，当对命名空间对象使用代理时，以"_"开头的属性会成为代理对象
+      的属性，而非被代理对象的属性：
+
+      #+BEGIN_EXAMPLE python
+        >>> manager = multiprocessing.Manager()
+        >>> Global = manager.Namespace()
+        >>> Global.x = 10
+        >>> Global.y = 'hello'
+        >>> Global._z = 12.3
+        >>> print(Global)
+        Namespace(x=10, y='hello')
+      #+END_EXAMPLE
+
 **** 定制管理器
+     创建自己的管理器对象时，可创建BaseManager的子类，并使用类方法
+     register()注册新的类型或可调用对象，比如：
+
+     #+BEGIN_SRC python :session
+       from multiprocessing.managers import BaseManager
+
+       class MathsClass:
+           def add(self, x, y): return x + y
+           def mul(self, x, y): return x * y
+
+       class MyManager(BaseManager):
+           pass
+
+       MyManager.register('Maths', MathsClass)
+
+       if __name__ == '__main__':
+           with MyManager() as manager:
+               maths = manager.Maths()
+               print(maths.add(4, 3))
+               print(maths.mul(4, 3))
+     #+END_SRC
+
+     #+RESULTS:
+     #+BEGIN_SRC org
+     - >>> >>> ... ... ... >>> >>> ... ... >>> >>> >>> >>> ... ... ... ... ... 7
+     - 12
+     #+END_SRC
+
 **** 使用远程管理器
+     可在一个主机上允许管理器服务器，然后在其他主机上创建客户端进行连
+     接（假定防火墙允许）。
+
+     运行下面命令为单个共享队列创建服务进程，远程客户端可访问：
+
+     #+BEGIN_EXAMPLE python
+       import queue
+       from multiprocessing.managers import BaseManager
+
+       queue = queue.Queue()
+
+       class QueueManager(BaseManager):
+           pass
+
+       QueueManager.register('get_queue', callable=lambda: queue)
+       m = QueueManager(address=('', 50000), authkey=b'abc')
+       s = m.get_server()
+       s.serve_forever()
+     #+END_EXAMPLE
+
+     一个客户端访问管理器服务器并向队列中添加数据：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing.managers import BaseManager
+
+       class QueueManager(BaseManager):
+           pass
+
+       m = QueueManager(address=('localhost', 50000), authkey=b'abc')
+       QueueManager.register('get_queue')
+
+       m.connect()
+       queue = m.get_queue()
+       queue.put('hello')
+     #+END_EXAMPLE
+
+     另一个客户端从队列中获取数据：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing.managers import BaseManager
+
+       class QueueManager(BaseManager):
+           pass
+
+       QueueManager.register('get_queue')
+       m = QueueManager(address=('localhost', 50000), authkey=b'abc')
+       m.connect()
+       queue = m.get_queue()
+       print(queue.get())
+     #+END_EXAMPLE
+
+     输出结果为：
+
+     #+BEGIN_EXAMPLE python
+       hello
+     #+END_EXAMPLE
+
 *** Proxy对象
+    代理对象为引用可能存在于多个进程中对象的对象。共享对象被称为代理对
+    象的被引用对象。多个代理对象可能引用同一个共享对象。
+
+    代理对象具有激活被引用对象方法的方法（可能不是被代理对象的全部方
+    法）。通畅情况下，可如使用被引用对象一样使用代理对象：
+
+    #+BEGIN_EXAMPLE python
+      >>> from multiprocessing import Manager
+      >>> manager = Manager()
+      >>> l = manager.list([i*i for i in range(10)])
+      >>> print(l)
+      [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+      >>> print(repr(l))
+      <ListProxy object, typeid 'list' at 0x7f4ebe74cdd8>
+      >>> l[4]
+      16
+      >>> l[2:5]
+      [4, 9, 16]
+    #+END_EXAMPLE
+
+    如上例所示，对代理对象调用str()方法返回表示被代理对象的字符串，而
+    调用repr()方法则返回表示代理对象本身的字符串。
+
+    代理对象重要的特征为picklable，从而可在进程中传递。但是，如果如果
+    代理对象被发送到管理器的进程，则unpickle时会生成被代理对象本身。如：
+
+    #+BEGIN_EXAMPLE python
+      >>> a = manager.list()
+      >>> b = manager.list()
+      >>> a.append(b) # 此时代理对象a含被代理对象b
+      >>> print(a, b)
+      [[]] []
+      >>> b.append('hello')
+      >>> print(a, b)
+      [['hello']] ['hello']
+    #+END_EXAMPLE
+
+    #+BEGIN_QUOTE
+    *注意* ： multiprocessing中的代理对象不支持比较：
+
+    #+BEGIN_EXAMPLE python
+      >>> manager.list([1,2,3]) == [1,2,3]
+      False
+    #+END_EXAMPLE
+
+    可通过复制被代理对象实现比较。
+
+    #+END_QUOTE
+
 **** class multiprocessing.managers. *BaseProxy*
+     所有的代理对象都为BaseProxy的子类。
+
 ***** _callmethod(methodname[,args[,kwds]])
+      调用被代理对象的方法，并返回对应返回值。
+
+      假设proxy为obj的代理对象，则：
+
+      #+BEGIN_EXAMPLE python
+        proxy._callmethod(methodname, args, kwds)
+      #+END_EXAMPLE
+
+      在管理器的进程中等价于：
+
+      #+BEGIN_EXAMPLE python
+        getattr(obj, methodname)(*args, **kwds)
+      #+END_EXAMPLE
+
+      返回值为被引用对象方法返回值的副本，或共享对象的新代理——参考
+      BaseManager.register()的method_to_typeid参数。
+
+      如果调用方法时抛出错误，则由_callmethod()重新抛出。如果在管理器
+      进程中抛出其他错误，则转换为RemoteError并被_callmethod()抛出。
+
+      如果methodname没被暴露，也会抛出错误。
+
+      下例演示了_callmehtod的用法：
+
+      #+BEGIN_EXAMPLE python
+        >>> l = manager.list(range(10))
+        >>> l._callmethod('__len__')
+        10
+        >>> l._callmethod('__getitem__', (slice(2, 7),))
+        [2, 3, 4, 5, 6]
+        >>> l._callmethod('__getitem__', (20,))
+        Traceback (most recent call last):
+        ...
+        IndexError: list index out of range
+      #+END_EXAMPLE
+
 ***** _getvalue()
+      返回被引用对象的副本。
+
+      如果被引用对象unpicklable，则抛出错误。
+
 ***** __repr__()
+      返回表示代理对象的字符串。
 ***** __str__()
+      返回表示被引用对象的字符串。
+
 **** 清空
-*** 进程“池”
+     代理对象使用弱引用回调，在垃圾回收时，从拥有被引用对象的管理器进
+     程中将自己撤销。
+
+     如果在管理器进程中没有被任何代理对象引用，则被代理对象被删除。
+
+*** “进程池（Pool）”
+    可通过类Pool创建进程池，将任务分配给进程池的多个进程。
+
 **** class multiprocessing.pool. *Pool* ([processes[,initilizer[,initagrs[,maxtasksperchild[,context]]]]])
+     一个进程池对象控制多个工作进程，可向其中提交任务。支持超时和回调机制异
+     步求结果，以及平行映射实现。
+
+     processes：将使用的工作进程数量，如果为None，则使用os.cpu_count()
+     的返回值。
+
+     initializer：如果不为None，则每个工作进程启动时将调用
+     initializer(*initargs)。
+
+     maxtaskperchild：每个工作进程处理的最多任务数量，如果超出该值，则
+     退出工作进程，创建一个全新的工作进程，进而释放没被使用的资源。
+
+     默认为None，表示所有工作进程存活至进程池执行完毕。
+
+     context：指定用于创建工作进程的上下文。一般情况下，使用
+     multiprocessing.Pool或multiprocessing.pool.Pool创建进程池时都会合
+     理字典设置。
+
+     注意，进程池对象的方法只能在创建该进程池对象的进程中调用。
+
+     #+BEGIN_QUOTE
+     *注意* ：进程池中的所有工作进程会存活至进程池队列执行完毕。可通过
+     maxtasksperchild参数设置一个工作进程最多处理任务的个数，使单位工
+     作进程执行完一定数量任务后释放资源，自动创建新进程。Apache和
+     mod_wsgi就采用了同样实现。
+     #+END_QUOTE
+
+     支持with山下文管理器，__enter__()方法返回进程池对象，__exit__()方
+     法调用terminate()方法。
+
 ***** apply(func[,args[,kwds]])
+      调用fun，使用参数args和关键字参数kwds。阻塞至调用返回结果。func
+      只在进程池的一个工作进程中运行。如果不希望阻塞，可使用
+      apply_async()实现平行运行。
+
 ***** apply_async(func[,args[,kwds[,callbacks[,error_callback]]]])
+      apply()的并行变体。
+
+      callback：如果指定，需为可调用对象，当func调用得出返回值时调用。
+      使用func返回结果作为唯一参数。
+
+      error_callback：如果指定，需为可调用对象，当func调用抛出错误时调
+      用，接受func抛出的错误对象作为唯一参数。
+
+      以上两个回调函数都不应阻塞，否则处理func返回结果的线程会被阻塞。
+
 ***** map(func,iterable[,chunksize])
+      内置函数map()的并行版本，不过只支持单个可迭代对象作为参数。阻塞
+      至调用得出结果。
+
+      此方法将可迭代参数划分为多个数据块，作为单个任务提交给进程池的工
+      作进程。每个数据块的近似大小可使用chunksize参数指定。
+
 ***** map_async(func,iterable[,chunksize[,callback[,error_callback]]])
+      Pool.map()的并行版本。
+
+      chunksize用法与Pool.map()用法相同。
+
+      callback和error_callback用法与Pool.map()用法相同。
 ***** imap(func,iterable[,chunksize])
+      map()的惰性求值版本，即返回值不为链表，而为iterator。且具有
+      next()方法。
+
+      chunksize：用法与map()用法相同，对于元素非常多的参数，较之于默认
+      值1，将此值设置为大型数字可大大提高计算速度。
+
+      对于imap，如果chunksize值为1，则在返回结果上调用next()方法时，可
+      使用next(timeout)，当在指定时长中不能获取返回值时，抛出
+      multiprocessing.TimeoutError错误。
+
 ***** imap_unordered(func,iterable[,chunksize])
+      类似map()，但结果序列中元素的顺序不定。只有单个工作进程操作时，
+      才能保证结果序列中元素顺序。
+
 ***** starmap(func,iterable[,chunksize])
+      类似于map()，不过iterable参数中的元素需为可迭代对象，分解作为
+      func的参数。
+
+      如果iterable为[(1,2), (3,4)]，则结果为[func(1,2), func(3,4)]
+
 ***** starmap_async(func,iterable[,chunksize[,error_back]])
+      starmap()和map_async()的结合体。
+
 ***** close()
+      防止再有任务提交给进程池对象。一旦所有任务完成，所有工作进程都退
+      出。
+
 ***** terminate()
+      无条件终止所有工作进程，不管是否有完成任务。当进程池对象被垃圾回
+      收时，会自动调用terminate()方法。
+
 ***** join()
+      等待所有工作进程退出。需在close()或terminate()方法前调用join()方
+      法。
+
 **** class multiprocessing.pool. *AsyncResult*
+     Pool.apply_async()和Pool.map_async()返回结果类型。
+
 ***** get([timeout])
+      返回已经得到的结果。
+
+      timeout：如果不为None，如果指定秒数内不能获取结果，则抛出
+      multiprocessing.TimeError错误。
+
+      如果使用apply_async()和map_async()计算时抛出错误，则会被get()重
+      新抛出。
+
 ***** wait([timeout])
+      等待直到结果可获取，或timeout指定时长。
+
 ***** ready()
+      返回表示计算是否执行完成的布尔值。
+
 ***** successful()
+      返回表示计算是否执行完成，且没有错误抛出的布尔值。如果还不能获取
+      结果，会抛出AssertionError错误。
+
 **** 用法举例
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Pool
+       import time
+
+       def f(i): return i * i
+
+       if __name__ == '__main__':
+           with Pool(processes=4) as pool:  # 开启4个工作单位进程
+               result = pool.apply_async(f, (10,))  # 在单个进程中异步计算f(10)，
+               print(result.get(timeout=1))        # 除非计算机“相当慢”，打印100
+
+               print(pool.map(f, range(10)))  # 打印[0, 1, 4,..., 81]
+
+               it = pool.imap(f, range(10))
+               print(next(it))         # 打印0
+               print(next(it))         # 打印1
+               print(it.next(timeout=1))  # 除非计算机“相当慢”，打印4
+
+               result = pool.apply_async(time.sleep, (10,))
+               print(result.get(timeout=1))  # 抛出multiprocessing.TimeError错误
+     #+END_EXAMPLE
+
 *** 监听器和客户端
+    一般情况下，进程间的消息传递都是使用队列，或Pipe()返回的Connection
+    对象。
+
+    但是，multiprocessing.connection模块提供了额外的工具，使消息传递更
+    灵活。提供高阶消息传递API，处理套接字，或Windows的命名管道。还支持
+    使用hmac模块进行“摘要式身份验证（digest authentication）”，以及同
+    时轮询多个连接对象。
+
 **** multiprocessing.connection. *deliver_challenger* (connection,authkey)
+     向连接的另一端发送随机生成的消息，等待回应。
+
+     如果回应使用authkey满足摘要消息，则向连接另一端发送欢迎消息。否则
+     抛出AuthenticationError。
+
 **** multiprocessing.connection. *answer_challenge* (connection,authkey)
+     接收消息，使用authey计算摘要消息，然后将摘要发送回去。
+
+     如果不能接收到欢迎消息，抛出AuthenticationError错误。
+
 **** multiprocessing.connection. *Client* (address[,family[,authenticate[,authkey]]])
+     尝试与使用address作为地址监听进程连接，返回连接对象。
+
+     连接的类型由family参数决定，不过一般可省略，因为通常通过address参
+     数自动推断。
+
+     authenticate：如果为True，或authkey为bytes对象，则使用摘要式消息
+     验证。如果指定authkey，则用于消息验证，如果authkey为None，则使用
+     current_process().authkey。如果验证失败，则抛出
+     AuthenticationError错误。
+
 **** multiprocessing.connection. *Listener* ([address[,family[,backlog[,authenticate[,authkey]]]]])
+     对限制性套接字（bound socket）或Windows命名管道的包装，用于“监听”连接。
+
+     address：监听对象限制性套接字或命名管道的地址。
+
+     #+BEGIN_QUOTE
+     *注意* ： 如果地址为“0.0.0.0”，则在Windows中作为连接终端，需使用
+     “127.0.0.1”。
+     #+END_QUOTE
+
+     family：指定套接字或命名管道的类型。可为字符串'AF_INET'（TCP套接
+     字）、'AF_UNIX'（Unix 域套接字）或'AF_PIPE'（Windows命名管道）。
+     其中只有第一个能保证始终有效。如果为None，则通过address值推断。
+     如果address为None，则使用默认值。默认值为最快的类型。
+
+     注意，如果family为'AF_UNIX'，且address参数为None，则套接字会使用
+     tempfile.mkstemp()创建在私有文件夹中。
+
+     如果监听对象使用套接字，则当套接字绑定后，socket.listen()中
+     使用1作为backlog参数值。
+
+     如果authenticate为True（默认为False）或authkey不为None，则使用摘
+     要式验证。
+
+     authykey：如果指定，须为bytes对象，用于摘要验证；如果为None，且
+     authenticate参数为True，则使用current_process().authkey验证；如
+     果authkey为None，且authenticate为False，则不验证。如果验证失败，
+     抛出AuthenticationError错误。
+
+     支持with上下文管理器，__enter__()方法返回监听对象，__exit__()方法
+     调用close()方法。
+
 ***** accept()
+      接受在监听对象限制性套接字或命名管道上的连接，返回Connection对象。
+      如果尝试验证且失败，则抛出AuthenticationError错误。
+
 ***** close()
+      关闭监听对象上的限制性套接字或命名管道。当监听对象被垃圾回收时自
+      动调用，但建议显示调用。
+
 ***** address
+      监听对象使用的地址。
+
 ***** last_accepted
+      上次接受连接的来源地址，如果没有连接则返回None。
+
 **** multiprocessing.connection. *wait* (object_list,timeout=None)
+     等待直到object_list中至少有一个对象准备好。返回object_list中已经
+     准备好的对象组成的链表。
+
+     timeout：直到最多等待秒数的浮点数。如果为None，则无限期等待至有对
+     象准备好为止。负数相当于0。
+
+     不管是Unix，还是Windows中，object_list链表中的对象可为：
+
+     - 可读的Connection对象；
+     - 已连接，且可读的socket.socket对象；或
+     - Process对象的sentinel属性。
+
+     如果可从连接对象或套接字对象，或另一端已经关闭表示已准备好。
+
+     *Unix* ：wait(object_list, timeout)基本上等价于
+     select.select(object_list, [], [], timeout)。不同之处为，如果
+     select.select()被信号中断，抛出错误码为EINTER的OSError错误，而
+     wait()则不会。
+
+     *Windows* ：object_list中的元素须为可写的整数句柄，或有fileno()方
+     法的对象（根据Win32的WiatForMultipleObject()的定义），返回套接字
+     句柄或管道句柄。（注意，套接字和管道句柄都为不可写句柄。）
+
 **** 举例
+
+     创建使用"secret password"验证的监听对象，等待客户端连接并向其发送
+     数据：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing.connection import Listener
+
+       from array import array
+
+       address = ('localhost', 9999) # family被推断为AF_INET
+
+       with Listener(address, authkey=b'secret password') as listener:
+           with listener.accept() as conn:
+               print('connnection accept from', listener.last_accepted)
+               conn.send([2.25, None, 'junk', float])
+               conn.send_bytes(b'hello')
+               conn.send_bytes(array('i', [42, 1729]))
+     #+END_EXAMPLE
+
+     创建客户端，并从服务器接收数据：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing.connection import Client
+       from array import array
+
+       address = ('localhost', 9999)
+
+       with Client(address, authkey=b'password') as conn:
+            print(conn.recv())
+            print(conn.recv_bytes())
+            arr = array('i', [0, 0, 0, 0, 0])
+            print(conn.recv_bytes_into(arr))
+            print(arr)
+     #+END_EXAMPLE
+
+     使用wait()同时等待多个进程的消息：
+
+     #+BEGIN_EXAMPLE python
+       from multiprocessing import Process, Pipe, current_process
+       from multiprocessing.connection import wait
+
+       def foo(w):
+           for i in range(10):
+               w.send((i, current_process().name))
+           w.close()
+
+       if __name__ == '__main__':
+           readers = []
+           for i in range(4):
+               r, w = Pipe(duplex=False)
+               readers.append(r)
+               p = Process(target=foo, args=(w,))
+               p.start()
+
+           while readers:
+               for r in wait(readers):
+                   try:
+                       msg = r.recv()
+                   except EOFError:
+                       readers.remove(r)
+                   else:
+                       print(msg)
+     #+END_EXAMPLE
+
 **** 地址格式
+
+     - AF_INET：以元组(hostname, port)表示的地址，其中hostname为字符串，
+       port为正整数。
+
+     - AF_UNIX：以字符串表示文件系统中的文件名。
+
+     - AF_PIPE：字符串形式，r'\\.\pipe\PipeName'。如果使用Client()连接
+       远程主机上名为ServerName的命名管道，须为
+       r'\\ServerName\pipe\PipeName'。
+
+     注意：任何以双反斜杠开头的地址都被识别为AF_PIPE，而非AF_UNIX。
+
 *** 授权键（Authentication keys）
-*** Logging
+    当使用Connection.recv时，任何接收数据都自动unpickled。但是，
+    unpickle数据如果来自不受信任的源，则存在安全隐患。所以Listener和
+    Client()使用hmac模块进行摘要式验证。
+
+    授权键可被认为是密码：一旦连接建立，两端就进行校验。（如果两端使用
+    相同授权键，不会在连接中传递授权键。）
+
+    如果指定需要验证，且没有提供授权键，则使用
+    current_process().authkey。该值会自动被当前进程中创建的进程基础。
+    即默认情况下，所有多进程程序中的进程搜会使用相同授权键，并可用于连
+    接验证。
+
+    生成授权键最合适的方法是使用os.urandom()
+
+*** Logging ？？？
+    虽然支持一些logging。但是logging包不适用进程共享互斥锁，所以可能
+    （依赖于句柄类型）从不同进程中获取的消息会出现混乱。
+
+**** multiprocessing. *get_logger* ()
+     返回multiprocessing模块使用的logger。如果需要，新建。
+
+     第一次创建logger时，其层级为logging.NOTSET，且无默认处理函数。被
+     发送到此logger的消息不会默认传播到根logger。
+
+     Windows中，子进程只会继承父进程logger的层级——对logger的任何定制不
+     会被继承。
+
+**** multiprocessing. *log_to_stderr* ()
+     执行get_logger，且返回get_logger创建的logger，使
+     用'[%(levelname)s/%(processName)s] %(message)s'添加将输出内容到
+     sys.stderr的处理函数。
+
+     如：
+
+     #+BEGIN_EXAMPLE python
+       >>> import multiprocessing, logging
+       >>> logger = multiprocessing.log_to_stderr()
+       >>> logger.setLevel(logging.INFO)
+       >>> logger.warning('doomed')
+       [WARNING/MainProcess] doomed
+       >>> m = multiprocessing.Manager()
+       [INFO/SyncManager-...] child process calling self.run()
+       [INFO/SyncManager-...] created temp directory /.../pymp-...
+       [INFO/SyncManager-...] manager serving at '/.../pymp-.../listener-...'
+       >>> del m
+       [INFO/MainProcess] sending shutdown message to manager
+       [INFO/SyncManager-...] process shutting down
+       [INFO/SyncManager-...] process exiting with exitcode 0
+     #+END_EXAMPLE
+
 **** multiprocessing. *get_logger* ()
 **** multiprocessing. *log_to_stderr* ()
 *** multiprocessing.dummy模块
+    将threading模块包装为multiprocessing模块API。
+
 ** 编程手册
-*** 所有启动方法
-*** spawn和forkserver启动方法
+   下面为使用multiprocessing模块时需遵守的原则。
+
+*** 针对所有启动方法
+
+    下面的直到适用于所有启动方法。
+
+    - 避免共享状态
+
+      须尽量避免在进程间传递大龄数据。
+
+      尽可能使用队列和管道实现进程间交流，而避免使用底层的同步原始。
+
+    - picklablity
+
+      保证代理对象方法的参数为picklable。
+
+    - 代理对象的线程安全
+
+      除非使用互斥锁保护，不得使用来自多于一个线程的代理对象。
+
+      不同进程使用相同代理对象完全无害。
+
+    - join僵尸进程
+
+      在Unix中，当一个进程执行结束，但没被join，会成为僵尸进程。虽然不
+      会有很多，因为当一个新进场创建时，或调用active_children()时都会
+      自动join所有，且调用执行完毕进程的is_alive()方法时都会join该进程；
+      但是，最好显示join所有开启的进程。
+
+    - 继承优于pickle/unpickle
+
+      当使用spawn和forkserver方法启动进程时，multiprocessing模块中的许
+      多数据类型都需为picklable，以便子进程可使用。但是，应避免使用管
+      道或队列发送共享数据到子进程。应合理组织程序，让子进程需使用的共
+      享数据继承自祖先进程。
+
+    - 避免手动终止子进程
+
+      使用Process.terminate方法停止某个进程时，可能造成当前被使用的共
+      享资源（如互斥锁、信号量、管道和队列）被破坏，或不能被其他进程使
+      用。
+      
+      所有，只有当不再需要任何共享资源时才使用Process.terminate。
+      
+    - 对使用队列的进程合理使用join操作
+
+      要记住，如果一个子进程已经向队列中添加元素，会等待直达所有缓存元
+      素被“供给”线程供给底层管道后才能退出。（子进程可调用
+      Queue.cancel_join_thread方法避免此行为，但不建议使用。）
+
+      意味着，当使用队列时，需保证在join进程前需将所有添加到队列中的元
+      素移除。否则，不能保证向队列添加元素的进程会终止。还需记住，所有
+      非后台进程都会自动join。
+
+      下面为一个会锁死的例子：
+
+      #+BEGIN_EXAMPLE python
+      import multiprocessing as mp
+      import time
+
+      def f(q):
+          q.put('x' * 1000000)
+
+      if __name__ == '__main__':
+          queue = mp.Queue()
+          p = mp.Process(target=f, args=(queue,))
+          p.start()
+          p.join()             # 锁死
+          obj = queue.get()
+      #+END_EXAMPLE
+
+      解决方法是将倒数两行交换位置。
+
+    - 显示传递资源给子进程
+
+      Unix中默认使用fork作为子进程创建方法，可将父进程的共享资源作为全
+      局共享资源。但是，最好的做法还是将共享对象作为子进程构造器的参数
+      传递。
+
+      除可与Windows的spawn启动方法和其他启动方法兼容外，还可保证只要子
+      进程存活，就不会被父进程垃圾回收。
+
+      所以：
+
+      #+BEGIN_EXAMPLE python
+      from multiprocessing import Process, Lock
+
+      def f():
+          ... do something using "lock" ...
+
+      if __name__ == '__main__':
+         lock = Lock()
+         for i in range(10):
+             Process(target=f).start()
+      #+END_EXAMPLE
+
+    可修改为：
+
+    #+BEGIN_EXAMPLE python
+      from multiprocessing import Process, Lock
+
+      def f(l):
+          ... do something using "l" ...
+
+      if __name__ == '__main__':
+         lock = Lock()
+         for i in range(10):
+             Process(target=f, args=(lock, )).start()
+    #+END_EXAMPLE
+
+    - 不要将sys.stdin替换为“类文件对象” ？？？
+
+      起先，在multiprocessing.Process._bootstrap()中无调价调用：
+
+      #+BEGIN_EXAMPLE python
+        os.close(sys.stdin.fileno())
+      #+END_EXAMPLE
+
+      但会在“进程中的进程”存在问题，最后修改为：
+
+      #+BEGIN_EXAMPLE python
+        sys.stdin.close()
+        sys.stdin = open(os.open(os.devnull, os.O_RDONLY), closefd=False)
+      #+END_EXAMPLE
+
+      解决了进程间碰撞，造成无效文件描述符的问题，但也引入了将
+      sys.stdin()替换为无输出缓存类文件对象的危险。如果多个进程对这个
+      类文件对象调用close()方法，会造成相同的数据多次flushed到该类文件
+      对象。
+
+      如果要编写类文件对象来实现缓存，可通过保存PID的方法来确保fork安
+      全，当PID改变是忽略缓存。比如：
+
+      #+BEGIN_EXAMPLE python
+        @property
+        def cache(self):
+            pid = os.getpid()
+            if pid != self._pid:
+               self._pid = pid
+               sefl._cache = []
+            return sefl._cache
+      #+END_EXAMPLE
+
+*** 针对spawn和forkserver启动方法
+    下面为除fork外，另外两个启动方法的限制。
+
+    - 更多picklablity
+
+      保证所有Process.__init__()的参数都为picklable。同样，如果声明
+      Process的子类，要保证调用Process.start()时其实例为picklable。
+
+    - 全局变量
+
+      要记住，如果尝试在子进程中访问全局变量，访问时的全局变量值可能与
+      调用Process.start时的值不同。
+
+      然而，模块乘积的常量不会引发相同问题。
+
+    - 安全导入主模块
+
+      保证主模块可被新的Python解释器导入，不引发如开启新进程之类的副作
+      用。
+
+      比如，使用spawn或forkserver启动方法允许下面代码会引发
+      RuntimeError：
+
+      #+BEGIN_EXAMPLE python
+        from multiprocessing import Process
+
+        def foo(): print('hello')
+
+        p = Process(target=foo)
+        p.start()
+      #+END_EXAMPLE
+
+      应将“接入点”保护在if __name__ == '__main__'语句中：
+
+      #+BEGIN_EXAMPLE python
+        from multiprocessing import Process, freeze_support, set_start_method
+
+        def foo():print('hello')
+
+        if __name__ == '__main__':
+           freeze_support()
+           set_start_method('spawn')
+           p = Process(target=foo)
+           p.start()
+      #+END_EXAMPLE
+
+      可保证新开启的Python解释器安全导入模块，并允许模块的foo()函数。
+
+      如果在主模块中创建进程池或管理器也会有相同限制。
+
 ** 举例
+*** 如何创建和定制管理器和代理对象：
 
-   如果利用队列向多个进程提交任务，并收集处理结果：
+    #+BEGIN_EXAMPLE python
+      from multiprocessing import freeze_support
+      from multiprocessing.managers import BaseManager, BaseProxy
+      import operator
 
-   #+BEGIN_SRC python :eval never
-     import random
-     import time
-     from multiprocessing import Process, Queue, current_process, freeze_support
+      #
+      #
+      #
 
-     #
-     # 工作线程执行函数
-     #
+      class Foo:
+          def f(self):
+              print('调用了Foo.f()')
 
-     def worker(input, output):
-         for func, args in iter(input.get, 'STOP'): # 一直迭代，当队列中不存在元素时阻塞，直到获取“STOP”
-             result = calculate(func, args)
-             output.put(result)
+          def g(self):
+              print('调用了Foo.g()')
 
-     #
-     # 用于计算结果的函数
-     #
+          def _h(self):
+              print('调用了Foo._h()')
 
-     def calculate(func, args):
-         result = func(*args)
-         return '{} 计算得出 {}{} = {}'.format(current_process().name,
-                                           func.__name__, args, result)
+      # 一个简单的生成器函数
 
-     #
-     # 被任务索引的函数
-     #
+      def baz():
+          for i in range(10):
+              yield i * i
 
-     def mul(a, b):
-         time.sleep(0.5 * random.random())
-         return a * b
+      # 生成器对象的代理类型
 
-     def plus(a, b):
-         time.sleep(0.5 * random.random())
-         return a + b
+      class GeneratorProxy(BaseProxy):
+          _exposed_ = ['__next__']
 
-     #
-     #
-     #
+          def __iter__(self):
+              return self
 
-     def test():
-         NUMBER_OF_PROCESSES = 4
-         TASK1 = [(mul, (i, 7)) for i in range(20)]
-         TASK2 = [(plus, (i, 8))for i in range(10)]
+          def __next__(self):
+              return self._callmethod('__next__')
 
-         # 创建队列
-         task_queue = Queue()
-         done_queue = Queue()
+      # 返回operator模块的函数
+      def get_operator_module():
+          return operator
 
-         # 提交任务
-         for task in TASK1:
-             task_queue.put(task)
 
-         # 开启工作进程
-         for i in range(NUMBER_OF_PROCESSES):
-             Process(target=worker, args=(task_queue, done_queue)).start()
+      #
+      #
+      #
 
-         # 获取并打印结果：
-         print('非顺序结果：')
-         for i in range(len(TASK1)):
-             print('\t', done_queue.get())
+      class MyManager(BaseManager):
+          pass
 
-         # 使用put()日安家更多任务
-         for task in TASK2:
-             task_queue.put(task)
 
-         # 显示更多结果
-         print('-' * 10)
-         for i in range(len(TASK2)):
-             print('\t', done_queue.get())
+      # 注册类Foo；使f()和g()可通过代理访问
+      MyManager.register('Foo1', Foo)
 
-         # 告知所有子进程停止工作
-         for i in range(NUMBER_OF_PROCESSES):
-             task_queue.put('STOP')
+      # 注册类Foo；使g()和_h()可通过代理访问
+      MyManager.register('Foo2', Foo, exposed=('g', '_h'))
 
-     if __name__ == '__main__':
-         freeze_support()
-         test()
-   #+END_SRC
+      # 注册生成器函数baz；并使用GeneratorProxy创建代理
+      MyManager.register('baz', baz, proxytype=GeneratorProxy)
+
+      # 注册get_operator_module()函数；让公用函数可通过代理访问
+      MyManager.register('operator', get_operator_module)
+
+      #
+      #
+      #
+
+
+      def test():
+          manager = MyManager()
+          manager.start()
+
+          print('-' * 20)
+          f1 = manager.Foo1()
+          f1.f()
+          f1.g()
+
+          assert not hasattr(f1, '_h')
+          assert sorted(f1._exposed_) == sorted(['f', 'g'])
+
+          print('-' * 20)
+          f2 = manager.Foo2()
+          f2.g()
+          f2._h()
+          assert not hasattr(f2, 'f')
+          assert sorted(f2._exposed_) == sorted(['g', '_h'])
+
+          print('-' * 20)
+          it = manager.baz()
+          for i in it:
+              print('<{}>'.format(i), end=' ')
+          print()
+
+          print('-' * 20)
+
+          op = manager.operator()
+          print('op.add(23, 45) = ', op.add(23, 45))
+          print('op.pow(2, 94) = ', op.pow(2, 94))
+          print('op._exposed_ = ', op._exposed_)
+      #
+      #
+      #
+
+      if __name__ == '__main__':
+          freeze_support()
+          test()
+    #+END_EXAMPLE
+
+*** 使用进程池Pool
+
+    #+BEGIN_EXAMPLE python
+      import multiprocessing
+      import time
+      import random
+      import sys
+
+      #
+      # 测试代码使用的函数
+      #
+
+      def caculate(func, args):
+          result = func(*args)
+          return '{}得出 {}{} = {}'.format(
+              multiprocessing.current_process().name,
+              func.__name__, args, result
+          )
+
+      def caculatestar(args):
+          return caculate(*args)
+
+      def fooz():
+          time.sleep(1 * random.random())
+
+      def mul(a, b):
+          fooz()
+          return a * b
+
+      def plus(a, b):
+          fooz()
+          return a + b
+
+      def f(x):
+          return 1.0 / (x - 5.0)
+
+      def pow3(x):
+          return x ** 3
+
+
+      def noop(x):
+          pass
+
+      #
+      # 测试代码
+      #
+
+
+      def test():
+          PROCESSES = 4
+          print('进程池中使用{}个工作进程'.format(PROCESSES))
+          with multiprocessing.Pool(PROCESSES) as pool:
+              # 开始测试
+
+              TASKS = [(mul, (i, 7)) for i in range(10)] +\
+                      [(plus, (i, 8)) for i in range(10)]
+
+              results = [pool.apply_async(caculate, t) for t in TASKS]
+              imap_it = pool.imap(caculatestar, TASKS)
+              imap_unordered_it = pool.imap_unordered(caculatestar, TASKS)
+
+              print('pool.apply_async()得出的排序结果为：')
+              for r in results:
+                  print('\t', r.get())
+              print()
+
+              print('pool.imap()得出的排序结果为：')
+              for x in imap_it:
+                  print('\t', x)
+              print()
+
+              print('pool.imap_unordered()得出的非排序结果为：')
+              for x in imap_unordered_it:
+                  print('\t', x)
+              print()
+
+              #
+              # 测试错误处理
+              #
+
+              print('测试错误处理')
+
+              try:
+                  print(pool.apply(f, (5,)))
+              except ZeroDivisionError:
+                  print('\t运行pool.apply时抛出ZeroDivisionError错误')
+              else:
+                  raise AssertionError('希望得到ZeroDivisionError')
+
+              try:
+                  print(pool.map(f, list(range(10))))
+              except ZeroDivisionError:
+                  print('\t运行pool.map时抛出ZeroDivisionError错误')
+              else:
+                  raise AssertionError('希望得到zerodivisionerror')
+
+              try:
+                  print(list(pool.imap(f, range(10))))
+              except ZeroDivisionError:
+                  print('\t运行pool.map时抛出ZeroDivisionError错误')
+              else:
+                  raise AssertionError('希望得到zerodivisionerror')
+
+              it = pool.imap(f, list(range(10)))
+              for i in range(10):
+                  try:
+                      x = it.next()
+                  except ZeroDivisionError:
+                      if i == 5:
+                          pass
+                  except StopIteration:
+                      break
+                  else:
+                      if i == 5:
+                          raise AssertionError('希望得到ZerodivisionError')
+
+              assert i == 9
+              print('\t成功从IMapIterator.next()方法中抛出一次ZerodivisionError')
+              print()
+
+              #
+              # 测试超时
+              #
+
+              print('测试ApplyResult.get()超时：', end=' ')
+              res = pool.apply_async(caculate, TASKS[0])
+              while 1:
+                  sys.stdout.flush()
+                  try:
+                      sys.stdout.write('\n\t{}'.format(res.get(0.02)))
+                  except multiprocessing.TimeoutError:
+                      sys.stdout.write('.')
+                  else:
+                      break
+              print()
+              print()
+
+              print('测试IMapIterator.next()超时：', end=' ')
+              it = pool.imap(caculatestar, TASKS)
+              while 1:
+                  sys.stdout.flush()
+                  try:
+                      sys.stdout.write('\n\t{}'.format(it.next(0.02)))
+                  except StopIteration:
+                      break
+                  except multiprocessing.TimeoutError:
+                      sys.stdout.write('.')
+              print()
+              print()
+
+
+      if __name__ == '__main__':
+          multiprocessing.freeze_support()
+          test()
+    #+END_EXAMPLE
+
+*** 如何利用队列向多个进程提交任务，并收集处理结果：
+
+    #+BEGIN_SRC python :eval never
+      import random
+      import time
+      from multiprocessing import Process, Queue, current_process, freeze_support
+
+      #
+      # 工作线程执行函数
+      #
+
+      def worker(input, output):
+          for func, args in iter(input.get, 'STOP'): # 一直迭代，当队列中不存在元素时阻塞，直到获取“STOP”
+              result = calculate(func, args)
+              output.put(result)
+
+      #
+      # 用于计算结果的函数
+      #
+
+      def calculate(func, args):
+          result = func(*args)
+          return '{} 计算得出 {}{} = {}'.format(current_process().name,
+                                            func.__name__, args, result)
+
+      #
+      # 被任务索引的函数
+      #
+
+      def mul(a, b):
+          time.sleep(0.5 * random.random())
+          return a * b
+
+      def plus(a, b):
+          time.sleep(0.5 * random.random())
+          return a + b
+
+      #
+      #
+      #
+
+      def test():
+          NUMBER_OF_PROCESSES = 4
+          TASK1 = [(mul, (i, 7)) for i in range(20)]
+          TASK2 = [(plus, (i, 8))for i in range(10)]
+
+          # 创建队列
+          task_queue = Queue()
+          done_queue = Queue()
+
+          # 提交任务
+          for task in TASK1:
+              task_queue.put(task)
+
+          # 开启工作进程
+          for i in range(NUMBER_OF_PROCESSES):
+              Process(target=worker, args=(task_queue, done_queue)).start()
+
+          # 获取并打印结果：
+          print('非顺序结果：')
+          for i in range(len(TASK1)):
+              print('\t', done_queue.get())
+
+          # 使用put()日安家更多任务
+          for task in TASK2:
+              task_queue.put(task)
+
+          # 显示更多结果
+          print('-' * 10)
+          for i in range(len(TASK2)):
+              print('\t', done_queue.get())
+
+          # 告知所有子进程停止工作
+          for i in range(NUMBER_OF_PROCESSES):
+              task_queue.put('STOP')
+
+      if __name__ == '__main__':
+          freeze_support()
+          test()
+    #+END_SRC
 
 * concurrent包
 * concurrent.future
