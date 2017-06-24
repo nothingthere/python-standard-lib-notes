@@ -3170,7 +3170,183 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     #+END_SRC
 
 * concurrent包
-* concurrent.future
+  目前为止，此包中只有一个模块：
+
+  + concurrent.futures - 发起并发任务
+
+* concurrent.futures - 发起并发任务
+  concurrent.futures模块提供异步执行调用的高阶接口。
+
+  异步执行可利用ThreadPoolExecutor通过线程实现，也可利用
+  ProcessPoolExecutor通过进程实现。两个实现都使用相同接口，用抽象类
+  Executor实现。
+
+** Executor对象
+*** class concurrent.futures. *Executor*
+
+    提供异步执行方法的抽象类。不得直接使用，而是通过具体子类使用。
+
+**** submit(fn,*args,**kwargs)
+     调度可调用对象fn，执行fn(*args, **kwargs)，返回表示执行过程的
+     Future对象。
+
+     #+BEGIN_EXAMPLE python
+       from concurrent.futures import ThreadPoolExecutor
+
+       with ThreadPoolExecutor(max_workers=1) as executor:
+           future = executor.submit(pow, 323, 12345)
+           print(future.result())
+     #+END_EXAMPLE
+
+**** map(func,*iterables,timeout=None,chunksize=1)
+     等价于map(func, *iterables)，不过会异步执行func，且可能将func分配
+     为多次并发调用。
+
+     返回迭代器对象。如果func调用有错误抛出，则当访问迭代器中对应元素
+     时重新抛出。
+
+     timeout：从调用Executor.map()算起，如果在返回迭代器上调
+     用__next__()方法在timeout时长内不能获取，则抛出
+     concurrent.futures.TimeoutError错误。如果不指定或为None，则可无限
+     期等待结果。
+
+     chunksize：指定对数据分段近似大小。当使用ProcessPoolExecutor时，
+     会将待处理数据分段，默认值为1。对应大型序列，将chunksize设置为较
+     大数值可大大提高效率。对于ThreadPoolExecutor，此参数没有任何意义。
+
+**** shutdown(wait=True)
+     向“执行器（executor）”发送信号，指定当当前所有futures完成后释放所
+     有资源。在Executor.submit()和Executor.map()前调用会抛出
+     RuntimeError。
+
+     wait：如果为True（默认），直到所有未完成的futures完成后，且所有资
+     源释放后才返回；如果为False，则立即返回，等待所有为执行完futures
+     执行完成后释放所有资源；不管为False还是True，整个Python程序都会在
+     所有为完成futures执行完成后才退出。
+
+     可使用with上下文管理器避免使用此方法，__exit__会调用此方法，且
+     wait参数默认为True：
+
+     #+BEGIN_EXAMPLE python
+       import shutil
+       with ThreadPoolExecutor(max_workers=4) as e:
+            e.submit(shutil.copy, 'src1.txt', 'dest1.txt')
+            e.submit(shutil.copy, 'src2.txt', 'dest2.txt')
+            e.submit(shutil.copy, 'src3.txt', 'dest3.txt')
+     #+END_EXAMPLE
+
+** ThreadPoolExecutor
+   ThreadPoolExecutor为Executor的子类，使用线程池实现异步调用。
+
+   当与Future对象关联的可调用对象等待另一个Future返回结果时，会造成锁
+   死，如：
+
+   #+BEGIN_EXAMPLE python
+     import time
+     from concurrent.futures import ThreadPoolExecutor
+
+     def wait_on_b():
+         time.sleep(5)
+         print(b.result())           # b永远不会完成，因为正在等待a。
+         return 5
+
+     def wait_on_a():
+         time.sleep(5)
+         print(a.result())           # a永远不会完成，因为正在等待b
+         return 6
+
+     executor = ThreadPoolExecutor(max_workers=2)
+     a = executor.submit(wait_on_a)
+     b = executor.submit(wait_on_b)
+   #+END_EXAMPLE
+
+   和：
+
+   #+BEGIN_EXAMPLE python
+     def wait_on_future():
+         f = executor.submit(pow, 5, 2)
+         # 永远不会完成，因为这是唯一的工作线程，且
+         # 正则执行本函数
+         print(f.result)
+
+     executor = ThreadPoolExecutor(max_workers=1)
+     executor.submit(wait_on_future)
+   #+END_EXAMPLE
+
+*** class concurrent.futures. *ThreadPoolExecutor* (max_workers=None)
+    Executor子类，使用最多max_workers个数的线程组成的线程池实现异步调
+    用。
+
+    max_Workers：如果不指定或为None（默认），则默认个数为计算机处理器
+    个数乘以5，假设ThreadPoolExecutor被用于I/O密集计算，而非CPU密集计
+    算，工作线程数量应该比ProcessPoolExecutor的工作进程数量高。
+
+*** ThreadPoolExecutor举例
+
+    #+BEGIN_EXAMPLE python
+      import concurrent.futures
+      import urllib.request
+
+      URLS = [
+          'http://www.baidu.com',
+          'http://www.bing.com',
+          'http://www.qq.com',
+          'http://www.google.com',
+      ]
+
+      # 访问单个页面，报告页面内容
+      def load_url(url, timeout):
+          print('开始请求页面：', url)
+          with urllib.request.urlopen(url, timeout=timeout) as conn:
+              return conn.read()
+
+      # 使用with上下文管理器，保证线程资源被释放
+      with concurrent.futures.ThreadPoolExecutor(max_workers=len(URLS)) as executor:
+          # 加载操作，标记各个future及其URL
+          future_to_url = {executor.submit(load_url, url, 2): url for url in URLS}
+          for future in concurrent.futures.as_completed(future_to_url.keys()):
+              url = future_to_url[future]
+              try:
+                  data = future.result()
+              except Exception as exc:
+                  print('{!r}抛出错误：{}'.format(url, exc))
+              else:
+                  print('{!r}页面读取了{}个字节'.format(url, len(data)))
+    #+END_EXAMPLE
+
+** ProcessPoolExecuter
+
+*** class concurrent.futures. *ProcessPoolExecutor* (max_workers=None)
+*** ProcessPoolExecutor举例
+** Future对象
+*** class concurrent.futures. *Future*
+**** 普通方法
+***** cancel()
+***** cancelled()
+***** running()
+***** done()
+***** result(timeout=None)
+***** exception(timeout=None)
+***** add_done_callback(fn)
+**** 用于单元测试和Executor实现的方法
+***** set_running_or_notify_cancel()
+***** set_result(result)
+***** set_exception(exception)
+
+** 模块函数
+
+*** class concurrent.futures. *wait* (fs,timeout=None,return_when=ALL_COMPLETED)
+
+*** class concurrent.futures. *as_completed* (fs,timeout=None)
+
+** Exception类
+
+*** exception concurrent.futures. *CancelledError*
+
+*** exception concurrent.futures. *TimeoutError*
+
+*** exception concurrent.futures. *BrokenProcessPool*
+
 * subprocess
   subprocess模块用于产生新进程，连接自己的输出/输入/错误流管道，并获取
   返回码。此模块旨在替换几个旧模块和函数：
@@ -3786,7 +3962,8 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 ** 遗留Shell激活函数 （存在于2.x中，可能不安全，待续）
 ** 注意点 （待续）
 *** 在Windows中将参数序列转换为字符串
-* sched
+* sched - 事件调度
+** scheduler对象
 * queue - 同步队列类
   queue模块实现了多生产者和多消费者队列。当多个线程需安全交换信息时尤
   其有用。Queue类实现了所有必须的互斥锁语义。
