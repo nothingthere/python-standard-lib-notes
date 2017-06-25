@@ -3304,7 +3304,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
       with concurrent.futures.ThreadPoolExecutor(max_workers=len(URLS)) as executor:
           # 加载操作，标记各个future及其URL
           future_to_url = {executor.submit(load_url, url, 2): url for url in URLS}
-          for future in concurrent.futures.as_completed(future_to_url.keys()):
+          for future in concurrent.futures.as_completed(future_to_url):
               url = future_to_url[future]
               try:
                   data = future.result()
@@ -3315,37 +3315,200 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
     #+END_EXAMPLE
 
 ** ProcessPoolExecuter
+   ProcessPoolExecuter为Executor的子类，使用进程池实现异步调用。
+   ProcessPoolExecuter使用multiprocessing模块，所以可避开“全局解释器锁”，
+   但也是只能执行和返回picklable的对象。
+
+   工作子进程需可导入__main__模块，也就意味着ProcessPoolExecuter不能在
+   交互式解释器中运行。
+
+   在向ProcessPoolExecuter提价的任务中调用Executor或Future会造成锁死。
 
 *** class concurrent.futures. *ProcessPoolExecutor* (max_workers=None)
+    Executor的子类，使用数量最多为max_workers的进程组成的进程池实现同
+    步调用。
+
+    max_worker：默认为计算机处理器数量；如果<=0，抛出ValueError错误。
+
+    如果某个工作进程“唐突”终止，会抛出BrokenProcessPool错误。
+
 *** ProcessPoolExecutor举例
+
+    #+BEGIN_EXAMPLE python
+      import concurrent.futures
+      import math
+      import time
+      import functools
+
+      PRIMES = [
+          112272535095293,
+          112582705942171,
+          112272535095293,
+          115280095190773,
+          115797848077099,
+          1099726899285419,
+      ]
+
+      def is_prime(n):
+          if n % 2 == 0:
+              return False
+
+          sqrt_n = int(math.floor(math.sqrt(n)))
+          for i in range(3, sqrt_n + 1, 2):
+              if n % i == 0:
+                  return False
+          return True
+
+      def timeit(fn):
+          @functools.wraps(fn)
+          def foo(*args, **kwds):
+              s_t = time.time()
+              fn(*args, **kwds)
+              print('耗时：{}'.format(time.time() - s_t))
+              print('-' * 20)
+          return foo
+
+      @timeit
+      def main_with_no_concurrent():
+          for num in PRIMES:
+              print('{} 是否为质数：{}'.format(num, is_prime(num)))
+
+      @timeit
+      def main():
+          with concurrent.futures.ProcessPoolExecutor() as executor:
+              for num, prime in zip(PRIMES, executor.map(is_prime, PRIMES)):
+                  print('{} 是否为质数：{}'.format(num, prime))
+
+      if __name__ == '__main__':
+          main_with_no_concurrent()
+          main()
+    #+END_EXAMPLE
+
 ** Future对象
+   由Executor.submit()创建，封装异步调用执行。
+
 *** class concurrent.futures. *Future*
+    封装异步调用执行，由Executor.submit()创建，除测试外不得直接创建。
+
 **** 普通方法
 ***** cancel()
+      取消执行调用。如果当前正在执行，且不能被取消此函数返回False，否
+      则取消执行且返回True。
+
 ***** cancelled()
+      如果成功取消，则返回True。
+
 ***** running()
+      如果正在执行，且不能被取消则返回True。
+
 ***** done()
+      如果被成功取消，或完成执行则返回True。
+
 ***** result(timeout=None)
+      返回执行结果。如果调用还没完成，则此方法等待最多timeout指定秒数。
+      如果在timeout指定时长内还没完成，抛出
+      concurrent.futures.TimeoutError错误。如果不指定timeout参数或为
+      None（默认），则可无限期等待。
+
+      如果执行完成前被取消，调用此方法会抛出CancelledError错误。
+
+      如果子进程中执行调用时抛出错误，会被此方法重新抛出。
+
 ***** exception(timeout=None)
+      返回子进程中执行时抛出的错误。如果还没完成执行，则等待最多
+      timeout指定秒数。如果在timeout指定时长内还没完成执行，则抛出
+      concurrent.futures.TimeoutError错误。如果不指定timeout参数或为
+      None（默认），则可无限期等待。
+
+      如果执行完成前被取消，调用此方法会抛出CancelledError错误。
+
+      如果执行完毕且无错误抛出，则返回None。
+
 ***** add_done_callback(fn)
+      为future对象添加回调函数fn，接受future对象作为唯一参数。在future
+      对象取消后或执行完毕后调用。
+
+      可添加多个回调函数，执行顺序与添加顺序相同，执行环境为添加回调函
+      数所在进程中的一个线程中。如果回调函数抛出Exception子类错误，会
+      被记录并忽视；如果抛出BaseException子类错误，行为还没被定义。
+
+      如果future已经执行完成或被取消，则fn函数立即被调用。
+
 **** 用于单元测试和Executor实现的方法
 ***** set_running_or_notify_cancel()
+      此方法仅可在Future执行前被Executor实现调用，或被单元测试调用。
+
+      如果返回False，则取消Future的执行，如调用Future.cancel()会返回
+      True。任何等待Future完成的线程（如通过wait()或as_completed()）都
+      会被唤醒。
+
+      如果此方法返回True，则不取消Future执行，并将其置于运行状态，如调
+      用Future.running()会返回True。
+
+      此方法仅能调用一次，且不能在Future.set_result()或
+      Future.set_exception()后调用。
+
 ***** set_result(result)
+      将Future的结果设置为result。
+
+      只能用于Executor实现和单元测试。
+
 ***** set_exception(exception)
+      设置Future抛出错误exception。
+
+      只能用于Executor实现和单元测试。
 
 ** 模块函数
-
 *** class concurrent.futures. *wait* (fs,timeout=None,return_when=ALL_COMPLETED)
+    等待fs指定的多个Future实例（可能由不同Executor实例创建）执行完成。
+    返回由2个set元素组成的命名元组。第一个set名为“done”，含所有完成的
+    futures（取消或执行完成）；第二个set名为"not_done"，含所有未完成的
+    futures。
+
+    timeout：指定返回前最多的等待秒数。如果不指定或为None（默认），则
+    可无限期等待。
+
+    #+BEGIN_EXAMPLE python
+      from concurrent.futures import ProcessPoolExecutor, wait
+      import time
+
+      def f():
+          time.sleep(1)
+
+      if __name__ == '__main__':
+          e = ProcessPoolExecutor(max_workers=1)
+          future = e.submit(f)
+          print(wait([future], timeout=0.5))
+    #+END_EXAMPLE
+
+    return_when：指定此函数何时返回，需为下面的模块常量：
+
+    | 常量            | 含义                                            |
+    |-----------------+-------------------------------------------------|
+    | FIRST_COMPLETED | 当任何future完成执行或被取消时返回              |
+    | ALL_COMPLETED   | 当所有future完成执行或被取消时返回              |
+    | FIRST_EXCEPTION | 当任何future因为有错误抛出执行完成时返回，      |
+    |                 | 如果没有任何future抛出错误，相当于ALL_COMPLETED |
 
 *** class concurrent.futures. *as_completed* (fs,timeout=None)
+    返回迭代对象，其__next__方法返回fs（可能由不同Executor实例创建）中
+    完成（执行完成或被取消）的future对象。如果fs中有重复，则只返回其中
+    一个。fs中任何在调用as_completed前就完成的future会被先返回。
+
+    timeout：如果自调用as_completed()方法时算起，对返回对象调
+    用__next__方法不能在timeout指定时长后获取返回值，则抛出
+    concurrent.futures.TimeoutError错误。如果不指定或为None（默认），
+    可无限期等待。
 
 ** Exception类
-
 *** exception concurrent.futures. *CancelledError*
-
+    当future被取消抛出。
 *** exception concurrent.futures. *TimeoutError*
+    当对future对象的操作超过指定时长时抛出。
 
 *** exception concurrent.futures. *BrokenProcessPool*
+    源自RuntimeError，当ProcessPoolExecutor中的工作进程被“唐突”终止
+    （如被外部环境杀死）时抛出。
 
 * subprocess
   subprocess模块用于产生新进程，连接自己的输出/输入/错误流管道，并获取
