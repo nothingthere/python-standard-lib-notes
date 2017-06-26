@@ -4126,7 +4126,117 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 ** 注意点 （待续）
 *** 在Windows中将参数序列转换为字符串
 * sched - 事件调度
+
+  [[https://lz5z.com/Python%25E5%25AE%259A%25E6%2597%25B6%25E4%25BB%25BB%25E5%258A%25A1%25E7%259A%2584%25E5%25AE%259E%25E7%258E%25B0%25E6%2596%25B9%25E5%25BC%258F/][@LeoScript]]
+
+  此模块定义了一个实现通用事件调度的类：scheduler。
+
+** class sched. *scheduler* (timefunc=time.monotonic,delayfun=time.sleep)
+   scheduler类定义了调度事件的通用接口。需两个函数与“外部世界”产生联系：
+
+   - timefunc：无参数，返回数值（表示任何单位的“时间”）。如果Python实
+     现中无time.monotonic，则默认使用time.time。
+   - delayfunc：需1个参数，与timefunc返回值兼容，延迟timefunc返回值指
+     定时长。当每个事件执行完毕后，会使用0作为参数调用一次，使多线程程
+     序中其他线程有机会运行。
+
+   可安全用于多线程程序中。
+
+*** 举例
+
+    如：
+
+    #+BEGIN_EXAMPLE python
+      import sched
+      import time
+      s = sched.scheduler(time.time, time.sleep)
+
+      def print_time(a='defualt'):
+          print('From print_time', time.time(), a)
+
+      def print_some_times():
+          print(time.time())
+          s.enter(10, 1, print_time)
+          s.enter(5, 2, print_time, argument=('positional', ))
+          s.enter(5, 1, print_time, kwargs={'a': 'keyword'})
+          s.run()
+          print(time.time())
+
+      print_some_times()
+    #+END_EXAMPLE
+
+    再如实现类似JavaScript的setInterval功能：
+
+    #+BEGIN_EXAMPLE python
+      import sched
+      import time
+
+      def set_interval(func, interval, *args, **kwds):
+          '''间隔一定时间执行函数
+          func：需执行的函数
+          args：func的位置参数
+          kwds：func的关键字参数
+          interval：间隔时间
+          '''
+
+          s = sched.scheduler(timefunc=time.time, delayfunc=time.sleep)
+
+          def run():
+              func(*args, **kwds)
+              s.enter(interval, 0, run)
+
+          def main():
+              s.enter(0, 0, run)
+              s.run()
+
+          main()
+    #+END_EXAMPLE
+
 ** scheduler对象
+
+   scheduler实例有如下方法和属性：
+
+*** scheduler. *enterabs* (time,priority,action,argument=(),kwargs={})
+    调用一个新事件。
+
+    time：须为数字类型，且与timefunc返回值兼容。如果将多个事件调用为同
+    一时间执行，则优先级（通过priority参数设置）越高的事件先执行。
+
+    事件执行相当于action(*argument, **kwargs)。其中argument为位置参数
+    组成的链表，kwargs为关键字参数组成的字典。
+
+    返回值为事件对象，可用于被cancel()方法取消。
+
+*** scheduler. *enter* (delay,priority,action,argument=(),kwargs={})
+    调度时间使其延迟delay参数指定时长执行。与enterabs()不同，时间为相
+    当时间；其他用法与enterabs()完全相同。
+
+*** scheduler. *cancel* (event)
+    移除队列中的事件event，如果event不在当前事件队列中，抛出ValueError
+    错误。
+
+*** scheduler. *empty* ()
+    返回表示事件队列是否为空的布尔值。
+
+*** scheduler. *run* (blocking=True)
+    运行所有已被调度的事件。使用构造器中delayfunc()等待下一个事件，执
+    行等到的事件，直到所有被调度的事件执行完毕。
+
+    blocking：If blocking is false executes the scheduled events due
+    to expire soonest (if any) and then return the deadline of the
+    next scheduled call in the scheduler (if any).？？？
+
+    action和delayfunc都可抛出错误。此两种情况下，调度器会维持连续状态，
+    并向上传播抛出错误。如果错误由action抛出，则该事件不会在以后调用
+    run()时执行。？？？
+
+    如果某个事件任务运行事件多于可用时长，调度器会在后面执行。不会落下
+    任何事件，调用代码有责任取消不适宜事件。？？？
+
+*** scheduler. *queue*
+    只读属性，按顺序返回即将执行事件组成的链表。每个时间以命名元组形式
+    返回，有域：time、priority、action、argument和kwargs。
+
 * queue - 同步队列类
   queue模块实现了多生产者和多消费者队列。当多个线程需安全交换信息时尤
   其有用。Queue类实现了所有必须的互斥锁语义。
@@ -4276,7 +4386,7 @@ CPU性能还是IO性能，协作多任务还是优先多任务。
 
    #+END_QUOTE
 
-* 支持上面模块服务的底层模块
+* 支持上面模块服务的底层模块（待续）
 ** dummy_threading
 ** _thread
 ** _dummy_thread
