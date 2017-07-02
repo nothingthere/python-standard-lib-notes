@@ -3,6 +3,8 @@
 # Commentary:
 #+TITLE: 进程通讯和网络协议
 
+[[file:~/Desktop/Python/resources/site/docs.python.org/3.5/library/ipc.html][本地页面]]
+
 * socket - 网络基础接口
 ** Socket家族
 *** AF_UNIX
