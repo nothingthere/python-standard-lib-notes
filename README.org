@@ -3,8 +3,6 @@
 # Commentary:
 #+TITLE: Python（3.5.3）标准库学习笔记
 
-12345
-
 * 目录
 - [[file:%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0.org][2.内置函数]]
 - [[file:%E5%86%85%E7%BD%AE%E5%B8%B8%E9%87%8F.org][3.内置常量]]
