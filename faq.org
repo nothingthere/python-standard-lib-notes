@@ -224,3 +224,52 @@
 
    Figure 2: Average timing for every percentage of a 12- to 12-character
    string match
+
+* 如何将Python图形界面打包成exe可执行文件
+
+  #+BEGIN_EXAMPLE sh
+    pip install pyinstaller
+
+    pyinstaller -wF ***.py
+  #+END_EXAMPLE
+
+  -w参数：exe程序不带命令行调试窗口。
+
+  -F参数：打包为当个可执行程序，不依赖**dll文件。
+
+** 可能遇到的问题
+
+   1. 目前pyinstaller支持道python3.5。
+   2. 执行时跑出错误：
+
+      #+BEGIN_QUOTE
+      Pyinstaller won't run. "ImportError: DLL load failed"
+      #+END_QUOTE
+
+      可参考：https://github.com/pyinstaller/pyinstaller/issues/1840
+
+      到：
+      https://www.microsoft.com/zh-cn/download/confirmation.aspx?id=5555
+
+      上下载安装需要组件。
+
+* 安装虚拟机
+
+  1. 安装virtualbox virtualbox-guest*
+  2. 镜像下载：itellyou.cn
+
+     测试Win7（64/32）企业版可用。
+
+  3. 安装镜像
+
+     - 最好一开始多分配一些内存，方便Windows更新。
+
+     - 安装后先选择“Device”，安装“Guest×××”，不然windows软件更新时会失
+       败。
+
+     - 安装python，依赖Service Pack 1，所以需先进行上一步。
+
+     - 安装pyinstaller，如果报错"DLL load failed"，则需安装Microsoft
+       Visual C++ 2010 Redistributable，下载地址：
+
+       https://www.microsoft.com/zh-cn/download/confirmation.aspx?id=5555

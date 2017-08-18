@@ -989,21 +989,21 @@
    #+BEGIN_QUOTE
    pathlib模块提供高阶的路径对象。
    #+END_QUOTE
-   
+
    #+BEGIN_QUOTE
    *注意* ：此模块中的所有函数只能同时使用字符串和bytes对象中的一种作
    为参数，返回值与参数形式相同。
    #+END_QUOTE
-   
+
    #+BEGIN_QUOTE
    *注意* ：不同的系统路径名规范不同，但os.path始终保存与当前操作系统
    兼容。如需在本地使用不同规范的路径模块，可参考（都有相同接口）：
-   
+
    - posixpath： Unix
    - ntpath：Windows
    - macpath：老式MocOS
    #+END_QUOTE
-   
+
 *** os.path. *abspath* (path)
     将将PATH标准化为绝对路径。在绝大多数系统中，等价于
     normpath(join(os.getcwd(), path))。
@@ -1029,12 +1029,13 @@
     #+BEGIN_SRC python :session
       from os.path import basename
       name = '~/data/test.db'
-      print(basename('~/qwd/'))
+      print(basename(name))
+      # print(basename('~/qwd/'))
     #+END_SRC
 
     #+RESULTS:
     #+BEGIN_SRC org
-    - >>>
+    - >>> test.db
     #+END_SRC
 
 *** os.path. *commonpath* (paths)
@@ -3050,20 +3051,20 @@
 *** shutil. *rmtree* (path,ignore_errors=False,onerror=None)
     删除整个文件夹；PATH需为表示文件夹路径的字符串（不能为指向文件夹的
     软链接）。
-    
-    如果IGNORE_ERRORS参数为True，任何删除文件时抛出的错误将被忽视；如
+
+    如果ignore_errors参数为True，任何删除文件时抛出的错误将被忽视；如
     果为False，函数执行过程中所有抛出的错误会添加到一个链表中，最后由
     ONERROR参数（可调用对象处理）。
-    
-    如果提供ONERROR参数，须为接受三个参数的可调用对象：fn、path,
+
+    如果提供onerror参数，须为接受三个参数的可调用对象：fn、path,
     excinfo。其中：
-    
+
     - fn：抛出错误时执行的函数；由系统和Python实现决定。
     - path：传递个fn的路径参数。
     - excinfo：sys.exc_info()返回结果。
-      
+
     ONERROR抛出的结果不被捕获。
-    
+
 **** rmtree. *avoid_symlink_attacks*
 
      表明Python在当前系统中的实现，是否支持防止 [[http://www.freebuf.com/vuls/49641.html][软链接攻击]] 版本的
